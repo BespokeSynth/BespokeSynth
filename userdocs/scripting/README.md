@@ -100,28 +100,28 @@ value = me.get("slider1")
 me.schedule_call(my_function, 1000)  # Call after 1000ms
 ```
 
-### The `bespoke` Object
+### The `bespoke` Module
 
 Access to global BespokeSynth functions.
 
 ```python
-# Get current time
-time = bespoke.get_time()
+# Get current time in measures
+time = bespoke.get_measure_time()  # e.g., 4.75
 
-# Get measure
-measure = bespoke.get_measure()
+# Get measure (integer)
+measure = bespoke.get_measure()  # e.g., 4
 
 # Get tempo
-bpm = bespoke.get_tempo()
+bpm = bespoke.get_tempo()  # e.g., 120.0
 
-# Play note
-bespoke.play_note(60, 100, 0.5)  # pitch, velocity, duration
+# Get scale notes
+scale = bespoke.get_scale_range(4, 8)  # Octave 4, 8 notes
 
-# Set module parameter
-bespoke.set("synth", "volume", 0.8)
+# Convert note name to pitch
+pitch = bespoke.name_to_pitch("C4")  # Returns 60
 
-# Get module parameter
-vol = bespoke.get("synth", "volume")
+# Convert pitch to frequency
+freq = bespoke.pitch_to_freq(60)  # Returns 261.63 Hz
 ```
 
 ### Timing
@@ -133,16 +133,22 @@ Scripts can schedule events and respond to timing.
 def my_function():
     print("Called!")
 
-me.schedule_call(my_function, 1000)  # After 1000ms
+me.schedule_call(1.0/4, "my_function()")  # After 1/4 measure
 
 # Get current time in measures
-measure = bespoke.get_measure()
+measure_time = bespoke.get_measure_time()  # e.g., 4.75
 
-# Get time in seconds
-time = bespoke.get_time()
+# Get current measure (integer)
+measure = bespoke.get_measure()  # e.g., 4
 
 # Get tempo
-bpm = bespoke.get_tempo()
+bpm = bespoke.get_tempo()  # e.g., 120.0
+
+# Get current step for subdivision
+step = bespoke.get_step(16)  # Current 16th note step
+
+# Time until next subdivision
+delay = bespoke.time_until_subdivision(1)  # Time to next downbeat
 ```
 
 ## Common Patterns
@@ -158,7 +164,7 @@ def on_pulse():
     # Play random note from scale
     pitch = random.choice(notes)
     velocity = random.randint(80, 120)
-    bespoke.play_note(pitch, velocity, 0.25)
+    me.play_note(pitch, velocity, 1.0/8)
 ```
 
 ### Parameter Automation
@@ -168,9 +174,9 @@ import math
 
 def on_pulse():
     # Sine wave automation
-    time = bespoke.get_time()
-    value = (math.sin(time) + 1) / 2  # 0 to 1
-    bespoke.set("synth", "filter_cutoff", value)
+    time = bespoke.get_measure_time()
+    value = (math.sin(time * math.pi * 2) + 1) / 2  # 0 to 1
+    me.set("filter~cutoff", value)
 ```
 
 ### Euclidean Rhythm
@@ -195,7 +201,7 @@ pattern = euclidean(16, 5)  # 5 hits in 16 steps
 def on_pulse():
     global step
     if pattern[step]:
-        bespoke.play_note(60, 100, 0.1)
+        me.play_note(60, 100, 1.0/16)
     step = (step + 1) % len(pattern)
 ```
 
@@ -204,10 +210,10 @@ def on_pulse():
 ```python
 def on_note(pitch, velocity):
     # Transpose up an octave
-    bespoke.play_note(pitch + 12, velocity, 0.5)
-    
+    me.play_note(pitch + 12, velocity, 1.0/4)
+
     # Also play original
-    bespoke.play_note(pitch, velocity, 0.5)
+    me.play_note(pitch, velocity, 1.0/4)
 ```
 
 ### Conditional Logic
@@ -218,29 +224,30 @@ count = 0
 def on_pulse():
     global count
     count += 1
-    
+
     # Play every 4th pulse
     if count % 4 == 0:
-        bespoke.play_note(60, 100, 0.25)
+        me.play_note(60, 100, 1.0/8)
 ```
 
 ## Advanced Features
 
-### Sliders
+### Using Sliders
 
-Add custom sliders to script module:
+Control script behavior with sliders:
 
 ```python
-# Define sliders
-me.add_slider("speed", 0.5, 0, 1)
-me.add_slider("pitch", 60, 0, 127)
-
-# Use slider values
+# Access slider values
 def on_pulse():
-    speed = me.get("speed")
-    pitch = int(me.get("pitch"))
-    bespoke.play_note(pitch, 100, speed)
+    speed = me.get("slider1")  # Get slider value
+    pitch = int(me.get("slider2"))
+    me.play_note(pitch, 100, speed)
+
+# Set slider values from script
+me.set("slider1", 0.5)
 ```
+
+**Note:** Add sliders through the script module's UI, not through code.
 
 ### Grid Control
 
@@ -297,21 +304,39 @@ def on_pulse():
     bespoke.play_note(pitch, 100, 0.25)
 ```
 
-## API Reference
+## Documentation
 
-See [API Reference](api-reference.md) for complete documentation of:
-- `me` object methods
-- `bespoke` object methods
-- Module-specific APIs
-- Callback functions
+### [Getting Started Guide](getting-started.md)
+Step-by-step tutorial for writing your first scripts:
+- Creating a script module
+- Understanding callbacks
+- Playing notes
+- Working with variables
+- Common patterns
 
-## Examples
+### [Quick Reference](quick-reference.md)
+Quick reference card for scripting:
+- All callback functions
+- Essential `me` and `bespoke` functions
+- Module API summaries
+- Common patterns
+- Tips and tricks
 
-See [Examples](examples.md) for:
-- Generative music examples
-- MIDI processing examples
-- Automation examples
-- Grid controller examples
+### [API Reference](api-reference.md)
+Complete documentation of all scripting functions:
+- Callback functions (`on_pulse`, `on_note`, etc.)
+- `me` object methods (note output, scheduling, parameters)
+- `bespoke` module (timing, scales, utilities)
+- Module-specific APIs (sequencers, grids, controllers, etc.)
+
+### [Examples](examples.md)
+Practical script examples:
+- Basic examples
+- Generative music
+- MIDI processing
+- Sequencing patterns
+- Parameter automation
+- Grid controller scripts
 - Advanced techniques
 
 ## Tips & Best Practices

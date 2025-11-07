@@ -28,9 +28,8 @@ Welcome to the comprehensive documentation for BespokeSynth - a software modular
 ### Python Scripting
 - **[Scripting Guide](scripting/README.md)** - Python scripting in BespokeSynth
   - [Getting Started with Scripting](scripting/getting-started.md) - Your first script
-  - [API Reference](scripting/api-reference.md) - Complete Python API
+  - [API Reference](scripting/api-reference.md) - Complete Python API documentation
   - [Examples](scripting/examples.md) - Example scripts and patterns
-  - [Module APIs](scripting/module-apis.md) - Module-specific scripting
 
 ### Advanced Topics
 - **[Advanced Usage](advanced/README.md)** - Advanced features and techniques
