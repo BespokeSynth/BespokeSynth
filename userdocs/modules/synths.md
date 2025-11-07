@@ -163,33 +163,6 @@ Generates test signals and waveforms.
 
 **Common uses**: Testing, drones, LFO audio rate
 
-## Additive & Wavetable
-
-### additivesynthmodule
-**Additive synthesis**
-
-Synthesis using multiple sine wave harmonics.
-
-**Key controls**:
-- **harmonics**: Harmonic levels
-- **a/d/s/r**: Envelope
-
-**Sound character**: Organ-like, pure tones
-**CPU usage**: Medium
-
-### wavetable
-**Wavetable synthesis**
-
-Synthesis using wavetables.
-
-**Key controls**:
-- **wavetable**: Wavetable selection
-- **position**: Position in wavetable
-- **a/d/s/r**: Envelope
-
-**Sound character**: Evolving, complex timbres
-**CPU usage**: Medium
-
 ## Specialized Synths
 
 ### beats
@@ -227,56 +200,6 @@ Classic vocoder effect.
 
 **Common uses**: Vocal effects, talking instruments
 
-## Granular
-
-### granulator
-**Granular synthesis**
-
-Granular synthesis and processing.
-
-**Key controls**:
-- **position**: Playback position
-- **grain size**: Grain length
-- **speed**: Playback speed
-- **spacing**: Grain spacing
-- **width**: Stereo width
-
-**Sound character**: Textural, atmospheric, glitchy
-**CPU usage**: High
-
-**Tips**:
-- Great for pads and textures
-- Experiment with grain size
-- Can create rhythmic patterns
-- CPU-intensive
-
-## Modular Components
-
-### envelope
-**Envelope generator**
-
-ADSR envelope for shaping sound.
-
-**Key controls**:
-- **a**: Attack time
-- **d**: Decay time
-- **s**: Sustain level
-- **r**: Release time
-
-**Common uses**: Amplitude shaping, filter modulation
-
-### filter
-**Audio filter**
-
-Filters audio frequencies.
-
-**Key controls**:
-- **type**: Lowpass, highpass, bandpass, notch
-- **freq**: Cutoff frequency
-- **q**: Resonance
-
-**Common uses**: Tone shaping, subtractive synthesis
-
 ## Polyphony
 
 Most synths support polyphony (multiple simultaneous notes).
@@ -309,7 +232,7 @@ drumsequencer → drumplayer → output
 
 ### Textural
 ```
-notesequencer → granulator → reverb → output
+notesequencer → sampler → granulator (effect) → reverb → output
 ```
 
 ### FM Bass
@@ -326,10 +249,11 @@ notesequencer → fmsynth → compressor → output
 - Adjust excitation for brightness
 
 ### Pads
-- Use fmsynth or granulator
+- Use fmsynth or sampler
 - Long attack and release
 - Add reverb
 - Layer multiple synths
+- Use granulator effect for texture
 
 ### Bass
 - Use karplusstrong or fmsynth
@@ -359,10 +283,8 @@ notesequencer → fmsynth → compressor → output
 **Medium CPU synths**:
 - fmsynth
 - sampler
-- wavetable
 
 **High CPU synths**:
-- granulator
 - vocoder
 
 **Tips**:
