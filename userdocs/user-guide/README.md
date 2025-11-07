@@ -88,7 +88,7 @@ BespokeSynth uses four main signal types:
 | **Notes** | 🟠 Orange | MIDI-style note messages | notesequencer, midicontroller |
 | **Audio** | 🔵 Cyan | Audio waveforms | karplusstrong, effectchain |
 | **Pulses** | 🟡 Yellow | Trigger/gate signals | pulser, notecounter |
-| **Modulators** | 🟢 Green | Control voltage (CV) | lfo, envelope |
+| **Modulators** | 🟣 Purple | Control voltage (CV) | lfo, envelope |
 
 ### Typical Signal Flow
 

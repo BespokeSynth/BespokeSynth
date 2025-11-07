@@ -368,8 +368,8 @@ This guide covers common issues and their solutions when using BespokeSynth.
    - Update to latest version
 
 3. **Recover from backup**:
-   - Check for auto-save files in data folder
-   - Look for `.bsk.backup` files
+   - Check for auto-save files in `savestate/autosave/` folder
+   - Look for timestamped `.bskt` files (e.g., `autosave_2024-01-15_14-30-00.bskt`)
 
 ### Save File Corruption
 
@@ -377,8 +377,9 @@ This guide covers common issues and their solutions when using BespokeSynth.
 
 **Solutions**:
 1. **Check backup files**:
-   - BespokeSynth creates backups automatically
-   - Look in save folder for `.backup` files
+   - BespokeSynth creates autosaves automatically
+   - Look in `savestate/autosave/` folder for `.bskt` files
+   - Load the most recent autosave file
 
 2. **Edit save file manually**:
    - Save files are JSON format

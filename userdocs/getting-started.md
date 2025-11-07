@@ -180,7 +180,7 @@ BespokeSynth uses different types of signals:
 - Used for timing and synchronization
 - Example: `pulser → notesequencer`
 
-### Modulation Signals (Green 🟢)
+### Modulation Signals (Purple 🟣)
 - Carry control voltage (CV) for parameter modulation
 - Can be connected to any slider
 - Example: `lfo → filter cutoff`

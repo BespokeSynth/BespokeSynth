@@ -4,7 +4,7 @@ Modules that create control voltage (CV) signals for parameter modulation.
 
 ## Overview
 
-Modulators generate control signals (green cables) that can be connected to any slider to create movement and automation. They're essential for dynamic, evolving sounds.
+Modulators generate control signals (purple cables) that can be connected to any slider to create movement and automation. They're essential for dynamic, evolving sounds.
 
 ## Core Modulators
 

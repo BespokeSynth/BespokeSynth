@@ -33,7 +33,7 @@ BespokeSynth uses different signal types, shown by cable colors:
 | **Notes** | 🟠 Orange | MIDI-style note messages | Instruments, Note Effects | Note Effects, Synths |
 | **Audio** | 🔵 Cyan | Audio waveforms | Synths, Audio Effects | Audio Effects, Output |
 | **Pulses** | 🟡 Yellow | Trigger/gate signals | Pulse modules | Instruments, Pulse modules |
-| **Modulators** | 🟢 Green | Control voltage (CV) | Modulators | Any slider/control |
+| **Modulators** | 🟣 Purple | Control voltage (CV) | Modulators | Any slider/control |
 
 ### Signal Flow Rules
 

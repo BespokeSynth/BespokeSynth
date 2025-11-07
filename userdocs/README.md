@@ -108,7 +108,7 @@ BespokeSynth uses different signal types:
 - 🟠 **Notes** - MIDI-style note messages
 - 🔵 **Audio** - Audio signals
 - 🟡 **Pulses** - Trigger/gate signals
-- 🟢 **Modulators** - Control voltage (CV) signals
+- 🟣 **Modulators** - Control voltage (CV) signals
 
 ## 🤝 Community & Support
 

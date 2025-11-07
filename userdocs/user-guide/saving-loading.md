@@ -97,20 +97,25 @@ BespokeSynth automatically creates backup saves.
 ### How Auto-Save Works
 
 - Saves periodically while you work
-- Creates `.bsk.backup` files
+- Creates timestamped `.bskt` files
 - Doesn't interrupt your workflow
 - Helps recover from crashes
+- Keeps up to 10 most recent autosaves
 
 ### Finding Auto-Save Files
 
 **Location**:
-- Same folder as your save file
-- Named: `yourpatch.bsk.backup`
+- Windows: `Documents/BespokeSynth/data/savestate/autosave/`
+- macOS: `~/Documents/BespokeSynth/data/savestate/autosave/`
+- Linux: `~/BespokeSynth/data/savestate/autosave/`
+
+**Filename format**: `autosave_YYYY-MM-DD_HH-MM-SS.bskt`
 
 **To recover**:
-1. Find `.bsk.backup` file
-2. Rename to `.bsk`
-3. Load normally
+1. Navigate to the autosave folder
+2. Find the most recent autosave file (check timestamp)
+3. Load the `.bskt` file normally (Ctrl/Cmd + L)
+4. Optionally, save it as a `.bsk` file with a new name
 
 ## File Organization
 
@@ -379,7 +384,7 @@ Share your creations with others.
 - Missing required modules/plugins
 
 **Solutions**:
-1. Try loading `.bsk.backup` file
+1. Try loading an autosave file from `savestate/autosave/` folder
 2. Update BespokeSynth to latest version
 3. Check error messages for clues
 4. Ask for help on Discord
