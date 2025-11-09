@@ -102,3 +102,47 @@ To be able to build you will need a few things, depending on your OS
 * On Linux you probably already have everything (gcc, git, etc...), but you will need to install required packages. The full list we
   install on a fresh ubuntu 20 box are listed in the azure-pipelines.yml
     * Some distributions may have slightly different package names like for instance Debian bookworm: You need to replace `alsa` and `alsa-tools` with `alsa-utils`
+
+### Using Go Task for Build Automation
+
+BespokeSynth has a [Go Task](https://taskfile.dev) Taskfile.yml as a cross-platform build automation tool. This makes it easy to configure, build, and run BespokeSynth with a single command.
+
+```sh
+task           # Configure and build BespokeSynth (default)
+task run       # Run the built BespokeSynth executable
+task clean     # Remove build artifacts
+task install   # Install build prerequisites for your platform
+```
+
+Task will automatically detect your platform (Windows, macOS, Linux, or WSL) and use the appropriate build directory and commands.
+
+For more details, see the `Taskfile.yml` in the repository root.
+
+---
+
+### One-Step Build Scripts: ensure_task
+
+For convenience, you can use the provided scripts to automatically install Go Task (if needed) and build BespokeSynth in a single step:
+
+- **Windows:** `ensure_task.bat`
+- **Linux/macOS/WSL:** `ensure_task.sh`
+
+#### Usage
+
+**On Windows (cmd.exe):**
+
+```cmd
+ensure_task.bat [task arguments]
+```
+
+**On Linux/macOS/WSL (bash):**
+
+```sh
+./ensure_task.sh [task arguments]
+```
+
+- If Go Task is not found, the script will attempt to install it using your system's package manager or by downloading a release.
+- Any arguments you provide will be passed directly to `task` (e.g., `run`, `clean`, etc.).
+- By default, running the script with no arguments will perform the default build.
+
+See the script files for more details or to customize the installation logic for your environment.
