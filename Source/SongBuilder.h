@@ -98,6 +98,7 @@ private:
    bool ShowSongSequencer() const { return mUseSequencer; }
    void RefreshSequencerDropdowns();
    void PlaySequence(double time, int startIndex);
+   int GetSequencerMeasure();
 
    enum class ContextMenuItems
    {
@@ -203,6 +204,7 @@ private:
    bool mUseSequencer{ false };
    Checkbox* mUseSequencerCheckbox{ nullptr };
    bool mResetOnSceneChange{ true };
+   bool mLegacyTransportResetBehavior { true };
    bool mActivateFirstSceneOnStop{ true };
    Checkbox* mActivateFirstSceneOnStopCheckbox{ nullptr };
    NoteInterval mChangeQuantizeInterval{ NoteInterval::kInterval_1n };
