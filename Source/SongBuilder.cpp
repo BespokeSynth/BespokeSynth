@@ -347,7 +347,6 @@ void SongBuilder::OnTimeEvent(double time)
 int SongBuilder::GetSequencerMeasure()
 {
    int sequencerMeasure = 0;
-   
    if (mResetOnSceneChange || mLegacyTransportResetBehavior)
    {
       sequencerMeasure = mSequencerStepLength[mSequenceStepIndex];
