@@ -204,7 +204,7 @@ private:
    bool mUseSequencer{ false };
    Checkbox* mUseSequencerCheckbox{ nullptr };
    bool mResetOnSceneChange{ true };
-   bool mLegacyTransportResetBehavior { true };
+   bool mLegacyTransportResetBehavior{ true };
    bool mActivateFirstSceneOnStop{ true };
    Checkbox* mActivateFirstSceneOnStopCheckbox{ nullptr };
    NoteInterval mChangeQuantizeInterval{ NoteInterval::kInterval_1n };
