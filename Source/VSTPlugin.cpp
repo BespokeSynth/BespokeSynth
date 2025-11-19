@@ -687,7 +687,8 @@ void VSTPlugin::Poll()
       mPresetFileUpdateQueued = false;
       if (mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
       {
-         File resourceFile = File(mPresetFilePaths[mPresetFileIndex]);
+         mLastLoadedPresetFilePath = mPresetFilePaths[mPresetFileIndex];
+         File resourceFile = File(mLastLoadedPresetFilePath);
 
          if (!resourceFile.existsAsFile())
          {
@@ -1352,8 +1353,12 @@ void VSTPlugin::RefreshPresetFiles()
    fileList.sort();
    for (const auto& file : fileList)
    {
-      mPresetFileSelector->AddLabel(file.getFileName().toStdString(), (int)mPresetFilePaths.size());
-      mPresetFilePaths.push_back(file.getFullPathName().toStdString());
+      int index = (int)mPresetFilePaths.size();
+      mPresetFileSelector->AddLabel(file.getFileNameWithoutExtension().toStdString(), index);
+      std::string filePath = file.getFullPathName().toStdString();
+      mPresetFilePaths.push_back(filePath);
+      if (filePath == mLastLoadedPresetFilePath)
+         mPresetFileIndex = index;
    }
 }
 
@@ -1460,6 +1465,8 @@ void VSTPlugin::SaveState(FileStreamOut& out)
    }
 
    IDrawableModule::SaveState(out);
+
+   out << mLastLoadedPresetFilePath;
 }
 
 void VSTPlugin::LoadState(FileStreamIn& in, int rev)
@@ -1487,7 +1494,11 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
    if (rev < 3)
       LoadVSTFromSaveData(in, rev);
 
+   if (rev >= 4)
+      in >> mLastLoadedPresetFilePath;
+
    RecreateUIOutputCables();
+   RefreshPresetFiles();
 }
 
 void VSTPlugin::LoadVSTFromSaveData(FileStreamIn& in, int rev)
