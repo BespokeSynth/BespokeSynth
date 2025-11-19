@@ -127,6 +127,11 @@ void LatencyCalculatorSender::LoadLayout(const ofxJSONElement& moduleInfo)
    SetUpFromSaveData();
 }
 
+void LatencyCalculatorSender::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   moduleInfo["receiver"] = mReceiver ? mReceiver->Path() : "";
+}
+
 void LatencyCalculatorSender::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
