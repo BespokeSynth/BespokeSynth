@@ -244,6 +244,11 @@ void ClipLauncher::LoadLayout(const ofxJSONElement& moduleInfo)
    SetUpFromSaveData();
 }
 
+void ClipLauncher::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   moduleInfo["looper"] = mLooper ? mLooper->Path() : "";
+}
+
 void ClipLauncher::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));

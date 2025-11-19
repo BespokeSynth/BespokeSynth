@@ -935,6 +935,11 @@ void LaunchpadKeyboard::LoadLayout(const ofxJSONElement& moduleInfo)
    SetUpFromSaveData();
 }
 
+void LaunchpadKeyboard::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   moduleInfo["chorder"] = mChorder ? mChorder->Path() : "";
+}
+
 void LaunchpadKeyboard::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
