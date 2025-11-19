@@ -69,7 +69,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override;
    int GetBitValue(int);
 
    float mInput{ 0 };
