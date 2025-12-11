@@ -278,6 +278,7 @@
 #include "ModulatorBinaryValue.h"
 #include "VelocityToDuration.h"
 #include "TapTempo.h"
+#include "ZeroCrossRate.h"
 
 #include <juce_core/juce_core.h>
 
@@ -511,6 +512,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(ModulatorBinaryValue, binaryvalue, kModuleCategory_Modulator);
    REGISTER(VelocityToDuration, velocitytoduration, kModuleCategory_Note);
    REGISTER(TapTempo, taptempo, kModuleCategory_Other);
+   REGISTER(ZeroCrossRate, zerocrossrate, kModuleCategory_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

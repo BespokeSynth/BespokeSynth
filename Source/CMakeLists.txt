@@ -779,6 +779,8 @@ target_sources(BespokeSynth PRIVATE
     WhiteKeys.cpp
     WhiteKeys.h
     WindowCloseListener.h
+    ZeroCrossRate.cpp
+    ZeroCrossRate.h
     ofxJSONElement.cpp
     ofxJSONElement.h
     )
