@@ -34,25 +34,14 @@ ZeroCrossRate::ZeroCrossRate()
 : IAudioProcessor(gBufferSize)
 {
    mModulationBuffer = new float[gBufferSize];
+   mZCRBuffer = new bool[ZCR_WINDOW_SIZE];
+   for (int i = 0; i < ZCR_WINDOW_SIZE; i++)
+      mZCRBuffer[i] = false;
 }
 
 void ZeroCrossRate::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-
-   mGainSlider = new FloatSlider(this, "gain", 3, 2, 100, 15, &mGain, 1, 100);
-   mAttackSlider = new FloatSlider(this, "attack", mGainSlider, kAnchor_Below, 100, 15, &mAttack, .01f, 1000);
-   mReleaseSlider = new FloatSlider(this, "release", mAttackSlider, kAnchor_Below, 100, 15, &mRelease, .01f, 1000);
-   mMinSlider = new FloatSlider(this, "min", mReleaseSlider, kAnchor_Below, 100, 15, &mDummyMin, 0, 1);
-   mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
-
-   mGainSlider->SetMode(FloatSlider::kSquare);
-   mAttackSlider->SetMode(FloatSlider::kSquare);
-   mReleaseSlider->SetMode(FloatSlider::kSquare);
-
-   //update mAttackFactor and mReleaseFactor
-   FloatSliderUpdated(mAttackSlider, 0, gTime);
-   FloatSliderUpdated(mReleaseSlider, 0, gTime);
 
    mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCableSource->SetModulatorOwner(this);
@@ -62,32 +51,11 @@ void ZeroCrossRate::CreateUIControls()
 ZeroCrossRate::~ZeroCrossRate()
 {
    delete[] mModulationBuffer;
+   delete[] mZCRBuffer;
 }
 
 void ZeroCrossRate::DrawModule()
 {
-   if (Minimized() || IsVisible() == false)
-      return;
-
-   mGainSlider->Draw();
-   mAttackSlider->Draw();
-   mReleaseSlider->Draw();
-   mMinSlider->Draw();
-   mMaxSlider->Draw();
-
-   ofPushStyle();
-   ofSetColor(0, 255, 0, gModuleDrawAlpha);
-   ofBeginShape();
-   float x, y;
-   float w, h;
-   mGainSlider->GetPosition(x, y, K(local));
-   mGainSlider->GetDimensions(w, h);
-   for (int i = 0; i < gBufferSize; ++i)
-   {
-      ofVertex(ofMap(mModulationBuffer[i], 0, 1, x, x + w, K(clamp)), ofMap(i, 0, gBufferSize, y, y + h), K(clamp));
-   }
-   ofEndShape();
-   ofPopStyle();
 }
 
 void ZeroCrossRate::Process(double time)
@@ -100,18 +68,15 @@ void ZeroCrossRate::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   assert(GetBuffer()->BufferSize());
-   Clear(gWorkBuffer, gBufferSize);
-   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
-      Add(gWorkBuffer, GetBuffer()->GetChannel(ch), gBufferSize);
    for (int i = 0; i < gBufferSize; ++i)
    {
-      float sample = fabsf(gWorkBuffer[i]);
-      if (sample > mVal)
-         mVal = mAttackFactor * (mVal - sample) + sample;
-      else
-         mVal = mReleaseFactor * (mVal - sample) + sample;
-      mModulationBuffer[i] = mVal * mGain;
+      bool sign = GetBuffer()->GetChannel(0)[i] >= 0;
+      bool sign_changed = sign != mLastSign;
+      mZCRCount = mZCRCount + sign_changed - mZCRBuffer[mZCRBufferPosition];
+      mZCRBuffer[mZCRBufferPosition] = sign_changed;
+      mZCRBufferPosition = (mZCRBufferPosition + 1) % ZCR_WINDOW_SIZE;
+      mLastSign = sign;
+      mModulationBuffer[i] = (float)mZCRCount / ZCR_WINDOW_SIZE;
    }
 
    GetBuffer()->Reset();
@@ -125,14 +90,6 @@ void ZeroCrossRate::PostRepatch(PatchCableSource* cableSource, bool fromUserClic
 float ZeroCrossRate::Value(int samplesIn)
 {
    return ofMap(mModulationBuffer[samplesIn], 0, 1, GetMin(), GetMax(), K(clamp));
-}
-
-void ZeroCrossRate::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
-{
-   if (slider == mAttackSlider)
-      mAttackFactor = powf(.01f, 1.0f / (mAttack * gSampleRateMs));
-   if (slider == mReleaseSlider)
-      mReleaseFactor = powf(.01f, 1.0f / (mRelease * gSampleRateMs));
 }
 
 void ZeroCrossRate::SaveLayout(ofxJSONElement& moduleInfo)

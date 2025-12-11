@@ -31,9 +31,11 @@
 #include "Slider.h"
 #include "IModulator.h"
 
+#define ZCR_WINDOW_SIZE 1024
+
 class PatchCableSource;
 
-class ZeroCrossRate : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IModulator
+class ZeroCrossRate : public IAudioProcessor, public IDrawableModule, public IModulator
 {
 public:
    ZeroCrossRate();
@@ -52,12 +54,12 @@ public:
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
+   //IAudioProcessor
+   InputMode GetInputMode() override { return kInputMode_Mono; }
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
-
-   //IFloatSliderListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -73,18 +75,13 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override
    {
-      w = 106;
-      h = 17 * 5 + 2;
+      w = 110;
+      h = 0;
    }
 
-   float mGain{ 1 };
+   bool mLastSign{ true };
+   int mZCRCount{ 0 };
+   int mZCRBufferPosition{ 0 };
    float* mModulationBuffer;
-   FloatSlider* mGainSlider{ nullptr };
-   FloatSlider* mAttackSlider{ nullptr };
-   FloatSlider* mReleaseSlider{ nullptr };
-   float mVal{ 0 };
-   float mAttack{ 10 };
-   float mRelease{ 10 };
-   float mAttackFactor{ .99 };
-   float mReleaseFactor{ .99 };
+   bool* mZCRBuffer;
 };
