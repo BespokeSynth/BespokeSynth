@@ -2181,3 +2181,5 @@ binaryvalue~convert modulated value to binary and send each bit to separate modu
 
 velocitytoduration~use a note's velocity to set its duration
 ~max duration~duration (in measures) corresponding to the maximum velocity value
+
+zerocrossrate~measure the zero-cross rate of input audio
