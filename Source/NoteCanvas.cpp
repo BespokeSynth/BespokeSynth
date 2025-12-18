@@ -409,7 +409,7 @@ bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contr
                   if (mGridKeyboardInterface != nullptr)
                      newPitch = mGridKeyboardInterface->TransposePitchInScale(element->GetPitch(), direction, octaveShift);
                   else
-                     newPitch = element->GetPitch() + direction * (octaveShift ? 12 : 1);
+                     newPitch = element->GetPitch() + direction * (octaveShift ? TheScale->GetPitchesPerOctave() : 1);
                   element->SetPitch(std::clamp(newPitch, 0, 127));
                }
 

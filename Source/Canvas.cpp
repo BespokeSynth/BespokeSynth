@@ -29,6 +29,7 @@
 #include "FileStream.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
+#include "Scale.h"
 #include "Snapshots.h"
 
 Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length, int rows, int cols, CreateCanvasElementFn elementCreator)
@@ -567,7 +568,7 @@ void Canvas::KeyPressed(int key, bool isRepeat)
          int direction = (key == OF_KEY_UP) ? -1 : 1;
 
          if (GetKeyModifiers() == kModifier_Shift)
-            direction *= 12; //octave
+            direction *= TheScale->GetPitchesPerOctave();
 
          for (auto* element : mElements)
          {
