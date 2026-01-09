@@ -72,6 +72,7 @@ void ZeroCrossRate::Process(double time)
    {
       bool sign = GetBuffer()->GetChannel(0)[i] >= 0;
       bool sign_changed = sign != mLastSign;
+      // last sign is stored in a buffer with a moving and wrapping pointer, thus by adding new sign we overwrite the last sign in the buffer
       mZCRCount = mZCRCount + sign_changed - mZCRBuffer[mZCRBufferPosition];
       mZCRBuffer[mZCRBufferPosition] = sign_changed;
       mZCRBufferPosition = (mZCRBufferPosition + 1) % ZCR_WINDOW_SIZE;
@@ -90,50 +91,4 @@ void ZeroCrossRate::PostRepatch(PatchCableSource* cableSource, bool fromUserClic
 float ZeroCrossRate::Value(int samplesIn)
 {
    return ofMap(mModulationBuffer[samplesIn], 0, 1, GetMin(), GetMax(), K(clamp));
-}
-
-void ZeroCrossRate::SaveLayout(ofxJSONElement& moduleInfo)
-{
-}
-
-void ZeroCrossRate::LoadLayout(const ofxJSONElement& moduleInfo)
-{
-   SetUpFromSaveData();
-}
-
-void ZeroCrossRate::SetUpFromSaveData()
-{
-}
-
-void ZeroCrossRate::SaveState(FileStreamOut& out)
-{
-   out << GetModuleSaveStateRev();
-
-   IDrawableModule::SaveState(out);
-}
-
-void ZeroCrossRate::LoadState(FileStreamIn& in, int rev)
-{
-   if (rev < 1)
-   {
-      // Temporary additional cable source
-      mTargetCableSource = new PatchCableSource(this, kConnectionType_Audio);
-      mTargetCableSource->SetModulatorOwner(this);
-      AddPatchCableSource(mTargetCableSource);
-   }
-
-   IDrawableModule::LoadState(in, rev);
-
-   if (rev < 1)
-   {
-      auto target = GetPatchCableSource(1)->GetTarget();
-      if (target != nullptr)
-         GetPatchCableSource()->SetTarget(target);
-      RemovePatchCableSource(GetPatchCableSource(1));
-      mTargetCableSource = GetPatchCableSource();
-   }
-
-   if (ModularSynth::sLoadingFileSaveStateRev < 423)
-      in >> rev;
-   LoadStateValidate(rev <= GetModuleSaveStateRev());
 }

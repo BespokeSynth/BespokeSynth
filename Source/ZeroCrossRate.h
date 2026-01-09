@@ -61,13 +61,6 @@ public:
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
 
-   void SaveLayout(ofxJSONElement& moduleInfo) override;
-   void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   void SetUpFromSaveData() override;
-   void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
-
    bool IsEnabled() const override { return mEnabled; }
 
 private:
