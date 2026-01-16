@@ -237,6 +237,8 @@ target_sources(BespokeSynth PRIVATE
     GroupControl.h
     HelpDisplay.cpp
     HelpDisplay.h
+    HarmonicOscillator.cpp
+    HarmonicOscillator.h
     IAudioEffect.h
     IAudioPoller.h
     IAudioProcessor.cpp
