@@ -43,9 +43,9 @@ void DopplerShift::CreateUIControls()
    mSpeed2Slider = new FloatSlider(this, "source speed", mSpeed1Slider, kAnchor_Below, 140, 15, &mSpeed2, -100, 100);
    mReverseButton = new ClickButton(this, "reverse", mSpeed2Slider, kAnchor_Below);
 
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 }
 
 void DopplerShift::DrawModule()
