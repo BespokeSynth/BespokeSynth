@@ -41,13 +41,15 @@ IModulator::~IModulator()
 
 void IModulator::OnModulatorRepatch()
 {
-   bool wasEmpty = (mTargets[0].mUIControlTarget == nullptr);
+   int targetCount = 0;
+   for (size_t i = 0; i < mTargets.size() && mTargets[i].mSliderTarget != nullptr; i++)
+      targetCount++;
 
    for (size_t i = 0; i < mTargets.size(); ++i)
    {
       IUIControl* newTarget = nullptr;
-      if (mTargetCable != nullptr && i < mTargetCable->GetPatchCables().size())
-         newTarget = dynamic_cast<IUIControl*>(mTargetCable->GetPatchCables()[i]->GetTarget());
+      if (mTargetCableSource != nullptr && i < mTargetCableSource->GetPatchCables().size())
+         newTarget = dynamic_cast<IUIControl*>(mTargetCableSource->GetPatchCables()[i]->GetTarget());
       if (newTarget != mTargets[i].mUIControlTarget)
       {
          if (mTargets[i].mSliderTarget != nullptr && mTargets[i].mSliderTarget->GetModulator() == this)
@@ -79,12 +81,12 @@ void IModulator::OnModulatorRepatch()
             if (mTargets[i].mSliderTarget != nullptr)
             {
                mTargets[i].mSliderTarget->SetModulator(this);
-               if (wasEmpty)
+               if (i == 0 && targetCount <= 1)
                   InitializeRange(mTargets[i].mSliderTarget->GetValue(), mTargets[i].mUIControlTarget->GetModulationRangeMin(), mTargets[i].mUIControlTarget->GetModulationRangeMax(), mTargets[i].mSliderTarget->GetMode());
             }
             else
             {
-               if (wasEmpty)
+               if (targetCount == 0)
                   InitializeRange(mTargets[i].mUIControlTarget->GetValue(), mTargets[i].mUIControlTarget->GetModulationRangeMin(), mTargets[i].mUIControlTarget->GetModulationRangeMax(), FloatSlider::kNormal);
             }
          }
@@ -134,16 +136,16 @@ float IModulator::GetRecentChange() const
 
 void IModulator::OnRemovedFrom(IUIControl* control)
 {
-   if (mTargetCable)
+   if (mTargetCableSource)
    {
-      auto& cables = mTargetCable->GetPatchCables();
+      auto& cables = mTargetCableSource->GetPatchCables();
       for (size_t i = 0; i < mTargets.size(); ++i)
       {
          for (auto& cable : cables)
          {
             if (cable->GetTarget() == control && cable->GetTarget() == mTargets[i].mUIControlTarget)
             {
-               mTargetCable->RemovePatchCable(cable);
+               mTargetCableSource->RemovePatchCable(cable);
                break;
             }
          }

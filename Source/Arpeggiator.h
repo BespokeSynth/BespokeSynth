@@ -108,13 +108,9 @@ private:
    };
    std::vector<ArpNote> mChord;
 
-   float mWidth;
-   float mHeight;
-
    NoteInterval mInterval{ NoteInterval::kInterval_16n };
    int mLastPitch{ -1 };
    int mArpIndex{ -1 };
-   char mArpString[MAX_TEXTENTRY_LENGTH]{};
 
    DropdownList* mIntervalSelector{ nullptr };
    int mArpStep{ 1 };

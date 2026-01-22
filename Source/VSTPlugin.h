@@ -63,8 +63,13 @@ public:
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return false; }
 
+   static const int kMaxJuceMidiStereoChannels = 16;
+
    std::string GetTitleLabel() const override;
    void CreateUIControls() override;
+   void AddExtraOutputCable();
+   void RemoveExtraOutputCable();
+   void RecreateUIOutputCables();
 
    void SetVol(float vol) { mVol = vol; }
 
@@ -98,14 +103,13 @@ public:
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 3; }
+   int GetModuleSaveStateRev() const override { return 4; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
    bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
-   void PreDrawModule() override;
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    void LoadVST(juce::PluginDescription desc);
@@ -130,9 +134,18 @@ private:
    bool mPresetFileUpdateQueued{ false };
    ClickButton* mSavePresetFileButton{ nullptr };
    std::vector<std::string> mPresetFilePaths;
+   std::string mLastLoadedPresetFilePath{};
    ClickButton* mOpenEditorButton{ nullptr };
+   ClickButton* mLoadParameterButton{ nullptr };
    ClickButton* mPanicButton{ nullptr };
+   ClickButton* mAddExtraOutputButton{ nullptr };
+   ClickButton* mRemoveExtraOutputButton{ nullptr };
    std::atomic<bool> mWantsPanic{ false };
+   std::atomic<bool> mWantsAddExtraOutput{ false };
+   std::atomic<bool> mWantsRemoveExtraOutput{ false };
+   std::atomic<bool> mWantLoadParameters{ false };
+   std::atomic<bool> mWantRemoveSlider{ false };
+   std::atomic<int> mWantRemoveSliderIndex{ -1 };
 
    bool mPluginReady{ false };
    std::unique_ptr<juce::AudioProcessor> mPlugin;
@@ -156,6 +169,7 @@ private:
       VSTPlugin* mOwner{ nullptr };
       float mValue{ 0 };
       FloatSlider* mSlider{ nullptr };
+      ClickButton* mRemoveButton{ nullptr };
       juce::AudioProcessorParameter* mParameter{ nullptr };
       bool mShowing{ false };
       bool mInSelectorList{ true };
@@ -173,6 +187,14 @@ private:
    int mModwheelCC{ 1 }; //or 74 in Multidimensional Polyphonic Expression (MPE) spec
    std::string mOldVstPath{ "" }; //for loading save files that predate pluginId-style saving
    int mParameterVersion{ 1 };
+   int mLastNumChannels{ -1 };
+
+   // juce supports a max of 16 stereo output channels
+   static const int maxStereoOutputChannels{ 16 };
+
+   std::vector<RollingBuffer*> mAdditionalVizBuffers;
+   std::vector<AdditionalNoteCable*> mAdditionalOutCables;
+   std::vector<PatchCableSource*> mAdditionalOutCableSources;
 
    struct ChannelModulations
    {
@@ -187,18 +209,9 @@ private:
    ofMutex mVSTMutex;
    VSTPlayhead mPlayhead;
 
-   //NSWindowOverlay* mWindowOverlay{ nullptr };
-
-   enum DisplayMode
-   {
-      kDisplayMode_Sliders,
-      kDisplayMode_PluginOverlay
-   };
-
-   DisplayMode mDisplayMode{ DisplayMode::kDisplayMode_Sliders };
    int mShowParameterIndex{ -1 };
    DropdownList* mShowParameterDropdown{ nullptr };
-   static constexpr int kMaxParametersInDropdown{ 30 };
+   static constexpr int kMaxParametersInDropdown{ 100 };
    int mTemporarilyDisplayedParamIndex{ -1 };
 
    /*

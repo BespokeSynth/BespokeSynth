@@ -34,6 +34,7 @@
 #include "juce_core/juce_core.h"
 
 ControlRecorder::ControlRecorder()
+: IDrawableModule(220, 100)
 {
 }
 
@@ -59,9 +60,9 @@ void ControlRecorder::CreateUIControls()
 
    mDisplayStartY = controlH + 3;
 
-   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-   mTargetCable->SetModulatorOwner(this);
-   AddPatchCableSource(mTargetCable);
+   mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+   mTargetCableSource->SetModulatorOwner(this);
+   AddPatchCableSource(mTargetCableSource);
 
    mQuantizeLengthSelector->AddLabel("8n", kInterval_8n);
    mQuantizeLengthSelector->AddLabel("4n", kInterval_4n);
@@ -219,12 +220,6 @@ void ControlRecorder::ButtonClicked(ClickButton* button, double time)
       Clear();
 }
 
-void ControlRecorder::GetModuleDimensions(float& width, float& height)
-{
-   width = mWidth;
-   height = mHeight;
-}
-
 void ControlRecorder::Resize(float w, float h)
 {
    w = MAX(w, 220);
@@ -252,9 +247,6 @@ void ControlRecorder::SaveState(FileStreamOut& out)
 
    IDrawableModule::SaveState(out);
 
-   out << mWidth;
-   out << mHeight;
-
    mCurve.SaveState(out);
    out << mHasRecorded;
    out << mLength;
@@ -269,8 +261,11 @@ void ControlRecorder::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in >> mWidth;
-   in >> mHeight;
+   if (rev < 2)
+   {
+      in >> mWidth;
+      in >> mHeight;
+   }
 
    mCurve.LoadState(in);
    in >> mHasRecorded;

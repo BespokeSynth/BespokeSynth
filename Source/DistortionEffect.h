@@ -69,18 +69,14 @@ private:
    };
 
    //IDrawableModule
-   void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
-
-   float mWidth{ 200 };
-   float mHeight{ 20 };
 
    DistortionType mType{ DistortionType::kClean };
    float mClip{ 1 };
    float mGain{ 1 };
    float mPreamp{ 1 };
    float mFuzzAmount{ 0 };
-   bool mRemoveInputDC{ true };
+   bool mRemoveInputDC{ false };
 
    DropdownList* mTypeDropdown{ nullptr };
    FloatSlider* mClipSlider{ nullptr };

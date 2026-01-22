@@ -169,12 +169,6 @@ void DistortionEffect::SetClip(float amount)
    mGain = 1 / pow(amount, 3);
 }
 
-void DistortionEffect::GetModuleDimensions(float& width, float& height)
-{
-   width = mWidth;
-   height = mHeight;
-}
-
 void DistortionEffect::DrawModule()
 {
    if (!IsEnabled())

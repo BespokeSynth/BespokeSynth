@@ -87,14 +87,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
-
-   float mWidth{ 160 };
-   float mHeight{ 160 };
 
    bool mHasExternalPulseSource{ false };
 

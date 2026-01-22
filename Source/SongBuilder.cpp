@@ -30,9 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace
 {
    const float kLeftMarginX = 3;
-   const float kSongSequencerWidth = 175;
+   const float kSongSequencerWidth = 255;
    const float kGridStartY = 20;
-   const float kSceneTabWidth = 165;
+   const float kSceneTabWidth = 205;
    const float kTargetTabHeightTop = 30;
    const float kTargetTabHeightBottom = 10;
    const float kRowHeight = 20;
@@ -103,7 +103,7 @@ void SongBuilder::CreateUIControls()
    UIBLOCK(10, height + 4);
    for (int i = 0; i < kMaxSequencerScenes; ++i)
    {
-      DROPDOWN(mSequencerSceneSelector[i], ("scene" + ofToString(i)).c_str(), &mSequencerSceneId[i], 80);
+      DROPDOWN(mSequencerSceneSelector[i], ("scene" + ofToString(i)).c_str(), &mSequencerSceneId[i], 160);
       mSequencerSceneSelector[i]->SetCableTargetable(false);
       mSequencerSceneSelector[i]->SetDrawTriangle(false);
       UIBLOCK_SHIFTRIGHT();
@@ -472,43 +472,40 @@ void SongBuilder::PlaySequence(double time, int startIndex)
    }
 }
 
-bool SongBuilder::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool SongBuilder::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
-   if (type == kMidiMessage_Note)
+   if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads() && midiValue > 0)
    {
-      if (controlIndex >= 36 && controlIndex <= 99 && midiValue > 0)
-      {
-         int gridIndex = controlIndex - 36;
-         int x = gridIndex % 8;
-         int y = 7 - gridIndex / 8;
+      int gridIndex = controlIndex - 36;
+      int x = gridIndex % 8;
+      int y = 7 - gridIndex / 8;
 
-         if (x == 0)
+      if (x == 0)
+      {
+         if (mUseSequencer)
          {
-            if (mUseSequencer)
+            switch (y)
             {
-               switch (y)
-               {
-                  case 0: mPlaySequenceButton->SetValue(1, gTime); break;
-                  case 1: mStopSequenceButton->SetValue(1, gTime); break;
-                  default: break;
-               }
+               case 0: mPlaySequenceButton->SetValue(1, gTime); break;
+               case 1: mStopSequenceButton->SetValue(1, gTime); break;
+               default: break;
             }
          }
-         else
-         {
-            int index = y + (x - 1) * 8;
-            if (index < mScenes.size())
-               mScenes[index]->mActivateButton->SetValue(1, gTime);
-         }
-
-         return true;
       }
+      else
+      {
+         int index = y + (x - 1) * 8;
+         if (index < mScenes.size())
+            mScenes[index]->mActivateButton->SetValue(1, gTime);
+      }
+
+      return true;
    }
 
    return false;
 }
 
-void SongBuilder::UpdatePush2Leds(Push2Control* push2)
+void SongBuilder::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
    for (int x = 0; x < 8; ++x)
    {
@@ -550,7 +547,7 @@ void SongBuilder::UpdatePush2Leds(Push2Control* push2)
             }
          }
 
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor, pushColorBlink);
+         abletonGrid->SetLed(x + (7 - y) * 8 + 36, pushColor, pushColorBlink);
       }
    }
 }
@@ -566,6 +563,24 @@ bool SongBuilder::DrawToPush2Screen()
    ofPopStyle();
 
    return false;
+}
+
+void SongBuilder::SetScene(int scene, double time)
+{
+   mSequenceStepIndex = -1; //stop playing
+   if (mChangeQuantizeInterval == kInterval_Free) //switch
+   {
+      SetActiveScene(time, scene);
+   }
+   else if (mChangeQuantizeInterval == kInterval_None) //jump
+   {
+      mQueuedScene = scene;
+      TheTransport->Reset();
+   }
+   else
+   {
+      mQueuedScene = scene;
+   }
 }
 
 void SongBuilder::ButtonClicked(ClickButton* button, double time)
@@ -603,20 +618,7 @@ void SongBuilder::ButtonClicked(ClickButton* button, double time)
    {
       if (button == mScenes[i]->mActivateButton)
       {
-         mSequenceStepIndex = -1; //stop playing
-         if (mChangeQuantizeInterval == kInterval_Free) //switch
-         {
-            SetActiveScene(time, i);
-         }
-         else if (mChangeQuantizeInterval == kInterval_None) //jump
-         {
-            mQueuedScene = i;
-            TheTransport->Reset();
-         }
-         else
-         {
-            mQueuedScene = i;
-         }
+         SetScene(i, time);
       }
    }
 
@@ -986,7 +988,7 @@ void SongBuilder::SongScene::CreateUIControls(SongBuilder* owner)
 #define UIBLOCK_OWNER owner //change owner
    UIBLOCK0();
    BUTTON_STYLE(mActivateButton, ("go" + ofToString(mId)).c_str(), ButtonDisplayStyle::kPlay);
-   TEXTENTRY(mNameEntry, ("name" + ofToString(mId)).c_str(), 12, &mName);
+   TEXTENTRY(mNameEntry, ("name" + ofToString(mId)).c_str(), 17, &mName);
    DROPDOWN(mContextMenu, ("context " + ofToString(mId)).c_str(), (int*)(&mContextMenuSelection), 20);
    ENDUIBLOCK0();
 #undef UIBLOCK_OWNER

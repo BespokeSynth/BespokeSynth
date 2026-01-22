@@ -24,6 +24,12 @@ from __future__ import annotations
    def get(path):
       pass
 
+   def get_text(path):
+      pass
+
+   def set_text(path, text):
+      pass
+
    def adjust(path, amount):
       pass
 

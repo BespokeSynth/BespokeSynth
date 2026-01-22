@@ -77,6 +77,8 @@ void OSCOutput::CreateUIControls()
    ENDUIBLOCK(mWidth, mHeight);
 
    mNoteOutLabelEntry->DrawLabel(true);
+
+   Resize(mWidth, mHeight);
 }
 
 void OSCOutput::Poll()
@@ -104,7 +106,7 @@ void OSCOutput::PlayNote(NoteMessage note)
 {
    if (mNoteOutLabel.size() > 0)
    {
-      juce::OSCMessage msg(("/bespoke/" + mNoteOutLabel).c_str());
+      juce::OSCMessage msg((mAddressPrefix + "/" + mNoteOutLabel).c_str());
       float pitchOut = note.pitch;
       if (note.modulation.pitchBend != nullptr)
          pitchOut += note.modulation.pitchBend->GetValue(0);
@@ -135,15 +137,25 @@ void OSCOutput::SendString(std::string address, std::string val)
    mOscOut.send(msg);
 }
 
-void OSCOutput::GetModuleDimensions(float& w, float& h)
+void OSCOutput::Resize(float width, float height)
 {
-   w = mWidth;
-   h = mHeight;
+   mWidth = width;
+
+   for (auto* entry : mLabelEntry)
+      entry->SetOverrideWidth((width - 10) / 2);
+
+   for (auto* slider : mSliders)
+   {
+      ofRectangle rect = slider->GetRect(K(local));
+      rect.width = (width - 10) / 2;
+      slider->SetPosition(width / 2, rect.y);
+      slider->SetDimensions(rect.width, rect.height);
+   }
 }
 
 void OSCOutput::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
-   juce::String address = "/bespoke/";
+   juce::String address = mAddressPrefix + "/";
    address += slider->Name();
    juce::OSCMessage msg(address);
    msg.addFloat32(slider->GetValue());
@@ -173,11 +185,14 @@ void OSCOutput::TextEntryComplete(TextEntry* entry)
 
 void OSCOutput::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadString("address_prefix", moduleInfo, mAddressPrefix);
+
    SetUpFromSaveData();
 }
 
 void OSCOutput::SetUpFromSaveData()
 {
+   mAddressPrefix = mModuleSaveData.GetString("address_prefix");
 }
 
 void OSCOutput::SaveLayout(ofxJSONElement& moduleInfo)

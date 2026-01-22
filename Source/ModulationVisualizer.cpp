@@ -29,6 +29,7 @@
 #include "PolyphonyMgr.h"
 
 ModulationVisualizer::ModulationVisualizer()
+: IDrawableModule(350, 100)
 {
    mVoices.resize(kNumVoices);
 }
@@ -91,10 +92,4 @@ std::string ModulationVisualizer::VizVoice::GetInfoString()
       info += "pressure:" + ofToString(mModulators.pressure->GetValue(0), 2) + "  ";
    info += "pan:" + ofToString(mModulators.pan, 2) + "  ";
    return info;
-}
-
-void ModulationVisualizer::Resize(float w, float h)
-{
-   mWidth = w;
-   mHeight = h;
 }

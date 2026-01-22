@@ -84,15 +84,8 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
    void UpdateOldControlName(std::string& oldName) override;
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    OscillatorVoiceParams mVoiceParams;

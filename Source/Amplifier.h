@@ -42,6 +42,11 @@ public:
 
    void CreateUIControls() override;
 
+   FloatSlider* GetGainSlider() { return mGainSlider; }
+   void GetLevel(float& level, float& watermarkLevel) const;
+   void SetShowLevelMeter(bool show);
+   void DrawLevelMeter(float x, float y, float w, float h);
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -57,15 +62,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
-
-   float mWidth{ 120 };
-   float mHeight{ 40 };
 
    float mGain{ 1 };
    FloatSlider* mGainSlider{ nullptr };

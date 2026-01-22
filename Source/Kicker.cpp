@@ -65,6 +65,11 @@ void Kicker::LoadLayout(const ofxJSONElement& moduleInfo)
    SetUpFromSaveData();
 }
 
+void Kicker::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   moduleInfo["drumplayer"] = mDrumPlayer ? mDrumPlayer->Path() : "";
+}
+
 void Kicker::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));

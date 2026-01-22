@@ -46,6 +46,7 @@ public:
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return false; }
+   bool IsResizable() const override { return true; }
 
    void Init() override;
    void Poll() override;
@@ -72,7 +73,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void Resize(float width, float height) override;
 
    std::string mLabels[OSC_OUTPUT_MAX_PARAMS];
    std::list<TextEntry*> mLabelEntry{};
@@ -89,6 +90,5 @@ private:
 
    juce::OSCSender mOscOut;
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
+   std::string mAddressPrefix{ "/bespoke" };
 };

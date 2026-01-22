@@ -33,6 +33,7 @@
 #include "PatchCableSource.h"
 
 PulseSequence::PulseSequence()
+: IDrawableModule(254, 58)
 {
    for (int i = 0; i < kMaxSteps; ++i)
       mVels[i] = 1;
@@ -195,12 +196,6 @@ void PulseSequence::Step(double time, float velocity, int flags)
    mVelocityGrid->SetHighlightCol(time, mStep);
 }
 
-void PulseSequence::GetModuleDimensions(float& width, float& height)
-{
-   width = mWidth;
-   height = mHeight;
-}
-
 void PulseSequence::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
@@ -315,15 +310,11 @@ void PulseSequence::LoadState(FileStreamIn& in, int rev)
 
 void PulseSequence::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   moduleInfo["width"] = mWidth;
-   moduleInfo["height"] = mHeight;
 }
 
 void PulseSequence::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("width", moduleInfo, 254, 254, 999999, K(isTextField));
-   mModuleSaveData.LoadInt("height", moduleInfo, 58, 58, 999999, K(isTextField));
 
    SetUpFromSaveData();
 }
@@ -331,6 +322,4 @@ void PulseSequence::LoadLayout(const ofxJSONElement& moduleInfo)
 void PulseSequence::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   PulseSequence::Resize(mModuleSaveData.GetInt("width"),
-                         mModuleSaveData.GetInt("height"));
 }

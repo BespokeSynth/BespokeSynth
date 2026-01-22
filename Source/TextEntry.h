@@ -66,6 +66,7 @@ public:
    void DrawLabel(bool draw) { mDrawLabel = draw; }
    void SetRequireEnter(bool require) { mRequireEnterToAccept = require; }
    void SetFlexibleWidth(bool flex) { mFlexibleWidth = flex; }
+   void SetOverrideWidth(float width) { mOverrideWidth = width; }
    void ClearInput();
    const char* GetText() const { return mString; }
    TextEntryType GetTextEntryType() const { return mType; }
@@ -129,4 +130,5 @@ private:
    bool mFlexibleWidth{ false };
    bool mHovered{ false };
    bool mRequireEnterToAccept{ false };
+   float mOverrideWidth{ 0 };
 };

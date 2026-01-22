@@ -304,8 +304,7 @@ float ofClamp(float val, float a, float b)
 
 float ofGetLastFrameTime()
 {
-   /*TODO_PORT(Ryan)*/
-   return .01666f;
+   return std::max(1.0f / ofGetFrameRate(), 1.0f / 30.0f);
 }
 
 int ofToInt(const std::string& intString)

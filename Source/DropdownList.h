@@ -103,6 +103,7 @@ class DropdownList : public IUIControl, public IPulseReceiver
 public:
    DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width = -1);
    DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, float width = -1);
+   IDropdownListener* GetOwner() { return mOwner; }
    void AddLabel(std::string label, int value);
    void RemoveLabel(int value);
    void SetLabel(std::string label, int value);
@@ -115,6 +116,7 @@ public:
    bool DropdownClickedAt(int x, int y);
    void SetIndex(int i, double time, bool forceUpdate);
    void Clear();
+   int* GetVar() { return mVar; }
    void SetVar(int* var) { mVar = var; }
    EnumMap GetEnumMap();
    void SetUnknownItemString(std::string str)

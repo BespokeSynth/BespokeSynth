@@ -34,12 +34,13 @@
 #include "INoteSource.h"
 #include "GridController.h"
 #include "Push2Control.h"
+#include "AbletonMoveControl.h"
 
 class LaunchpadNoteDisplayer;
 
 class Chorder;
 
-class LaunchpadKeyboard : public IDrawableModule, public INoteSource, public IScaleListener, public IIntSliderListener, public ITimeListener, public IDropdownListener, public IFloatSliderListener, public IGridControllerListener, public IPush2GridController
+class LaunchpadKeyboard : public IDrawableModule, public INoteSource, public IScaleListener, public IIntSliderListener, public ITimeListener, public IDropdownListener, public IFloatSliderListener, public IGridControllerListener, public IAbletonGridController
 {
 public:
    LaunchpadKeyboard();
@@ -56,7 +57,12 @@ public:
 
    void SetDisplayer(LaunchpadNoteDisplayer* displayer) { mDisplayer = displayer; }
    void DisplayNote(int pitch, int velocity);
+   void SetPreviewNotes(const std::function<bool(int)>& IsPreviewNote);
    void SetChorder(Chorder* chorder) { mChorder = chorder; }
+   void AdjustOctave(int amount);
+   int GridToPitch(int x, int y);
+   bool IsDrumMode() const { return mLayout == LaunchpadLayout::kDrum; }
+   int TransposePitchInScale(int pitch, int amount, bool octaveMultiplier);
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
@@ -74,9 +80,9 @@ public:
    //ITimeListener
    void OnTimeEvent(double time) override;
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
@@ -84,12 +90,13 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   enum LaunchpadLayout
+   enum class LaunchpadLayout
    {
       kChromatic,
       kMajorThirds,
@@ -99,10 +106,13 @@ private:
       kGuitar,
       kSeptatonic,
       kDrum,
-      kAllPads
+      kAllPads,
+      kPiano,
+      kScaleRows,
+      kPentatonic
    };
 
-   enum ArrangementMode
+   enum class ArrangementMode
    {
       kFull,
       kFive,
@@ -121,7 +131,6 @@ private:
    void PlayKeyboardNote(double time, int pitch, int velocity);
    void UpdateLights(bool force = false);
    GridColor GetGridSquareColor(int x, int y);
-   int GridToPitch(int x, int y);
    void HandleChordButton(int pitch, bool bOn);
    bool IsChordButtonPressed(int pitch);
    void PressedNoteFor(int x, int y, int velocity);
@@ -137,8 +146,8 @@ private:
 
    int mRootNote{ 4 }; // 4 = E
 
-   int mCurrentNotes[128]{};
-   bool mTestKeyHeld{ false };
+   std::array<int, 128> mCurrentNotes{};
+   std::array<bool, 128> mPreviewNotes{};
    int mOctave{ 3 };
    IntSlider* mOctaveSlider{ nullptr };
    bool mLatch{ false };
@@ -158,4 +167,6 @@ private:
    bool mPreserveChordRoot{ true };
    Checkbox* mPreserveChordRootCheckbox{ nullptr };
    GridControlTarget* mGridControlTarget{ nullptr };
+   int mRows{ 8 };
+   int mCols{ 8 };
 };

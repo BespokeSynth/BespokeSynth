@@ -69,10 +69,10 @@ void NoteTable::CreateUIControls()
 
    mGrid = new UIGrid(this, "uigrid", 5, height + 18, width - 10, 110, mLength, mNoteRange);
 
-   mNoteModeSelector->AddLabel("scale", kNoteMode_Scale);
-   mNoteModeSelector->AddLabel("chromatic", kNoteMode_Chromatic);
-   mNoteModeSelector->AddLabel("pentatonic", kNoteMode_Pentatonic);
-   mNoteModeSelector->AddLabel("5ths", kNoteMode_Fifths);
+   mNoteModeSelector->AddLabel("scale", (int)NoteStepSequencer::NoteMode::Scale);
+   mNoteModeSelector->AddLabel("chromatic", (int)NoteStepSequencer::NoteMode::Chromatic);
+   mNoteModeSelector->AddLabel("pentatonic", (int)NoteStepSequencer::NoteMode::Pentatonic);
+   mNoteModeSelector->AddLabel("5ths", (int)NoteStepSequencer::NoteMode::Fifths);
 
    mGrid->SetFlip(true);
    mGrid->SetListener(this);
@@ -176,7 +176,7 @@ void NoteTable::DrawModule()
          ofSetColor(0, 255, 0, 80);
       else if (TheScale->GetPitchesPerOctave() == 12 && RowToPitch(i) % TheScale->GetPitchesPerOctave() == (TheScale->ScaleRoot() + 7) % TheScale->GetPitchesPerOctave())
          ofSetColor(200, 150, 0, 80);
-      else if (mNoteMode == kNoteMode_Chromatic && TheScale->IsInScale(RowToPitch(i)))
+      else if (mNoteMode == NoteStepSequencer::NoteMode::Chromatic && TheScale->IsInScale(RowToPitch(i)))
          ofSetColor(100, 75, 0, 80);
       else
          continue;
@@ -270,11 +270,11 @@ int NoteTable::RowToPitch(int row)
    int numPitchesInScale = TheScale->NumTonesInScale();
    switch (mNoteMode)
    {
-      case kNoteMode_Scale:
+      case NoteStepSequencer::NoteMode::Scale:
          return TheScale->GetPitchFromTone(row + mOctave * numPitchesInScale + TheScale->GetScaleDegree());
-      case kNoteMode_Chromatic:
+      case NoteStepSequencer::NoteMode::Chromatic:
          return row + mOctave * TheScale->GetPitchesPerOctave();
-      case kNoteMode_Pentatonic:
+      case NoteStepSequencer::NoteMode::Pentatonic:
       {
          bool isMinor = TheScale->IsInScale(TheScale->ScaleRoot() + 3);
          const int minorPentatonic[5] = { 0, 3, 5, 7, 10 };
@@ -285,7 +285,7 @@ int NoteTable::RowToPitch(int row)
          else
             return TheScale->ScaleRoot() + (row / 5 + mOctave) * TheScale->GetPitchesPerOctave() + majorPentatonic[row % 5];
       }
-      case kNoteMode_Fifths:
+      case NoteStepSequencer::NoteMode::Fifths:
       {
          int oct = (row / 2) * numPitchesInScale;
          bool isFifth = row % 2 == 1;
@@ -493,66 +493,63 @@ void NoteTable::SetColumnRow(int column, int row)
 void NoteTable::GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows)
 {
    sequenceRows = (mLength - 1) / 8 + 1;
-   if (mNoteMode == kNoteMode_Scale && TheScale->NumTonesInScale() == 7)
+   if (mNoteMode == NoteStepSequencer::NoteMode::Scale && TheScale->NumTonesInScale() == 7)
       pitchCols = 7;
    else
       pitchCols = 8;
    pitchRows = (mNoteRange - 1) / pitchCols + 1;
 }
 
-bool NoteTable::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool NoteTable::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
    if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
    {
       int sequenceRows, pitchCols, pitchRows;
       GetPush2Layout(sequenceRows, pitchCols, pitchRows);
 
-      if (type == kMidiMessage_Note)
+      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
       {
-         if (controlIndex >= 36 && controlIndex <= 99)
-         {
-            int gridIndex = controlIndex - 36;
-            int x = gridIndex % 8;
-            int y = 7 - gridIndex / 8;
+         int gridIndex = controlIndex - 36;
+         int x = gridIndex % 8;
+         int y = 7 - gridIndex / 8;
 
-            if (y < sequenceRows)
+         if (y < sequenceRows)
+         {
+            int index = x + y * 8;
+            if (midiValue > 0)
+               mPush2HeldStep = index;
+            else if (index == mPush2HeldStep)
+               mPush2HeldStep = -1;
+         }
+         else if (y < sequenceRows + pitchRows)
+         {
+            if (midiValue > 0)
             {
-               int index = x + y * 8;
-               if (midiValue > 0)
-                  mPush2HeldStep = index;
-               else if (index == mPush2HeldStep)
-                  mPush2HeldStep = -1;
-            }
-            else if (y < sequenceRows + pitchRows)
-            {
-               if (midiValue > 0)
+               int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
+               if (index < 0 || index >= mNoteRange)
                {
-                  int index = x + (pitchRows - 1 - (y - sequenceRows)) * pitchCols;
-                  if (index < 0 || index >= mNoteRange)
-                  {
-                     //out of range, do nothing
-                  }
-                  else if (mPush2HeldStep != -1)
-                  {
-                     mGrid->SetVal(mPush2HeldStep, index, mGrid->GetVal(mPush2HeldStep, index) > 0 ? 0 : 1);
-                  }
-                  else
-                  {
-                     //I'm not liking this "queued pitch" behavior, let's disable it for now
-                     //mQueuedPitches[RowToPitch(index)] = true;
-                  }
+                  //out of range, do nothing
+               }
+               else if (mPush2HeldStep != -1)
+               {
+                  mGrid->SetVal(mPush2HeldStep, index, mGrid->GetVal(mPush2HeldStep, index) > 0 ? 0 : 1);
+               }
+               else
+               {
+                  //I'm not liking this "queued pitch" behavior, let's disable it for now
+                  //mQueuedPitches[RowToPitch(index)] = true;
                }
             }
-
-            return true;
          }
+
+         return true;
       }
    }
    else if (mPush2GridDisplayMode == Push2GridDisplayMode::GridView)
    {
-      if (type == kMidiMessage_Note)
+      if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
       {
-         int gridIndex = controlIndex - 36;
+         int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
          int x = gridIndex % 8;
          int y = gridIndex / 8;
          int col = x + mGridControlOffsetX;
@@ -575,25 +572,22 @@ bool NoteTable::OnPush2Control(Push2Control* push2, MidiMessageType type, int co
       }
    }
 
-   if (type == kMidiMessage_Control)
+   if (controlIndex == abletonGrid->GetGridControllerOption1Control())
    {
-      if (controlIndex == push2->GetGridControllerOption1Control())
+      if (midiValue > 0)
       {
-         if (midiValue > 0)
-         {
-            if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
-               mPush2GridDisplayMode = Push2GridDisplayMode::GridView;
-            else
-               mPush2GridDisplayMode = Push2GridDisplayMode::PerStep;
-         }
-         return true;
+         if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
+            mPush2GridDisplayMode = Push2GridDisplayMode::GridView;
+         else
+            mPush2GridDisplayMode = Push2GridDisplayMode::PerStep;
       }
+      return true;
    }
 
    return false;
 }
 
-void NoteTable::UpdatePush2Leds(Push2Control* push2)
+void NoteTable::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
    int sequenceRows, pitchCols, pitchRows;
    GetPush2Layout(sequenceRows, pitchCols, pitchRows);
@@ -684,18 +678,18 @@ void NoteTable::UpdatePush2Leds(Push2Control* push2)
             }
          }
 
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(x + (7 - y) * 8 + 36, pushColor);
       }
    }
 
-   push2->SetLed(kMidiMessage_Control, push2->GetGridControllerOption1Control(), 127);
+   abletonGrid->SetLed(abletonGrid->GetGridControllerOption1Control(), 127);
 }
 
 void NoteTable::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    if (list == mNoteModeSelector)
    {
-      if (mNoteMode != oldVal)
+      if ((int)mNoteMode != oldVal)
          mRowOffset = 0;
    }
 }

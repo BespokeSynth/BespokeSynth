@@ -61,7 +61,8 @@ public:
    virtual void Poll() {}
    virtual void KeyPressed(int key, bool isRepeat) {}
    void StartBeacon() override;
-   bool IsPreset();
+   bool IsSnapshot();
+   void SetSnapshotHighlight(bool highlight) { mSnapshotHighlight = highlight; }
    virtual void GetRange(float& min, float& max)
    {
       min = 0;
@@ -113,6 +114,7 @@ protected:
    bool mCableTargetable{ true };
    bool mNoHover{ false };
    bool mShouldSaveState{ true };
+   bool mSnapshotHighlight{ false };
 
    static IUIControl* sLastHoveredUIControl;
    static bool sLastUIHoverWasSetManually;

@@ -31,6 +31,7 @@
 #include "UIControlMacros.h"
 
 RhythmSequencer::RhythmSequencer()
+: IDrawableModule(160, 160)
 {
    mTransportPriority = ITimeListener::kTransportPriorityLate;
    for (size_t i = 0; i < mInputPitches.size(); ++i)

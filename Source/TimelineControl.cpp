@@ -29,6 +29,7 @@
 #include "ModularSynth.h"
 
 TimelineControl::TimelineControl()
+: IDrawableModule(400, 0)
 {
 }
 
@@ -180,17 +181,13 @@ void TimelineControl::ButtonClicked(ClickButton* button, double time)
 
 void TimelineControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadFloat("width", moduleInfo, 390, 100, 99999, K(isTextField));
-
    SetUpFromSaveData();
 }
 
 void TimelineControl::SetUpFromSaveData()
 {
-   Resize(mModuleSaveData.GetFloat("width"), 0);
 }
 
 void TimelineControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   moduleInfo["width"] = mWidth;
 }

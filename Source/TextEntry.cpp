@@ -206,7 +206,9 @@ void TextEntry::Render()
 
 void TextEntry::GetDimensions(float& width, float& height)
 {
-   if (mFlexibleWidth)
+   if (mOverrideWidth > 0)
+      width = mOverrideWidth;
+   else if (mFlexibleWidth)
       width = MAX(30.0f, gFontFixedWidth.GetStringWidth(mString, 12) + 4);
    else
       width = mCharWidth * 9;
@@ -563,13 +565,13 @@ void TextEntry::SetValue(float value, double time, bool forceUpdate /*= false*/)
 {
    if (mType == kTextEntry_Int)
    {
-      *mVarInt = std::round(value);
+      *mVarInt = ofClamp(std::round(value), mIntMin, mIntMax);
       UpdateDisplayString();
    }
 
    if (mType == kTextEntry_Float)
    {
-      *mVarFloat = value;
+      *mVarFloat = ofClamp(value, mFloatMin, mFloatMax);
       UpdateDisplayString();
    }
 }

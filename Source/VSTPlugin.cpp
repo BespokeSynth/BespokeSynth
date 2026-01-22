@@ -312,15 +312,55 @@ VSTPlugin::VSTPlugin()
    mPluginName = "no plugin loaded";
 }
 
+
+void VSTPlugin::AddExtraOutputCable()
+{
+   AdditionalNoteCable* NewAdditionalCable = new AdditionalNoteCable();
+   RollingBuffer* NewBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS * gSampleRate);
+   NewBuffer->SetNumChannels(2);
+
+   PatchCableSource* NewCableSource = new PatchCableSource(this, kConnectionType_Audio);
+
+   NewCableSource->SetOverrideVizBuffer(NewBuffer);
+   NewAdditionalCable->SetPatchCableSource(NewCableSource);
+   AddPatchCableSource(NewCableSource);
+
+   mAdditionalOutCables.push_back(NewAdditionalCable);
+   mAdditionalVizBuffers.push_back(NewBuffer);
+   mAdditionalOutCableSources.push_back(NewCableSource);
+
+   mModuleSaveData.SetInt("numAdditionalStereoOutputs", (int)mAdditionalOutCables.size());
+}
+
+void VSTPlugin::RemoveExtraOutputCable()
+{
+   if (static_cast<int>(mAdditionalOutCables.size()) == 0)
+      return;
+
+   int IndexToRemove = static_cast<int>(mAdditionalOutCables.size()) - 1;
+
+   mAdditionalOutCables.pop_back();
+   mAdditionalVizBuffers.pop_back();
+   PatchCableSource* SourceToRemove = mAdditionalOutCableSources[IndexToRemove];
+   RemovePatchCableSource(SourceToRemove);
+   mAdditionalOutCableSources.pop_back();
+
+   mModuleSaveData.SetInt("numAdditionalStereoOutputs", (int)mAdditionalOutCables.size());
+}
+
 void VSTPlugin::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
+
    mVolSlider = new FloatSlider(this, "vol", 3, 3, 80, 15, &mVol, 0, 4);
    mOpenEditorButton = new ClickButton(this, "open", mVolSlider, kAnchor_Right_Padded);
-   mPresetFileSelector = new DropdownList(this, "preset", 3, 21, &mPresetFileIndex, 110);
+   mPresetFileSelector = new DropdownList(this, "preset", 3, 21, &mPresetFileIndex, 142);
    mSavePresetFileButton = new ClickButton(this, "save as", -1, -1);
-   mShowParameterDropdown = new DropdownList(this, "show parameter", 3, 38, &mShowParameterIndex, 160);
-   mPanicButton = new ClickButton(this, "panic", 166, 38);
+   mShowParameterDropdown = new DropdownList(this, "show parameter", 3, 56, &mShowParameterIndex, 190);
+   mLoadParameterButton = new ClickButton(this, "load parameter", mShowParameterDropdown, kAnchor_Right);
+   mPanicButton = new ClickButton(this, "panic", mOpenEditorButton, kAnchor_Right_Padded);
+   mRemoveExtraOutputButton = new ClickButton(this, "  -  ", 83, 38);
+   mAddExtraOutputButton = new ClickButton(this, " + ", mRemoveExtraOutputButton, kAnchor_Right);
 
    mPresetFileSelector->DrawLabel(true);
    mSavePresetFileButton->PositionTo(mPresetFileSelector, kAnchor_Right);
@@ -331,13 +371,59 @@ void VSTPlugin::CreateUIControls()
    AddPatchCableSource(mMidiOutCable->GetPatchCableSource());
    mMidiOutCable->GetPatchCableSource()->SetManualPosition(206 - 10, 10);
 
-
    if (mPlugin)
    {
       CreateParameterSliders();
    }
 
-   //const auto* editor = mPlugin->createEditor();
+   RecreateUIOutputCables();
+}
+
+void VSTPlugin::RecreateUIOutputCables()
+{
+   // Need to recalculate slider postitions so that the cablesources can be positioned correctly on load (before a draw call).
+   constexpr int kRows = 25;
+   int sliderCount{ 0 };
+   for (const auto& slider : mParameterSliders)
+   {
+      if (slider.mSlider)
+      {
+         slider.mSlider->SetShowing(slider.mShowing);
+         slider.mRemoveButton->SetShowing(slider.mShowing);
+         if (slider.mShowing)
+         {
+            slider.mSlider->SetPosition(
+            3 + (slider.mSlider->GetRect().width + slider.mRemoveButton->GetRect().width + 9) * (sliderCount / kRows),
+            74 + 17 * (sliderCount % kRows));
+            slider.mRemoveButton->SetPosition(
+            6 + slider.mSlider->GetRect().width + (slider.mSlider->GetRect().width + slider.mRemoveButton->GetRect().width + 9) * (sliderCount / kRows),
+            74 + 17 * (sliderCount % kRows));
+            ++sliderCount;
+         }
+      }
+   }
+
+   float width, height;
+   GetModuleDimensions(width, height);
+
+   auto NumCables = static_cast<float>(mAdditionalOutCables.size()) + 1;
+   float DesiredGap = width / (NumCables + 1);
+
+   GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);
+   GetPatchCableSource()->SetManualPosition(DesiredGap, height + 3);
+
+   mMidiOutCable->GetPatchCableSource()->SetManualPosition(width - 8, 10);
+
+   for (int CableCount = 0; CableCount < NumCables - 1; CableCount++)
+   {
+      PatchCableSource* NewSource = mAdditionalOutCableSources[CableCount];
+      NewSource->SetManualSide(PatchCableSource::Side::kBottom);
+      NewSource->SetManualPosition(DesiredGap + (CableCount + 1) * DesiredGap, height + 3);
+   }
+
+   mLoadParameterButton->SetPosition(
+   GetRect(true).width - 3 - mLoadParameterButton->GetRect(true).width,
+   mShowParameterDropdown->GetRect(true).y);
 }
 
 VSTPlugin::~VSTPlugin()
@@ -443,8 +529,6 @@ void VSTPlugin::SetVST(juce::PluginDescription pluginDesc)
    {
       VSTWindow* window = mWindow.release();
       delete window;
-      //delete mWindowOverlay;
-      //mWindowOverlay = nullptr;
    }
 
    LoadVST(pluginDesc);
@@ -454,31 +538,6 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
 {
    mPluginReady = false;
 
-   /*auto completionCallback = [this, &callbackDone] (std::unique_ptr<juce::AudioPluginInstance> instance, const String& error)
-         {
-            if (instance == nullptr)
-            {
-               ofLog() << error;
-            }
-            else
-            {
-               mVSTMutex.lock();
-               //instance->enableAllBuses();
-               instance->prepareToPlay(gSampleRate, gBufferSize);
-               instance->setPlayHead(&mPlayhead);
-               mNumInputChannels = CLAMP(instance->getTotalNumInputChannels(), 1, 4);
-               mNumOutputChannels = CLAMP(instance->getTotalNumOutputChannels(), 1, 4);
-               ofLog() << "vst inputs: " << mNumInputChannels << "  vst outputs: " << mNumOutputChannels;
-               mPlugin = std::move(instance);
-               mVSTMutex.unlock();
-            }
-            if (mPlugin != nullptr)
-               CreateParameterSliders();
-            callbackDone = true;
-         };
-
-         TheSynth->GetAudioPluginFormatManager().getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
-
    mVSTMutex.lock();
    juce::String errorMessage;
    mPlugin = TheSynth->GetAudioPluginFormatManager().createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
@@ -487,10 +546,6 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
       mPlugin->enableAllBuses();
       mPlugin->addListener(this);
 
-      /*
-       * For now, since Bespoke is at best stereo in stereo out,
-       * Disable all non-main input and output buses
-       */
       mNumInputChannels = mPlugin->getTotalNumInputChannels();
       mNumOutputChannels = mPlugin->getTotalNumOutputChannels();
       ofLog() << "vst channel - inputs: " << mNumInputChannels << " x outputs: " << mNumOutputChannels;
@@ -533,8 +588,13 @@ void VSTPlugin::CreateParameterSliders()
       if (slider.mSlider)
       {
          slider.mSlider->SetShowing(false);
+         slider.mRemoveButton->SetShowing(false);
          RemoveUIControl(slider.mSlider);
+         RemoveUIControl(slider.mRemoveButton);
          slider.mSlider->Delete();
+         slider.mRemoveButton->Delete();
+         slider.mSlider = nullptr;
+         slider.mRemoveButton = nullptr;
       }
    }
    mParameterSliders.clear();
@@ -547,6 +607,7 @@ void VSTPlugin::CreateParameterSliders()
    mParameterSliders.resize(numParameters);
    for (int i = 0; i < numParameters; ++i)
    {
+
       mParameterSliders[i].mOwner = this;
       mParameterSliders[i].mValue = parameters[i]->getValue();
       mParameterSliders[i].mParameter = parameters[i];
@@ -559,7 +620,7 @@ void VSTPlugin::CreateParameterSliders()
       mParameterSliders[i].mShowing = false;
       if (numParameters <= kMaxParametersInDropdown) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
       {
-         mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName.c_str(), i);
+         mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName, i);
          mParameterSliders[i].mInSelectorList = true;
       }
       else
@@ -567,6 +628,8 @@ void VSTPlugin::CreateParameterSliders()
          mParameterSliders[i].mInSelectorList = false;
       }
    }
+   // Move output cables
+   RecreateUIOutputCables();
 }
 
 void VSTPlugin::Poll()
@@ -576,7 +639,7 @@ void VSTPlugin::Poll()
       mRescanParameterNames = false;
       const auto& parameters = mPlugin->getParameters();
 
-      int numParameters = MIN((int)mParameterSliders.size(), (int)parameters.size());
+      const int numParameters = MIN((int)mParameterSliders.size(), (int)parameters.size());
       for (int i = 0; i < numParameters; ++i)
       {
          mParameterSliders[i].mDisplayName = parameters[i]->getName(64).toStdString();
@@ -589,34 +652,23 @@ void VSTPlugin::Poll()
          mShowParameterDropdown->Clear();
          for (int i = 0; i < numParameters; ++i)
          {
-            mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName.c_str(), i);
+            mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName, i);
             mParameterSliders[i].mInSelectorList = true;
          }
       }
    }
-   if (mDisplayMode == kDisplayMode_Sliders)
+
+   for (auto& parameterSlider : mParameterSliders)
+      parameterSlider.mValue = parameterSlider.mParameter->getValue();
+
+   if (mChangeGestureParameterIndex != -1)
    {
-      for (int i = 0; i < mParameterSliders.size(); ++i)
+      if (mChangeGestureParameterIndex < (int)mParameterSliders.size() && !mParameterSliders[mChangeGestureParameterIndex].mInSelectorList)
       {
-         float value = mParameterSliders[i].mParameter->getValue();
-         if (mParameterSliders[i].mValue != value)
-            mParameterSliders[i].mValue = value;
+         mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mDisplayName, mChangeGestureParameterIndex);
+         mParameterSliders[mChangeGestureParameterIndex].mInSelectorList = true;
       }
-
-      if (mChangeGestureParameterIndex != -1)
-      {
-         if (mChangeGestureParameterIndex < (int)mParameterSliders.size() &&
-             !mParameterSliders[mChangeGestureParameterIndex].mInSelectorList &&
-             mTemporarilyDisplayedParamIndex != mChangeGestureParameterIndex)
-         {
-            if (mTemporarilyDisplayedParamIndex != -1)
-               mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
-            mTemporarilyDisplayedParamIndex = mChangeGestureParameterIndex;
-            mShowParameterDropdown->AddLabel(mParameterSliders[mChangeGestureParameterIndex].mDisplayName, mChangeGestureParameterIndex);
-         }
-
-         mChangeGestureParameterIndex = -1;
-      }
+      mChangeGestureParameterIndex = -1;
    }
 
    if (mWantOpenVstWindow)
@@ -627,9 +679,6 @@ void VSTPlugin::Poll()
          if (mWindow == nullptr)
             mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
          mWindow->ShowWindow();
-
-         //if (mWindow->GetNSViewComponent())
-         //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
       }
    }
 
@@ -638,7 +687,8 @@ void VSTPlugin::Poll()
       mPresetFileUpdateQueued = false;
       if (mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
       {
-         File resourceFile = File(mPresetFilePaths[mPresetFileIndex]);
+         mLastLoadedPresetFilePath = mPresetFilePaths[mPresetFileIndex];
+         File resourceFile = File(mLastLoadedPresetFilePath);
 
          if (!resourceFile.existsAsFile())
          {
@@ -686,6 +736,8 @@ void VSTPlugin::Poll()
                      mParameterSliders[index].MakeSlider();
                }
             }
+            // Move output cables
+            RecreateUIOutputCables();
          }
       }
    }
@@ -728,25 +780,74 @@ void VSTPlugin::Process(double time)
 
    PROFILER(VSTPlugin);
 
+   if (mWantsAddExtraOutput || mWantsRemoveExtraOutput)
+   {
+      auto layouts = mPlugin->getBusesLayout();
+
+      if (mWantsAddExtraOutput && ((mAdditionalOutCables.size() < (maxStereoOutputChannels - 1))))
+      {
+         AddExtraOutputCable();
+      }
+      else if (mWantsRemoveExtraOutput)
+      {
+         RemoveExtraOutputCable();
+      }
+
+      mWantsAddExtraOutput = false;
+      mWantsRemoveExtraOutput = false;
+
+      RecreateUIOutputCables();
+   }
+
    int inputChannels = MAX(2, mNumInputChannels);
    int outputChannels = MAX(2, mNumOutputChannels);
-   GetBuffer()->SetNumActiveChannels(inputChannels);
+   ChannelBuffer* AllChannelsBuffer = GetBuffer();
+
+   AllChannelsBuffer->SetNumActiveChannels(inputChannels);
    SyncBuffers();
+
+   if (mWantLoadParameters)
+   {
+      auto numParametersAdded{ 0 };
+      bool addSliders = GetKeyModifiers() & kModifier_Shift;
+      for (int i = 0; i < mParameterSliders.size(); ++i)
+      {
+         if (mParameterSliders[i].mInSelectorList == false)
+         {
+            mShowParameterDropdown->AddLabel(mParameterSliders[i].mDisplayName, i);
+            mParameterSliders[i].mInSelectorList = true;
+            if (addSliders && mParameterSliders[i].mSlider == nullptr)
+            {
+               mParameterSliders[i].MakeSlider();
+               mParameterSliders[i].mShowing = true;
+            }
+            numParametersAdded++;
+         }
+         if (numParametersAdded >= 100)
+            break;
+      }
+      mWantLoadParameters = false;
+      if (numParametersAdded > 0)
+         RecreateUIOutputCables();
+   }
 
    /*
     * Multi-out VSTs which can't disable those outputs will expect *something* in the
     * buffer even though we don't read it.
+    * 
+    * Before processing audio in the VST we copy the Bespoke inputs into a juce buffer, the buffer needs enough mono channels to cover inputs and outputs
+    * So 2 inputs and 4 outputs means we need 4 channels total (the first two for inputs will be overwritten with the outputs)
     */
-   int bufferChannels = MAX(MAX(inputChannels * mNumInBuses, outputChannels * mNumOutBuses), 2); // how much to allocate in the juce::AudioBuffer
+   int juceBufferChannelCount = MAX(MAX(inputChannels * mNumInBuses, outputChannels * mNumOutBuses), 2); // how much to allocate in the juce::AudioBuffer
 
-   const int kSafetyMaxChannels = 16; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
+   const int kSafetyMaxStereoChannels = VSTPlugin::maxStereoOutputChannels; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
 
    int bufferSize = GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
-   juce::AudioBuffer<float> buffer(bufferChannels, bufferSize);
-   for (int i = 0; i < inputChannels && i < kSafetyMaxChannels; ++i)
-      buffer.copyFrom(i, 0, GetBuffer()->GetChannel(MIN(i, GetBuffer()->NumActiveChannels() - 1)), GetBuffer()->BufferSize());
+   juce::AudioBuffer<float> buffer(juceBufferChannelCount, bufferSize);
+   for (int i = 0; i < inputChannels && i < kSafetyMaxStereoChannels; ++i)
+      buffer.copyFrom(i, 0, AllChannelsBuffer->GetChannel(MIN(i, GetBuffer()->NumActiveChannels() - 1)), AllChannelsBuffer->BufferSize());
 
    IAudioReceiver* target = GetTarget();
 
@@ -755,6 +856,21 @@ void VSTPlugin::Process(double time)
       mVSTMutex.lock();
 
       ComputeSliders(0);
+
+      if (mWantRemoveSlider)
+      {
+         mParameterSliders[mWantRemoveSliderIndex].mSlider->SetShowing(false);
+         mParameterSliders[mWantRemoveSliderIndex].mRemoveButton->SetShowing(false);
+         RemoveUIControl(mParameterSliders[mWantRemoveSliderIndex].mSlider);
+         RemoveUIControl(mParameterSliders[mWantRemoveSliderIndex].mRemoveButton);
+         mParameterSliders[mWantRemoveSliderIndex].mSlider->Delete();
+         mParameterSliders[mWantRemoveSliderIndex].mRemoveButton->Delete();
+         mParameterSliders[mWantRemoveSliderIndex].mSlider = nullptr;
+         mParameterSliders[mWantRemoveSliderIndex].mRemoveButton = nullptr;
+         mParameterSliders[mWantRemoveSliderIndex].mInSelectorList = false;
+         mWantRemoveSlider = false;
+         RecreateUIOutputCables();
+      }
 
       {
          const juce::ScopedLock lock(mMidiInputLock);
@@ -804,9 +920,9 @@ void VSTPlugin::Process(double time)
             mWantsPanic = false;
 
             mMidiBuffer.clear();
-            for (int channel = 1; channel <= 16; ++channel)
+            for (int channel = 1; channel <= kMaxJuceMidiStereoChannels; ++channel)
                mMidiBuffer.addEvent(juce::MidiMessage::allNotesOff(channel), 0);
-            for (int channel = 1; channel <= 16; ++channel)
+            for (int channel = 1; channel <= kMaxJuceMidiStereoChannels; ++channel)
                mMidiBuffer.addEvent(juce::MidiMessage::allSoundOff(channel), 1);
          }
 
@@ -839,24 +955,73 @@ void VSTPlugin::Process(double time)
       }
       mVSTMutex.unlock();
 
-      GetBuffer()->Clear();
+      AllChannelsBuffer->Clear();
+
+      int numChannels = 2 + ((int)mAdditionalOutCableSources.size() * 2);
+
+      if (numChannels != mLastNumChannels)
+      {
+         AllChannelsBuffer->SetNumActiveChannels(numChannels);
+         AllChannelsBuffer->SetMaxAllowedChannels(numChannels);
+         mLastNumChannels = numChannels;
+      }
+
       /*
        * Until we support multi output we end up with this requirement that
        * the output is at most stereo. This stops mis-behaving plugins which
        * output the full buffer set from copying that onto the output.
        * (Ahem: Surge 1.9)
        */
-      int nChannelsToCopy = MIN(2, buffer.getNumChannels());
-      for (int ch = 0; ch < nChannelsToCopy && ch < kSafetyMaxChannels; ++ch)
+      int nSingleChannelsToCopy = MIN(AllChannelsBuffer->NumActiveChannels(), buffer.getNumChannels());
+      for (int sourceChannel = 0; sourceChannel < nSingleChannelsToCopy && sourceChannel < (kSafetyMaxStereoChannels * 2); ++sourceChannel)
       {
-         int outputChannel = MIN(ch, GetBuffer()->NumActiveChannels() - 1);
-         for (int sampleIndex = 0; sampleIndex < buffer.getNumSamples(); ++sampleIndex)
+         int sourceStereoChannel = sourceChannel % 2;
+         int stereoIndex = floor(sourceChannel / 2);
+
+         IAudioReceiver* CurrentTargetAudioReceiver;
+         RollingBuffer* CurrentVizBuffer;
+
+         if (stereoIndex == 0)
          {
-            GetBuffer()->GetChannel(outputChannel)[sampleIndex] += buffer.getSample(ch, sampleIndex) * mVol;
+            // Default behaviour for single output VST plugins, use the IAudioSource defined target and default VizBuffer
+            CurrentTargetAudioReceiver = target;
+            CurrentVizBuffer = GetVizBuffer();
          }
-         if (target)
-            Add(target->GetBuffer()->GetChannel(outputChannel), GetBuffer()->GetChannel(outputChannel), bufferSize);
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(outputChannel), bufferSize, outputChannel);
+         else
+         {
+            // This is a multi out VST, we need to use the additional Vis Buffer and set the target to the node this pat
+            CurrentTargetAudioReceiver = mAdditionalOutCables[stereoIndex - 1]->GetPatchCableSource()->GetAudioReceiver();
+            CurrentVizBuffer = mAdditionalVizBuffers[stereoIndex - 1];
+         }
+
+         // Copy the output from juce into our own buffer
+         int numMonoSamples = buffer.getNumSamples();
+         for (int sampleIndex = 0; sampleIndex < numMonoSamples; ++sampleIndex)
+         {
+            auto temp_buffer = AllChannelsBuffer->GetChannel(sourceChannel);
+            if (temp_buffer == nullptr)
+               continue;
+            temp_buffer[sampleIndex] += buffer.getSample(sourceChannel, sampleIndex) * mVol;
+         }
+
+         // Copy the outputs from the single buffer into our multiple output buffers
+         if (CurrentTargetAudioReceiver)
+         {
+            ChannelBuffer* targetBuffer = CurrentTargetAudioReceiver->GetBuffer();
+            targetBuffer->SetNumActiveChannels(2);
+
+            float* Destination = targetBuffer->GetChannel(sourceStereoChannel);
+            float* Source = AllChannelsBuffer->GetChannel(sourceChannel);
+
+            // Add the samples to the destination Audio Receiver buffer
+            Add(
+            Destination,
+            Source,
+            AllChannelsBuffer->BufferSize());
+
+            // Also write the samples to the Visualizer Buffer for this cable output
+            CurrentVizBuffer->WriteChunk(Source, targetBuffer->BufferSize(), sourceStereoChannel);
+         }
       }
    }
    else
@@ -865,12 +1030,15 @@ void VSTPlugin::Process(double time)
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          if (target)
-            Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+            Add(
+            target->GetBuffer()->GetChannel(ch),
+            AllChannelsBuffer->GetChannel(ch),
+            AllChannelsBuffer->BufferSize());
+         GetVizBuffer()->WriteChunk(AllChannelsBuffer->GetChannel(ch), AllChannelsBuffer->BufferSize(), ch);
       }
    }
 
-   GetBuffer()->Clear();
+   AllChannelsBuffer->Clear();
 }
 
 void VSTPlugin::PlayNote(NoteMessage note)
@@ -943,24 +1111,6 @@ void VSTPlugin::SetEnabled(bool enabled)
    mEnabled = enabled;
 }
 
-void VSTPlugin::PreDrawModule()
-{
-   /*if (mDisplayMode == kDisplayMode_PluginOverlay && mWindowOverlay)
-   {
-      mWindowOverlay->GetDimensions(mOverlayWidth, mOverlayHeight);
-      if (mWindow)
-      {
-         mOverlayWidth = 500;
-         mOverlayHeight = 500;
-         float contentMult = gDrawScale;
-         float width = mOverlayWidth * contentMult;
-         float height = mOverlayHeight * contentMult;
-         mWindow->setSize(width, height);
-      }
-      mWindowOverlay->UpdatePosition(this);
-   }*/
-}
-
 void VSTPlugin::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
@@ -971,61 +1121,44 @@ void VSTPlugin::DrawModule()
    mSavePresetFileButton->Draw();
    mOpenEditorButton->Draw();
    mPanicButton->Draw();
+   mRemoveExtraOutputButton->Draw();
+   mAddExtraOutputButton->Draw();
    mShowParameterDropdown->Draw();
 
    ofPushStyle();
    ofSetColor(IDrawableModule::GetColor(kModuleCategory_Note));
-   DrawTextRightJustify("midi out:", 206 - 18, 14);
+   DrawTextRightJustify("midi out:", GetRect().width - 15, 14);
    ofPopStyle();
 
-   if (mDisplayMode == kDisplayMode_Sliders)
-   {
-      int sliderCount = 0;
-      for (auto& slider : mParameterSliders)
+   ofPushStyle();
+   ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth));
+   DrawTextNormal("extra outputs:", 3, 50);
+   ofPopStyle();
+
+   ofPushStyle();
+   ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth), 75);
+   DrawTextRightJustify(ofToString(mParameterSliders.size()), GetRect().width - 3, 67);
+   ofPopStyle();
+
+   for (const auto& slider : mParameterSliders)
+      if (slider.mSlider && slider.mShowing)
       {
-         if (slider.mSlider)
-         {
-            slider.mSlider->SetShowing(slider.mShowing);
-            if (slider.mShowing)
-            {
-               const int kRows = 20;
-               slider.mSlider->SetPosition(3 + (slider.mSlider->GetRect().width + 2) * (sliderCount / kRows), 60 + (17 * (sliderCount % kRows)));
-
-               slider.mSlider->Draw();
-
-               ++sliderCount;
-            }
-         }
+         slider.mSlider->Draw();
+         slider.mRemoveButton->Draw();
       }
-   }
 }
+
 
 void VSTPlugin::GetModuleDimensions(float& width, float& height)
 {
-   if (mDisplayMode == kDisplayMode_PluginOverlay)
+   width = 236;
+   height = 76;
+   for (auto& slider : mParameterSliders)
    {
-      /*if (mWindowOverlay)
+      if (slider.mSlider && slider.mShowing)
       {
-         width = mOverlayWidth;
-         height = mOverlayHeight+20;
-      }
-      else
-      {*/
-      width = 206;
-      height = 40;
-      //}
-   }
-   else
-   {
-      width = 206;
-      height = 58;
-      for (auto& slider : mParameterSliders)
-      {
-         if (slider.mSlider && slider.mShowing)
-         {
-            width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 3);
-            height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
-         }
+         width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 23);
+         height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
       }
    }
 }
@@ -1055,16 +1188,19 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal, double time)
       mParameterSliders[mShowParameterIndex].mInSelectorList = true;
       mShowParameterIndex = -1;
       mTemporarilyDisplayedParamIndex = -1;
+      // Move output cables
+      RecreateUIOutputCables();
    }
 }
 
 void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
-   for (int i = 0; i < mParameterSliders.size(); ++i)
+   for (const auto& parameterSlider : mParameterSliders)
    {
-      if (mParameterSliders[i].mSlider == slider)
+      if (parameterSlider.mSlider == slider)
       {
-         mParameterSliders[i].mParameter->setValue(mParameterSliders[i].mValue);
+         parameterSlider.mParameter->setValue(parameterSlider.mValue);
+         break;
       }
    }
 }
@@ -1080,11 +1216,38 @@ void VSTPlugin::CheckboxUpdated(Checkbox* checkbox, double time)
 void VSTPlugin::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mOpenEditorButton)
+   {
       mWantOpenVstWindow = true;
+      return;
+   }
 
    if (button == mPanicButton)
    {
       mWantsPanic = true;
+      return;
+   }
+
+   if (button == mAddExtraOutputButton)
+   {
+      mWantsAddExtraOutput = true;
+      return;
+   }
+
+   if (button == mRemoveExtraOutputButton)
+   {
+      mWantsRemoveExtraOutput = true;
+      return;
+   }
+
+   if (button == mLoadParameterButton)
+   {
+      if (GetKeyModifiers() & kModifier_Command)
+      {
+         CreateParameterSliders();
+         return;
+      }
+      mWantLoadParameters = true;
+      return;
    }
 
    if (button == mSavePresetFileButton && mPlugin != nullptr)
@@ -1157,6 +1320,15 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
          }
       }
    }
+
+   for (int i = 0; i < mParameterSliders.size(); ++i)
+   {
+      if (mParameterSliders[i].mRemoveButton == button)
+      {
+         mWantRemoveSlider = true;
+         mWantRemoveSliderIndex = i;
+      }
+   }
 }
 
 void VSTPlugin::DropdownClicked(DropdownList* list)
@@ -1181,8 +1353,12 @@ void VSTPlugin::RefreshPresetFiles()
    fileList.sort();
    for (const auto& file : fileList)
    {
-      mPresetFileSelector->AddLabel(file.getFileName().toStdString(), (int)mPresetFilePaths.size());
-      mPresetFilePaths.push_back(file.getFullPathName().toStdString());
+      int index = (int)mPresetFilePaths.size();
+      mPresetFileSelector->AddLabel(file.getFileNameWithoutExtension().toStdString(), index);
+      std::string filePath = file.getFullPathName().toStdString();
+      mPresetFilePaths.push_back(filePath);
+      if (filePath == mLastLoadedPresetFilePath)
+         mPresetFileIndex = index;
    }
 }
 
@@ -1201,6 +1377,7 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("usevoiceaschannel", moduleInfo, false);
    mModuleSaveData.LoadFloat("pitchbendrange", moduleInfo, 2, 1, 96, K(isTextField));
    mModuleSaveData.LoadInt("modwheelcc(1or74)", moduleInfo, 1, 0, 127, K(isTextField));
+   mModuleSaveData.LoadInt("numAdditionalStereoOutputs", moduleInfo, 0, 0, VSTPlugin::maxStereoOutputChannels, false);
 
    mModuleSaveData.LoadBool("preset_file_sets_params", moduleInfo, true);
 
@@ -1240,6 +1417,13 @@ void VSTPlugin::SetUpFromSaveData()
    SetVST(pluginDesc);
 
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+
+   // Add VST output pins
+   int numAdditionalStereoOutputs = mModuleSaveData.GetInt("numAdditionalStereoOutputs");
+   for (int newOutputCount = 0; newOutputCount < numAdditionalStereoOutputs; newOutputCount++)
+   {
+      AddExtraOutputCable();
+   }
 
    mChannel = mModuleSaveData.GetInt("channel");
    mUseVoiceAsChannel = mModuleSaveData.GetBool("usevoiceaschannel");
@@ -1281,6 +1465,8 @@ void VSTPlugin::SaveState(FileStreamOut& out)
    }
 
    IDrawableModule::SaveState(out);
+
+   out << mLastLoadedPresetFilePath;
 }
 
 void VSTPlugin::LoadState(FileStreamIn& in, int rev)
@@ -1307,6 +1493,12 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
 
    if (rev < 3)
       LoadVSTFromSaveData(in, rev);
+
+   if (rev >= 4)
+      in >> mLastLoadedPresetFilePath;
+
+   RecreateUIOutputCables();
+   RefreshPresetFiles();
 }
 
 void VSTPlugin::LoadVSTFromSaveData(FileStreamIn& in, int rev)
@@ -1368,8 +1560,9 @@ void VSTPlugin::ParameterSlider::MakeSlider()
       sliderID = mDisplayName.c_str(); //old save files used unstable parameters names
    else
       sliderID = mID.c_str(); //now we use parameter IDs for more stability
-   mSlider = new FloatSlider(mOwner, sliderID, -1, -1, 200, 15, &mValue, 0, 1);
+   mSlider = new FloatSlider(mOwner, sliderID, -1, -1, 210, 15, &mValue, 0, 1);
    mSlider->SetOverrideDisplayName(mDisplayName);
+   mRemoveButton = new ClickButton(mOwner, " X ", -1, -1);
 }
 
 void VSTPlugin::OnUIControlRequested(const char* name)

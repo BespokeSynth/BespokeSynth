@@ -95,14 +95,6 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
-
-   float mWidth{ 100 };
-   float mHeight{ 100 };
 
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;

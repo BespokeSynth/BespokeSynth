@@ -109,8 +109,8 @@ private:
       {
       }
       void UpdateControl() { OnModulatorRepatch(); }
-      void SetCableSource(PatchCableSource* cableSource) { mTargetCable = cableSource; }
-      PatchCableSource* GetCableSource() const { return mTargetCable; }
+      void SetCableSource(PatchCableSource* cableSource) { mTargetCableSource = cableSource; }
+      PatchCableSource* GetCableSource() const { return mTargetCableSource; }
 
       //IModulator
       virtual float Value(int samplesIn = 0) override;
@@ -132,8 +132,6 @@ private:
    float mSpeed{ 1 };
    FloatSlider* mSpeedSlider{ nullptr };
    ClickButton* mClearButton{ nullptr };
-   float mWidth{ 220 };
-   float mHeight{ kTopControlHeight + 200 + kTimelineSectionHeight + kBottomControlHeight };
    double mRecordStartOffset{ 0 };
    bool mIsDrawing{ false };
    bool mIsRightClicking{ false };
