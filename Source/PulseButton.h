@@ -53,14 +53,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
    ClickButton* mButton{ nullptr };
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    bool mForceImmediate{ false };
 };

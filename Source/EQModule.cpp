@@ -35,6 +35,7 @@
 
 EQModule::EQModule()
 : IAudioProcessor(gBufferSize)
+, IDrawableModule(825, 255)
 , mFFT(kNumFFTBins)
 , mFFTData(kNumFFTBins, kNumFFTBins / 2 + 1)
 , mRollingInputBuffer(kNumFFTBins)
@@ -487,18 +488,14 @@ void EQModule::GetModuleDimensions(float& w, float& h)
 
 void EQModule::Resize(float w, float h)
 {
-   mWidth = w;
-   mHeight = h;
-   mModuleSaveData.SetInt("width", w);
-   mModuleSaveData.SetInt("height", h);
+   mWidth = MAX(w, 208);
+   mHeight = MAX(h, 150);
    mNeedToUpdateFrequencyResponseGraph = true;
 }
 
 void EQModule::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("width", moduleInfo, mWidth, 50, 2000, K(isTextField));
-   mModuleSaveData.LoadInt("height", moduleInfo, mHeight, 50, 2000, K(isTextField));
    mModuleSaveData.LoadFloat("draw_gain", moduleInfo, 1, .1f, 4, K(isTextField));
    mModuleSaveData.LoadBool("lite_cpu_modulation", moduleInfo, true);
 
@@ -507,15 +504,11 @@ void EQModule::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void EQModule::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   moduleInfo["width"] = mWidth;
-   moduleInfo["height"] = mHeight;
 }
 
 void EQModule::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   mWidth = mModuleSaveData.GetInt("width");
-   mHeight = mModuleSaveData.GetInt("height");
    mDrawGain = mModuleSaveData.GetFloat("draw_gain");
    mLiteCpuModulation = mModuleSaveData.GetBool("lite_cpu_modulation");
 }

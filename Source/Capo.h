@@ -68,14 +68,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    int mCapo{ 0 };
    IntSlider* mCapoSlider{ nullptr };
    std::array<NoteInfo, 128> mInputNotes;

@@ -78,6 +78,7 @@ public:
    }
 
    void SetCuePoint(int pitch, float startSeconds, float lengthSeconds, float speed);
+   bool validCuePoint(int cueIndex);
    void FillData(std::vector<float> data);
    ChannelBuffer* GetCueSampleData(int cueIndex);
    float GetLengthInSeconds() const;
@@ -128,14 +129,10 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
-
-   float mWidth{ 608 };
-   float mHeight{ 150 };
 
    Sample* mSample{ nullptr };
    bool mOwnsSample{ true };

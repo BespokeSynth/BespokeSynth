@@ -28,9 +28,9 @@ struct NVGLUframebuffer {
 typedef struct NVGLUframebuffer NVGLUframebuffer;
 
 // Helper function to create GL frame buffer to render to.
-void nvgluBindFramebuffer(NVGLUframebuffer* fb);
-NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags);
-void nvgluDeleteFramebuffer(NVGLUframebuffer* fb);
+static inline void nvgluBindFramebuffer(NVGLUframebuffer* fb);
+static inline NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags);
+static inline void nvgluDeleteFramebuffer(NVGLUframebuffer* fb);
 
 #endif // NANOVG_GL_UTILS_H
 
@@ -49,7 +49,7 @@ void nvgluDeleteFramebuffer(NVGLUframebuffer* fb);
 
 static GLint defaultFBO = -1;
 
-NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags)
+static inline NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int w, int h, int imageFlags)
 {
 #ifdef NANOVG_FBO_VALID
 	GLint defaultFBO;
@@ -120,7 +120,7 @@ error:
 #endif
 }
 
-void nvgluBindFramebuffer(NVGLUframebuffer* fb)
+static inline void nvgluBindFramebuffer(NVGLUframebuffer* fb)
 {
 #ifdef NANOVG_FBO_VALID
 	if (defaultFBO == -1) glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
@@ -130,7 +130,7 @@ void nvgluBindFramebuffer(NVGLUframebuffer* fb)
 #endif
 }
 
-void nvgluDeleteFramebuffer(NVGLUframebuffer* fb)
+static inline void nvgluDeleteFramebuffer(NVGLUframebuffer* fb)
 {
 #ifdef NANOVG_FBO_VALID
 	if (fb == NULL) return;

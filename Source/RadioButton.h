@@ -56,6 +56,9 @@ class RadioButton : public IUIControl, public IPulseReceiver
 public:
    RadioButton(IRadioButtonListener* owner, const char* name, int x, int y, int* var, RadioDirection direction = kRadioVertical);
    RadioButton(IRadioButtonListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, RadioDirection direction = kRadioVertical);
+   IRadioButtonListener* GetOwner() { return mOwner; }
+   int* GetVar() { return mVar; }
+   void SetVar(int* var) { mVar = var; }
    void AddLabel(const char* label, int value);
    void SetLabel(const char* label, int value);
    void RemoveLabel(int value);
@@ -65,6 +68,7 @@ public:
    EnumMap GetEnumMap();
    void SetForcedWidth(int width) { mForcedWidth = width; }
    void CopyContentsTo(DropdownList* list) const;
+   RadioButtonElement GetElement(int index) { return mElements[index]; }
 
    bool MouseMoved(float x, float y) override;
 

@@ -25,14 +25,19 @@
 
 #include "Profiler.h"
 #include "SynthGlobals.h"
+#include "ModularSynth.h"
 #if BESPOKE_WINDOWS
 #include <intrin.h>
 #else
 #include <chrono>
 #endif
 
+#include "juce_audio_devices/juce_audio_devices.h"
+
 Profiler::Cost Profiler::sCosts[];
 bool Profiler::sEnableProfiler = false;
+std::array<float, 50> Profiler::sCpuUsageHistory{};
+int Profiler::sCpuUsageHistoryIndex = 0;
 
 namespace
 {
@@ -121,12 +126,27 @@ void Profiler::PrintCounters()
 //static
 void Profiler::Draw()
 {
+   sCpuUsageHistory[sCpuUsageHistoryIndex] = TheSynth->GetAudioDeviceManager().getCpuUsage();
+   sCpuUsageHistoryIndex = (sCpuUsageHistoryIndex + 1) % (int)sCpuUsageHistory.size();
+
    if (!sEnableProfiler)
       return;
 
    ofPushMatrix();
    ofTranslate(30, 70);
    ofPushStyle();
+   ofSetColor(255, 255, 255);
+   float maxCpu = 0;
+   float minCpu = 9999;
+   for (int i = 0; i < (int)sCpuUsageHistory.size(); ++i)
+   {
+      if (sCpuUsageHistory[i] > maxCpu)
+         maxCpu = sCpuUsageHistory[i];
+      if (sCpuUsageHistory[i] < minCpu)
+         minCpu = sCpuUsageHistory[i];
+   }
+   DrawTextNormal("min cpu: " + ofToString(minCpu * 100, 1) + "%\nmax cpu: " + ofToString(maxCpu * 100, 1) + "%", 0, 0);
+   ofTranslate(0, 100);
    ofFill();
    ofSetColor(0, 0, 0, 140);
    //ofRect(-5,-15,600,sCosts.size()*15+10);

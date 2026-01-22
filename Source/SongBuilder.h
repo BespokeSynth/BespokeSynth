@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "TextEntry.h"
 #include "Push2Control.h"
 
-class SongBuilder : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public ITextEntryListener, public INoteReceiver, public IPush2GridController
+class SongBuilder : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public ITextEntryListener, public INoteReceiver, public IAbletonGridController
 {
 public:
    SongBuilder();
@@ -48,6 +48,11 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void Poll() override;
 
+   int GetCurrentScene() const { return mCurrentScene; }
+   int GetQueuedScene() const { return mQueuedScene; }
+   int GetNumScenes() const { return (int)mScenes.size(); }
+   void SetScene(int scene, double time);
+
    //ITimeListener
    void OnTimeEvent(double time) override;
 
@@ -59,9 +64,9 @@ public:
    void SendPressure(int pitch, int pressure) override {}
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
    bool DrawToPush2Screen() override;
 
    void ButtonClicked(ClickButton* button, double time) override;

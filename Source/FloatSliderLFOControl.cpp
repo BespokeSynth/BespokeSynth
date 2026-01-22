@@ -39,6 +39,7 @@ FloatSliderLFOControl::FloatSliderLFOControl()
    mLFOSettings.mSoften = 0;
    mLFOSettings.mShuffle = 0;
    mLFOSettings.mFreeRate = 1;
+   mLFOSettings.mRandomSeed = gRandom() % 10000;
 
    mLFO.SetPeriod(mLFOSettings.mInterval);
 }
@@ -59,9 +60,11 @@ void FloatSliderLFOControl::CreateUIControls()
    FLOATSLIDER(mOffsetSlider, "offset", &mLFOSettings.mLFOOffset, 0, 1);
    FLOATSLIDER(mMinSlider, "low", &mDummyMin, 0, 1);
    FLOATSLIDER(mMaxSlider, "high", &mDummyMax, 0, 1);
-   FLOATSLIDER(mSpreadSlider, "spread", &mLFOSettings.mSpread, 0, 1);
+   FLOATSLIDER(mSpreadSlider, "spread", &mLFOSettings.mSpread, -1, 1);
    FLOATSLIDER(mBiasSlider, "bias", &mLFOSettings.mBias, 0, 1);
    FLOATSLIDER(mLengthSlider, "length", &mLFOSettings.mLength, 0, 1);
+   UIBLOCK_SHIFTUP();
+   TEXTENTRY_NUM(mRandomSeedEntry, "seed", 6, &mLFOSettings.mRandomSeed, 0, 99999);
    FLOATSLIDER(mShuffleSlider, "shuffle", &mLFOSettings.mShuffle, 0, 1);
    FLOATSLIDER(mSoftenSlider, "soften", &mLFOSettings.mSoften, 0, 1);
    FLOATSLIDER(mFreeRateSlider, "free rate", &mLFOSettings.mFreeRate, 0, 20);
@@ -106,6 +109,8 @@ void FloatSliderLFOControl::CreateUIControls()
    mFreeRateSlider->SetMode(FloatSlider::kBezier);
    mFreeRateSlider->SetBezierControl(1);
 
+   mRandomSeedEntry->DrawLabel(true);
+
    UpdateVisibleControls();
 }
 
@@ -145,6 +150,7 @@ void FloatSliderLFOControl::DrawModule()
    mShuffleSlider->Draw();
    mLengthSlider->Draw();
    mLowResModeCheckbox->Draw();
+   mRandomSeedEntry->Draw();
    if (!mPinned)
       mPinButton->Draw();
 
@@ -184,12 +190,15 @@ void FloatSliderLFOControl::DrawModule()
    {
       squeeze = 2;
    }
-   if (mLFO.GetOsc()->GetType() == kOsc_Perlin)
-      currentPhase = 0;
    float displayPhase = currentPhase;
    displayPhase -= 1 - mLFOSettings.mLFOOffset;
    if (displayPhase < 0)
       displayPhase += squeeze;
+   if (mLFO.GetOsc()->GetType() == kOsc_Perlin)
+   {
+      currentPhase = 0;
+      displayPhase = 0;
+   }
    ofCircle(displayPhase / squeeze * width + x,
             ofMap(GetLFOValue(0, mLFO.TransformPhase(currentPhase)), GetTargetMax(), GetTargetMin(), 0, height) + y, 2);
 }
@@ -283,10 +292,10 @@ void FloatSliderLFOControl::RandomizeSettings()
 
 void FloatSliderLFOControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (mTargetCable == nullptr)
+   if (mTargetCableSource == nullptr)
       return;
-   if (GetSliderTarget() != mTargetCable->GetTarget() || mTargetCable->GetTarget() == nullptr)
-      SetOwner(dynamic_cast<FloatSlider*>(mTargetCable->GetTarget()));
+   if (GetSliderTarget() != mTargetCableSource->GetTarget() || mTargetCableSource->GetTarget() == nullptr)
+      SetOwner(dynamic_cast<FloatSlider*>(mTargetCableSource->GetTarget()));
    OnModulatorRepatch();
 }
 
@@ -305,11 +314,37 @@ float FloatSliderLFOControl::Value(int samplesIn /*= 0*/)
    return GetLFOValue(samplesIn);
 }
 
+namespace
+{
+   inline float Spread(float x, float spread)
+   {
+      if (spread == 0.0f)
+         return x;
+
+      float exp = (spread > 0.0f)
+                  ? 1.0f / (1.0f - spread)
+                  : 1.0f + spread;
+
+      if (x <= 0.5f)
+      {
+         float t = x / 0.5f;
+         return 0.5f * std::pow(t, exp);
+      }
+      else
+      {
+         float t = (x - 0.5f) / 0.5f;
+         return 0.5f + 0.5f * (1.0f - std::pow(1.0f - t, exp));
+      }
+   }
+}
+
 float FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, float forcePhase /*= -1*/)
 {
    float val = mLFO.Value(samplesIn, forcePhase);
-   if (mLFOSettings.mSpread > 0)
+   if (mUseOldSpreadStyle)
       val = val * (1 - mLFOSettings.mSpread) + (-cosf(val * FPI) + 1) * .5f * mLFOSettings.mSpread;
+   else
+      val = Spread(val, mLFOSettings.mSpread);
    return ofClamp(Interp(val, GetMin(), GetMax()), GetTargetMin(), GetTargetMax());
 }
 
@@ -359,6 +394,7 @@ void FloatSliderLFOControl::UpdateVisibleControls()
    mSoftenSlider->SetShowing(mLFO.GetOsc()->GetType() == kOsc_Saw || mLFO.GetOsc()->GetType() == kOsc_Square || mLFO.GetOsc()->GetType() == kOsc_NegSaw || isRandom);
    mSpreadSlider->SetShowing(mLFO.GetOsc()->GetType() != kOsc_Square);
    mLengthSlider->SetShowing(!isPerlin && !isDrunk && !isRandom);
+   mRandomSeedEntry->SetShowing(isDrunk || isRandom || isPerlin);
    mFreeRateSlider->SetShowing(showFreeRate);
 }
 
@@ -434,6 +470,12 @@ void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal
       mLFOSettings.mMaxValue = mMaxSlider->GetValue();
 }
 
+void FloatSliderLFOControl::TextEntryComplete(TextEntry* entry)
+{
+   if (entry == mRandomSeedEntry)
+      mLFO.SetRandomSeed(mLFOSettings.mRandomSeed);
+}
+
 void FloatSliderLFOControl::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mEnabledCheckbox)
@@ -455,12 +497,12 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button, double time)
 
          SetName(GetUniqueName("lfo", TheSynth->GetModuleNames<FloatSliderLFOControl*>()).c_str());
 
-         if (mTargetCable == nullptr)
+         if (mTargetCableSource == nullptr)
          {
-            mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-            mTargetCable->SetModulatorOwner(this);
-            AddPatchCableSource(mTargetCable);
-            mTargetCable->SetTarget(GetSliderTarget());
+            mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+            mTargetCableSource->SetModulatorOwner(this);
+            AddPatchCableSource(mTargetCableSource);
+            mTargetCableSource->SetTarget(GetSliderTarget());
          }
       }
    }
@@ -485,12 +527,33 @@ void FloatSliderLFOControl::SetUpFromSaveData()
    UpdateFromSettings();
    UpdateVisibleControls();
 
-   if (mTargetCable == nullptr)
+   if (mTargetCableSource == nullptr)
    {
-      mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
-      mTargetCable->SetModulatorOwner(this);
-      AddPatchCableSource(mTargetCable);
+      mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
+      mTargetCableSource->SetModulatorOwner(this);
+      AddPatchCableSource(mTargetCableSource);
    }
+}
+
+void FloatSliderLFOControl::SaveState(FileStreamOut& out)
+{
+   out << GetModuleSaveStateRev();
+
+   IDrawableModule::SaveState(out);
+
+   out << mUseOldSpreadStyle;
+}
+
+void FloatSliderLFOControl::LoadState(FileStreamIn& in, int rev)
+{
+   IDrawableModule::LoadState(in, rev);
+
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
+
+   if (rev < 1)
+      mUseOldSpreadStyle = true;
+   else
+      in >> mUseOldSpreadStyle;
 }
 
 FloatSliderLFOControl* LFOPool::sLFOPool[LFO_POOL_SIZE];

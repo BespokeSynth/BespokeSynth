@@ -36,7 +36,7 @@
 #include "Scale.h"
 #include "NoteStepSequencer.h"
 
-class BassLineSequencer : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public INoteSource, public INoteReceiver, IDrivableSequencer, public UIGridListener, public IFloatSliderListener, public IScaleListener
+class BassLineSequencer : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public INoteSource, public INoteReceiver, public IDrivableSequencer, public UIGridListener, public IFloatSliderListener, public IScaleListener
 {
 public:
    BassLineSequencer();
@@ -48,6 +48,10 @@ public:
 
    void CreateUIControls() override;
    void Init() override;
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
+
+   void SetStep(int step, int tone, StepVelocityType velocity, bool tie);
 
    //IDrawableModule
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -82,19 +86,18 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 0; }
+   int GetModuleSaveStateRev() const override { return 1; }
 
    bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    void KeyPressed(int key, bool isRepeat) override;
-   bool ShouldSerializeForSnapshot() override { return true; }
+   bool ShouldSerializeForSnapshot() const override { return true; }
 
    void StepBy(double time, float velocity, int flags);
    void ResetStep();
@@ -104,12 +107,14 @@ private:
    void UpdatePitchLabels();
    int GetPageCount() const { return (int)ceil((float)mLength / mNumVisibleStepControls); }
    float GetDisplayWidth() const { return mWidth - 6; }
+   float GetDisplayHeight() const { return mHeight - 102; }
 
    static const int kMaxSteps = 128;
    static const int kMaxStepControls = 16;
    static const int kEditStepControlIndex = kMaxStepControls;
    static constexpr float kDisplayX = 3;
-   static constexpr float kDisplayHeight = 50;
+   static constexpr float kMouseClickAccentPortion = .2f;
+   static constexpr float kMouseClickTiePortion = .2f;
 
    struct Step
    {
@@ -122,6 +127,8 @@ private:
 
    struct StepControl
    {
+      void Move(float x, float y);
+
       float xPos{ 0 };
       float yPos{ 0 };
       float xMax{ 0 };
@@ -143,9 +150,17 @@ private:
       SlideCC
    };
 
+   enum class StepEditAction
+   {
+      None,
+      SetPitch,
+      AdjustAccent,
+      ToggleTie
+   };
+
    std::array<Step, kMaxSteps> mSteps;
    std::array<StepControl, kMaxStepControls + 1> mStepControls;
-   float mWidth{ 0 }, mHeight{ 0 };
+   float mMinWidth{ 0 }, mMinHeight{ 0 };
    bool mHasExternalPulseSource{ false };
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
 
@@ -158,10 +173,15 @@ private:
    int mNumVisibleStepControls{ 16 };
    int mHighlightDisplayStepIdx{ -1 };
    int mHighlightStepControlIdx{ -1 };
+   float mHoverStepIdx{ -1 };
+   bool mMouseDown{ false };
    ofVec2f mMouseHoverPos{};
+   double mMouseClickedTime{ 0 };
+   int mStepToEraseOnMouseRelease{ -1 };
    int mHeldInputPitch{ -1 };
    int mWriteNewNotePitch{ -1 };
    float mLastInputVelocity{ 0.0f };
+   StepEditAction mHoverEditAction{ StepEditAction::None };
 
    NoteInterval mInterval{ NoteInterval::kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };
@@ -169,7 +189,7 @@ private:
    IntSlider* mLengthSlider{ nullptr };
    int mOctave{ 1 };
    IntSlider* mOctaveSlider{ nullptr };
-   NoteStepSequencer::NoteMode mNoteMode{ NoteStepSequencer::NoteMode::kNoteMode_Scale };
+   NoteStepSequencer::NoteMode mNoteMode{ NoteStepSequencer::NoteMode::Scale };
    DropdownList* mNoteModeSelector{ nullptr };
    float mGlideTime{ 35 };
    FloatSlider* mGlideSlider{ nullptr };

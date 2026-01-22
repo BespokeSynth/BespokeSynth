@@ -35,10 +35,11 @@
 #include "Scale.h"
 #include "GridController.h"
 #include "Push2Control.h"
+#include "NoteStepSequencer.h"
 
 class PatchCableSource;
 
-class NoteTable : public IDrawableModule, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public UIGridListener, public INoteReceiver, public IGridControllerListener, public IPush2GridController
+class NoteTable : public IDrawableModule, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public UIGridListener, public INoteReceiver, public IGridControllerListener, public IAbletonGridController
 {
 public:
    NoteTable();
@@ -78,9 +79,9 @@ public:
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -111,18 +112,10 @@ private:
    void GetPush2Layout(int& sequenceRows, int& pitchCols, int& pitchRows);
    void SetColumnRow(int column, int row);
 
-   enum NoteMode
-   {
-      kNoteMode_Scale,
-      kNoteMode_Chromatic,
-      kNoteMode_Pentatonic,
-      kNoteMode_Fifths
-   };
-
    UIGrid* mGrid{ nullptr };
    int mOctave{ 3 };
    IntSlider* mOctaveSlider{ nullptr };
-   NoteMode mNoteMode{ NoteMode::kNoteMode_Scale };
+   NoteStepSequencer::NoteMode mNoteMode{ NoteStepSequencer::NoteMode::Scale };
    DropdownList* mNoteModeSelector{ nullptr };
    int mLength{ 8 };
    IntSlider* mLengthSlider{ nullptr };

@@ -34,7 +34,8 @@
 #include "juce_core/juce_core.h"
 
 FubbleModule::FubbleModule()
-: mAxisH(this, true)
+: IDrawableModule(220, kTopControlHeight + 200 + kTimelineSectionHeight + kBottomControlHeight)
+, mAxisH(this, true)
 , mAxisV(this, false)
 {
    UpdatePerlinSeed();
@@ -475,16 +476,12 @@ void FubbleModule::SaveLayout(ofxJSONElement& moduleInfo)
 {
    moduleInfo["uicontrol_h"] = mAxisH.GetCableSource()->GetTarget() ? mAxisH.GetCableSource()->GetTarget()->Path() : "";
    moduleInfo["uicontrol_v"] = mAxisV.GetCableSource()->GetTarget() ? mAxisV.GetCableSource()->GetTarget()->Path() : "";
-   moduleInfo["width"] = mWidth;
-   moduleInfo["height"] = mHeight;
 }
 
 void FubbleModule::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("uicontrol_h", moduleInfo);
    mModuleSaveData.LoadString("uicontrol_v", moduleInfo);
-   mModuleSaveData.LoadInt("width", moduleInfo, mWidth, 120, 1000);
-   mModuleSaveData.LoadInt("height", moduleInfo, mHeight, 15, 1000);
 
    SetUpFromSaveData();
 }
@@ -516,8 +513,6 @@ void FubbleModule::SetUpFromSaveData()
          }
       }
    }
-
-   Resize(mModuleSaveData.GetInt("width"), mModuleSaveData.GetInt("height"));
 }
 
 void FubbleModule::SaveState(FileStreamOut& out)

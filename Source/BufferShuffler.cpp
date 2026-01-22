@@ -30,6 +30,7 @@
 
 BufferShuffler::BufferShuffler()
 : IAudioProcessor(gBufferSize)
+, IDrawableModule(245, 85)
 , mInputBuffer(20 * 48000)
 {
 }
@@ -105,30 +106,36 @@ void BufferShuffler::Process(double time)
       {
          ComputeSliders(0);
 
-         if (mPlaybackSampleStartTime != -1 && time >= mPlaybackSampleStartTime)
-         {
-            int numSlices = GetNumSlices();
-            int slicePosIndex = mQueuedSlice;
-            if (mQueuedPlaybackStyle != PlaybackStyle::None)
-               mPlaybackStyle = mQueuedPlaybackStyle;
-            mQueuedPlaybackStyle = PlaybackStyle::None;
-            if (GetSlicePlaybackRate() < 0)
-               slicePosIndex += 1;
-            float slicePos = (slicePosIndex % numSlices) / (float)numSlices;
-            mPlaybackSampleIndex = int(GetLengthInSamples() * slicePos);
-            mPlaybackSampleStartTime = -1;
-            mSwitchAndRamp.StartSwitch();
-            if (mDrawDebug)
-               AddDebugLine(ofToString(gTime) + " switch and ramp for slice start", 10);
-         }
+         int eventIndex = ConsumeEvent(time);
 
-         if (mPlaybackSampleStopTime != -1 && time >= mPlaybackSampleStopTime)
+         if (eventIndex != -1)
          {
-            mPlaybackSampleIndex = -1;
-            mPlaybackSampleStopTime = -1;
-            mSwitchAndRamp.StartSwitch();
-            if (mDrawDebug)
-               AddDebugLine(ofToString(gTime) + " switch and ramp for slice end", 10);
+            ShuffleEvent& event = mEvents[eventIndex];
+
+            if (event.mSlice != -1)
+            {
+               int numSlices = GetNumSlices();
+               int slicePosIndex = event.mSlice;
+               if (mQueuedPlaybackStyle != PlaybackStyle::None)
+                  mPlaybackStyle = mQueuedPlaybackStyle;
+               mQueuedPlaybackStyle = PlaybackStyle::None;
+               if (GetSlicePlaybackRate() < 0)
+                  slicePosIndex += 1;
+               float slicePos = (slicePosIndex % numSlices) / (float)numSlices;
+               mPlaybackSampleIndex = int(GetLengthInSamples() * slicePos);
+               mSwitchAndRamp.StartSwitch();
+               if (mDrawDebug)
+                  AddDebugLine(ofToString(gTime) + " switch and ramp for slice start", 10);
+            }
+            else
+            {
+               mPlaybackSampleIndex = -1;
+               mSwitchAndRamp.StartSwitch();
+               if (mDrawDebug)
+                  AddDebugLine(ofToString(gTime) + " switch and ramp for slice end", 10);
+            }
+
+            event.mTime = -1;
          }
 
          for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
@@ -270,19 +277,13 @@ void BufferShuffler::PlayNote(NoteMessage note)
 {
    if (note.velocity > 0)
    {
-      mQueuedSlice = note.pitch;
       if (mUseVelocitySpeedControl)
          mQueuedPlaybackStyle = VelocityToPlaybackStyle(note.velocity);
-      mPlaybackSampleStartTime = note.time;
-      mPlaybackSampleStopTime = -1;
+      QueueEvent(note.time, note.pitch, mPlaybackStyle);
    }
    else
    {
-      if (mQueuedSlice == note.pitch)
-      {
-         mQueuedSlice = -1;
-         mPlaybackSampleStopTime = note.time;
-      }
+      QueueEvent(note.time, -1);
    }
 }
 
@@ -306,15 +307,53 @@ void BufferShuffler::OnClicked(float x, float y, bool right)
 
 void BufferShuffler::PlayOneShot(int slice)
 {
-   mQueuedSlice = slice;
    double sliceSizeMs = TheTransport->GetMeasureFraction(mInterval) * TheTransport->MsPerBar();
    double currentTime = NextBufferTime(false);
    double remainderMs;
    TransportListenerInfo timeInfo(nullptr, mInterval, OffsetInfo(0, false), false);
    TheTransport->GetQuantized(currentTime, &timeInfo, &remainderMs);
    double timeUntilNextInterval = sliceSizeMs - remainderMs;
-   mPlaybackSampleStartTime = currentTime + timeUntilNextInterval;
-   mPlaybackSampleStopTime = mPlaybackSampleStartTime + sliceSizeMs / abs(GetSlicePlaybackRate());
+   double startTime = currentTime + timeUntilNextInterval;
+   double endTime = startTime + sliceSizeMs / abs(GetSlicePlaybackRate());
+   QueueEvent(startTime, slice, mPlaybackStyle);
+   QueueEvent(endTime, -1);
+}
+
+void BufferShuffler::QueueEvent(double time, int slice, PlaybackStyle style /*=PlaybackStyle::Normal*/)
+{
+   for (int i = 0; i < (int)mEvents.size(); ++i)
+   {
+      //skip note-off if we're note-on'ing at the same time
+      if (mEvents[i].mSlice == -1 &&
+          mEvents[i].mTime != -1 &&
+          time <= mEvents[i].mTime)
+      {
+         mNextEventWriteRoundRobin = i;
+      }
+
+      //don't queue up note-off if there's a note-on at the same time
+      if (slice == -1 &&
+          time <= mEvents[i].mTime)
+      {
+         return;
+      }
+   }
+   mEvents[mNextEventWriteRoundRobin].mTime = time;
+   mEvents[mNextEventWriteRoundRobin].mSlice = slice;
+   mEvents[mNextEventWriteRoundRobin].mStyle = style;
+   mNextEventWriteRoundRobin = (mNextEventWriteRoundRobin + 1) % (int)mEvents.size();
+}
+
+int BufferShuffler::ConsumeEvent(double time)
+{
+   if (mEvents[mNextEventReadRoundRobin].mTime != -1 &&
+       time >= mEvents[mNextEventReadRoundRobin].mTime)
+   {
+      int ret = mNextEventReadRoundRobin;
+      mNextEventReadRoundRobin = (mNextEventReadRoundRobin + 1) % (int)mEvents.size();
+      return ret;
+   }
+   return -1;
 }
 
 int BufferShuffler::GetWritePositionInSamples(double time)
@@ -364,54 +403,56 @@ float BufferShuffler::GetSlicePlaybackRate() const
    }
 }
 
-bool BufferShuffler::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool BufferShuffler::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
-   if (type == kMidiMessage_Note)
+   if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex <= abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
    {
-      if (controlIndex >= 36 && controlIndex <= 99)
+      int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
+      int x = gridIndex % abletonGrid->GetGridNumCols();
+      int y = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
+      int index = x + y * abletonGrid->GetGridNumCols();
+
+      if (y == abletonGrid->GetGridNumRows() - 1)
       {
-         int gridIndex = controlIndex - 36;
-         int x = gridIndex % 8;
-         int y = 7 - gridIndex / 8;
-         int index = x + y * 8;
-
-         if (y == 7)
+         if (midiValue > 0 && x < 5)
          {
-            if (midiValue > 0 && x < 5)
-               mPlaybackStyle = PlaybackStyle(x + 1);
-            else
-               mPlaybackStyle = PlaybackStyle::Normal;
+            mPlaybackStyle = PlaybackStyle(x + 1);
+            abletonGrid->DisplayScreenMessage(mPlaybackStyleDropdown->GetDisplayValue((int)mPlaybackStyle));
          }
-         else if (index < GetNumSlices() && midiValue > 0)
+         else
          {
-            PlayOneShot(index);
+            mPlaybackStyle = PlaybackStyle::Normal;
          }
-
-         return true;
       }
+      else if (index < GetNumSlices() && midiValue > 0)
+      {
+         PlayOneShot(index);
+      }
+
+      return true;
    }
 
    return false;
 }
 
-void BufferShuffler::UpdatePush2Leds(Push2Control* push2)
+void BufferShuffler::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
-   for (int x = 0; x < 8; ++x)
+   for (int x = 0; x < abletonGrid->GetGridNumCols(); ++x)
    {
-      for (int y = 0; y < 8; ++y)
+      for (int y = 0; y < abletonGrid->GetGridNumRows(); ++y)
       {
          int pushColor = 0;
-         int index = x + y * 8;
+         int index = x + y * abletonGrid->GetGridNumCols();
          int writeSlice = GetWritePositionInSamples(gTime) * GetNumSlices() / GetLengthInSamples();
          int playSlice = mPlaybackSampleIndex * GetNumSlices() / GetLengthInSamples();
-         if (y == 7)
+         if (y == abletonGrid->GetGridNumRows() - 1)
          {
             if (x < 5)
                pushColor = (x == (int)mPlaybackStyle - 1) ? 2 : 1;
          }
          else if (index < GetNumSlices())
          {
-            if (index == mQueuedSlice && mPlaybackSampleStartTime != -1)
+            if (index == mEvents[mNextEventReadRoundRobin].mSlice && mEvents[mNextEventReadRoundRobin].mTime != -1)
                pushColor = 32;
             else if (mPlaybackSampleIndex >= 0 && index == playSlice)
                pushColor = 126;
@@ -421,7 +462,7 @@ void BufferShuffler::UpdatePush2Leds(Push2Control* push2)
                pushColor = 16;
          }
 
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex(), pushColor);
       }
    }
 }
@@ -465,7 +506,7 @@ void BufferShuffler::UpdateGridControllerLights(bool force)
          int playSlice = mPlaybackSampleIndex * GetNumSlices() / GetLengthInSamples();
          if (index < GetNumSlices())
          {
-            if (index == mQueuedSlice && mPlaybackSampleStartTime != -1)
+            if (index == mEvents[mNextEventReadRoundRobin].mSlice && mEvents[mNextEventReadRoundRobin].mTime != -1)
                color = kGridColor2Dim;
             else if (mPlaybackSampleIndex >= 0 && index == playSlice)
                color = kGridColor2Bright;

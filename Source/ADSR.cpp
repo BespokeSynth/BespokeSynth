@@ -153,7 +153,10 @@ float ::ADSR::Value(double time, const EventInfo* e) const
       return mStages[stage - 1].target;
 
    if (stage == 0)
-      stageStartValue = e->mStartBlendFromValue;
+      if (mZeroValueIsFirstStage)
+         stageStartValue = mStages[0].target;
+      else
+         stageStartValue = e->mStartBlendFromValue;
    else if (mHasSustainStage && stage == mSustainStage + 1 && e->mStopBlendFromValue != std::numeric_limits<float>::max())
       stageStartValue = e->mStopBlendFromValue;
    else

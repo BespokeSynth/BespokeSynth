@@ -46,6 +46,7 @@
 #include "UIGrid.h"
 #include "UserPrefs.h"
 #include "Prefab.h"
+#include "Snapshots.h"
 
 float IDrawableModule::sHueNote = 27;
 float IDrawableModule::sHueAudio = 135;
@@ -55,6 +56,12 @@ float IDrawableModule::sSaturation = 145;
 float IDrawableModule::sBrightness = 220;
 
 IDrawableModule::IDrawableModule()
+{
+}
+
+IDrawableModule::IDrawableModule(float width, float height)
+: mWidth(width)
+, mHeight(height)
 {
 }
 
@@ -483,6 +490,24 @@ void IDrawableModule::Render()
          source->DrawSource();
       }
    }
+}
+
+void IDrawableModule::PreRenderUnclipped()
+{
+   if (!mShowing)
+      return;
+
+   ofPushMatrix();
+   ofPushStyle();
+
+   ofTranslate(mX, mY, 0);
+   ofColor color = GetColor(mModuleCategory);
+   ofSetColor(color);
+
+   PreDrawModuleUnclipped();
+
+   ofPopMatrix();
+   ofPopStyle();
 }
 
 void IDrawableModule::RenderUnclipped()
@@ -1224,7 +1249,7 @@ void IDrawableModule::SetUpFromSaveDataBase()
 
 namespace
 {
-   const int kBaseSaveStateRev = 3;
+   const int kBaseSaveStateRev = 4;
    const int kControlSeparatorLength = 16;
    const char kControlSeparator[kControlSeparatorLength + 1] = "controlseparator";
 }
@@ -1234,6 +1259,9 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    if (!CanModuleTypeSaveState())
       return;
 
+   if (Snapshots::sSerializingModuleStateForSnapshot)
+      return;
+
    out << GetModuleSaveStateRev();
 
    out << kBaseSaveStateRev;
@@ -1241,6 +1269,12 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    out << mPinned;
    out << mPinnedPosition.x;
    out << mPinnedPosition.y;
+
+   if (IsResizable())
+   {
+      out << mWidth;
+      out << mHeight;
+   }
 
    std::vector<IUIControl*> controlsToSave;
    for (auto* control : mUIControls)
@@ -1303,6 +1337,9 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
    if (!CanModuleTypeSaveState())
       return;
 
+   if (Snapshots::sSerializingModuleStateForSnapshot)
+      return;
+
    if (rev != -1 && ModularSynth::sLoadingFileSaveStateRev >= 423)
    {
       int moduleRev;
@@ -1318,6 +1355,16 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
       in >> mPinned;
       in >> mPinnedPosition.x;
       in >> mPinnedPosition.y;
+   }
+
+   if (baseRev >= 4 && IsResizable())
+   {
+      float width, height;
+      in >> width;
+      in >> height;
+      width = MAX(width, GetMinimumDimensions().x);
+      height = MAX(height, GetMinimumDimensions().y);
+      Resize(width, height);
    }
 
    int numUIControls;

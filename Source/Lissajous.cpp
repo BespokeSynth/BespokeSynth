@@ -29,6 +29,7 @@
 
 Lissajous::Lissajous()
 : IAudioProcessor(gBufferSize)
+, IDrawableModule(500, 500)
 {
    for (int i = 0; i < NUM_LISSAJOUS_POINTS; ++i)
       mLissajousPoints[i].set(0, 0);
@@ -127,8 +128,6 @@ void Lissajous::Resize(float w, float h)
 void Lissajous::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadFloat("width", moduleInfo, 500);
-   mModuleSaveData.LoadFloat("height", moduleInfo, 500);
    mModuleSaveData.LoadBool("autocorrelation", moduleInfo, true);
 
    SetUpFromSaveData();
@@ -136,15 +135,11 @@ void Lissajous::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void Lissajous::SaveLayout(ofxJSONElement& moduleInfo)
 {
-   moduleInfo["width"] = mWidth;
-   moduleInfo["height"] = mHeight;
    moduleInfo["autocorrelation"] = mAutocorrelationMode;
 }
 
 void Lissajous::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   mWidth = mModuleSaveData.GetFloat("width");
-   mHeight = mModuleSaveData.GetFloat("height");
    mAutocorrelationMode = mModuleSaveData.GetBool("autocorrelation");
 }

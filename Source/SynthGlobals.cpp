@@ -65,7 +65,6 @@ RetinaTrueTypeFont gFont;
 RetinaTrueTypeFont gFontBold;
 RetinaTrueTypeFont gFontFixedWidth;
 float gModuleDrawAlpha = 255;
-float gNullBuffer[kWorkBufferSize];
 float gZeroBuffer[kWorkBufferSize];
 float gWorkBuffer[kWorkBufferSize];
 ChannelBuffer gWorkChannelBuffer(kWorkBufferSize);
@@ -152,6 +151,9 @@ void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float sta
 
 void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/, int bufferSize /*=-1*/)
 {
+   static std::array<float, 10000> sAudioBufferMinValues;
+   static std::array<float, 10000> sAudioBufferMaxValues;
+
    vol = MAX(.1f, vol); //make sure we at least draw something if there is waveform data
 
    ofPushStyle();
@@ -163,6 +165,9 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
       ofRect(0, 0, width, height);
    else
       ofRect(width, 0, -width, height);
+
+   ofSetColor(color, 17);
+   ofLine(0, height / 2, width, height / 2);
 
    float length = end - 1 - start;
    if (length < 0)
@@ -183,11 +188,13 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
 
          ofSetColor(color);
 
+         float highestMagnitude = 0;
          for (float i = 0; abs(i) < abs(width); i += step)
          {
-            float mag = 0;
+            float max = -999;
+            float min = 999;
             int position = i / width * length + start;
-            //rms
+
             int j;
             int inc = 1 + samplesPerStep / 100;
             for (j = 0; j < samplesPerStep; j += inc)
@@ -197,22 +204,50 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
                   sampleIdx = sampleIdx - wraparoundFrom + wraparoundTo;
                if (bufferSize > 0)
                   sampleIdx %= bufferSize;
-               mag = MAX(mag, fabsf(buffer[sampleIdx]));
+               max = std::max(max, buffer[sampleIdx]);
+               min = std::min(min, buffer[sampleIdx]);
             }
-            mag = pow(mag, .25f);
-            mag *= height / 2 * vol;
-            if (mag > height / 2)
+
+            if (max > highestMagnitude)
+               highestMagnitude = max;
+            if (min < -highestMagnitude)
+               highestMagnitude = -min;
+
+            if (i < (int)sAudioBufferMinValues.size())
+            {
+               sAudioBufferMaxValues[i] = max;
+               sAudioBufferMinValues[i] = min;
+            }
+         }
+
+         float rescale = 1.0f;
+         if (highestMagnitude != 0.0)
+            rescale = std::clamp(1.0f / highestMagnitude, 1.0f, 10.0f);
+         for (float i = 0; abs(i) < abs(width); i += step)
+         {
+            float max = sAudioBufferMaxValues[i];
+            float min = sAudioBufferMinValues[i];
+
+            min *= height / 2 * vol * rescale;
+            max *= height / 2 * vol * rescale;
+            if (max > height / 2 || min < -(height / 2))
             {
                //ofSetColor(255,0,0);
-               mag = height / 2;
+               max = std::min(max, height / 2);
+               min = std::max(min, -height / 2);
             }
             else
             {
                //ofSetColor(color);
             }
-            if (mag == 0)
-               mag = .1f;
-            ofLine(i, height / 2 - mag, i, height / 2 + mag);
+
+            if (fabsf(max - min) < .1f) //always draw something even if max == min
+            {
+               max += .05f;
+               min -= .05f;
+            }
+
+            ofLine(i, height / 2 - max, i, height / 2 - min);
          }
 
          if (pos != -1)
@@ -780,6 +815,11 @@ double NextBufferTime(bool includeLookahead)
    if (includeLookahead)
       time += TheTransport->GetEventLookaheadMs();
    return time;
+}
+
+bool IsMainThread()
+{
+   return std::this_thread::get_id() == ModularSynth::GetMainThreadID();
 }
 
 bool IsAudioThread()
@@ -11484,19 +11524,19 @@ bool EvaluateExpression(std::string expressionStr, float currentValue, float& ou
 {
    exprtk::symbol_table<float> symbolTable;
    exprtk::expression<float> expression;
-   symbolTable.add_variable("current_value", currentValue);
+   symbolTable.add_variable("x", currentValue);
    symbolTable.add_constants();
    expression.register_symbol_table(symbolTable);
 
    juce::String input = expressionStr;
    if (input.startsWith("+="))
-      input = input.replace("+=", "current_value+");
+      input = input.replace("+=", "x+");
    if (input.startsWith("*="))
-      input = input.replace("*=", "current_value*");
+      input = input.replace("*=", "x*");
    if (input.startsWith("/="))
-      input = input.replace("/=", "current_value/");
+      input = input.replace("/=", "x/");
    if (input.startsWith("-="))
-      input = input.replace("-=", "current_value-");
+      input = input.replace("-=", "x-");
 
    exprtk::parser<float> parser;
    bool expressionValid = parser.compile(input.toStdString(), expression);

@@ -70,11 +70,6 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
    struct Remap
    {
@@ -84,8 +79,6 @@ private:
       TextEntry* mToPitchEntry;
    };
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    std::array<Remap, 8> mRemaps;
    std::array<NoteInfo, 128> mInputNotes;
 };

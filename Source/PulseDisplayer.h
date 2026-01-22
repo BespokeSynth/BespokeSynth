@@ -54,10 +54,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-
-   float mWidth{ 150 };
-   float mHeight{ 30 };
 
    int mLastReceivedFlags{ 0 };
    double mLastReceivedFlagTime{ 0 };

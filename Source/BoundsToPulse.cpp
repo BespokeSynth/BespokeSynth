@@ -80,12 +80,12 @@ void BoundsToPulse::FloatSliderUpdated(FloatSlider* slider, float oldVal, double
    {
       // send the pulse through our main source *and* the relevant cable
 
-      if (mValue == slider->GetMin() && mValue < oldVal)
+      if (mValue <= slider->GetMin() && mValue < oldVal)
       {
          DispatchPulse(GetPatchCableSource(), time, 1.f, 0);
          DispatchPulse(mMinCable, time, 1.f, 0);
       }
-      else if (mValue == slider->GetMax() && oldVal < mValue)
+      else if (mValue >= slider->GetMax() && oldVal < mValue)
       {
          DispatchPulse(GetPatchCableSource(), time, 1.f, 0);
          DispatchPulse(mMaxCable, time, 1.f, 0);

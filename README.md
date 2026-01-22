@@ -90,6 +90,8 @@ There are a few useful options to the *first* cmake command which many folks cho
 The directory name `ignore/build` is arbitrary. Bespoke is set up to `.gitignore` everything in the `ignore` directory but you
 can use any directory name you want for a build or have multiple builds also.
 
+For building on Linux, you can also use [`just`](https://github.com/casey/just) to build by running `just build`. Use `just list` to see other options available with `just`.
+
 To be able to build you will need a few things, depending on your OS
 
 * All systems require an install of git

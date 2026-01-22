@@ -59,14 +59,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    NoteInterval mRatchetDuration{ NoteInterval::kInterval_8n };
    DropdownList* mRatchetDurationSelector{ nullptr };
    NoteInterval mRatchetSubdivision{ NoteInterval::kInterval_32n };

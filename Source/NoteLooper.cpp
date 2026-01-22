@@ -32,6 +32,7 @@
 #include "UIControlMacros.h"
 
 NoteLooper::NoteLooper()
+: IDrawableModule(370, 140)
 {
 }
 
@@ -409,9 +410,6 @@ void NoteLooper::SaveState(FileStreamOut& out)
 
    IDrawableModule::SaveState(out);
 
-   out << mWidth;
-   out << mHeight;
-
    out << mMinRow;
    out << mMaxRow;
 
@@ -439,9 +437,12 @@ void NoteLooper::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in >> mWidth;
-   in >> mHeight;
-   Resize(mWidth, mHeight);
+   if (rev < 1)
+   {
+      in >> mWidth;
+      in >> mHeight;
+      Resize(mWidth, mHeight);
+   }
 
    in >> mMinRow;
    in >> mMaxRow;

@@ -69,12 +69,11 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 0; }
+   int GetModuleSaveStateRev() const override { return 1; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
    bool IsEnabled() const override { return mEnabled; }
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
@@ -88,7 +87,6 @@ private:
       Chromatic
    };
 
-   float mWidth{ 400 }, mHeight{ 200 };
    bool mHasExternalPulseSource{ false };
    int mStepIdx{ -1 };
    TransportListenerInfo* mTransportListenerInfo{ nullptr };
