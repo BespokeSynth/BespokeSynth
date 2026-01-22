@@ -271,6 +271,7 @@
 #include "BassLineSequencer.h"
 #include "Acciaccatura.h"
 #include "ModulatorWander.h"
+#include "PadSynth.h"
 #include "DopplerShift.h"
 #include "StereoRotation.h"
 #include "LatencyCalculator.h"
@@ -504,6 +505,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(BassLineSequencer, basslinesequencer, kModuleCategory_Instrument);
    REGISTER(Acciaccatura, acciaccatura, kModuleCategory_Note);
    REGISTER(ModulatorWander, wander, kModuleCategory_Modulator);
+   REGISTER(PadSynth, padsynth, kModuleCategory_Synth);
    REGISTER(DopplerShift, dopplershift, kModuleCategory_Modulator);
    REGISTER(StereoRotation, stereorotation, kModuleCategory_Audio);
    REGISTER(LatencyCalculatorSender, latencycalculator, kModuleCategory_Synth);
