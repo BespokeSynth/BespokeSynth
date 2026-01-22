@@ -61,14 +61,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
-   {
-      w = mWidth;
-      h = mHeight;
-   }
 
-   float mWidth{ 500 };
-   float mHeight{ 500 };
    float mScale{ 1 };
    FloatSlider* mScaleSlider{ nullptr };
 

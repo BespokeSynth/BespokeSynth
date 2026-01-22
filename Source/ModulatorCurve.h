@@ -83,7 +83,7 @@ private:
    void OnClicked(float x, float y, bool right) override;
 
    float mInput{ 0 };
-   EnvelopeControl mEnvelopeControl{ ofVec2f(3, 19), ofVec2f(100, 100) };
+   EnvelopeControl mEnvelopeControl{ ofVec2f(3, 19), ofVec2f(100, 100), nullptr };
    ::ADSR mAdsr;
 
    FloatSlider* mInputSlider{ nullptr };

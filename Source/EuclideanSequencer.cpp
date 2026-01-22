@@ -46,6 +46,7 @@ namespace
 }
 
 EuclideanSequencer::EuclideanSequencer()
+: IDrawableModule(785, 200)
 {
    for (int i = 0; i < 4; ++i)
       mEuclideanSequencerRings.push_back(new EuclideanSequencerRing(this, i));
@@ -351,11 +352,6 @@ void EuclideanSequencer::SaveState(FileStreamOut& out)
 
    IDrawableModule::SaveState(out);
 
-   float width, height;
-   GetModuleDimensions(width, height);
-   out << width;
-   out << height;
-
    out << (int)mEuclideanSequencerRings.size();
    for (size_t i = 0; i < mEuclideanSequencerRings.size(); ++i)
       mEuclideanSequencerRings[i]->SaveState(out);
@@ -387,10 +383,13 @@ void EuclideanSequencer::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   float width, height;
-   in >> width;
-   in >> height;
-   Resize(width, height);
+   if (rev < 3)
+   {
+      float width, height;
+      in >> width;
+      in >> height;
+      Resize(width, height);
+   }
 
    int numRings;
    in >> numRings;

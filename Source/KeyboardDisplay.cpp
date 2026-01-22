@@ -37,6 +37,7 @@ namespace
 }
 
 KeyboardDisplay::KeyboardDisplay()
+: IDrawableModule(500, 110)
 {
    for (int i = 0; i < 128; ++i)
    {
@@ -401,8 +402,6 @@ void KeyboardDisplay::SaveState(FileStreamOut& out)
 
    IDrawableModule::SaveState(out);
 
-   out << mWidth;
-   out << mHeight;
    out << mNumOctaves;
    out << mRootOctave;
 }
@@ -418,8 +417,11 @@ void KeyboardDisplay::LoadState(FileStreamIn& in, int rev)
       in >> rev;
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   in >> mWidth;
-   in >> mHeight;
+   if (rev < 3)
+   {
+      in >> mWidth;
+      in >> mHeight;
+   }
    if (rev >= 2)
    {
       in >> mNumOctaves;

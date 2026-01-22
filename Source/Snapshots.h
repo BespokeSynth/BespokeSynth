@@ -40,7 +40,7 @@
 #include "GridController.h"
 
 
-class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IIntSliderListener, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener, public IPush2GridController, public IGridControllerListener
+class Snapshots : public IDrawableModule, public IButtonListener, public IAudioPoller, public IIntSliderListener, public IFloatSliderListener, public IDropdownListener, public INoteReceiver, public ITextEntryListener, public IAbletonGridController, public IGridControllerListener
 {
 public:
    Snapshots();
@@ -55,7 +55,7 @@ public:
    //IDrawableModule
    void Init() override;
    void Poll() override;
-   bool IsResizable() const override { return mDisplayMode == DisplayMode::Grid; }
+   bool IsResizable() const override { return true; /*mDisplayMode == DisplayMode::Grid;*/ }
    void Resize(float w, float h) override;
 
    bool HasSnapshot(int index) const;
@@ -78,9 +78,9 @@ public:
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override {}
@@ -94,11 +94,12 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
-   int GetModuleSaveStateRev() const override { return 4; }
+   int GetModuleSaveStateRev() const override { return 5; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    void UpdateOldControlName(std::string& oldName) override;
 
    static std::vector<IUIControl*> sSnapshotHighlightControls;
+   static bool sSerializingModuleStateForSnapshot;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -117,7 +118,6 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& w, float& h) override;
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void UpdateGridControllerLights(bool force);
@@ -201,8 +201,6 @@ private:
    bool mAutoStoreOnSwitch{ false };
    DisplayMode mDisplayMode{ DisplayMode::List };
    int mSnapshotRenameIndex{ -1 };
-   float mOldWidth{ 0 };
-   float mOldHeight{ 0 };
    bool mPush2Connected{ false };
    GridControlTarget* mGridControlTarget{ nullptr };
    int mGridControlOffsetX{ 0 };

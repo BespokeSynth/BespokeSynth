@@ -61,11 +61,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
 
    void SendNoteToIndex(int index, NoteMessage note);
    void Reseed();
@@ -76,8 +71,6 @@ private:
    float mWeight[kMaxDestinations]{};
    FloatSlider* mWeightSlider[kMaxDestinations]{ nullptr };
    std::vector<AdditionalNoteCable*> mDestinationCables;
-   float mWidth{ 200 };
-   float mHeight{ 20 };
    int mLastNoteDestinations[128];
    bool mDeterministic{ false };
    int mLength{ 4 };

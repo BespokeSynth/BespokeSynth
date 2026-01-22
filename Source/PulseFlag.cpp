@@ -31,6 +31,7 @@
 #include "Transport.h"
 
 PulseFlag::PulseFlag()
+: IDrawableModule(150, 40)
 {
 }
 
@@ -78,12 +79,6 @@ void PulseFlag::OnPulse(double time, float velocity, int flags)
    }
 
    DispatchPulse(GetPatchCableSource(), time, velocity, flags);
-}
-
-void PulseFlag::GetModuleDimensions(float& width, float& height)
-{
-   width = mWidth;
-   height = mHeight;
 }
 
 void PulseFlag::LoadLayout(const ofxJSONElement& moduleInfo)

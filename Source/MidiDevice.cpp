@@ -127,7 +127,7 @@ void MidiDevice::DisconnectInput()
    if (mDeviceInInfo.identifier.isNotEmpty())
    {
       deviceManager.setMidiInputDeviceEnabled(mDeviceInInfo.identifier, false);
-      deviceManager.removeMidiInputDeviceCallback(mDeviceOutInfo.identifier, this);
+      deviceManager.removeMidiInputDeviceCallback(mDeviceInInfo.identifier, this);
    }
 }
 

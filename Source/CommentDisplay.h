@@ -54,6 +54,6 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
 
-   std::string mComment{};
+   std::string mComment{ "insert comment here" };
    TextEntry* mCommentEntry{ nullptr };
 };

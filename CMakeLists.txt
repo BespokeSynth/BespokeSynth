@@ -18,6 +18,7 @@ option(BESPOKE_SYSTEM_TUNING_LIBRARY "Use system installation of tuning-library"
 option(BESPOKE_SYSTEM_ABLETONLINK "Use system installation of abletonlink" OFF)
 option(BESPOKE_FLUIDSYNTH "Enable FluidSynth" ON)
 option(BESPOKE_SYSTEM_FLUIDSYNTH "Use system installation of FluidSynth" OFF)
+option(BESPOKE_SYSTEM_READERWRITERQUEUE "Use system installation of readerwriterqueue" OFF)
 option(BESPOKE_USE_ASAN "Build with ASAN" OFF)
 
 # Global CMake options

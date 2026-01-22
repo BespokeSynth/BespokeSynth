@@ -31,6 +31,7 @@
 #include "juce_core/juce_core.h"
 
 std::vector<IUIControl*> Snapshots::sSnapshotHighlightControls;
+bool Snapshots::sSerializingModuleStateForSnapshot = false;
 
 namespace
 {
@@ -40,6 +41,7 @@ namespace
 }
 
 Snapshots::Snapshots()
+: IDrawableModule(148, 202)
 {
 }
 
@@ -87,7 +89,7 @@ void Snapshots::CreateUIControls()
    }
 
    for (int i = 0; i < 32; ++i)
-      mCurrentSnapshotSelector->AddLabel(("snapshot" + ofToString(i)).c_str(), i);
+      mCurrentSnapshotSelector->AddLabel((ofToString(i)).c_str(), i);
 }
 
 void Snapshots::Init()
@@ -524,7 +526,9 @@ void Snapshots::SetSnapshot(int idx, double time)
          FileStreamIn in(outputStream);
          int dataRev;
          in >> dataRev;
+         sSerializingModuleStateForSnapshot = true;
          module->LoadState(in, dataRev);
+         sSerializingModuleStateForSnapshot = false;
       }
    }
 
@@ -667,7 +671,7 @@ void Snapshots::DeleteSnapshot(int idx)
    {
       SnapshotCollection& coll = mSnapshotCollection[idx];
       coll.mSnapshots.clear();
-      coll.mLabel = "snapshot" + ofToString(idx);
+      coll.mLabel = ofToString(idx);
       mCurrentSnapshotSelector->SetLabel(coll.mLabel, idx);
 
       UpdateGridValues();
@@ -739,47 +743,44 @@ void Snapshots::OnGridButton(int x, int y, float velocity, IGridController* grid
    }
 }
 
-bool Snapshots::OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue)
+bool Snapshots::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
    mPush2Connected = true;
 
-   if (type == kMidiMessage_Note)
+   if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
    {
-      if (controlIndex >= 36 && controlIndex <= 99)
+      int gridIndex = controlIndex - 36;
+      int x = gridIndex % 8;
+      int y = 7 - gridIndex / 8;
+      int index = x + (y - 1) * 8;
+
+      if (x == 0 && y == 0)
       {
-         int gridIndex = controlIndex - 36;
-         int x = gridIndex % 8;
-         int y = 7 - gridIndex / 8;
-         int index = x + (y - 1) * 8;
-
-         if (x == 0 && y == 0)
-         {
-            mStoreMode = midiValue > 0;
-         }
-         else if (x == 1 && y == 0)
-         {
-            mDeleteMode = midiValue > 0;
-         }
-         else if (midiValue > 0 && index >= 0 && index < (int)mSnapshotCollection.size())
-         {
-            if (mStoreMode)
-               StoreSnapshot(index, true);
-            else if (mDeleteMode)
-               DeleteSnapshot(index);
-            else
-               SetSnapshot(index, gTime);
-
-            UpdateGridValues();
-         }
-
-         return true;
+         mStoreMode = midiValue > 0;
       }
+      else if (x == 1 && y == 0)
+      {
+         mDeleteMode = midiValue > 0;
+      }
+      else if (midiValue > 0 && index >= 0 && index < (int)mSnapshotCollection.size())
+      {
+         if (mStoreMode)
+            StoreSnapshot(index, true);
+         else if (mDeleteMode)
+            DeleteSnapshot(index);
+         else
+            SetSnapshot(index, gTime);
+
+         UpdateGridValues();
+      }
+
+      return true;
    }
 
    return false;
 }
 
-void Snapshots::UpdatePush2Leds(Push2Control* push2)
+void Snapshots::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
    mPush2Connected = true;
 
@@ -818,7 +819,7 @@ void Snapshots::UpdatePush2Leds(Push2Control* push2)
             pushColor = 0;
          }
 
-         push2->SetLed(kMidiMessage_Note, x + (7 - y) * 8 + 36, pushColor);
+         abletonGrid->SetLed(x + (7 - y) * 8 + 36, pushColor);
       }
    }
 }
@@ -830,7 +831,7 @@ void Snapshots::ResizeSnapshotCollection(int size)
    {
       mSnapshotCollection.resize(size);
       for (int i = oldSize; i < size; ++i)
-         mSnapshotCollection[i].mLabel = "snapshot" + ofToString(i);
+         mSnapshotCollection[i].mLabel = ofToString(i);
 
       if (mDisplayMode == DisplayMode::List)
          mModuleSaveData.SetInt("num_list_snapshots", size);
@@ -839,7 +840,7 @@ void Snapshots::ResizeSnapshotCollection(int size)
 
 namespace
 {
-   const float extraW = 9;
+   const float extraW = 11;
    const float extraH = 58;
    const float gridSquareDimension = 18;
    const int maxGridSide = 20;
@@ -908,22 +909,34 @@ void Snapshots::TextEntryComplete(TextEntry* entry)
    }
 }
 
-void Snapshots::GetModuleDimensions(float& width, float& height)
-{
-   width = mGrid->GetWidth() + extraW;
-   height = mGrid->GetHeight() + extraH + ((mGridControlOffsetXSlider->IsShowing() || mGridControlOffsetYSlider->IsShowing()) ? 18 : 0);
-}
-
 void Snapshots::Resize(float w, float h)
 {
-   SetGridSize(MAX(w - extraW, 137), MAX(h - extraH, gridSquareDimension));
+   auto gridOffset = mGridControlOffsetXSlider->IsShowing() || mGridControlOffsetYSlider->IsShowing() ? 18.f : 0.f;
+   if (mDisplayMode == DisplayMode::Grid)
+   {
+
+      mWidth = MAX(w, kListModeGridWidth + extraW);
+      mHeight = MAX(h, extraH + gridSquareDimension + gridOffset);
+   }
+   else
+   {
+      mWidth = kListModeGridWidth + extraW;
+      mHeight = MAX(h, extraH + mGrid->GetRect().height + gridOffset);
+   }
+   SetGridSize(MAX(w - extraW, 137), MAX(h - extraH - gridOffset, gridSquareDimension));
 }
 
 void Snapshots::SetGridSize(float w, float h)
 {
-   assert(mDisplayMode == DisplayMode::Grid);
+   if (mDisplayMode == DisplayMode::List)
+   {
+      h = MAX(h, 8 * gridSquareDimension);
+      w = kListModeGridWidth;
+   }
    mGrid->SetDimensions(w, h);
-   int cols = MIN(w / gridSquareDimension, maxGridSide);
+   int cols = 1;
+   if (mDisplayMode == DisplayMode::Grid)
+      cols = MIN(w / gridSquareDimension, maxGridSide);
    int rows = MIN(h / gridSquareDimension, maxGridSide);
    mGrid->SetGrid(cols, rows);
    ResizeSnapshotCollection(cols * rows);
@@ -941,10 +954,6 @@ void Snapshots::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("allow_set_on_audio_thread", moduleInfo, true);
    mModuleSaveData.LoadBool("auto_store_on_switch", moduleInfo, false);
 
-   //for rev < 4
-   mOldWidth = moduleInfo["gridwidth"].asFloat();
-   mOldHeight = moduleInfo["gridheight"].asFloat();
-
    SetUpFromSaveData();
 }
 
@@ -954,19 +963,7 @@ void Snapshots::SetUpFromSaveData()
    mDisplayMode = mModuleSaveData.GetEnum<DisplayMode>("display_mode");
    mAutoStoreOnSwitch = mModuleSaveData.GetBool("auto_store_on_switch");
 
-   if (mDisplayMode == DisplayMode::Grid)
-   {
-      // set up the grid
-      float w, h;
-      GetModuleDimensions(w, h);
-      Resize(w, h);
-   }
-
-   if (mDisplayMode == DisplayMode::List)
-   {
-      ResizeSnapshotCollection(mModuleSaveData.GetInt("num_list_snapshots"));
-      UpdateListGrid();
-   }
+   Resize(mWidth, mHeight);
 }
 
 void Snapshots::UpdateListGrid()
@@ -1034,9 +1031,6 @@ void Snapshots::SaveState(FileStreamOut& out)
    }
 
    out << mCurrentSnapshot;
-
-   out << mGrid->GetWidth();
-   out << mGrid->GetHeight();
 }
 
 void Snapshots::LoadState(FileStreamIn& in, int rev)
@@ -1081,7 +1075,7 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
       }
       in >> mSnapshotCollection[i].mLabel;
       if (rev < 2 && mSnapshotCollection[i].mLabel.empty())
-         mSnapshotCollection[i].mLabel = "snapshot" + ofToString(i);
+         mSnapshotCollection[i].mLabel = ofToString(i);
       mCurrentSnapshotSelector->SetLabel(mSnapshotCollection[i].mLabel, i);
    }
 
@@ -1127,17 +1121,13 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
       mModuleSaveData.SetEnum("display_mode", DisplayMode::Grid);
    }
 
-   if (rev >= 4)
+   if (rev == 4)
    {
       float w, h;
       in >> w;
       in >> h;
       if (mDisplayMode == DisplayMode::Grid)
          SetGridSize(w, h);
-   }
-   else
-   {
-      SetGridSize(mOldWidth, mOldHeight);
    }
 }
 
@@ -1259,7 +1249,9 @@ Snapshots::SnapshotModuleData::SnapshotModuleData(IDrawableModule* module)
    juce::MemoryBlock tempBlock;
    {
       FileStreamOut out(tempBlock);
+      sSerializingModuleStateForSnapshot = true;
       module->SaveState(out);
+      sSerializingModuleStateForSnapshot = false;
    }
    mData = tempBlock.toBase64Encoding().toStdString();
 }

@@ -103,7 +103,7 @@ public:
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 3; }
+   int GetModuleSaveStateRev() const override { return 4; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
    bool IsEnabled() const override { return mEnabled; }
@@ -134,6 +134,7 @@ private:
    bool mPresetFileUpdateQueued{ false };
    ClickButton* mSavePresetFileButton{ nullptr };
    std::vector<std::string> mPresetFilePaths;
+   std::string mLastLoadedPresetFilePath{};
    ClickButton* mOpenEditorButton{ nullptr };
    ClickButton* mLoadParameterButton{ nullptr };
    ClickButton* mPanicButton{ nullptr };

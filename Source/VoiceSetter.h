@@ -30,7 +30,9 @@
 class VoiceSetter : public NoteEffectBase, public IDrawableModule, public IIntSliderListener
 {
 public:
-   VoiceSetter() = default;
+   VoiceSetter()
+   : IDrawableModule(90, 20)
+   {}
    static IDrawableModule* Create() { return new VoiceSetter(); }
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return true; }
@@ -51,15 +53,6 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
-
-   float mWidth{ 90 };
-   float mHeight{ 20 };
 
    int mVoiceIdx{ 0 };
    IntSlider* mVoiceSlider{ nullptr };

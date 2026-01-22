@@ -648,6 +648,8 @@ void PatchCableSource::FindValidTargets()
          continue;
       if (mTypeFilter.empty() == false && !VectorContains(module->GetTypeName(), mTypeFilter))
          continue;
+      if (mFilterPredicate != nullptr && !mFilterPredicate(module))
+         continue;
       if (mType == kConnectionType_Audio && module->CanReceiveAudio())
          mValidTargets.push_back(module);
       if (mType == kConnectionType_Note && module->CanReceiveNotes())

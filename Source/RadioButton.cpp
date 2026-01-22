@@ -305,7 +305,7 @@ void RadioButton::SetIndex(int i, double time)
 void RadioButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
 {
    slider = ofClamp(slider, 0, 1);
-   SetIndex(int(slider * mElements.size()), time);
+   SetIndex((int)round(slider * (mElements.size() - 1)), time);
    mSliderVal = slider;
    mLastSetValue = *mVar;
 }
@@ -315,7 +315,7 @@ float RadioButton::GetValueForMidiCC(float slider) const
    if (mElements.empty())
       return 0;
 
-   int index = int(slider * mElements.size());
+   int index = (int)round(slider * (mElements.size() - 1));
    index = ofClamp(index, 0, mElements.size() - 1);
    return mElements[index].mValue;
 }

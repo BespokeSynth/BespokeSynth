@@ -187,6 +187,11 @@ void IUIControl::PositionTo(IUIControl* anchor, AnchorDirection direction)
       mX = rect.x + rect.width + 10;
       mY = rect.y;
    }
+   else if (direction == kAnchor_Below_Padded)
+   {
+      mX = rect.x;
+      mY = rect.y + rect.height + 8;
+   }
 }
 
 void IUIControl::GetColors(ofColor& color, ofColor& textColor)

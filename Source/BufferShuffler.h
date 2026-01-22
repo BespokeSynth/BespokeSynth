@@ -33,7 +33,7 @@
 #include "Push2Control.h"
 #include "GridController.h"
 
-class BufferShuffler : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IPush2GridController, public IGridControllerListener
+class BufferShuffler : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IAbletonGridController, public IGridControllerListener
 {
 public:
    BufferShuffler();
@@ -61,9 +61,9 @@ public:
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   //IPush2GridController
-   bool OnPush2Control(Push2Control* push2, MidiMessageType type, int controlIndex, float midiValue) override;
-   void UpdatePush2Leds(Push2Control* push2) override;
+   //IAbletonGridController
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    //IGridControllerListener
    void OnControllerPageSelected() override;
@@ -89,11 +89,6 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
    void OnClicked(float x, float y, bool right) override;
    bool DrawToPush2Screen() override;
    float GetFourTetPosition(double time);
@@ -111,7 +106,7 @@ private:
 
    struct ShuffleEvent
    {
-      double mTime{ 0.0 };
+      double mTime{ -1 };
       int mSlice{ 0 };
       PlaybackStyle mStyle{ PlaybackStyle::Normal };
    };
@@ -128,8 +123,6 @@ private:
 
    ChannelBuffer mInputBuffer;
 
-   float mWidth{ 245 };
-   float mHeight{ 85 };
    int mNumBars{ 1 };
    IntSlider* mNumBarsSlider{ nullptr };
    NoteInterval mInterval{ kInterval_8n };

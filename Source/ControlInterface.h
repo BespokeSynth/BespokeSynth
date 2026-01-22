@@ -58,6 +58,10 @@ public:
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
+   FloatSlider* AddFloatSlider(std::string name, float defaultVal, float min, float max);
+   IntSlider* AddIntSlider(std::string name, int defaultVal, int min, int max);
+   void ClearAllControls();
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -82,14 +86,8 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override
-   {
-      w = mWidth;
-      h = mHeight;
-   }
 
-   float mWidth{ 130 };
-   float mHeight{ 20 };
+   static const int kDefaultSliderWidth{ 120 };
 
    class ControlElement
    {
@@ -121,14 +119,18 @@ private:
       bool* mBoolVar{ nullptr };
       ControlInterface* mOwner{ nullptr };
       PatchCableSource* mTargetCable{ nullptr };
+
+      float mDummyFloat{ 0.0 };
+      int mDummyInt{ 0 };
+      bool mDummyBool{ false };
    };
+
+   ofVec2f FindNewUIControlPos();
+   ControlElement* FindOrCreateNewControl(std::string identifier, std::string type, bool& isNewControl);
 
    PatchCableSource* mAddControlCable{ nullptr };
    std::list<ControlElement*> mControls;
    ControlElement* mCurrentEditControl{ nullptr };
    CodeEntry* mControlEditorBox{ nullptr };
    bool mShowCables{ true };
-   float mDummyFloat{ 0.0 };
-   int mDummyInt{ 0 };
-   bool mDummyBool{ false };
 };

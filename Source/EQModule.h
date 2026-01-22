@@ -84,9 +84,6 @@ private:
    float PosForGain(float gain) { return .5f - gain / 30.0f; };
    float GainForPos(float pos) { return (.5f - pos) * 30; }
 
-   float mWidth{ 825 };
-   float mHeight{ 255 };
-
    float* mWindower{ nullptr };
    float* mSmoother{ nullptr };
 

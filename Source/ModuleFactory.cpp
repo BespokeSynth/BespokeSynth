@@ -260,6 +260,7 @@
 #include "RhythmSequencer.h"
 #include "DotSequencer.h"
 #include "VoiceSetter.h"
+#include "VoiceManager.h"
 #include "LabelDisplay.h"
 #include "ControlRecorder.h"
 #include "EuclideanSequencer.h"
@@ -270,8 +271,14 @@
 #include "BassLineSequencer.h"
 #include "Acciaccatura.h"
 #include "ModulatorWander.h"
+#include "DopplerShift.h"
 #include "StereoRotation.h"
 #include "LatencyCalculator.h"
+#include "AbletonMoveControl.h"
+#include "TrackOrganizer.h"
+#include "ModulatorBinaryValue.h"
+#include "VelocityToDuration.h"
+#include "TapTempo.h"
 
 #ifdef BESPOKE_FLUIDSYNTH
 #include "FluidSynthModule.h"
@@ -491,6 +498,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(RhythmSequencer, rhythmsequencer, kModuleCategory_Note);
    REGISTER(DotSequencer, dotsequencer, kModuleCategory_Instrument);
    REGISTER(VoiceSetter, voicesetter, kModuleCategory_Note);
+   REGISTER(VoiceManager, voicemanager, kModuleCategory_Note);
    REGISTER(ControlRecorder, controlrecorder, kModuleCategory_Modulator);
    REGISTER(EuclideanSequencer, euclideansequencer, kModuleCategory_Instrument);
    REGISTER(ControlInterface, interface, kModuleCategory_Modulator);
@@ -500,12 +508,18 @@ ModuleFactory::ModuleFactory()
    REGISTER(BassLineSequencer, basslinesequencer, kModuleCategory_Instrument);
    REGISTER(Acciaccatura, acciaccatura, kModuleCategory_Note);
    REGISTER(ModulatorWander, wander, kModuleCategory_Modulator);
+   REGISTER(DopplerShift, dopplershift, kModuleCategory_Modulator);
    REGISTER(StereoRotation, stereorotation, kModuleCategory_Audio);
    REGISTER(LatencyCalculatorSender, latencycalculator, kModuleCategory_Synth);
    REGISTER(LatencyCalculatorReceiver, latencycalculatorreceiver, kModuleCategory_Audio);
 #ifdef BESPOKE_FLUIDSYNTH
    REGISTER(FluidSynth, fluidsynth, kModuleCategory_Synth);
 #endif
+   REGISTER(AbletonMoveControl, abletonmovecontrol, kModuleCategory_Other);
+   REGISTER(TrackOrganizer, trackorganizer, kModuleCategory_Other);
+   REGISTER(ModulatorBinaryValue, binaryvalue, kModuleCategory_Modulator);
+   REGISTER(VelocityToDuration, velocitytoduration, kModuleCategory_Note);
+   REGISTER(TapTempo, taptempo, kModuleCategory_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

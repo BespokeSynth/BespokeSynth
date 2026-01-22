@@ -41,6 +41,8 @@
 #include "DrumPlayer.h"
 #include "VSTPlugin.h"
 #include "Snapshots.h"
+#include "BassLineSequencer.h"
+#include "ControlInterface.h"
 
 #include "leathers/push"
 #include "leathers/unused-value"
@@ -156,6 +158,19 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
       {
          if (module)
             paths.push_back(module->Path());
+      }
+      return paths;
+   });
+   m.def("get_controls", [](std::string path)
+   {
+      const auto module = TheSynth->FindModule(std::move(path));
+      std::vector<std::string> paths;
+      if (module == nullptr)
+         return paths;
+      for (auto* control : module->GetUIControls())
+      {
+         if (control && control->IsShowing())
+            paths.push_back(control->Path());
       }
       return paths;
    });
@@ -334,6 +349,30 @@ PYBIND11_EMBEDDED_MODULE(drumsequencer, m)
       {
          return seq.GetStep(step, pitch);
       });
+}
+
+PYBIND11_EMBEDDED_MODULE(basslinesequencer, m)
+{
+   m.def("get", [](std::string path)
+   {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
+      auto* ret = dynamic_cast<BassLineSequencer*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<BassLineSequencer, IDrawableModule> bassLineSequencerClass(m, "basslinesequencer");
+   py::enum_<StepVelocityType>(bassLineSequencerClass, "StepVelocityType")
+   .value("Off", StepVelocityType::Off)
+   .value("Ghost", StepVelocityType::Ghost)
+   .value("Normal", StepVelocityType::Normal)
+   .value("Accent", StepVelocityType::Accent)
+   .export_values();
+   bassLineSequencerClass
+   .def("set_step", [](BassLineSequencer& seq, int step, int tone, StepVelocityType velocity, bool tie)
+        {
+           seq.SetStep(step, tone, velocity, tie);
+        });
 }
 
 PYBIND11_EMBEDDED_MODULE(grid, m)
@@ -751,6 +790,31 @@ PYBIND11_EMBEDDED_MODULE(snapshots, m)
       {
          snapshots.DeleteSnapshot(index);
       });
+}
+
+PYBIND11_EMBEDDED_MODULE(interface, m)
+{
+   m.def("get", [](std::string path)
+   {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
+      auto* ret = dynamic_cast<ControlInterface*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<ControlInterface, IDrawableModule>(m, "interface")
+   .def("add_float_slider", [](ControlInterface& interface, std::string name, float defaultValue, float min, float max)
+   {
+      interface.AddFloatSlider(name, defaultValue, min, max);
+   })
+   .def("add_int_slider", [](ControlInterface& interface, std::string name, int defaultValue, int min, int max)
+   {
+      interface.AddIntSlider(name, defaultValue, min, max);
+   })
+   .def("clear_controls", [](ControlInterface& interface)
+   {
+      interface.ClearAllControls();
+   });
 }
 
 PYBIND11_EMBEDDED_MODULE(module, m)

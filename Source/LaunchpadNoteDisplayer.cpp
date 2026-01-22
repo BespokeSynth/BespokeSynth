@@ -58,6 +58,11 @@ void LaunchpadNoteDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)
    SetUpFromSaveData();
 }
 
+void LaunchpadNoteDisplayer::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   moduleInfo["gridkeyboard"] = mLaunchpad ? mLaunchpad->Path() : "";
+}
+
 void LaunchpadNoteDisplayer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
