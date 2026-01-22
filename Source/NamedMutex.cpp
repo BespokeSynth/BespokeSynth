@@ -36,6 +36,21 @@ void NamedMutex::Lock(std::string locker)
    mLocker = locker;
 }
 
+bool NamedMutex::TryLock(std::string locker)
+{
+   if (mLocker == locker)
+   {
+      ++mExtraLockCount;
+      return true;
+   }
+
+   if (!mMutex.try_lock())
+      return false;
+
+   mLocker = locker;
+   return true;
+}
+
 void NamedMutex::Unlock()
 {
    if (mExtraLockCount == 0)
@@ -58,4 +73,16 @@ ScopedMutex::ScopedMutex(NamedMutex* mutex, std::string locker)
 ScopedMutex::~ScopedMutex()
 {
    mMutex->Unlock();
+}
+
+ScopedTryMutex::ScopedTryMutex(NamedMutex* mutex, std::string locker)
+: mMutex(mutex)
+{
+   mIsLocked = mMutex->TryLock(locker);
+}
+
+ScopedTryMutex::~ScopedTryMutex()
+{
+   if (mIsLocked)
+      mMutex->Unlock();
 }
