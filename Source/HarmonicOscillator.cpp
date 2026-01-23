@@ -44,7 +44,7 @@
 
 
 //  ------------------ CONSTRUCTOR----------
-// 
+//
 // Gets called when the module is first created.
 HarmonicOscillator::HarmonicOscillator()
 {
@@ -214,7 +214,7 @@ void HarmonicOscillator::DrawModuleUnclipped()
 }
 
 //  -------------------MIDI NOTE HANDLING------------------------
-// 
+//
 // This is called by Bespoke whenever a MIDI note message hits the module.
 // It updates mNoteFreq so the oscillator knows what pitch to play.
 void HarmonicOscillator::PlayNote(NoteMessage note)
@@ -226,7 +226,7 @@ void HarmonicOscillator::PlayNote(NoteMessage note)
 }
 
 //  ----------------CV PITCH HELPER----------------------------
-// 
+//
 // Converts CV input (-1..+1) into pitch shift in semitones.
 static float ApplyPitchCV(float baseFreq, PatchCableSource* cvInput)
 {
