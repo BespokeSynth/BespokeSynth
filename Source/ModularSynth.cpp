@@ -89,7 +89,11 @@ ModularSynth::ModularSynth()
    mAudioPluginFormatManager = std::make_unique<juce::AudioPluginFormatManager>();
    mKnownPluginList = std::make_unique<juce::KnownPluginList>();
 
+#if JUCE_VERSION < ((8 << 16) + (0 << 8) + 11) // member-function replaced in 8.0.11
    mAudioPluginFormatManager->addDefaultFormats();
+#else
+   juce::addDefaultFormatsToManager(*mAudioPluginFormatManager);
+#endif
 }
 
 ModularSynth::~ModularSynth()
