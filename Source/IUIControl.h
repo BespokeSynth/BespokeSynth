@@ -38,7 +38,8 @@ enum AnchorDirection
 {
    kAnchor_Below,
    kAnchor_Right,
-   kAnchor_Right_Padded
+   kAnchor_Right_Padded,
+   kAnchor_Below_Padded
 };
 
 class IUIControl : public IClickable

@@ -2165,6 +2165,11 @@ acciaccatura~adds a quick grace note before playing the input pitch
 ~hold ms~how long to hold offset pitch before transitioning to input pitch
 ~glide ms~how long to spend bending between offset pitch and input pitch after hold ms
 
+dopplershift~output pitch shift value based on speeds of receiver and source
+~receiver speed~speed of receiver towards the source in m/s
+~source speed~speed of source towards the receiver in m/s
+~reverse~reverse moving direction of both receiver and source
+
 stereorotation~rotates the phase of input audio
 ~phase~phase offset
 

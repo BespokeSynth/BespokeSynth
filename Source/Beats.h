@@ -47,9 +47,11 @@ class Beats;
 struct BeatData
 {
    void LoadBeat(Sample* sample);
-   void RecalcPos(double time, bool doubleTime, int numBars);
+   void RecalcPos(double time);
 
-   Sample* mBeat{ nullptr };
+   Sample* mSample{ nullptr };
+   float mVolume{ 1.0f };
+   int mNumBars{ 1 };
 };
 
 class BeatColumn
@@ -63,18 +65,20 @@ public:
    void Process(double time, ChannelBuffer* buffer, int bufferSize);
    int GetNumSamples() { return (int)mSamples.size(); }
    void SaveState(FileStreamOut& out);
-   void LoadState(FileStreamIn& in);
+   void LoadState(FileStreamIn& in, int rev);
 
    void RadioButtonUpdated(RadioButton* list, int oldVal, double time);
    void ButtonClicked(ClickButton* button, double time);
    void PlayNote(const NoteMessage& note);
 
 private:
+   void UpdateRadioButtonLabels();
+   void UpdateClipSliders();
+
    RadioButton* mSelector{ nullptr };
    int mSampleIndex{ -1 };
-   float mVolume{ 0 };
+   float mVolume{ 1 };
    FloatSlider* mVolumeSlider{ nullptr };
-   BeatData mBeatData;
    int mIndex{ 0 };
    float mFilter{ 0 };
    FloatSlider* mFilterSlider{ nullptr };
@@ -82,14 +86,14 @@ private:
    std::array<BiquadFilter, 2> mHighpass;
    Beats* mOwner{ nullptr };
    Ramp mFilterRamp;
-   bool mDoubleTime{ false };
-   Checkbox* mDoubleTimeCheckbox{ nullptr };
-   int mNumBars{ 4 };
-   IntSlider* mNumBarsSlider{ nullptr };
-   std::vector<Sample*> mSamples;
+   std::vector<BeatData> mSamples;
    float mPan{ 0 };
    FloatSlider* mPanSlider{ nullptr };
    ClickButton* mDeleteButton{ nullptr };
+   FloatSlider* mClipVolumeSlider{ nullptr };
+   IntSlider* mClipNumBarsSlider{ nullptr };
+   float mDummyClipVolume{ 0 };
+   int mDummyClipNumBars{ 1 };
 };
 
 class Beats : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITimeListener, public IButtonListener, public IRadioButtonListener, public INoteReceiver
@@ -137,9 +141,12 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
+   int GetModuleSaveStateRev() const override { return 3; }
 
    bool IsEnabled() const override { return mEnabled; }
+
+   int mLegacyNumBars{ 1 }; // for loading older savestate data
 
 private:
    //IDrawableModule
