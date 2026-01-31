@@ -80,7 +80,7 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   void CalcSliderVal();;
+   void CalcSliderVal();
 
    float mWidth{ 15 };
    float mHeight{ 15 };
