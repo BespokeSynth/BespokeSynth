@@ -63,7 +63,6 @@ public:
    bool IsButtonControl() override { return true; }
    void SetBoxSize(float size) { mHeight = size; }
    bool CanBeTargetedBy(PatchCableSource* source) const override;
-   void SetOverrideDisplayName(std::string name) override;
 
    bool CheckNeedsDraw() override;
 
@@ -72,6 +71,7 @@ public:
 
 protected:
    ~Checkbox(); //protected so that it can't be created on the stack
+   void UpdateWidth() override;
 
 private:
    void OnClicked(float x, float y, bool right) override;
@@ -81,7 +81,6 @@ private:
       height = mHeight;
    }
    void CalcSliderVal();
-   void UpdateWidth();
 
    float mWidth{ 15 };
    float mHeight{ 15 };

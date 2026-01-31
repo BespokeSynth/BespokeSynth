@@ -79,10 +79,11 @@ public:
    void DrawBeacon(int x, int y);
    IClickable* GetRootParent();
    IDrawableModule* GetModuleParent();
-   virtual void SetOverrideDisplayName(std::string name)
+   void SetOverrideDisplayName(std::string name)
    {
       mHasOverrideDisplayName = true;
       mOverrideDisplayName = name;
+      UpdateWidth();
    }
    std::string GetDisplayName()
    {
@@ -101,6 +102,7 @@ protected:
    virtual void OnClicked(float x, float y, bool right) {}
    virtual bool MouseMoved(float x, float y) { return false; }
    virtual bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) { return false; }
+   virtual void UpdateWidth() {}
 
    float mX{ 0 };
    float mY{ 0 };
