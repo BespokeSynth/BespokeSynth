@@ -96,15 +96,16 @@ private:
    struct ArpNote
    {
       ArpNote(int _pitch, int _vel, int _voiceIdx, ModulationParameters _modulation)
-      : pitch(_pitch)
-      , vel(_vel)
-      , voiceIdx(_voiceIdx)
-      , modulation(_modulation)
+      : mPitch(_pitch)
+      , mInitialVelocity(_vel)
+      , mVoiceIdx(_voiceIdx)
+      , mModulation(_modulation)
       {}
-      int pitch;
-      int vel;
-      int voiceIdx;
-      ModulationParameters modulation;
+      int mPitch;
+      int mInitialVelocity;
+      int mVoiceIdx;
+      ModulationParameters mModulation;
+      bool mPressureControlledVelocity{ false };
    };
    std::vector<ArpNote> mChord;
 
