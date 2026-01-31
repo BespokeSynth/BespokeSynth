@@ -82,7 +82,6 @@ public:
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return false; }
    static bool AcceptsPulses() { return false; }
-   void Delete() { delete this; }
    void DrawModule() override;
 
    void SetEnabled(bool enabled) override {} //don't use this one

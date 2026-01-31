@@ -108,6 +108,7 @@ public:
    void RemoveLabel(int value);
    void SetLabel(std::string label, int value);
    std::string GetLabel(int val) const;
+   bool HasLabel(int val) const;
    void SetDisplayStyle(DropdownDisplayStyle style) { mDisplayStyle = style; }
    void Render() override;
    bool MouseMoved(float x, float y) override;

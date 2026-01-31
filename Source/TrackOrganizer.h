@@ -35,6 +35,7 @@ class Snapshots;
 class IAbletonGridController;
 class IInputRecordable;
 class Amplifier;
+class AudioSend;
 
 class TrackOrganizer : public IDrawableModule, public ITextEntryListener, public IDropdownListener, public IButtonListener
 {
@@ -63,11 +64,13 @@ public:
    IDrawableModule* GetCurrentModule() const;
    IAbletonGridController* GetCurrentGridInterface() const;
    Snapshots* GetSnapshots() const;
+   IUIControl* GetSoundSelector() const;
    int GetNumPages() const { return (int)mControlModuleCables.size(); }
    std::vector<IDrawableModule*> GetControlModules() const;
    std::vector<IAbletonGridController*> GetGridInterfaces() const;
    IInputRecordable* GetRecorder() const;
    Amplifier* GetGain() const;
+   AudioSend* GetSend() const;
    int GetColorIndex() const { return mColorIndex; }
    std::string GetTrackName() const { return mTrackName; }
    ofRectangle GetBoundingRect();
@@ -93,11 +96,13 @@ private:
    void GatherModules(const std::vector<IDrawableModule*>& modulesToAdd);
 
    PatchCableSource* mSnapshotsCable{ nullptr };
+   PatchCableSource* mSoundSelectorCable{ nullptr };
    static constexpr int kNumPages{ 5 };
    std::array<PatchCableSource*, kNumPages> mControlModuleCables{};
    std::array<PatchCableSource*, kNumPages> mGridInterfaceCables{};
    PatchCableSource* mRecorderCable{ nullptr };
    PatchCableSource* mGainCable{ nullptr };
+   PatchCableSource* mSendCable{ nullptr };
    PatchCableSource* mOtherTrackModulesCable{ nullptr };
    int mModuleIndex{ 0 };
    float mModuleViewOffset{ 0.0f };

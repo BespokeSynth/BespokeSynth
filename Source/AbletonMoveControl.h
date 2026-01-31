@@ -72,6 +72,7 @@ public:
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
+   void OnMidiPressure(MidiPressure& pressure) override;
 
    MidiDevice* GetDevice() override { return &mDevice; }
 
@@ -82,7 +83,7 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 3; }
 
    int GetGridControllerOption1Control() const override;
    int GetGridControllerOption2Control() const override;
@@ -120,7 +121,7 @@ private:
    bool AdjustGlobalModuleIndex(int amount);
    IDrawableModule* GetCurrentGlobalModule() const;
    IAbletonGridController* GetCurrentGlobalGridInterface() const;
-   void AdjustControlWithEncoder(IUIControl* control, float midiInputValue);
+   void AdjustControlWithEncoder(IUIControl* control, float midiInputValue, bool ignoreShift = false);
    int GetDisplayKnobIndex();
    bool ShouldDisplayMixer();
    bool ShouldDisplaySnapshotView();
@@ -128,6 +129,7 @@ private:
    void SetModuleViewOffset(float offset);
    void DetermineTrackControlLayout();
    bool WasPeekHold(int controlIndex) const { return gTime - mControlState[controlIndex].mLastChangeTime > 300; }
+   void ZoomToTrack(TrackOrganizer* track);
 
    const int kTrackRowGlobal = -1;
    const int kTrackRowMixer = -2;
@@ -138,6 +140,8 @@ private:
    double mScreenOverrideTimeout{ 0.0 };
    std::string mTemporaryScreenMessage{};
    double mTemporaryScreenMessageTimeout{ 0.0 };
+   bool mShowSoundSelector{ false };
+   int mSoundSelectorIndex{ 0 };
 
    IDrawableModule* mDisplayModule{ nullptr };
    std::string mDisplayModuleContext{};
@@ -149,6 +153,7 @@ private:
    int mSelectedTrackRow{ kTrackRowMixer };
    int mPreviousSelectedTrackRow{ -1 };
    double mDisplayModuleSelectTimeout{ 0.0 };
+   int mSnapshotOffset{ 0 };
 
    static constexpr int kNumPages{ 5 };
    std::array<PatchCableSource*, kNumPages> mGlobalControlModuleCables{};
@@ -189,6 +194,9 @@ private:
    double mLastGainAdjustTrackTime{ -1 };
    float mTrackRowOffsetSmoothed{ 0 };
    bool mShowLCDOnScreen{ false };
+   bool mAutoZoomToTrack{ false };
+   bool mPageWithinModules{ false };
+   bool mBottomRowMode{ false };
 
    IAbletonGridController* mGridControlInterface{ nullptr };
 

@@ -442,6 +442,23 @@ bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contr
          return true;
       }
    }
+   else
+   {
+      if (controlIndex == AbletonDevice::kVolumeEncoderTurn && abletonGrid->GetButtonState(AbletonDevice::kLoopButton))
+      {
+         mEditMeasureOffsetSlider += AbletonDevice::GetEncoderIncrement(midiValue) * 10;
+         if (mEditMeasureOffsetSlider > 1.0f)
+         {
+            mEditMeasureOffset = std::clamp(mEditMeasureOffset + 1, 0, mNumMeasures - 1);
+            mEditMeasureOffsetSlider -= 1.0f;
+         }
+         else if (mEditMeasureOffsetSlider < -1.0f)
+         {
+            mEditMeasureOffset = std::clamp(mEditMeasureOffset - 1, 0, mNumMeasures - 1);
+            mEditMeasureOffsetSlider += 1.0f;
+         }
+      }
+   }
 
    int stepIndex = -1;
    if (abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move)
@@ -466,28 +483,34 @@ bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contr
 
             int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
             int totalNumSteps = stepsPerMeasure * mNumMeasures;
-            float pos = (stepIndex + mEditMeasureOffset * stepsPerMeasure) / float(totalNumSteps);
-            float nextPos = (stepIndex + mEditMeasureOffset * stepsPerMeasure + 1) / float(totalNumSteps);
-            const auto& elements = mCanvas->GetElements();
             bool hasEditPitch = false;
-            for (auto* element : elements)
+            for (int measure = 0; measure < mNumMeasures; ++measure)
             {
-               auto* noteElement = static_cast<NoteCanvasElement*>(element);
-               if (mEditCurrentPitchContext != -1 && noteElement->GetPitch() != mEditCurrentPitchContext)
-                  continue;
-               if (noteElement->GetStart() >= pos && noteElement->GetStart() < nextPos)
+               if (measure == mEditMeasureOffset || abletonGrid->GetButtonState(AbletonDevice::kShiftButton))
                {
-                  mCurrentEditElements.push_back(noteElement);
+                  float pos = (stepIndex + measure * stepsPerMeasure) / float(totalNumSteps);
+                  float nextPos = (stepIndex + measure * stepsPerMeasure + 1) / float(totalNumSteps);
+                  const auto& elements = mCanvas->GetElements();
+                  for (auto* element : elements)
+                  {
+                     auto* noteElement = static_cast<NoteCanvasElement*>(element);
+                     if (mEditCurrentPitchContext != -1 && noteElement->GetPitch() != mEditCurrentPitchContext)
+                        continue;
+                     if (noteElement->GetStart() >= pos && noteElement->GetStart() < nextPos)
+                     {
+                        mCurrentEditElements.push_back(noteElement);
 
-                  if (noteElement->GetPitch() == mEditCurrentPitchContext)
-                     hasEditPitch = true;
+                        if (noteElement->GetPitch() == mEditCurrentPitchContext && measure == mEditMeasureOffset)
+                           hasEditPitch = true;
+                     }
+                  }
                }
             }
 
             if (mEditCurrentPitchContext != -1 && !hasEditPitch)
             {
                // turn note on
-               ToggleEditPitch(mEditCurrentPitchContext);
+               AddEditPitch(mEditCurrentPitchContext, abletonGrid->GetButtonState(AbletonDevice::kShiftButton));
                mHasMadeStepEdit = true;
             }
 
@@ -533,7 +556,7 @@ bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contr
             {
                if (!mHasMadeStepEdit && mEditCurrentPitchContext != -1)
                {
-                  bool added = ToggleEditPitch(mEditCurrentPitchContext);
+                  bool added = ToggleEditPitch(mEditCurrentPitchContext, abletonGrid->GetButtonState(AbletonDevice::kShiftButton));
                   if (added)
                      abletonGrid->DisplayScreenMessage("added " + NoteName(mEditCurrentPitchContext, false, true));
                   else
@@ -684,7 +707,7 @@ bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contr
       {
          if (midiValue > 0)
          {
-            bool added = ToggleEditPitch(pressedPitch);
+            bool added = ToggleEditPitch(pressedPitch, abletonGrid->GetButtonState(AbletonDevice::kShiftButton));
             /*if (added)
                abletonGrid->DisplayScreenMessage("added " + NoteName(pressedPitch, false, true));
             else
@@ -699,7 +722,7 @@ bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contr
    return false;
 }
 
-bool NoteCanvas::ToggleEditPitch(int pitch)
+bool NoteCanvas::RemoveEditPitch(int pitch)
 {
    bool removed = false;
    for (std::vector<NoteCanvasElement*>::iterator iter = mCurrentEditElements.begin(); iter != mCurrentEditElements.end();)
@@ -715,17 +738,58 @@ bool NoteCanvas::ToggleEditPitch(int pitch)
          ++iter;
       }
    }
+   return removed;
+}
 
-   if (!removed)
+bool NoteCanvas::AddEditPitch(int pitch, bool atEveryMeasure)
+{
+   bool added = false;
+   int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+   for (int measure = 0; measure < mNumMeasures; ++measure)
    {
-      int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
-      float pos = mEditHoldStep / float(stepsPerMeasure) + mEditMeasureOffset;
-      NoteCanvasElement* element = AddNote(pos, pitch, mPlaceNoteVelocity * 127, 1.0f / stepsPerMeasure, -1);
-      mCurrentEditElements.push_back(element);
-      FitNotes(false, true);
+      if (atEveryMeasure || mEditMeasureOffset == measure)
+      {
+         float pos = mEditHoldStep / float(stepsPerMeasure) + measure;
+         float nextPos = (mEditHoldStep + 1) / float(stepsPerMeasure) + measure;
+
+         //check to see if one already exists here, and don't add if it does
+         bool alreadyHasStep = false;
+         const auto& elements = mCanvas->GetElements();
+         for (auto* element : elements)
+         {
+            auto* noteElement = static_cast<NoteCanvasElement*>(element);
+            if (noteElement->GetPitch() == pitch &&
+                noteElement->GetStart() * mNumMeasures >= pos &&
+                noteElement->GetStart() * mNumMeasures < nextPos)
+            {
+               alreadyHasStep = true;
+               break;
+            }
+         }
+
+         if (!alreadyHasStep)
+         {
+            NoteCanvasElement* element = AddNote(pos, pitch, mPlaceNoteVelocity * 127, 1.0f / stepsPerMeasure, -1);
+            mCurrentEditElements.push_back(element);
+            added = true;
+         }
+      }
    }
 
-   return !removed;
+   if (added)
+      FitNotes(false, true);
+
+   return added;
+}
+
+bool NoteCanvas::ToggleEditPitch(int pitch, bool atEveryMeasure)
+{
+   bool removed = RemoveEditPitch(pitch);
+
+   if (removed)
+      return false;
+   else
+      return AddEditPitch(pitch, atEveryMeasure);
 }
 
 void NoteCanvas::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
@@ -780,7 +844,7 @@ void NoteCanvas::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
             int pitch = mGridKeyboardInterface->GridToPitch(x, y);
             int ledIndex = x + (abletonMove->GetGridNumRows() - 1 - y) * abletonMove->GetGridNumCols() + abletonMove->GetGridStartIndex();
 
-            if (mPitchMuted[pitch])
+            if (pitch > 0 && pitch < (int)mPitchMuted.size() && mPitchMuted[pitch])
                abletonMove->SetLed(ledIndex, AbletonDevice::kColorDarkRed);
 
             int flashColor = -1;
@@ -801,7 +865,7 @@ void NoteCanvas::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
       {
          int pushColor = 0;
 
-         if (abletonGrid->GetButtonState(AbletonDevice::kLoopButton))
+         if (abletonGrid->GetButtonState(AbletonDevice::kLoopButton) && mCurrentEditElements.empty())
          {
             if (step == mEditMeasureOffset)
                pushColor = AbletonDevice::kColorGreen;
@@ -879,7 +943,7 @@ bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Ableto
       if (abletonGrid->GetButtonState(AbletonDevice::kOctaveUpButton) ||
           abletonGrid->GetButtonState(AbletonDevice::kOctaveDownButton))
          lcd->DrawRect(17, 6, 4, 4, !K(filled));
-      if (abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch))
+      if (abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch) && abletonGrid->GetButtonState(AbletonDevice::kLoopButton))
          lcd->DrawRect(42, 6, 4, 4, !K(filled));
       if (abletonGrid->GetButtonState(AbletonDevice::kPageLeftButton) ||
           abletonGrid->GetButtonState(AbletonDevice::kPageRightButton))
@@ -904,6 +968,8 @@ bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Ableto
    {
       lcd->DrawLCDText(("num measures: " + ofToString(mNumMeasures)).c_str(), 10, 13, LCDFONT_STYLE_REGULAR);
       lcd->DrawLCDText(GetCurrentEditMeasureString().c_str(), 10, 13 + AbletonMoveLCD::kTextLineSpacing, LCDFONT_STYLE_REGULAR);
+      if (abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch))
+         lcd->DrawRect(10 + 20 + mEditMeasureOffsetSlider * 20, 13, 1, 5, K(filled));
       return true;
    }
    return false;
@@ -1357,6 +1423,7 @@ void NoteCanvas::SaveLayout(ofxJSONElement& moduleInfo)
 {
    moduleInfo["canvaswidth"] = mCanvas->GetWidth();
    moduleInfo["canvasheight"] = mCanvas->GetHeight();
+   moduleInfo["grid_keyboard_interface"] = mGridKeyboardInterface ? mGridKeyboardInterface->Path() : "";
 }
 
 void NoteCanvas::SaveState(FileStreamOut& out)

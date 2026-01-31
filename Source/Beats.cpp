@@ -178,6 +178,12 @@ bool Beats::MouseMoved(float x, float y)
    return false;
 }
 
+void Beats::ClearSamples()
+{
+   for (BeatColumn* column : mBeatColumns)
+      column->ClearSamples();
+}
+
 void Beats::ButtonClicked(ClickButton* button, double time)
 {
    for (BeatColumn* column : mBeatColumns)
@@ -509,6 +515,13 @@ void BeatColumn::UpdateRadioButtonLabels()
 
    for (int i = 0; i < (int)mSamples.size(); ++i)
       mSelector->AddLabel(mSamples[i].mSample->Name().c_str(), i);
+}
+
+void BeatColumn::ClearSamples()
+{
+   mSamples.clear();
+   mSelector->Clear();
+   mSelector->AddLabel("none", -1);
 }
 
 void BeatColumn::PlayNote(const NoteMessage& note)

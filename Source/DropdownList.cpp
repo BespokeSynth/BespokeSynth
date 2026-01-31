@@ -145,6 +145,16 @@ std::string DropdownList::GetLabel(int val) const
    return "";
 }
 
+bool DropdownList::HasLabel(int val) const
+{
+   for (int i = 0; i < mElements.size(); ++i)
+   {
+      if (mElements[i].mValue == val)
+         return true;
+   }
+   return false;
+}
+
 void DropdownList::Poll()
 {
    if (*mVar != mLastSetValue)

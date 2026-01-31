@@ -79,10 +79,10 @@ void NoteOutput::PlayNoteInternal(NoteMessage note, bool isFromMainThreadAndSche
    }
 }
 
-void NoteOutput::SendPressure(int pitch, int pressure)
+void NoteOutput::SendPressure(int channel, int pressure)
 {
    for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
-      noteReceiver->SendPressure(pitch, pressure);
+      noteReceiver->SendPressure(channel, pressure);
 }
 
 void NoteOutput::SendCC(int control, int value, int voiceIdx)

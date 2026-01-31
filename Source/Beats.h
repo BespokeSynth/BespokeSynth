@@ -64,6 +64,7 @@ public:
    void AddBeat(Sample* sample);
    void Process(double time, ChannelBuffer* buffer, int bufferSize);
    int GetNumSamples() { return (int)mSamples.size(); }
+   void ClearSamples();
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in, int rev);
 
@@ -110,6 +111,7 @@ public:
 
    void Init() override;
    int GetNumColumns() const { return (int)mBeatColumns.size(); }
+   void ClearSamples();
 
    //IAudioSource
    void Process(double time) override;

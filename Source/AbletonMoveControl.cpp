@@ -45,11 +45,12 @@
 #include "push2/../../Push2-Display.h"
 #include "AbletonDeviceShared.h"
 #include "TrackOrganizer.h"
-#include "LaunchpadKeyboard.h"
 #include "IInputRecordable.h"
 #include "Amplifier.h"
+#include "AudioSend.h"
 #include "SongBuilder.h"
 #include "LooperRecorder.h"
+#include "AudioSend.h"
 
 using namespace AbletonDevice;
 
@@ -330,6 +331,8 @@ void AbletonMoveControl::SaveState(FileStreamOut& out)
    out << GetModuleSaveStateRev();
 
    IDrawableModule::SaveState(out);
+
+   out << mAutoZoomToTrack;
 }
 
 void AbletonMoveControl::LoadState(FileStreamIn& in, int rev)
@@ -338,20 +341,14 @@ void AbletonMoveControl::LoadState(FileStreamIn& in, int rev)
 
    LoadStateValidate(rev <= GetModuleSaveStateRev());
 
-   if (rev < 2)
-   {
-      int numBookmarks;
-      in >> numBookmarks;
-      for (int i = 0; i < numBookmarks; ++i)
-      {
-         std::string path;
-         in >> path;
-      }
-   }
+   if (rev >= 3)
+      in >> mAutoZoomToTrack;
 }
 
 bool AbletonMoveControl::Initialize()
 {
+   mLCD.Init();
+
    if (!ThePushBridge.IsInitialized())
    {
       if (auto result = ThePushBridge.Init(ableton::DeviceType::Move); result.Failed())
@@ -362,8 +359,6 @@ bool AbletonMoveControl::Initialize()
       }
       ofLog() << "ableton move connected";
    }
-
-   mLCD.Init();
 
    const std::vector<std::string>& devices = mDevice.GetPortList(false);
    for (int i = 0; i < devices.size(); ++i)
@@ -425,6 +420,8 @@ bool AbletonMoveControl::ShouldDisplaySnapshotView()
       return true;
    if (mSelectedTrackRow == kTrackRowMixer)
       return true;
+   if (GetButtonState(kClickyEncoderButton) && !mShowSoundSelector)
+      return true;
    return false;
 }
 
@@ -463,6 +460,30 @@ void AbletonMoveControl::DrawToFramebuffer()
 
    bool needToDraw = true;
 
+   if (needToDraw && mShowSoundSelector)
+   {
+      TrackOrganizer* trackRow = GetActiveTrackRow();
+      IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
+      if (soundSelector != nullptr)
+      {
+         const int kMaxDisplayEntries = 5;
+         int numValues = soundSelector->GetNumValues();
+         int displayOffset = std::clamp(mSoundSelectorIndex - 2, 0, std::max(numValues - kMaxDisplayEntries, 0));
+         int y = 12;
+         for (int i = displayOffset; i < numValues && i < displayOffset + kMaxDisplayEntries; ++i)
+         {
+            float normalized = float(i) / (numValues - 1);
+            int value = soundSelector->GetValueForMidiCC(normalized);
+            std::string label = soundSelector->GetDisplayValue(value);
+            mLCD.DrawLCDText(label.c_str(), 13, y, value == soundSelector->GetValue() ? LCDFONT_STYLE_UNDERLINE : LCDFONT_STYLE_REGULAR);
+            if (i == mSoundSelectorIndex)
+               mLCD.DrawArrow(9, y - 4, 4, false, true);
+            y += 12;
+         }
+      }
+      needToDraw = false;
+   }
+
    if (needToDraw && mGridControlInterface != nullptr && mGridControlInterface->HasHighPriorityAbletonMoveScreenUpdate(this))
    {
       if (mGridControlInterface->UpdateAbletonMoveScreen(this, &mLCD))
@@ -471,7 +492,7 @@ void AbletonMoveControl::DrawToFramebuffer()
 
    //scroll module offset
    int trackRowSpacingY = 8;
-   bool holdingModuleSelectInput = GetButtonState(kClickyEncoderTouch) && (mShiftHeld || GetButtonState(kClickyEncoderButton));
+   bool holdingModuleSelectInput = GetButtonState(kClickyEncoderTouch) && GetButtonState(kClickyEncoderButton);
    bool moduleIsScrolling = fabsf(mTrackRowOffsetSmoothed - mTrackRowOffset) > .05f;
    if (needToDraw && (holdingModuleSelectInput || moduleIsScrolling))
    {
@@ -512,17 +533,27 @@ void AbletonMoveControl::DrawToFramebuffer()
          mLCD.DrawLCDText(mTrackControlLayout[i].mName.c_str(), 14, 20 + i * 10, i == moduleIndex ? LCDFONT_STYLE_UNDERLINE : LCDFONT_STYLE_REGULAR);
          for (int j = 0; j < mTrackControlLayout[i].mPageCount; ++j)
          {
-            mLCD.DrawRect(84 + j * 10, 14 + i * 10, 5, 5, i == moduleIndex && int(GetModuleViewOffset()) == j);
+            mLCD.DrawRect(84 + j * 9, 14 + i * 10, 5, 5, i == moduleIndex && int(GetModuleViewOffset()) == j);
          }
       }
 
       needToDraw = false;
    }
 
+   if (needToDraw && ShouldDisplaySnapshotView() && GetButtonState(kClickyEncoderTouch))
+   {
+      mLCD.DrawLCDText(("snapshot offset: " + ofToString(mSnapshotOffset)).c_str(), 5, 10, LCDFONT_STYLE_REGULAR);
+      needToDraw = false;
+   }
+
    int mixerAdjustTrackIndex = -1;
+   float mixerAdjustValue = 0;
    if (needToDraw && ShouldDisplayMixer())
    {
-      mLCD.DrawLCDText("mixer", 5, 10, LCDFONT_STYLE_UNDERLINE);
+      std::string title = "mixer";
+      if (mShiftHeld)
+         title = "sends";
+      mLCD.DrawLCDText(title.c_str(), 5, 10, LCDFONT_STYLE_UNDERLINE);
 
       const int kBarPadBelow = 3;
       const int kMaxBarHeight = mLCD.kMoveDisplayHeight - 16;
@@ -534,8 +565,13 @@ void AbletonMoveControl::DrawToFramebuffer()
          if (track != nullptr)
          {
             Amplifier* gain = track->GetGain();
-            FloatSlider* gainSlider = gain != nullptr ? gain->GetGainSlider() : nullptr;
-            if (gain != nullptr && gainSlider != nullptr)
+            AudioSend* send = track->GetSend();
+            FloatSlider* adjustSlider = nullptr;
+            if (mShiftHeld)
+               adjustSlider = send != nullptr ? send->GetAmountSlider() : nullptr;
+            else
+               adjustSlider = gain != nullptr ? gain->GetGainSlider() : nullptr;
+            if (gain != nullptr && adjustSlider != nullptr)
             {
                bool isBeingAdjusted = false;
                if (GetButtonState(kMainEncoderTouchSection + i) ||
@@ -543,11 +579,12 @@ void AbletonMoveControl::DrawToFramebuffer()
                {
                   isBeingAdjusted = true;
                   mixerAdjustTrackIndex = i;
+                  mixerAdjustValue = adjustSlider != nullptr ? adjustSlider->GetValue() : 0;
                }
 
                float level, watermarkLevel;
                gain->GetLevel(level, watermarkLevel);
-               int gainPosition = std::clamp(int(gainSlider->GetMidiValue() * kMaxBarHeight), 0, kMaxBarHeight);
+               int sliderPosition = std::clamp(int(adjustSlider->GetMidiValue() * kMaxBarHeight), 0, kMaxBarHeight);
                int levelHeight = std::clamp(int(level * kMaxBarHeight), 0, kMaxBarHeight);
                int watermarkLevelHeight = std::clamp(int(watermarkLevel * kMaxBarHeight), 0, kMaxBarHeight);
                mLCD.DrawRect(x, mLCD.kMoveDisplayHeight - kBarPadBelow - kMaxBarHeight, 4, kMaxBarHeight, !K(filled));
@@ -561,17 +598,7 @@ void AbletonMoveControl::DrawToFramebuffer()
                   arrowSize = 5;
                   fillArrow = true;
                }
-               for (int arrowX = 0; arrowX < arrowSize; ++arrowX)
-               {
-                  for (int arrowY = 0; arrowY < arrowSize; ++arrowY)
-                  {
-                     if (arrowX == arrowY || (fillArrow && arrowY < arrowX) || arrowX == arrowSize - 1)
-                     {
-                        mLCD.DrawPixel(x + 7 + arrowX, mLCD.kMoveDisplayHeight - kBarPadBelow - gainPosition - arrowY);
-                        mLCD.DrawPixel(x + 7 + arrowX, mLCD.kMoveDisplayHeight - kBarPadBelow - gainPosition + arrowY);
-                     }
-                  }
-               }
+               mLCD.DrawArrow(x + 7, mLCD.kMoveDisplayHeight - kBarPadBelow - sliderPosition, arrowSize, true, fillArrow);
                //mLCD.DrawRect(x + 7, mLCD.kMoveDisplayHeight - kBarPadBelow - gainPosition - 3, 4, 6, K(filled));
             }
          }
@@ -580,7 +607,11 @@ void AbletonMoveControl::DrawToFramebuffer()
       {
          TrackOrganizer* track = dynamic_cast<TrackOrganizer*>(mTrackCables[mixerAdjustTrackIndex]->GetTarget());
          if (track != nullptr)
-            mLCD.DrawLCDText(track->GetTrackName().c_str(), 52, 10, LCDFONT_STYLE_REGULAR);
+         {
+            std::string display = track->GetTrackName();
+            display += "  " + ofToString(mixerAdjustValue, 2);
+            mLCD.DrawLCDText(display.c_str(), 52, 10, LCDFONT_STYLE_REGULAR);
+         }
       }
 
       needToDraw = false;
@@ -673,8 +704,20 @@ void AbletonMoveControl::DrawToFramebuffer()
       }
    }
 
+   TrackOrganizer* track = GetActiveTrackRow();
+
    float measurePos = TheTransport->GetMeasurePos(gTime);
-   mLCD.DrawRect(0, 0, ((measurePos + (TheTransport->GetMeasure(gTime) % 4)) / 4) * mLCD.kMoveDisplayWidth, 1, true);
+   int wrapLengthMeasures = 4;
+   if (track != nullptr)
+   {
+      if (const auto& recordable = track->GetRecorder())
+      {
+         int recordableLength = (int)recordable->GetRecordingLengthMeasures();
+         if (recordableLength > 0)
+            wrapLengthMeasures = recordableLength;
+      }
+   }
+   mLCD.DrawRect(0, 0, ((measurePos + (TheTransport->GetMeasure(gTime) % wrapLengthMeasures)) / wrapLengthMeasures) * mLCD.kMoveDisplayWidth, 1, true);
    float numBeats = TheTransport->GetTimeSigTop();
    int beat = int(measurePos * numBeats);
    float beatWidth = mLCD.kMoveDisplayWidth / numBeats;
@@ -682,7 +725,7 @@ void AbletonMoveControl::DrawToFramebuffer()
 
    if (!ShouldDisplayMixer())
    {
-      TrackOrganizer* track = GetActiveTrackRow();
+
       if (track != nullptr)
       {
          Amplifier* gain = track->GetGain();
@@ -861,28 +904,118 @@ void AbletonMoveControl::UpdateLeds()
          SetLed(kDotButton, 0);
    }
 
-   SetLed(kShiftButton, 127, mShiftHeld ? 0 : -1);
+   SetLed(kMoveDeleteButton, 0);
+
+   if (ShouldDisplaySnapshotView())
+   {
+      for (int i = 0; i < kNumTrackButtons; ++i)
+      {
+         const int kNumCols = 8;
+         int colors[kNumCols]{ 0, 0, 0, 0, 0, 0, 0, 0 };
+         int colors2[kNumCols]{ -1, -1, -1, -1, -1, -1, -1, -1 };
+         TrackOrganizer* trackRow = dynamic_cast<TrackOrganizer*>(mTrackCables[i + mTrackRowOffset]->GetTarget());
+         if (trackRow != nullptr)
+         {
+            Snapshots* snapshots = trackRow->GetSnapshots();
+            if (snapshots != nullptr)
+            {
+               for (int col = 0; col < kNumCols; ++col)
+               {
+                  int snapshotIdx = col + mSnapshotOffset;
+                  if (snapshots->GetCurrentSnapshot() == snapshotIdx)
+                  {
+                     colors[col] = kColorWhite;
+                     colors2[col] = kColorDarkGrey;
+                  }
+                  else if (snapshots->HasSnapshot(snapshotIdx))
+                  {
+                     if (snapshots->GetLabel(snapshotIdx) == "off" || snapshots->GetLabel(snapshotIdx) == "none" || snapshots->GetLabel(snapshotIdx) == "0")
+                        colors[col] = kColorDarkGrey;
+                     else
+                        colors[col] = trackRow->GetColorIndex();
+                  }
+               }
+            }
+         }
+
+         for (int col = 0; col < kNumCols; ++col)
+         {
+            SetLed(kMovePadsSection + (kNumTrackButtons - 1 - i) * 8 + col, colors[col], colors2[col]);
+         }
+      }
+   }
+   else if (mGridControlInterface != nullptr)
+   {
+      mGridControlInterface->UpdateAbletonGridLeds(this);
+   }
+   else
+   {
+      for (int i = kMovePadsSection; i < kMovePadsSection + kNumMovePads; ++i)
+         SetLed(i, kColorOff);
+   }
+
+   bool soundSelectorAvailable = false;
+   TrackOrganizer* trackRow = GetActiveTrackRow();
+   IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
+   if (soundSelector != nullptr)
+      soundSelectorAvailable = true;
+
+   SetLed(kShiftButton, 127, mShiftHeld || mBottomRowMode ? 0 : -1);
+
+   if (mAutoZoomToTrack)
+      SetLed(kLedNew, 127);
+   else if (mBottomRowMode)
+      SetLed(kLedNew, 10);
+   else
+      SetLed(kLedNew, 0);
 
    if (mDisplayModule == TheTransport)
       SetLed(kLedTempo, 127, 30);
-   else if (mShiftHeld)
+   else if (mBottomRowMode)
       SetLed(kLedTempo, 10);
    else
       SetLed(kLedTempo, 0);
 
+   if (mShowSoundSelector)
+      SetLed(kLedGroove, 127, 30);
+   else if (mBottomRowMode)
+      SetLed(kLedGroove, soundSelectorAvailable ? 10 : 0);
+   else
+      SetLed(kLedGroove, 0);
+
    if (mDisplayModule == TheScale)
       SetLed(kLedScale, 127, 30);
-   else if (mShiftHeld)
+   else if (mBottomRowMode)
       SetLed(kLedScale, 10);
    else
       SetLed(kLedScale, 0);
 
    if (mLissajousDisplayMode != LissajousDisplayMode::Never)
-      SetLed(kLedStar, 127, mShiftHeld ? 30 : -1);
-   else if (mShiftHeld)
+      SetLed(kLedStar, 127, mBottomRowMode ? 30 : -1);
+   else if (mBottomRowMode)
       SetLed(kLedStar, 10);
    else
       SetLed(kLedStar, 0);
+
+   if (mBottomRowMode)
+   {
+      SetLed(kButtonNew, kColorLightGrey, 0);
+      SetLed(kButtonSettings, kColorOff);
+      SetLed(kButtonBranch, kColorOff);
+      SetLed(kButtonDowel, kColorOff);
+      SetLed(kButtonTempo, kColorLightGrey, 0);
+      SetLed(kButtonMetronome, kColorOff);
+      SetLed(kButtonGroove, soundSelectorAvailable ? kColorLightGrey : kColorOff, 0);
+      SetLed(kButtonLayout, kColorOff);
+      SetLed(kButtonScale, kColorLightGrey, 0);
+      SetLed(kButtonFullVelocity, kColorOff);
+      SetLed(kButtonRepeat, kColorOff);
+      SetLed(kButtonChord, kColorOff);
+      SetLed(kButtonStar, kColorLightGrey, 0);
+      SetLed(kButtonAdd, kColorOff);
+      SetLed(kButtonDuplicate, kColorOff);
+      SetLed(kButtonQuantize, kColorOff);
+   }
 
    //test led colors
    //SetLed(92, (int)mModuleListOffset);
@@ -945,18 +1078,21 @@ void AbletonMoveControl::UpdateLeds()
    {
       for (int i = 0; i < kNumMainEncoders; ++i)
       {
-         SetLed(i + kMainEncoderSection, mTrackCables[i]->GetTarget() != nullptr ? 121 : 0);
+         const auto* trackRow = dynamic_cast<TrackOrganizer*>(mTrackCables[i]->GetTarget());
+         SetLed(i + kMainEncoderSection, trackRow != nullptr ? trackRow->GetColorIndex() : kColorOff);
       }
    }
    else
    {
       for (int i = 0; i < kNumMainEncoders; ++i)
       {
-         SetLed(i + kMainEncoderSection, i + GetControlOffset() < (int)mControls.size() ? 121 : 0);
+         int color = kColorLightGrey;
+         const auto* trackRow = GetActiveTrackRow();
+         if (trackRow != nullptr)
+            color = trackRow->GetColorIndex();
+         SetLed(i + kMainEncoderSection, i + GetControlOffset() < (int)mControls.size() ? color : kColorOff);
       }
    }
-
-   SetLed(kMoveDeleteButton, 0);
 
    SetLed(kCaptureButton, 127);
 }
@@ -1026,50 +1162,6 @@ void AbletonMoveControl::Poll()
       UpdateControlList();
 
    UpdateLeds();
-
-   if (ShouldDisplaySnapshotView())
-   {
-      for (int i = 0; i < kNumTrackButtons; ++i)
-      {
-         const int kNumCols = 8;
-         int colors[kNumCols]{ 0, 0, 0, 0, 0, 0, 0, 0 };
-         int colors2[kNumCols]{ -1, -1, -1, -1, -1, -1, -1, -1 };
-         TrackOrganizer* trackRow = dynamic_cast<TrackOrganizer*>(mTrackCables[i + mTrackRowOffset]->GetTarget());
-         if (trackRow != nullptr)
-         {
-            Snapshots* snapshots = trackRow->GetSnapshots();
-            if (snapshots != nullptr)
-            {
-               for (int col = 0; col < kNumCols; ++col)
-               {
-                  if (snapshots->GetCurrentSnapshot() == col)
-                  {
-                     colors[col] = kColorWhite;
-                     colors2[col] = kColorDarkGrey;
-                  }
-                  else if (snapshots->HasSnapshot(col))
-                  {
-                     colors[col] = trackRow->GetColorIndex();
-                  }
-               }
-            }
-         }
-
-         for (int col = 0; col < kNumCols; ++col)
-         {
-            SetLed(kMovePadsSection + (kNumTrackButtons - 1 - i) * 8 + col, colors[col], colors2[col]);
-         }
-      }
-   }
-   else if (mGridControlInterface != nullptr)
-   {
-      mGridControlInterface->UpdateAbletonGridLeds(this);
-   }
-   else
-   {
-      for (int i = kMovePadsSection; i < kMovePadsSection + kNumMovePads; ++i)
-         SetLed(i, kColorOff);
-   }
 
    if (GetButtonState(kCaptureButton))
    {
@@ -1249,8 +1341,15 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
 
    mControlState[note.mPitch].mButtonState = note.mVelocity > 0;
 
-   if (mShiftHeld)
+   bool handled = false;
+   if (mBottomRowMode)
    {
+      if (note.mPitch == kButtonNew)
+      {
+         if (note.mVelocity > 0)
+            mAutoZoomToTrack = !mAutoZoomToTrack;
+         handled = true;
+      }
       if (note.mPitch == kButtonTempo)
       {
          if (note.mVelocity > 0)
@@ -1265,12 +1364,43 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
             if (wasHold)
                SetActiveTrackRow(mPreviousSelectedTrackRow, false);
          }
+         handled = true;
+      }
+      if (note.mPitch == kButtonGroove)
+      {
+         if (note.mVelocity > 0)
+         {
+            mShowSoundSelector = true;
+            mSoundSelectorIndex = 0;
+            SetDisplayModule(nullptr);
+
+            TrackOrganizer* trackRow = GetActiveTrackRow();
+            IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
+            if (soundSelector != nullptr)
+            {
+               int numValues = soundSelector->GetNumValues();
+               for (int i = 0; i < numValues; ++i)
+               {
+                  float normalized = float(i) / (numValues - 1);
+                  int value = soundSelector->GetValueForMidiCC(normalized);
+                  if (value == soundSelector->GetValue())
+                  {
+                     mSoundSelectorIndex = i;
+                     break;
+                  }
+               }
+            }
+         }
+         handled = true;
       }
       if (note.mPitch == kButtonScale)
       {
          if (note.mVelocity > 0)
          {
-            SetActiveTrackRow(kTrackRowScale, false);
+            SetDisplayModule(TheScale);
+            mPreviousSelectedTrackRow = mSelectedTrackRow;
+            mShowSoundSelector = false;
+            //SetActiveTrackRow(kTrackRowScale, false);
          }
          else
          {
@@ -1280,6 +1410,7 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
             if (wasHold)
                SetActiveTrackRow(mPreviousSelectedTrackRow, false);
          }
+         handled = true;
       }
       if (note.mPitch == kButtonStar)
       {
@@ -1299,169 +1430,185 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
             else if (mLissajousDisplayMode == LissajousDisplayMode::Never)
                DisplayScreenMessage("lissajous: hide");
          }
+         handled = true;
       }
-   }
 
-   if (!ShouldDisplaySnapshotView() && mGridControlInterface != nullptr)
-   {
-      bool handled = mGridControlInterface->OnAbletonGridControl(this, note.mPitch, note.mVelocity);
       if (handled)
-         return;
+         mBottomRowMode = false;
    }
 
-   if (note.mPitch >= kMainEncoderTouchSection && note.mPitch < kMainEncoderTouchSection + kNumMainEncoders) //main encoders
+   if (!handled)
    {
-      int controlIndex = note.mPitch - kMainEncoderTouchSection + GetControlOffset();
-      if (controlIndex < mControls.size())
+      if (!ShouldDisplaySnapshotView() && mGridControlInterface != nullptr)
+      {
+         bool handled = mGridControlInterface->OnAbletonGridControl(this, note.mPitch, note.mVelocity);
+         if (handled)
+            return;
+      }
+
+      if (note.mPitch >= kMainEncoderTouchSection && note.mPitch < kMainEncoderTouchSection + kNumMainEncoders) //main encoders
+      {
+         int controlIndex = note.mPitch - kMainEncoderTouchSection + GetControlOffset();
+         if (controlIndex < mControls.size())
+         {
+            if (note.mVelocity > 0)
+            {
+               mControls[controlIndex]->StartBeacon();
+
+               /*if (mLFOButtonHeld)
+               {
+                  FloatSlider* slider = dynamic_cast<FloatSlider*>(mControls[controlIndex]);
+                  if (slider != nullptr)
+                  {
+                     bool hadLFO = (slider->GetLFO() != nullptr);
+                     FloatSliderLFOControl* lfo = slider->AcquireLFO();
+                     if (!hadLFO)
+                        lfo->SetLFOEnabled(true);
+                     SetDisplayModule(lfo, true);
+                  }
+               }
+               else if (mAutomateButtonHeld)
+               {
+                  if (mControls[controlIndex] != nullptr && mCurrentControlRecorder == nullptr)
+                  {
+                     std::vector<IDrawableModule*> modules;
+                     TheSynth->GetAllModules(modules);
+                     for (auto* searchModule : modules)
+                     {
+                        ControlRecorder* controlRecorderModule = dynamic_cast<ControlRecorder*>(searchModule);
+                        if (controlRecorderModule != nullptr)
+                        {
+                           if (controlRecorderModule->GetPatchCableSource()->GetTarget() == mControls[controlIndex])
+                              mCurrentControlRecorder = controlRecorderModule;
+                        }
+                     }
+
+                     if (mCurrentControlRecorder == nullptr) //couldn't find one, so make one
+                     {
+                        ModuleFactory::Spawnable spawnable;
+                        spawnable.mLabel = "controlrecorder";
+                        mCurrentControlRecorder = dynamic_cast<ControlRecorder*>(TheSynth->SpawnModuleOnTheFly(spawnable, mControls[controlIndex]->GetRect().getMaxX() + 40, mControls[controlIndex]->GetPosition().y));
+                        mCurrentControlRecorder->SetTarget(mControls[controlIndex]);
+                     }
+
+                     mCurrentControlRecorder->SetEnabled(true);
+                     mCurrentControlRecorder->SetRecording(true);
+                  }
+               }
+               else if (mInMidiControllerBindMode)
+               {
+                  sBindToUIControl = mControls[controlIndex];
+               }
+
+               if (mHeldModule && AllowRepatch())
+               {
+                  PatchCableSource* cable = mHeldModule->GetPatchCableSource();
+                  if (mHeldModulePatchCableIndex > 0)
+                     cable = mHeldModule->GetPatchCableSources()[mHeldModulePatchCableIndex];
+                  if (cable != nullptr)
+                  {
+                     cable->FindValidTargets();
+                     if (cable->IsValidTarget(mControls[controlIndex]))
+                        cable->SetTarget(mControls[controlIndex]);
+                  }
+               }*/
+            }
+            else
+            {
+               if (sBindToUIControl == mControls[controlIndex])
+                  sBindToUIControl = nullptr;
+            }
+         }
+
+         if (note.mVelocity > 0)
+            mMostRecentlyTouchedKnobIndex = note.mPitch - kMainEncoderTouchSection;
+      }
+      else if (note.mPitch >= kMovePadsSection && note.mPitch < kMovePadsSection + kNumMovePads && ShouldDisplaySnapshotView()) //pads
+      {
+         int gridIndex = note.mPitch - kMovePadsSection;
+         int row = (3 - gridIndex / 8) + mTrackRowOffset;
+         int col = gridIndex % 8 + mSnapshotOffset;
+         if (row < (int)mTrackCables.size())
+         {
+            TrackOrganizer* trackRow = dynamic_cast<TrackOrganizer*>(mTrackCables[row]->GetTarget());
+            if (trackRow != nullptr)
+            {
+               Snapshots* snapshots = trackRow->GetSnapshots();
+               if (snapshots != nullptr)
+               {
+                  if (GetButtonState(kShiftButton))
+                  {
+                     DisplayScreenMessage(snapshots->GetLabel(col));
+                  }
+                  else if (GetButtonState(kDotButton))
+                  {
+                     snapshots->StoreSnapshot(col, true);
+                  }
+                  else if (snapshots->HasSnapshot(col))
+                  {
+                     snapshots->SetSnapshot(col, gTime);
+                     DisplayScreenMessage(snapshots->GetLabel(col));
+                  }
+               }
+            }
+         }
+      }
+      else if (note.mPitch >= kStepButtonSection && note.mPitch < kStepButtonSection + kNumStepButtons)
       {
          if (note.mVelocity > 0)
          {
-            mControls[controlIndex]->StartBeacon();
-
-            /*if (mLFOButtonHeld)
+            if (ShouldDisplaySnapshotView())
             {
-               FloatSlider* slider = dynamic_cast<FloatSlider*>(mControls[controlIndex]);
-               if (slider != nullptr)
+               SongBuilder* songBuilder = dynamic_cast<SongBuilder*>(mSongBuilderCable->GetTarget());
+               if (songBuilder != nullptr)
                {
-                  bool hadLFO = (slider->GetLFO() != nullptr);
-                  FloatSliderLFOControl* lfo = slider->AcquireLFO();
-                  if (!hadLFO)
-                     lfo->SetLFOEnabled(true);
-                  SetDisplayModule(lfo, true);
+                  int scene = note.mPitch - kStepButtonSection;
+                  if (scene >= 0 && scene < songBuilder->GetNumScenes())
+                     songBuilder->SetScene(scene, NextBufferTime(false));
                }
             }
-            else if (mAutomateButtonHeld)
+            else
             {
-               if (mControls[controlIndex] != nullptr && mCurrentControlRecorder == nullptr)
+               auto* activeTrackRow = GetActiveTrackRow();
+               auto* recorder = activeTrackRow != nullptr ? activeTrackRow->GetRecorder() : nullptr;
+               if (recorder)
                {
-                  std::vector<IDrawableModule*> modules;
-                  TheSynth->GetAllModules(modules);
-                  for (auto* searchModule : modules)
+                  LooperRecorder* looperRecorder = dynamic_cast<LooperRecorder*>(recorder);
+                  Looper* looper = dynamic_cast<Looper*>(recorder);
+                  if (looperRecorder == nullptr && looper != nullptr)
+                     looperRecorder = looper->GetRecorder();
+                  if (looperRecorder != nullptr)
                   {
-                     ControlRecorder* controlRecorderModule = dynamic_cast<ControlRecorder*>(searchModule);
-                     if (controlRecorderModule != nullptr)
+                     int buttonIndex = note.mPitch - kStepButtonSection;
+                     if (buttonIndex < 5)
                      {
-                        if (controlRecorderModule->GetPatchCableSource()->GetTarget() == mControls[controlIndex])
-                           mCurrentControlRecorder = controlRecorderModule;
+                        int numBars;
+                        if (buttonIndex == 0)
+                           numBars = 16;
+                        else if (buttonIndex == 1)
+                           numBars = 8;
+                        else if (buttonIndex == 2)
+                           numBars = 4;
+                        else if (buttonIndex == 3)
+                           numBars = 2;
+                        else
+                           numBars = 1;
+
+                        looperRecorder->SetNumBars(numBars);
+                        if (looper)
+                           looperRecorder->Commit(looper);
+                        else
+                           looperRecorder->Commit(looperRecorder->GetNextCommitTarget());
                      }
                   }
-
-                  if (mCurrentControlRecorder == nullptr) //couldn't find one, so make one
-                  {
-                     ModuleFactory::Spawnable spawnable;
-                     spawnable.mLabel = "controlrecorder";
-                     mCurrentControlRecorder = dynamic_cast<ControlRecorder*>(TheSynth->SpawnModuleOnTheFly(spawnable, mControls[controlIndex]->GetRect().getMaxX() + 40, mControls[controlIndex]->GetPosition().y));
-                     mCurrentControlRecorder->SetTarget(mControls[controlIndex]);
-                  }
-
-                  mCurrentControlRecorder->SetEnabled(true);
-                  mCurrentControlRecorder->SetRecording(true);
                }
             }
-            else if (mInMidiControllerBindMode)
-            {
-               sBindToUIControl = mControls[controlIndex];
-            }
-
-            if (mHeldModule && AllowRepatch())
-            {
-               PatchCableSource* cable = mHeldModule->GetPatchCableSource();
-               if (mHeldModulePatchCableIndex > 0)
-                  cable = mHeldModule->GetPatchCableSources()[mHeldModulePatchCableIndex];
-               if (cable != nullptr)
-               {
-                  cable->FindValidTargets();
-                  if (cable->IsValidTarget(mControls[controlIndex]))
-                     cable->SetTarget(mControls[controlIndex]);
-               }
-            }*/
-         }
-         else
-         {
-            if (sBindToUIControl == mControls[controlIndex])
-               sBindToUIControl = nullptr;
          }
       }
-
-      if (note.mVelocity > 0)
-         mMostRecentlyTouchedKnobIndex = note.mPitch - kMainEncoderTouchSection;
-   }
-   else if (note.mPitch >= kMovePadsSection && note.mPitch < kMovePadsSection + kNumMovePads && ShouldDisplaySnapshotView()) //pads
-   {
-      int gridIndex = note.mPitch - kMovePadsSection;
-      int row = (3 - gridIndex / 8) + mTrackRowOffset;
-      int col = gridIndex % 8;
-      if (row < (int)mTrackCables.size())
+      else
       {
-         TrackOrganizer* trackRow = dynamic_cast<TrackOrganizer*>(mTrackCables[row]->GetTarget());
-         if (trackRow != nullptr)
-         {
-            Snapshots* snapshots = trackRow->GetSnapshots();
-            if (snapshots != nullptr)
-            {
-               if (GetButtonState(kDotButton))
-                  snapshots->StoreSnapshot(col, true);
-               else if (snapshots->HasSnapshot(col))
-                  snapshots->SetSnapshot(col, gTime);
-            }
-         }
+         //ofLog() << "unhandled note " << note.mPitch << " " << note.mVelocity;
       }
-   }
-   else if (note.mPitch >= kStepButtonSection && note.mPitch < kStepButtonSection + kNumStepButtons)
-   {
-      if (note.mVelocity > 0)
-      {
-         if (ShouldDisplaySnapshotView())
-         {
-            SongBuilder* songBuilder = dynamic_cast<SongBuilder*>(mSongBuilderCable->GetTarget());
-            if (songBuilder != nullptr)
-            {
-               int scene = note.mPitch - kStepButtonSection;
-               if (scene >= 0 && scene < songBuilder->GetNumScenes())
-                  songBuilder->SetScene(scene, NextBufferTime(false));
-            }
-         }
-         else
-         {
-            auto* activeTrackRow = GetActiveTrackRow();
-            auto* recorder = activeTrackRow != nullptr ? activeTrackRow->GetRecorder() : nullptr;
-            if (recorder)
-            {
-               LooperRecorder* looperRecorder = dynamic_cast<LooperRecorder*>(recorder);
-               Looper* looper = dynamic_cast<Looper*>(recorder);
-               if (looperRecorder == nullptr && looper != nullptr)
-                  looperRecorder = looper->GetRecorder();
-               if (looperRecorder != nullptr)
-               {
-                  int buttonIndex = note.mPitch - kStepButtonSection;
-                  if (buttonIndex < 5)
-                  {
-                     int numBars;
-                     if (buttonIndex == 0)
-                        numBars = 16;
-                     else if (buttonIndex == 1)
-                        numBars = 8;
-                     else if (buttonIndex == 2)
-                        numBars = 4;
-                     else if (buttonIndex == 3)
-                        numBars = 2;
-                     else
-                        numBars = 1;
-
-                     looperRecorder->SetNumBars(numBars);
-                     if (looper)
-                        looperRecorder->Commit(looper);
-                     else
-                        looperRecorder->Commit(looperRecorder->GetNextCommitTarget());
-                  }
-               }
-            }
-         }
-      }
-   }
-   else
-   {
-      //ofLog() << "unhandled note " << note.mPitch << " " << note.mVelocity;
    }
 
    mControlState[note.mPitch].mLastChangeTime = gTime;
@@ -1487,10 +1634,15 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
                if (track != nullptr)
                {
                   Amplifier* gain = track->GetGain();
-                  FloatSlider* gainSlider = gain != nullptr ? gain->GetGainSlider() : nullptr;
-                  if (gainSlider != nullptr)
+                  AudioSend* send = track->GetSend();
+                  FloatSlider* adjustSlider = nullptr;
+                  if (mShiftHeld)
+                     adjustSlider = send != nullptr ? send->GetAmountSlider() : nullptr;
+                  else
+                     adjustSlider = gain != nullptr ? gain->GetGainSlider() : nullptr;
+                  if (adjustSlider != nullptr)
                   {
-                     AdjustControlWithEncoder(gainSlider, control.mValue);
+                     AdjustControlWithEncoder(adjustSlider, control.mValue, K(ignoreShift));
                      mLastGainAdjustTrackIndex = trackIndex;
                      mLastGainAdjustTrackTime = gTime;
                      /*mLCD.Clear();
@@ -1555,9 +1707,14 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
             if (track != nullptr)
             {
                Amplifier* gain = track->GetGain();
-               FloatSlider* gainSlider = gain != nullptr ? gain->GetGainSlider() : nullptr;
-               if (gainSlider != nullptr)
-                  AdjustControlWithEncoder(gainSlider, control.mValue);
+               AudioSend* send = track->GetSend();
+               FloatSlider* adjustSlider = nullptr;
+               if (mShiftHeld)
+                  adjustSlider = send != nullptr ? send->GetAmountSlider() : nullptr;
+               else
+                  adjustSlider = gain != nullptr ? gain->GetGainSlider() : nullptr;
+               if (adjustSlider != nullptr)
+                  AdjustControlWithEncoder(adjustSlider, control.mValue, K(ignoreShift));
             }
          }
       }
@@ -1591,6 +1748,9 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
          //if we quickly pressed a button for a track we were already holding, reset module index within row
          if (!wasHold && index == mPreviousSelectedTrackRow)
             SetActiveTrackRow(index, true);
+
+         if (!wasHold && mAutoZoomToTrack)
+            ZoomToTrack(GetActiveTrackRow());
       }
    }
    else if (control.mControl == kBackButton)
@@ -1627,37 +1787,89 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
             SetActiveTrackRow(mPreviousSelectedTrackRow, false);
       }
    }
+   else if (control.mControl == kClickyEncoderButton)
+   {
+      if (mShowSoundSelector)
+      {
+         TrackOrganizer* trackRow = GetActiveTrackRow();
+         IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
+         if (soundSelector != nullptr)
+         {
+            int numValues = soundSelector->GetNumValues();
+            soundSelector->SetFromMidiCC(float(mSoundSelectorIndex) / (numValues - 1), control.mValue, gTime);
+         }
+      }
+   }
    else if (control.mControl == kClickyEncoderTurn)
    {
       int direction = control.mValue < 64 ? 1 : -1;
 
       TrackOrganizer* trackRow = GetActiveTrackRow();
-      if (mShiftHeld || GetButtonState(kClickyEncoderButton))
+      if (mShowSoundSelector)
+      {
+         IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
+         if (soundSelector != nullptr)
+         {
+            mSoundSelectorIndex = std::clamp(mSoundSelectorIndex + direction, 0, soundSelector->GetNumValues() - 1);
+         }
+      }
+      else if (GetButtonState(kClickyEncoderButton))
       {
          mTrackRowOffset = std::clamp(mTrackRowOffset + direction, 0, (int)mTrackCables.size() - kNumTrackButtons);
       }
+      else if (ShouldDisplaySnapshotView())
+      {
+         const int kNumCols = 8;
+         int maxNumSnapshots = 8;
+         for (auto* trackCable : mTrackCables)
+         {
+            TrackOrganizer* trackRow = dynamic_cast<TrackOrganizer*>(trackCable->GetTarget());
+            if (trackRow != nullptr)
+            {
+               Snapshots* snapshots = trackRow->GetSnapshots();
+               if (snapshots != nullptr)
+               {
+                  maxNumSnapshots = std::max(maxNumSnapshots, snapshots->GetSize());
+               }
+            }
+         }
+         mSnapshotOffset = std::clamp(mSnapshotOffset + direction, 0, maxNumSnapshots - kNumCols);
+      }
       else if (trackRow != nullptr)
       {
-         int numModulePages = 1;
-         if (trackRow->GetModuleIndex() < (int)mTrackControlLayout.size())
-            numModulePages = mTrackControlLayout[trackRow->GetModuleIndex()].mPageCount;
-         if (trackRow->GetModuleViewOffset() + direction < 0 || trackRow->GetModuleViewOffset() + direction >= numModulePages)
+         if (mPageWithinModules)
          {
-            bool changed = trackRow->AdjustModuleIndex(direction);
-            if (changed)
+            int numModulePages = 1;
+            if (trackRow->GetModuleIndex() < (int)mTrackControlLayout.size())
+               numModulePages = mTrackControlLayout[trackRow->GetModuleIndex()].mPageCount;
+            if (trackRow->GetModuleViewOffset() + direction < 0 || trackRow->GetModuleViewOffset() + direction >= numModulePages)
             {
-               if (direction > 0)
-                  trackRow->SetModuleViewOffset(0);
-               else
-                  trackRow->SetModuleViewOffset(trackRow->GetModuleIndex() < (int)mTrackControlLayout.size() ? mTrackControlLayout[trackRow->GetModuleIndex()].mPageCount - 1 : 0);
+               bool changed = trackRow->AdjustModuleIndex(direction);
+               if (changed)
+               {
+                  if (direction > 0)
+                     trackRow->SetModuleViewOffset(0);
+                  else
+                     trackRow->SetModuleViewOffset(trackRow->GetModuleIndex() < (int)mTrackControlLayout.size() ? mTrackControlLayout[trackRow->GetModuleIndex()].mPageCount - 1 : 0);
 
-               SetDisplayModuleWithContext(trackRow->GetCurrentModule(), trackRow->GetTrackName());
-               SetGridControlInterface(trackRow->GetCurrentGridInterface());
+                  SetDisplayModuleWithContext(trackRow->GetCurrentModule(), trackRow->GetTrackName());
+                  SetGridControlInterface(trackRow->GetCurrentGridInterface());
+               }
+            }
+            else
+            {
+               trackRow->SetModuleViewOffset(int(trackRow->GetModuleViewOffset()) + direction);
             }
          }
          else
          {
-            trackRow->SetModuleViewOffset(int(trackRow->GetModuleViewOffset()) + direction);
+            bool changed = trackRow->AdjustModuleIndex(direction);
+            if (changed)
+            {
+               trackRow->SetModuleViewOffset(0);
+               SetDisplayModuleWithContext(trackRow->GetCurrentModule(), trackRow->GetTrackName());
+               SetGridControlInterface(trackRow->GetCurrentGridInterface());
+            }
          }
       }
       else
@@ -1866,6 +2078,14 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
    else if (control.mControl == kShiftButton)
    {
       mShiftHeld = control.mValue > 0;
+
+      if (control.mValue > 0)
+      {
+         if (gTime - mControlState[control.mControl].mLastChangeTime < 200) //double-click
+            mBottomRowMode = true;
+         else
+            mBottomRowMode = false;
+      }
    }
    /*else if (control.mControl == kAddTrackButton)
    {
@@ -1939,14 +2159,7 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
       {
          auto* track = GetActiveTrackRow();
          if (track != nullptr)
-         {
-            ofRectangle rect = track->GetBoundingRect();
-            float ratioX = ofGetWidth() / rect.width;
-            float ratioY = ofGetHeight() / rect.height;
-            float newScale = std::min(ratioX, ratioY) * .9f;
-            ofVec2f offset = (rect.getCenter() * -1) + ofVec2f(ofGetWidth(), ofGetHeight()) / newScale * .5f;
-            TheSynth->GetLocationZoomer()->MoveToLocation(newScale, offset);
-         }
+            ZoomToTrack(track);
       }
    }
    else
@@ -1972,6 +2185,31 @@ void AbletonMoveControl::OnMidiPitchBend(MidiPitchBend& pitchBend)
    //ofLog() << "pitchbend " << pitchBend.mChannel << " " << pitchBend.mValue;
 }
 
+void AbletonMoveControl::OnMidiPressure(MidiPressure& pressure)
+{
+   if (mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl(this, kChannelPressureIndex + pressure.mChannel, pressure.mPressure);
+      if (handled)
+         return;
+   }
+}
+
+
+void AbletonMoveControl::ZoomToTrack(TrackOrganizer* track)
+{
+   if (track)
+   {
+      ofRectangle rect = track->GetBoundingRect();
+      float ratioX = ofGetWidth() / rect.width;
+      float ratioY = ofGetHeight() / rect.height;
+      float newScale = std::min(ratioX, ratioY) * .9f;
+      ofVec2f offset = (rect.getCenter() * -1) + ofVec2f(ofGetWidth(), ofGetHeight()) / newScale * .5f;
+      TheSynth->GetLocationZoomer()->MoveToLocation(newScale, offset);
+   }
+}
+
+
 bool AbletonMoveControl::AdjustGlobalModuleIndex(int amount)
 {
    int newIndex = mGlobalModuleIndex + amount;
@@ -1984,11 +2222,11 @@ bool AbletonMoveControl::AdjustGlobalModuleIndex(int amount)
    return false;
 }
 
-void AbletonMoveControl::AdjustControlWithEncoder(IUIControl* control, float midiInputValue)
+void AbletonMoveControl::AdjustControlWithEncoder(IUIControl* control, float midiInputValue, bool ignoreShift)
 {
    float currentNormalized = control->GetMidiValue();
    float increment = GetEncoderIncrement(midiInputValue);
-   if (mShiftHeld)
+   if (mShiftHeld && !ignoreShift)
       increment *= 0.1f;
 
    FloatSlider* floatSlider = dynamic_cast<FloatSlider*>(control);
@@ -2055,6 +2293,7 @@ void AbletonMoveControl::SetActiveTrackRow(int row, bool resetModuleIndex)
       mDisplayModuleSelectTimeout = gTime + 500.0;
 
    mSelectedTrackRow = row;
+   mShowSoundSelector = false;
 
    if (row == kTrackRowGlobal)
    {

@@ -312,7 +312,7 @@ void LaunchpadKeyboard::PlayKeyboardNote(double time, int pitch, int velocity)
    {
       if (velocity == 0)
          time += .001f; //TODO(Ryan) gross hack. need to handle the case better of receiving a note-on followed by a note-off for one pitch at the exact same time. right now it causes stuck notes.
-      PlayNoteOutput(NoteMessage(time, pitch, velocity));
+      PlayNoteOutput(NoteMessage(time, pitch, velocity, 0, ModulationParameters(mModulation.GetPitchBend(0), mModulation.GetModWheel(0), mModulation.GetPressure(0), 0)));
    }
 
    if (mDrawDebug)
@@ -374,6 +374,14 @@ void LaunchpadKeyboard::OnTimeEvent(double time)
 
 bool LaunchpadKeyboard::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
+   if (controlIndex >= AbletonDevice::kChannelPressureIndex && controlIndex < AbletonDevice::kChannelPressureIndex + AbletonDevice::kNumChannelPressureIndices)
+   {
+      int channel = 0; //controlIndex - AbletonDevice::kChannelPressureIndex;
+      mModulation.GetPressure(channel)->SetValue(midiValue / 127.0f);
+      mNoteOutput.SendPressure(channel, midiValue / 127.0f);
+      return true;
+   }
+
    int rangeStart = abletonGrid->GetGridStartIndex();
    int rangeEnd = abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads();
    mCols = abletonGrid->GetGridNumCols(); //TODO(Ryan) need proper way to update grid size based upon context of relevant grid
