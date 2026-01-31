@@ -2081,9 +2081,9 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
 
       if (control.mValue > 0)
       {
-          if (gTime - mControlState[control.mControl].mLastChangeTime < 200) //double-click
+         if (gTime - mControlState[control.mControl].mLastChangeTime < 200) //double-click
             mBottomRowMode = true;
-          else
+         else
             mBottomRowMode = false;
       }
    }

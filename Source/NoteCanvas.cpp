@@ -969,7 +969,7 @@ bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Ableto
       lcd->DrawLCDText(("num measures: " + ofToString(mNumMeasures)).c_str(), 10, 13, LCDFONT_STYLE_REGULAR);
       lcd->DrawLCDText(GetCurrentEditMeasureString().c_str(), 10, 13 + AbletonMoveLCD::kTextLineSpacing, LCDFONT_STYLE_REGULAR);
       if (abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch))
-         lcd->DrawRect(10 + 20 + mEditMeasureOffsetSlider* 20, 13, 1, 5, K(filled));
+         lcd->DrawRect(10 + 20 + mEditMeasureOffsetSlider * 20, 13, 1, 5, K(filled));
       return true;
    }
    return false;

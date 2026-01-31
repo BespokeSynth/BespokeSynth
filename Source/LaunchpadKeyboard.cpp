@@ -376,7 +376,7 @@ bool LaunchpadKeyboard::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, in
 {
    if (controlIndex >= AbletonDevice::kChannelPressureIndex && controlIndex < AbletonDevice::kChannelPressureIndex + AbletonDevice::kNumChannelPressureIndices)
    {
-      int channel = 0;//controlIndex - AbletonDevice::kChannelPressureIndex;
+      int channel = 0; //controlIndex - AbletonDevice::kChannelPressureIndex;
       mModulation.GetPressure(channel)->SetValue(midiValue / 127.0f);
       mNoteOutput.SendPressure(channel, midiValue / 127.0f);
       return true;
