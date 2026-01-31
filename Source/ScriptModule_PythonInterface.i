@@ -43,6 +43,7 @@
 #include "Snapshots.h"
 #include "BassLineSequencer.h"
 #include "ControlInterface.h"
+#include "Beats.h"
 
 #include "leathers/push"
 #include "leathers/unused-value"
@@ -814,6 +815,29 @@ PYBIND11_EMBEDDED_MODULE(interface, m)
    .def("clear_controls", [](ControlInterface& interface)
    {
       interface.ClearAllControls();
+   });
+}
+
+PYBIND11_EMBEDDED_MODULE(beats, m)
+{
+   m.def("get", [](std::string path)
+   {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
+      auto* ret = dynamic_cast<Beats*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<Beats, IDrawableModule>(m, "beats")
+   .def("add_sample", [](Beats& beats, std::string sample)
+   {
+      std::vector<std::string> files;
+      files.push_back(sample);
+      beats.FilesDropped(files, 0, 0);
+   })
+   .def("clear", [](Beats& beats)
+   {
+      beats.ClearSamples();
    });
 }
 

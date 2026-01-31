@@ -807,9 +807,9 @@ void StepSequencer::OnPulse(double time, float velocity, int flags)
 }
 
 
-void StepSequencer::SendPressure(int pitch, int pressure)
+void StepSequencer::SendPressure(int channel, int pressure)
 {
-   mPadPressures[pitch] = pressure;
+   mPadPressures[channel] = pressure;
 }
 
 void StepSequencer::Exit()

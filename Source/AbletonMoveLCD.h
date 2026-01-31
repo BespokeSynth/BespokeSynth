@@ -53,6 +53,7 @@ public:
    void Clear();
    void DrawLCDText(const char* text, int x, int y, int style = LCDFONT_STYLE_REGULAR, int fontSize = 12);
    void DrawRect(int x, int y, int width, int height, bool filled);
+   void DrawArrow(int pointX, int pointY, int arrowSize, bool left, bool fill);
    void ClearRect(int x, int y, int width, int height);
    void DrawPixel(int x, int y);
    void TogglePixel(int x, int y);

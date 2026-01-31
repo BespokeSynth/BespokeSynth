@@ -86,6 +86,9 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
+   bool ShouldSerializeForSnapshot() const override { return true; }
+   void SaveSnapshotData(FileStreamOut& out, int snapshotIndex) override;
+   void LoadSnapshotData(FileStreamIn& in, int snapshotIndex) override;
    int GetModuleSaveStateRev() const override { return 1; }
 
    bool IsEnabled() const override { return mEnabled; }
@@ -97,7 +100,6 @@ private:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    void KeyPressed(int key, bool isRepeat) override;
-   bool ShouldSerializeForSnapshot() const override { return true; }
 
    void StepBy(double time, float velocity, int flags);
    void ResetStep();
@@ -108,6 +110,8 @@ private:
    int GetPageCount() const { return (int)ceil((float)mLength / mNumVisibleStepControls); }
    float GetDisplayWidth() const { return mWidth - 6; }
    float GetDisplayHeight() const { return mHeight - 102; }
+   void SaveSequenceData(FileStreamOut& out);
+   void LoadSequenceData(FileStreamIn& in);
 
    static const int kMaxSteps = 128;
    static const int kMaxStepControls = 16;

@@ -77,7 +77,7 @@ class INoteReceiver
 public:
    virtual ~INoteReceiver() {}
    virtual void PlayNote(NoteMessage note) = 0;
-   virtual void SendPressure(int pitch, int pressure) {}
+   virtual void SendPressure(int channel, int pressure) {}
    virtual void SendCC(int control, int value, int voiceIdx = -1) = 0;
    virtual void SendMidi(const juce::MidiMessage& message) {}
 };

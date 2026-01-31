@@ -169,4 +169,6 @@ private:
    GridControlTarget* mGridControlTarget{ nullptr };
    int mRows{ 8 };
    int mCols{ 8 };
+
+   Modulations mModulation{ true };
 };

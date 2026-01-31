@@ -31,6 +31,7 @@
 #include "LaunchpadKeyboard.h"
 #include "IInputRecordable.h"
 #include "Amplifier.h"
+#include "AudioSend.h"
 #include "UIControlMacros.h"
 
 #include <cstring>
@@ -104,6 +105,12 @@ void TrackOrganizer::CreateUIControls()
    AddPatchCableSource(mGainCable);
    cableX += 12;
 
+   mSendCable = new PatchCableSource(this, kConnectionType_Special);
+   mSendCable->AddTypeFilter("send");
+   mSendCable->SetColor(cableColor);
+   mSendCable->SetManualPosition(cableX, cableY);
+   cableX += 12;
+
    cableX += 10;
 
    mOtherTrackModulesCable = new PatchCableSource(this, kConnectionType_Special);
@@ -120,6 +127,17 @@ void TrackOrganizer::CreateUIControls()
       mGridInterfaceCables[i]->SetManualPosition(controlModuleCablePos.x + i * 12, controlModuleCablePos.y + 12);
       AddPatchCableSource(mGridInterfaceCables[i]);
    }
+
+   ofVec2f snapshotCablePosition = mSnapshotsCable->GetManualPosition();
+   cableX = snapshotCablePosition.x;
+   cableY = snapshotCablePosition.y;
+   cableY += 12;
+
+   mSoundSelectorCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mSoundSelectorCable->SetManualPosition(cableX, cableY);
+   AddPatchCableSource(mSoundSelectorCable);
+
+   AddPatchCableSource(mSendCable);
 }
 
 void TrackOrganizer::DrawModule()
@@ -279,6 +297,12 @@ void TrackOrganizer::DrawModuleUnclipped()
       tooltip = "snapshots";
    }
 
+   if (mSoundSelectorCable->IsHovered())
+   {
+      hoverCable = mSoundSelectorCable;
+      tooltip = "sound selector";
+   }
+
    for (int i = 0; i < (size_t)mControlModuleCables.size(); ++i)
    {
       if (mControlModuleCables[i]->IsHovered())
@@ -303,6 +327,12 @@ void TrackOrganizer::DrawModuleUnclipped()
    {
       hoverCable = mGainCable;
       tooltip = "gain";
+   }
+
+   if (mSendCable->IsHovered())
+   {
+      hoverCable = mSendCable;
+      tooltip = "send";
    }
 
    if (mOtherTrackModulesCable->IsHovered())
@@ -407,6 +437,8 @@ void TrackOrganizer::GatherModules(const std::vector<IDrawableModule*>& modulesT
             mRecorderCable->SetTarget(module);
          else if (mGainCable->GetTarget() == nullptr && dynamic_cast<Amplifier*>(module))
             mGainCable->SetTarget(module);
+         else if (mSendCable->GetTarget() == nullptr && dynamic_cast<AudioSend*>(module))
+            mSendCable->SetTarget(module);
          else
             mOtherTrackModulesCable->AddPatchCable(module);
       }
@@ -474,6 +506,11 @@ Snapshots* TrackOrganizer::GetSnapshots() const
    return dynamic_cast<Snapshots*>(mSnapshotsCable->GetTarget());
 }
 
+IUIControl* TrackOrganizer::GetSoundSelector() const
+{
+   return dynamic_cast<IUIControl*>(mSoundSelectorCable->GetTarget());
+}
+
 IInputRecordable* TrackOrganizer::GetRecorder() const
 {
    return dynamic_cast<IInputRecordable*>(mRecorderCable->GetTarget());
@@ -482,6 +519,11 @@ IInputRecordable* TrackOrganizer::GetRecorder() const
 Amplifier* TrackOrganizer::GetGain() const
 {
    return dynamic_cast<Amplifier*>(mGainCable->GetTarget());
+}
+
+AudioSend* TrackOrganizer::GetSend() const
+{
+   return dynamic_cast<AudioSend*>(mSendCable->GetTarget());
 }
 
 void TrackOrganizer::LoadLayout(const ofxJSONElement& moduleInfo)

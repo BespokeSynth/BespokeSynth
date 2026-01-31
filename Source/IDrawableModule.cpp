@@ -1259,9 +1259,6 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    if (!CanModuleTypeSaveState())
       return;
 
-   if (Snapshots::sSerializingModuleStateForSnapshot)
-      return;
-
    out << GetModuleSaveStateRev();
 
    out << kBaseSaveStateRev;
@@ -1335,9 +1332,6 @@ int IDrawableModule::LoadModuleSaveStateRev(FileStreamIn& in)
 void IDrawableModule::LoadState(FileStreamIn& in, int rev)
 {
    if (!CanModuleTypeSaveState())
-      return;
-
-   if (Snapshots::sSerializingModuleStateForSnapshot)
       return;
 
    if (rev != -1 && ModularSynth::sLoadingFileSaveStateRev >= 423)

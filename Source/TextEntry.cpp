@@ -99,7 +99,7 @@ void TextEntry::Delete()
 {
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == this)
       IKeyboardFocusListener::ClearActiveKeyboardFocus(false);
-   delete this;
+   IUIControl::Delete();
 }
 
 void TextEntry::Render()

@@ -33,4 +33,5 @@ public:
    virtual bool IsRecording() const = 0;
    virtual void ClearRecording() = 0;
    virtual void CancelRecording() = 0;
+   virtual float GetRecordingLengthMeasures() const { return 0; }
 };

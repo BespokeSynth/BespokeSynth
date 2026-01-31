@@ -66,7 +66,7 @@ public:
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return false; }
    static bool AcceptsPulses() { return true; }
-   void Delete() { delete this; }
+   void Delete() { mDeleted = true; }
    void DrawModule() override;
 
    const LFOSettings& GetSettings() { return mLFOSettings; }
@@ -149,6 +149,7 @@ private:
 
    bool mPinned{ false };
    bool mUseOldSpreadStyle{ false };
+   bool mDeleted{ false };
 };
 
 class LFOPool

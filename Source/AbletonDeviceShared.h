@@ -99,6 +99,8 @@ namespace AbletonDevice
    const int kNumMainEncoders = 8;
    const int kNumPads = 64;
    const int kPitchBendIndex = 128 + 128;
+   const int kChannelPressureIndex = kPitchBendIndex + 1; //reserve next 16 indices for channels
+   const int kNumChannelPressureIndices = 16;
 
    //move
    const int kTrackButtonSection = 40 + 128;

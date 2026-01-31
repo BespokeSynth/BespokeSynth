@@ -87,6 +87,7 @@ public:
    bool IsRecording() const override { return mRecord; }
    void ClearRecording() override { Clear(NextBufferTime(false)); }
    void CancelRecording() override { SetRecording(false); }
+   float GetRecordingLengthMeasures() const override { return mNumMeasures; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
@@ -116,7 +117,9 @@ private:
    void QuantizeNotes();
    void LoadMidi();
    void SaveMidi();
-   bool ToggleEditPitch(int pitch);
+   bool RemoveEditPitch(int pitch);
+   bool AddEditPitch(int pitch, bool atEveryMeasure);
+   bool ToggleEditPitch(int pitch, bool atEveryMeasure);
    void DoubleLoop();
    void CopyNotesToClipboard(int stepIndex);
    std::string GetCurrentEditMeasureString() const;
@@ -152,6 +155,7 @@ private:
    LaunchpadKeyboard* mGridKeyboardInterface{ nullptr };
 
    int mEditMeasureOffset{ 0 };
+   float mEditMeasureOffsetSlider{ 0.0f };
    double mEditHoldTime{ 0.0 };
    double mCopyHoldTime{ 0.0 };
    int mEditHoldStep{ -1 };

@@ -171,7 +171,6 @@ public:
    bool CanReceiveNotes() { return mCanReceiveNotes; }
    bool CanReceivePulses() { return mCanReceivePulses; }
    virtual bool ShouldSuppressAutomaticOutputCable() { return false; }
-   virtual bool ShouldSerializeForSnapshot() const { return false; }
 
    virtual void CheckboxUpdated(Checkbox* checkbox, double time) {}
 
@@ -187,6 +186,9 @@ public:
    int LoadModuleSaveStateRev(FileStreamIn& in);
    virtual int GetModuleSaveStateRev() const { return -1; }
    virtual void PostLoadState() {}
+   virtual bool ShouldSerializeForSnapshot() const { return false; }
+   virtual void SaveSnapshotData(FileStreamOut& out, int snapshotIndex) {}
+   virtual void LoadSnapshotData(FileStreamIn& in, int snapshotIndex) {}
    virtual std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const;
    virtual std::vector<IUIControl*> ControlsToIgnoreInSaveState() const;
    virtual void UpdateOldControlName(std::string& oldName) {}

@@ -67,6 +67,7 @@ public:
    void DeleteSnapshot(int idx);
    int GetSize() { return (int)mSnapshotCollection.size(); }
    void SetLabel(int idx, const std::string& label);
+   std::string GetLabel(int idx) const;
 
    void OnTransportAdvanced(float amount) override;
 
@@ -99,7 +100,6 @@ public:
    void UpdateOldControlName(std::string& oldName) override;
 
    static std::vector<IUIControl*> sSnapshotHighlightControls;
-   static bool sSerializingModuleStateForSnapshot;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -154,7 +154,7 @@ private:
 
    struct SnapshotModuleData
    {
-      SnapshotModuleData(IDrawableModule* module);
+      SnapshotModuleData(IDrawableModule* module, int snapshotIndex);
       std::string mModulePath;
       std::string mData;
    };
@@ -207,4 +207,5 @@ private:
    int mGridControlOffsetY{ 0 };
    IntSlider* mGridControlOffsetXSlider{ nullptr };
    IntSlider* mGridControlOffsetYSlider{ nullptr };
+   bool mOnlyListFilledSnapshots{ false };
 };
