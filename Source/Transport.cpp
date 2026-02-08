@@ -283,7 +283,7 @@ void Transport::Reset(bool timeSensitive /*= false*/)
    if (timeSensitive) //try to line up downbeat with when user actually gave this input
       mSeekMsAfterJump = gBufferSizeMs;
 
-   SetQueuedMeasure(NextBufferTime(true), 0);
+   SetQueuedMeasure(gTime, 0);
 
    if (TheSynth->IsAudioPaused())
       TheSynth->SetAudioPaused(false);
@@ -712,12 +712,14 @@ bool Transport::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contro
       float increment = midiValue < 64 ? 1.0f : -1.0f;
       float resolution = 1.0f;
       if (abletonGrid->GetButtonState(AbletonDevice::kClickyEncoderButton))
-         resolution = 10.0f;
+         resolution *= 10.0f;
+      if (abletonGrid->GetButtonState(AbletonDevice::kShiftButton))
+         resolution *= 10.0f;
 
       if (increment > 0.0f)
-         mTempo = floor(mTempo * resolution) / resolution + increment / resolution;
+         mTempo = floor((mTempo + .0001f) * resolution) / resolution + increment / resolution;
       else
-         mTempo = ceil(mTempo * resolution) / resolution + increment / resolution;
+         mTempo = ceil((mTempo - .0001f) * resolution) / resolution + increment / resolution;
 
       return true;
    }
@@ -737,21 +739,35 @@ bool Transport::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contro
 
       if (midiValue > 0)
       {
-         if (index == 0)
-            mTapTempoDetector.Tap(gTime);
-
-         if (index == 1)
+         if (y == 0)
          {
-            if (mTapTempoDetector.HasEnoughSamples())
+            if (x == 0)
+               mTapTempoDetector.Tap(gTime);
+
+            if (x == 1)
             {
-               SetTempo(round(mTapTempoDetector.GetCalculatedTempo()));
-               Reset(K(timeSensitive));
-               mTapTempoDetector.Clear();
+               if (mTapTempoDetector.HasEnoughSamples())
+               {
+                  SetTempo(round(mTapTempoDetector.GetCalculatedTempo()));
+                  Reset(K(timeSensitive));
+                  mTapTempoDetector.Clear();
+               }
             }
          }
 
-         if (index == abletonGrid->GetGridNumCols())
-            Reset(K(timeSensitive));
+         if (y == 1)
+         {
+            if (x == 0)
+               Reset(K(timeSensitive));
+         }
+
+         if (y == 2)
+         {
+            if (x == 0) //shift backward 1 beat
+               SetMeasureTime(GetMeasureTime(gTime) - 1.0f / mTimeSigTop);
+            if (x == 1) //shift forward 1 beat
+               SetMeasureTime(GetMeasureTime(gTime) + 1.0f / mTimeSigTop);
+         }
       }
 
       return true;
@@ -767,16 +783,54 @@ void Transport::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
       for (int y = 0; y < abletonGrid->GetGridNumRows(); ++y)
       {
          int pushColor = 0;
-         int index = x + y * abletonGrid->GetGridNumCols();
 
-         if (index == 0)
-            pushColor = AbletonDevice::kColorLemonYellow;
-         if (index == 1 && mTapTempoDetector.HasEnoughSamples())
-            pushColor = AbletonDevice::kColorGreen;
-         if (index == abletonGrid->GetGridNumCols())
-            pushColor = AbletonDevice::kColorRed;
+         if (y == 0)
+         {
+            if (x == 0)
+               pushColor = AbletonDevice::kColorLemonYellow;
+         }
+         if (y == 0)
+         {
+            if (x == 1 && mTapTempoDetector.HasEnoughSamples())
+            {
+               pushColor = AbletonDevice::kColorGreen;
+            }
+         }
+         if (y == 1)
+         {
+            if (x == 0)
+               pushColor = AbletonDevice::kColorRed;
+         }
+         if (y == 2)
+         {
+            if (x == 0 || x == 1)
+               pushColor = AbletonDevice::kColorYellowGold;
+         }
 
          abletonGrid->SetLed(x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex(), pushColor);
+      }
+   }
+
+   if (abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move)
+   {
+      for (int x = 0; x < AbletonDevice::kNumStepButtons; ++x)
+      {
+         int pushColor = AbletonDevice::kColorOff;
+
+         int displayedBeats = mTimeSigTop;
+         while (displayedBeats > 4)
+            displayedBeats /= 2;
+
+         int displayDot = int(GetMeasurePos(gTime) * displayedBeats * 4);
+
+         if (x < 0 || x >= displayedBeats * 4)
+            pushColor = AbletonDevice::kColorOff;
+         else if (x == displayDot)
+            pushColor = (x % 4 == 0) ? AbletonDevice::kColorGreen : AbletonDevice::kColorMossGreen;
+         else
+            pushColor = AbletonDevice::kColorDarkGrey;
+
+         abletonGrid->SetLed(AbletonDevice::kStepButtonSection + x, pushColor);
       }
    }
 }

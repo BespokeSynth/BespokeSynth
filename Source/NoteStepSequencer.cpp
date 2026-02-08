@@ -988,6 +988,9 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
       mArpIndex = step;
    }
 
+   if (mArpIndex < 0 || mArpIndex >= mLength)
+      mArpIndex = 0;
+
    int offPitch = -1;
    int offStep = -1;
    if (mLastPitch >= 0 && !mAlreadyDidNoteOff)
