@@ -504,6 +504,7 @@ void ModularSynth::PanTo(float x, float y)
 void ModularSynth::Draw(void* vg)
 {
    gNanoVG = (NVGcontext*)vg;
+   sRenderThreadId = std::this_thread::get_id();
 
    ofNoFill();
 

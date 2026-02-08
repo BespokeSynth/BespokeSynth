@@ -827,6 +827,11 @@ bool IsAudioThread()
    return std::this_thread::get_id() == ModularSynth::GetAudioThreadID();
 }
 
+bool IsRenderThread()
+{
+   return std::this_thread::get_id() == ModularSynth::GetRenderThreadID();
+}
+
 float GetLeftPanGain(float pan)
 {
    return 1 - ofClamp(pan, -1, 1);
