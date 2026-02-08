@@ -235,6 +235,7 @@ bool EvaluateExpression(std::string expression, float currentValue, float& outpu
 double NextBufferTime(bool includeLookahead);
 bool IsMainThread();
 bool IsAudioThread();
+bool IsRenderThread();
 
 inline static float RandomSample()
 {

@@ -239,6 +239,7 @@ public:
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
    static std::thread::id GetMainThreadID() { return sMainThreadId; }
    static std::thread::id GetAudioThreadID() { return sAudioThreadId; }
+   static std::thread::id GetRenderThreadID() { return sRenderThreadId; }
    NoteOutputQueue* GetNoteOutputQueue() { return mNoteOutputQueue; }
 
    IDrawableModule* CreateModule(const ofxJSONElement& moduleInfo);
@@ -372,6 +373,7 @@ private:
    NamedMutex mAudioThreadMutex;
    static std::thread::id sMainThreadId;
    static std::thread::id sAudioThreadId;
+   static std::thread::id sRenderThreadId;
    NoteOutputQueue* mNoteOutputQueue{ nullptr };
 
    bool mAudioPaused{ false };

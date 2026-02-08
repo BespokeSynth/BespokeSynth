@@ -586,6 +586,8 @@ void HelpDisplay::ScreenshotModule(IDrawableModule* module)
 
 void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, std::string filename)
 {
+   assert(IsRenderThread());
+
    float scale = gDrawScale * TheSynth->GetPixelRatio();
    x = (x + TheSynth->GetDrawOffset().x) * scale;
    y = (y + TheSynth->GetDrawOffset().y) * scale;
