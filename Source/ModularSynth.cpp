@@ -65,6 +65,7 @@ int ModularSynth::sLoadingFileSaveStateRev = ModularSynth::kSaveStateRev;
 int ModularSynth::sLastLoadedFileSaveStateRev = ModularSynth::kSaveStateRev;
 std::thread::id ModularSynth::sMainThreadId;
 std::thread::id ModularSynth::sAudioThreadId;
+std::thread::id ModularSynth::sRenderThreadId;
 
 #if BESPOKE_WINDOWS
 LONG WINAPI TopLevelExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo);
@@ -504,6 +505,7 @@ void ModularSynth::PanTo(float x, float y)
 void ModularSynth::Draw(void* vg)
 {
    gNanoVG = (NVGcontext*)vg;
+   sRenderThreadId = std::this_thread::get_id();
 
    ofNoFill();
 
