@@ -48,6 +48,8 @@ public:
    void SetADSR(::ADSR* adsr);
    ::ADSR* GetADSR() { return mAdsr; }
    void SpawnEnvelopeEditor();
+   bool IsSliderControl() override { return false; }
+   bool IsButtonControl() override { return false; }
    void SetOverrideDrawTime(double time) { mOverrideDrawTime = time; }
    void SetDimensions(float w, float h)
    {
