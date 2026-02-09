@@ -31,6 +31,7 @@
 class FileStreamIn;
 class FileStreamOut;
 class PatchCableSource;
+class IModulator;
 
 #define HIDDEN_UICONTROL 9999
 
@@ -98,6 +99,7 @@ public:
    virtual float GetModulationRangeMin() const { return 0; }
    virtual float GetModulationRangeMax() const { return 1; }
    virtual bool ShouldSerializeForSnapshot() const { return false; }
+   virtual IModulator* GetModulator() { return nullptr; }
 
    static void SetNewManualHoverViaTab(int direction);
    static void SetNewManualHoverViaArrow(ofVec2f direction);

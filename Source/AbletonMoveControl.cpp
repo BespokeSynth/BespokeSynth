@@ -653,7 +653,12 @@ void AbletonMoveControl::DrawToFramebuffer()
                if (controlIndex < (int)mControls.size())
                {
                   auto* control = mControls[controlIndex];
-                  mLCD.DrawLCDText(control->GetDisplayName().c_str(), i * 14 + 4, 26 + (i % 4) * 10);
+                  std::string display = control->GetDisplayName();
+                  if (control->GetModulator())
+                     display = "*"+display;
+                  if (display.length() > 12)
+                     display = display.substr(0, 12);
+                  mLCD.DrawLCDText(display.c_str(), i * 14 + 4, 26 + (i % 4) * 10);
                }
             }
 
@@ -1202,6 +1207,10 @@ void AbletonMoveControl::DisplayScreenMessage(std::string message, float duratio
 bool AbletonMoveControl::IsDisplayableControl(IUIControl* control)
 {
    const IDrawableModule* owningModule = control->GetModuleParent();
+
+   if (owningModule == TheTransport && control->Name() == std::string("tempo"))
+      return false;
+
    bool isEnabledCheckbox = owningModule != nullptr && control == owningModule->GetEnabledCheckbox();
    if (!isEnabledCheckbox &&
        (control->IsSliderControl() || control->IsButtonControl()) &&
@@ -1397,10 +1406,7 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
       {
          if (note.mVelocity > 0)
          {
-            SetDisplayModule(TheScale);
-            mPreviousSelectedTrackRow = mSelectedTrackRow;
-            mShowSoundSelector = false;
-            //SetActiveTrackRow(kTrackRowScale, false);
+            SetActiveTrackRow(kTrackRowScale, false);
          }
          else
          {
@@ -1433,7 +1439,7 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
          handled = true;
       }
 
-      if (handled)
+      if (handled && note.mVelocity == 0)
          mBottomRowMode = false;
    }
 
