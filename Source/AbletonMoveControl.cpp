@@ -655,7 +655,7 @@ void AbletonMoveControl::DrawToFramebuffer()
                   auto* control = mControls[controlIndex];
                   std::string display = control->GetDisplayName();
                   if (control->GetModulator())
-                     display = "*"+display;
+                     display = "*" + display;
                   if (display.length() > 12)
                      display = display.substr(0, 12);
                   mLCD.DrawLCDText(display.c_str(), i * 14 + 4, 26 + (i % 4) * 10);
