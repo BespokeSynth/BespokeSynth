@@ -629,6 +629,9 @@ void ControlInterface::ControlElement::SetUpControl()
       mUIControl = mRadioButton;
    }
 
+   if (mUIControl != nullptr && mAttachedToUIControl != nullptr)
+      mUIControl->SetControlVizualizer(mAttachedToUIControl->GetControlVisualizer());
+
    ApplyInfoToControl();
 }
 

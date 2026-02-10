@@ -30,8 +30,9 @@
 #include "Slider.h"
 #include "BiquadFilter.h"
 #include "RadioButton.h"
+#include "IControlVisualizer.h"
 
-class BiquadFilterEffect : public IAudioEffect, public IDropdownListener, public IFloatSliderListener, public IRadioButtonListener
+class BiquadFilterEffect : public IAudioEffect, public IDropdownListener, public IFloatSliderListener, public IRadioButtonListener, public IControlVisualizer
 {
 public:
    BiquadFilterEffect();
@@ -55,6 +56,9 @@ public:
    std::string GetType() override { return "biquad"; }
 
    bool MouseMoved(float x, float y) override;
+
+   //IControlVisualizer
+   void DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* control) override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;

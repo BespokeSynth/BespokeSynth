@@ -154,6 +154,13 @@ void SingleOscillator::CreateUIControls()
    mFilterCutoffMaxSlider->SetMode(FloatSlider::kSquare);
    mFilterCutoffMinSlider->SetMode(FloatSlider::kSquare);
    mFilterQSlider->SetMode(FloatSlider::kSquare);
+
+   mOscSelector->SetControlVizualizer(this);
+   mPulseWidthSlider->SetControlVizualizer(this);
+   mSoftenSlider->SetControlVizualizer(this);
+   mSyncFreqSlider->SetControlVizualizer(this);
+   mSyncRatioSlider->SetControlVizualizer(this);
+   mShuffleSlider->SetControlVizualizer(this);
 }
 
 SingleOscillator::~SingleOscillator()
@@ -288,18 +295,7 @@ void SingleOscillator::DrawModule()
       {
          float phase = i / width * FTWO_PI;
          phase += gTime * .005f;
-         if (mVoiceParams.mSyncMode != Oscillator::SyncMode::None)
-         {
-            phase = FloatWrap(phase, FTWO_PI);
-            if (mVoiceParams.mSyncMode == Oscillator::SyncMode::Frequency)
-               phase *= mVoiceParams.mSyncFreq / 200;
-            if (mVoiceParams.mSyncMode == Oscillator::SyncMode::Ratio)
-               phase *= mVoiceParams.mSyncRatio;
-         }
-         if (mDrawOsc.GetShuffle() > 0)
-            phase *= 2;
-         mDrawOsc.SetSoften(mVoiceParams.mSoften);
-         float value = mDrawOsc.Value(phase);
+         float value = GetDrawValue(phase);
          ofVertex(i + x, ofMap(value, -1, 1, 0, height) + y);
       }
       ofEndShape(false);
@@ -328,6 +324,47 @@ void SingleOscillator::DrawModuleUnclipped()
          DrawTextNormal(line.text, 0, y);
          y += 15;
       }
+   }
+}
+
+float SingleOscillator::GetDrawValue(float phase)
+{
+   if (mVoiceParams.mSyncMode != Oscillator::SyncMode::None)
+   {
+      phase = FloatWrap(phase, FTWO_PI);
+      if (mVoiceParams.mSyncMode == Oscillator::SyncMode::Frequency)
+         phase *= mVoiceParams.mSyncFreq / 200;
+      if (mVoiceParams.mSyncMode == Oscillator::SyncMode::Ratio)
+         phase *= mVoiceParams.mSyncRatio;
+   }
+   if (mDrawOsc.GetShuffle() > 0)
+      phase *= 2;
+   mDrawOsc.SetSoften(mVoiceParams.mSoften);
+   return mDrawOsc.Value(phase);
+}
+
+void SingleOscillator::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* control)
+{
+   float lastY = -1;
+   for (float x = 0; x < AbletonMoveLCD::kMoveDisplayWidth; ++x)
+   {
+      float phase = x / AbletonMoveLCD::kMoveDisplayWidth * FTWO_PI;
+      phase += gTime * .005f;
+      float value = GetDrawValue(phase);
+      float newY = ofMap(value, -1, 1, 10, AbletonMoveLCD::kMoveDisplayHeight - 10);
+      if (lastY == -1)
+         lastY = newY;
+      if (lastY < newY)
+      {
+         for (int y = lastY; y <= newY; ++y)
+            screen->TogglePixel(x, y);
+      }
+      else
+      {
+         for (int y = lastY; y >= newY; --y)
+            screen->TogglePixel(x, y);
+      }
+      lastY = newY;
    }
 }
 
