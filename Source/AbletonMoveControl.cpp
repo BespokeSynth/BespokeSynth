@@ -51,6 +51,7 @@
 #include "SongBuilder.h"
 #include "LooperRecorder.h"
 #include "AudioSend.h"
+#include "IControlVisualizer.h"
 
 using namespace AbletonDevice;
 
@@ -653,26 +654,29 @@ void AbletonMoveControl::DrawToFramebuffer()
                if (controlIndex < (int)mControls.size())
                {
                   auto* control = mControls[controlIndex];
-                  std::string display = control->GetDisplayName();
+                  std::string displayName = control->GetDisplayName();
                   if (control->GetModulator())
-                     display = "*" + display;
-                  if (display.length() > 12)
-                     display = display.substr(0, 12);
-                  mLCD.DrawLCDText(display.c_str(), i * 14 + 4, 26 + (i % 4) * 10);
+                     displayName = "*" + displayName;
+                  if (displayName.length() > 12 && controlIndex + 4 < (int)mControls.size()) // truncate if we might stomp on the control name in the next column
+                     displayName = displayName.substr(0, 12);
+                  mLCD.DrawLCDText(displayName.c_str(), i * 14 + 4, 26 + (i % 4) * 10);
                }
             }
 
-            const int kModuleViewBarX = 4;
-            const int kModuleViewBarY = 58;
-            const int kModuleViewBarWidth = 124;
-            const int kModuleViewBarHeight = 6;
-            mLCD.DrawRect(kModuleViewBarX, kModuleViewBarY, kModuleViewBarWidth, kModuleViewBarHeight, false);
-            float numControlsQuantized = ceil((float)mControls.size() / kNumMainEncoders) * kNumMainEncoders;
-            float offsetStart = GetControlOffset() / numControlsQuantized;
-            float offsetEnd = MIN(GetControlOffset() + kNumMainEncoders, numControlsQuantized) / numControlsQuantized;
-            mLCD.DrawRect(kModuleViewBarX + offsetStart * kModuleViewBarWidth, kModuleViewBarY + 2, (offsetEnd - offsetStart) * kModuleViewBarWidth, kModuleViewBarHeight - 4, true);
-            if (GetButtonState(kVolumeEncoderTouch))
-               mLCD.DrawRect(kModuleViewBarX + (GetModuleViewOffset() * kNumMainEncoders / numControlsQuantized) * kModuleViewBarWidth, kModuleViewBarY, 1, kModuleViewBarHeight, true);
+            if ((int)mControls.size() > kNumMainEncoders)
+            {
+               const int kModuleViewBarX = 4;
+               const int kModuleViewBarY = 58;
+               const int kModuleViewBarWidth = 124;
+               const int kModuleViewBarHeight = 6;
+               mLCD.DrawRect(kModuleViewBarX, kModuleViewBarY, kModuleViewBarWidth, kModuleViewBarHeight, false);
+               float numControlsQuantized = ceil((float)mControls.size() / kNumMainEncoders) * kNumMainEncoders;
+               float offsetStart = GetControlOffset() / numControlsQuantized;
+               float offsetEnd = MIN(GetControlOffset() + kNumMainEncoders, numControlsQuantized) / numControlsQuantized;
+               mLCD.DrawRect(kModuleViewBarX + offsetStart * kModuleViewBarWidth, kModuleViewBarY + 2, (offsetEnd - offsetStart) * kModuleViewBarWidth, kModuleViewBarHeight - 4, true);
+               if (GetButtonState(kVolumeEncoderTouch))
+                  mLCD.DrawRect(kModuleViewBarX + (GetModuleViewOffset() * kNumMainEncoders / numControlsQuantized) * kModuleViewBarWidth, kModuleViewBarY, 1, kModuleViewBarHeight, true);
+            }
          }
       }
 
@@ -683,7 +687,10 @@ void AbletonMoveControl::DrawToFramebuffer()
          if (controlIndex < (int)mControls.size())
          {
             auto* control = mControls[controlIndex];
-            mLCD.DrawLCDText(control->GetDisplayName().c_str(), 5, 26);
+            std::string displayName = control->GetDisplayName();
+            if (control->GetModulator())
+               displayName = "*" + displayName;
+            mLCD.DrawLCDText(displayName.c_str(), 5, 26);
             mLCD.DrawLCDText(control->GetDisplayValue(control->GetValue()).c_str(), 5, 40);
 
             int sliderX = 5;
@@ -705,6 +712,9 @@ void AbletonMoveControl::DrawToFramebuffer()
                   mLCD.DrawRect(x, sliderY + sliderH - 2, 1, 2, false);
                }
             }
+
+            if (IControlVisualizer* visualizer = control->GetControlVisualizer())
+               visualizer->DrawVisualizationToScreen(&mLCD, control);
          }
       }
    }
@@ -1906,8 +1916,8 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
    else if (control.mControl == kVolumeEncoderTurn)
    {
       float increment = control.mValue < 64 ? control.mValue : control.mValue - 128;
-      increment *= 0.07f;
-      SetModuleViewOffset(ofClamp(GetModuleViewOffset() + increment, 0, MAX(0, (int)mControls.size() / kNumMainEncoders)));
+      increment *= 0.03f;
+      SetModuleViewOffset(ofClamp(GetModuleViewOffset() + increment, 0, MAX(0, ((int)mControls.size() + kNumMainEncoders - 1) / kNumMainEncoders) - .01f));
    }
    /*else if (control.mControl == kSetupButton && control.mValue > 0)
    {

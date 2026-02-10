@@ -52,6 +52,11 @@ void BiquadFilterEffect::CreateUIControls()
    mQSlider->SetMode(FloatSlider::kSquare);
    mQSlider->SetShowing(mBiquad[0].UsesQ());
    mGSlider->SetShowing(mBiquad[0].UsesGain());
+
+   mTypeSelector->SetControlVizualizer(this);
+   mFSlider->SetControlVizualizer(this);
+   mQSlider->SetControlVizualizer(this);
+   mGSlider->SetControlVizualizer(this);
 }
 
 BiquadFilterEffect::~BiquadFilterEffect()
@@ -107,6 +112,14 @@ void BiquadFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    }
 }
 
+namespace
+{
+   float FreqForPos(float pos)
+   {
+      return 20.0 * std::pow(2.0, pos * 10);
+   }
+}
+
 void BiquadFilterEffect::DrawModule()
 {
    mTypeSelector->Draw();
@@ -114,11 +127,6 @@ void BiquadFilterEffect::DrawModule()
    mFSlider->Draw();
    mQSlider->Draw();
    mGSlider->Draw();
-
-   auto FreqForPos = [](float pos)
-   {
-      return 20.0 * std::pow(2.0, pos * 10);
-   };
 
    float w, h;
    GetModuleDimensions(w, h);
@@ -136,6 +144,21 @@ void BiquadFilterEffect::DrawModule()
       }
    }
    ofEndShape(false);
+}
+
+void BiquadFilterEffect::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* control)
+{
+   for (float x = 0; x < AbletonMoveLCD::kMoveDisplayWidth; ++x)
+   {
+      float freq = FreqForPos(x / AbletonMoveLCD::kMoveDisplayWidth);
+      if (freq < gSampleRate / 2)
+      {
+         float response = mBiquad[0].GetMagnitudeResponseAt(freq);
+         float screenEnvelopeY = (.5f - .666f * log10(response)) * AbletonMoveLCD::kMoveDisplayHeight;
+         for (int screenY = screenEnvelopeY; screenY < AbletonMoveLCD::kMoveDisplayHeight; ++screenY)
+            screen->TogglePixel(x, screenY);
+      }
+   }
 }
 
 float BiquadFilterEffect::GetEffectAmount()

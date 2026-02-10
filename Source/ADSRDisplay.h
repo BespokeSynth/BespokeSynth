@@ -27,12 +27,13 @@
 
 #include "IUIControl.h"
 #include "ADSR.h"
+#include "IControlVisualizer.h"
 #include "Slider.h"
 
 class IDrawableModule;
 class EnvelopeEditor;
 
-class ADSRDisplay : public IUIControl
+class ADSRDisplay : public IUIControl, public IControlVisualizer
 {
 public:
    ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y, int w, int h, ::ADSR* adsr);
@@ -74,6 +75,9 @@ public:
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool GetNoHover() const override { return true; }
 
+   //IControlVisualizer
+   void DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* control) override;
+
    enum DisplayMode
    {
       kDisplayEnvelope,
@@ -82,7 +86,7 @@ public:
    static void ToggleDisplayMode();
 
 protected:
-   ~ADSRDisplay(); //protected so that it can't be created on the stack
+   ~ADSRDisplay() override; //protected so that it can't be created on the stack
 
 private:
    enum AdjustParam
@@ -106,6 +110,8 @@ private:
 
    void UpdateSliderVisibility();
    ofVec2f GetDrawPoint(float time, const ADSR::EventInfo& adsrEvent);
+   float GetDrawTime(float releaseTime) const;
+   void GetDrawEventTimes(float& releaseTime, float& timeBeforeSustain) const;
 
    float mWidth;
    float mHeight;

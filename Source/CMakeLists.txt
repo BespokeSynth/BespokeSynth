@@ -249,6 +249,7 @@ target_sources(BespokeSynth PRIVATE
     IAudioSource.h
     IClickable.cpp
     IClickable.h
+    IControlVisualizer.h
     IDrawableModule.cpp
     IDrawableModule.h
     IDrivableSequencer.h

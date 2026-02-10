@@ -24,6 +24,8 @@
 //
 
 #include "ADSRDisplay.h"
+
+#include "AbletonMoveLCD.h"
 #include "SynthGlobals.h"
 #include "IDrawableModule.h"
 #include "ModularSynth.h"
@@ -63,6 +65,11 @@ ADSRDisplay::ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y,
       mSSlider->SetShowName(false);
       mRSlider->SetShowName(false);
 
+      mASlider->SetControlVizualizer(this);
+      mDSlider->SetControlVizualizer(this);
+      mSSlider->SetControlVizualizer(this);
+      mRSlider->SetControlVizualizer(this);
+
       UpdateSliderVisibility();
    }
 }
@@ -94,19 +101,9 @@ void ADSRDisplay::Render()
       ofSetColor(245, 58, 0, gModuleDrawAlpha);
       ofSetLineWidth(1);
 
-      float timeBeforeSustain = mMaxTime;
-      float releaseTime = mMaxTime;
-      if (mAdsr->GetMaxSustain() == -1 && mAdsr->GetHasSustainStage())
-      {
-         timeBeforeSustain = 0;
-         for (int i = 0; i < mAdsr->GetNumStages(); ++i)
-         {
-            timeBeforeSustain += mAdsr->GetStageData(i).time;
-            if (i == mAdsr->GetSustainStage())
-               break;
-         }
-         releaseTime = timeBeforeSustain + mMaxTime * .2f;
-      }
+      float releaseTime;
+      float timeBeforeSustain;
+      GetDrawEventTimes(releaseTime, timeBeforeSustain);
       ADSR::EventInfo adsrEvent(0, releaseTime);
 
       ofBeginShape();
@@ -161,18 +158,7 @@ void ADSRDisplay::Render()
          ofEndShape(false);
       }
 
-      float drawTime = 0;
-      if (mOverrideDrawTime != -1)
-      {
-         drawTime = mOverrideDrawTime;
-      }
-      else
-      {
-         if (mAdsr->GetStartTime(gTime) > 0 && mAdsr->GetStartTime(gTime) >= mAdsr->GetStopTime(gTime))
-            drawTime = ofClamp(gTime - mAdsr->GetStartTime(gTime), 0, releaseTime * mAdsr->GetTimeScale()) / mAdsr->GetTimeScale();
-         if (mAdsr->GetStopTime(gTime) > mAdsr->GetStartTime(gTime))
-            drawTime = releaseTime + (gTime - mAdsr->GetStopTime(gTime));
-      }
+      float drawTime = GetDrawTime(releaseTime);
 
       ofPushStyle();
       ofSetColor(0, 255, 0, gModuleDrawAlpha * .5f);
@@ -298,6 +284,40 @@ void ADSRDisplay::Render()
    }
 }
 
+float ADSRDisplay::GetDrawTime(float releaseTime) const
+{
+   float drawTime = 0;
+   if (mOverrideDrawTime != -1)
+   {
+      drawTime = mOverrideDrawTime;
+   }
+   else
+   {
+      if (mAdsr->GetStartTime(gTime) > 0 && mAdsr->GetStartTime(gTime) >= mAdsr->GetStopTime(gTime))
+         drawTime = ofClamp(gTime - mAdsr->GetStartTime(gTime), 0, releaseTime * mAdsr->GetTimeScale()) / mAdsr->GetTimeScale();
+      if (mAdsr->GetStopTime(gTime) > mAdsr->GetStartTime(gTime))
+         drawTime = releaseTime + (gTime - mAdsr->GetStopTime(gTime));
+   }
+   return drawTime;
+}
+
+void ADSRDisplay::GetDrawEventTimes(float& releaseTime, float& timeBeforeSustain) const
+{
+   timeBeforeSustain = mMaxTime;
+   releaseTime = mMaxTime;
+   if (mAdsr->GetMaxSustain() == -1 && mAdsr->GetHasSustainStage())
+   {
+      timeBeforeSustain = 0;
+      for (int i = 0; i < mAdsr->GetNumStages(); ++i)
+      {
+         timeBeforeSustain += mAdsr->GetStageData(i).time;
+         if (i == mAdsr->GetSustainStage())
+            break;
+      }
+      releaseTime = timeBeforeSustain + mMaxTime * .2f;
+   }
+}
+
 ofVec2f ADSRDisplay::GetDrawPoint(float time, const ADSR::EventInfo& adsrEvent)
 {
    float value = mAdsr->Value(time, &adsrEvent) * mVol;
@@ -371,6 +391,32 @@ void ADSRDisplay::UpdateSliderVisibility()
          mSSlider->SetShowing(false);
          mRSlider->SetShowing(false);
       }
+   }
+}
+
+void ADSRDisplay::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* control)
+{
+   float releaseTime;
+   float timeBeforeSustain;
+   GetDrawEventTimes(releaseTime, timeBeforeSustain);
+   ADSR::EventInfo adsrEvent(0, releaseTime);
+
+   for (float x = 0; x < AbletonMoveLCD::kMoveDisplayWidth; ++x)
+   {
+      float time = x / AbletonMoveLCD::kMoveDisplayWidth * mMaxTime;
+      ofVec2f point = GetDrawPoint(time, adsrEvent);
+      int screenX = point.x / mWidth * AbletonMoveLCD::kMoveDisplayWidth;
+      int screenEnvelopeY = point.y / mHeight * AbletonMoveLCD::kMoveDisplayHeight;
+      for (int screenY = screenEnvelopeY; screenY < AbletonMoveLCD::kMoveDisplayHeight; ++screenY)
+         screen->TogglePixel(screenX, screenY);
+   }
+
+   float drawTime = GetDrawTime(releaseTime);
+   int nowX = drawTime / mMaxTime * AbletonMoveLCD::kMoveDisplayWidth;
+   if (nowX >= 0 && nowX < AbletonMoveLCD::kMoveDisplayWidth)
+   {
+      for (float y = 0; y < AbletonMoveLCD::kMoveDisplayHeight; ++y)
+         screen->TogglePixel(nowX, y);
    }
 }
 
