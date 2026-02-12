@@ -155,12 +155,14 @@ void SingleOscillator::CreateUIControls()
    mFilterCutoffMinSlider->SetMode(FloatSlider::kSquare);
    mFilterQSlider->SetMode(FloatSlider::kSquare);
 
-   mOscSelector->SetControlVizualizer(this);
-   mPulseWidthSlider->SetControlVizualizer(this);
-   mSoftenSlider->SetControlVizualizer(this);
-   mSyncFreqSlider->SetControlVizualizer(this);
-   mSyncRatioSlider->SetControlVizualizer(this);
-   mShuffleSlider->SetControlVizualizer(this);
+   mOscSelector->SetControlVisualizer(this);
+   mPulseWidthSlider->SetControlVisualizer(this);
+   mSoftenSlider->SetControlVisualizer(this);
+   mSyncFreqSlider->SetControlVisualizer(this);
+   mSyncRatioSlider->SetControlVisualizer(this);
+   mShuffleSlider->SetControlVisualizer(this);
+   mFilterCutoffMaxSlider->SetControlVisualizer(this);
+   mFilterCutoffMinSlider->SetControlVisualizer(this);
 }
 
 SingleOscillator::~SingleOscillator()
@@ -345,26 +347,39 @@ float SingleOscillator::GetDrawValue(float phase)
 
 void SingleOscillator::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* control)
 {
-   float lastY = -1;
-   for (float x = 0; x < AbletonMoveLCD::kMoveDisplayWidth; ++x)
+   if (control == mFilterCutoffMinSlider || control == mFilterCutoffMaxSlider)
    {
-      float phase = x / AbletonMoveLCD::kMoveDisplayWidth * FTWO_PI;
-      phase += gTime * .005f;
-      float value = GetDrawValue(phase);
-      float newY = ofMap(value, -1, 1, 10, AbletonMoveLCD::kMoveDisplayHeight - 10);
-      if (lastY == -1)
+      float minVal = mFilterCutoffMinSlider->GetMin();
+      float maxVal = mFilterCutoffMaxSlider->GetMax();
+      int minX = ofMap(mVoiceParams.mFilterCutoffMin, minVal, maxVal, 6, AbletonMoveLCD::kMoveDisplayWidth - 6);
+      int maxX = ofMap(mVoiceParams.mFilterCutoffMax, minVal, maxVal, 6, AbletonMoveLCD::kMoveDisplayWidth - 6);
+      screen->DrawRect(minX, 27, 1, 4, false);
+      screen->DrawRect(maxX, 27, 1, 4, false);
+      screen->DrawRect(minX, 28, maxX - minX, 2, false);
+   }
+   else
+   {
+      float lastY = -1;
+      for (float x = 0; x < AbletonMoveLCD::kMoveDisplayWidth; ++x)
+      {
+         float phase = x / AbletonMoveLCD::kMoveDisplayWidth * FTWO_PI;
+         phase += gTime * .005f;
+         float value = GetDrawValue(phase);
+         float newY = ofMap(value, -1, 1, 10, AbletonMoveLCD::kMoveDisplayHeight - 10);
+         if (lastY == -1)
+            lastY = newY;
+         if (lastY < newY)
+         {
+            for (int y = lastY; y <= newY; ++y)
+               screen->TogglePixel(x, y);
+         }
+         else
+         {
+            for (int y = lastY; y >= newY; --y)
+               screen->TogglePixel(x, y);
+         }
          lastY = newY;
-      if (lastY < newY)
-      {
-         for (int y = lastY; y <= newY; ++y)
-            screen->TogglePixel(x, y);
       }
-      else
-      {
-         for (int y = lastY; y >= newY; --y)
-            screen->TogglePixel(x, y);
-      }
-      lastY = newY;
    }
 }
 
