@@ -101,7 +101,7 @@ public:
    virtual float GetModulationRangeMax() const { return 1; }
    virtual bool ShouldSerializeForSnapshot() const { return false; }
    virtual IModulator* GetModulator() { return nullptr; }
-   void SetControlVizualizer(IControlVisualizer* visualizer) { mControlVisualizer = visualizer; }
+   void SetControlVisualizer(IControlVisualizer* visualizer) { mControlVisualizer = visualizer; }
    IControlVisualizer* GetControlVisualizer() const { return mControlVisualizer; }
 
    static void SetNewManualHoverViaTab(int direction);

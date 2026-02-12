@@ -53,10 +53,10 @@ void BiquadFilterEffect::CreateUIControls()
    mQSlider->SetShowing(mBiquad[0].UsesQ());
    mGSlider->SetShowing(mBiquad[0].UsesGain());
 
-   mTypeSelector->SetControlVizualizer(this);
-   mFSlider->SetControlVizualizer(this);
-   mQSlider->SetControlVizualizer(this);
-   mGSlider->SetControlVizualizer(this);
+   mTypeSelector->SetControlVisualizer(this);
+   mFSlider->SetControlVisualizer(this);
+   mQSlider->SetControlVisualizer(this);
+   mGSlider->SetControlVisualizer(this);
 }
 
 BiquadFilterEffect::~BiquadFilterEffect()

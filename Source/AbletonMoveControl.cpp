@@ -659,7 +659,12 @@ void AbletonMoveControl::DrawToFramebuffer()
                      displayName = "*" + displayName;
                   if (displayName.length() > 12 && controlIndex + 4 < (int)mControls.size()) // truncate if we might stomp on the control name in the next column
                      displayName = displayName.substr(0, 12);
-                  mLCD.DrawLCDText(displayName.c_str(), i * 14 + 4, 26 + (i % 4) * 10);
+                  int x = i * 14 + 3;
+                  int y = 26 + (i % 4) * 10;
+                  mLCD.DrawLCDText(displayName.c_str(), x + 3, y);
+
+                  int pixelHeight = control->GetMidiValue() * 8;
+                  mLCD.DrawRect(x, y - pixelHeight, 1, pixelHeight, false);
                }
             }
 
@@ -688,10 +693,18 @@ void AbletonMoveControl::DrawToFramebuffer()
          {
             auto* control = mControls[controlIndex];
             std::string displayName = control->GetDisplayName();
-            if (control->GetModulator())
+            if (control->GetModulator() && control->GetModulator()->Active())
                displayName = "*" + displayName;
             mLCD.DrawLCDText(displayName.c_str(), 5, 26);
-            mLCD.DrawLCDText(control->GetDisplayValue(control->GetValue()).c_str(), 5, 40);
+            std::string displayValue = control->GetDisplayValue(control->GetValue());
+            if (control->GetModulator() && control->GetModulator()->Active())
+            {
+               if (mShiftHeld)
+                  displayValue += "   min: " + control->GetDisplayValue(control->GetModulator()->GetMin());
+               else
+                  displayValue += "   max: " + control->GetDisplayValue(control->GetModulator()->GetMax());
+            }
+            mLCD.DrawLCDText(displayValue.c_str(), 5, 40);
 
             int sliderX = 5;
             int sliderY = 42;
@@ -711,6 +724,30 @@ void AbletonMoveControl::DrawToFramebuffer()
                   mLCD.DrawRect(x, sliderY, 1, 2, false);
                   mLCD.DrawRect(x, sliderY + sliderH - 2, 1, 2, false);
                }
+            }
+
+            IModulator* modulator = control->GetModulator();
+            if (modulator && modulator->Active())
+            {
+               float sliderMin = 0;
+               float sliderMax = 1;
+               FloatSlider* slider = dynamic_cast<FloatSlider*>(control);
+               if (slider)
+               {
+                  sliderMin = slider->GetMin();
+                  sliderMax = slider->GetMax();
+               }
+               float modMin = ofMap(modulator->GetMin(), sliderMin, sliderMax, 0, 1);
+               float modMax = ofMap(modulator->GetMax(), sliderMin, sliderMax, 0, 1);
+               int min = ofLerp(sliderMinPos, sliderMaxPos, modMin);
+               int max = ofLerp(sliderMinPos, sliderMaxPos, modMax);
+               if (min > max) //swap
+               {
+                  float temp = min;
+                  min = max;
+                  max = temp;
+               }
+               mLCD.DrawRect(min, sliderY + 4, max - min, sliderH - 8, true);
             }
 
             if (IControlVisualizer* visualizer = control->GetControlVisualizer())
@@ -2252,11 +2289,17 @@ void AbletonMoveControl::AdjustControlWithEncoder(IUIControl* control, float mid
       IModulator* modulator = floatSlider->GetModulator();
       float min = floatSlider->GetMin();
       float max = floatSlider->GetMax();
-      float modMin = ofMap(modulator->GetMin(), min, max, 0, 1);
-      float modMax = ofMap(modulator->GetMax(), min, max, 0, 1);
-
-      modulator->GetMin() = ofMap(modMin - increment, 0, 1, min, max, K(clamp));
-      modulator->GetMax() = ofMap(modMax + increment, 0, 1, min, max, K(clamp));
+      if (mShiftHeld)
+      {
+         increment = GetEncoderIncrement(midiInputValue);
+         float modMin = ofMap(modulator->GetMin(), min, max, 0, 1);
+         modulator->GetMin() = ofMap(modMin + increment, 0, 1, min, max, K(clamp));
+      }
+      else
+      {
+         float modMax = ofMap(modulator->GetMax(), min, max, 0, 1);
+         modulator->GetMax() = ofMap(modMax + increment, 0, 1, min, max, K(clamp));
+      }
    }
    else if (button)
    {

@@ -65,10 +65,10 @@ ADSRDisplay::ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y,
       mSSlider->SetShowName(false);
       mRSlider->SetShowName(false);
 
-      mASlider->SetControlVizualizer(this);
-      mDSlider->SetControlVizualizer(this);
-      mSSlider->SetControlVizualizer(this);
-      mRSlider->SetControlVizualizer(this);
+      mASlider->SetControlVisualizer(this);
+      mDSlider->SetControlVisualizer(this);
+      mSSlider->SetControlVisualizer(this);
+      mRSlider->SetControlVisualizer(this);
 
       UpdateSliderVisibility();
    }

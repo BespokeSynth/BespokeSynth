@@ -630,7 +630,7 @@ void ControlInterface::ControlElement::SetUpControl()
    }
 
    if (mUIControl != nullptr && mAttachedToUIControl != nullptr)
-      mUIControl->SetControlVizualizer(mAttachedToUIControl->GetControlVisualizer());
+      mUIControl->SetControlVisualizer(mAttachedToUIControl->GetControlVisualizer());
 
    ApplyInfoToControl();
 }
