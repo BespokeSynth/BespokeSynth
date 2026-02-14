@@ -12,6 +12,7 @@ pr:
 
 jobs:
   - job: Build
+    timeoutInMinutes: 120
     variables:
       isBuild: True
     strategy:
