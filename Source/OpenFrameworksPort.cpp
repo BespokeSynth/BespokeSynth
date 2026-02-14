@@ -57,9 +57,6 @@ ofColor ofColor::magenta(255, 0, 255);
 ofColor ofColor::cyan(0, 255, 255);
 ofColor ofColor::clear(0, 0, 0, 0);
 
-NVGcontext* gNanoVG = nullptr;
-NVGcontext* gFontBoundsNanoVG = nullptr;
-
 std::string ofToSamplePath(const std::string& path)
 {
    if (!path.empty() && (path[0] == '.' || juce::File::isAbsolutePath(path)))
@@ -788,8 +785,15 @@ void RetinaTrueTypeFont::LoadFont(std::string path)
    File file(mFontPath.c_str());
    if (file.existsAsFile())
    {
-      mFontHandle = nvgCreateFont(gNanoVG, path.c_str(), path.c_str());
-      mFontBoundsHandle = nvgCreateFont(gFontBoundsNanoVG, path.c_str(), path.c_str());
+      for (int i = 0; i < (int)NanoVGRenderContext::Num; ++i) // load font in each render context
+      {
+         int fontHandle = nvgCreateFont(gNanoVGRenderContexts[i], path.c_str(), path.c_str());
+         if (i == (int)NanoVGRenderContext::Main)
+            mFontHandle = fontHandle;
+         if (i == (int)NanoVGRenderContext::FontBounds)
+            mFontBoundsHandle = fontHandle;
+      }
+
       mLoaded = true;
    }
    else
@@ -855,7 +859,7 @@ float RetinaTrueTypeFont::GetStringWidth(std::string str, float size)
    }
    else
    {
-      vg = gFontBoundsNanoVG;
+      vg = gNanoVGRenderContexts[(int)NanoVGRenderContext::FontBounds];
       handle = mFontBoundsHandle;
    }
 
@@ -881,7 +885,7 @@ float RetinaTrueTypeFont::GetStringHeight(std::string str, float size)
    }
    else
    {
-      vg = gFontBoundsNanoVG;
+      vg = gNanoVGRenderContexts[(int)NanoVGRenderContext::FontBounds];
       handle = mFontBoundsHandle;
    }
 

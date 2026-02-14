@@ -86,7 +86,6 @@ public:
    int GetGridControllerOption2Control() const override;
 
    static bool sDrawingPush2Display;
-   static NVGcontext* sVG;
    static NVGLUframebuffer* sFB;
    static void CreateStaticFramebuffer(); //windows was having trouble creating a nanovg context and fbo on the fly
    static IUIControl* sBindToUIControl;
@@ -141,9 +140,6 @@ private:
    const int kPixelRatio = 1;
 
    const float kColumnSpacing = 121;
-
-   int mFontHandle{ 0 };
-   int mFontHandleBold{ 0 };
 
    IDrawableModule* mDisplayModule{ nullptr };
    Snapshots* mDisplayModuleSnapshots{ nullptr };

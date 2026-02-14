@@ -80,6 +80,7 @@ class IUIControl;
 class IDrawableModule;
 class RollingBuffer;
 class ChannelBuffer;
+struct NVGcontext;
 
 typedef std::map<std::string, int> EnumMap;
 
@@ -111,6 +112,16 @@ extern float gControlTactileFeedback;
 extern float gDrawScale;
 extern bool gShowDevModules;
 extern float gCornerRoundness;
+
+enum class NanoVGRenderContext
+{
+   Main,
+   FontBounds,
+   AbletonPush2Screen,
+   Num
+};
+extern std::array<NVGcontext*, (int)NanoVGRenderContext::Num> gNanoVGRenderContexts;
+extern NVGcontext* gNanoVG;
 
 extern std::random_device gRandomDevice;
 
