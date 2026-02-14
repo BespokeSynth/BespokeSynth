@@ -48,8 +48,6 @@
 
 using namespace juce;
 
-class NVGcontext;
-
 int gBufferSize = -999; //values set in SetGlobalSampleRateAndBufferSize(), setting them to bad values here to highlight any bugs
 int gSampleRate = -999;
 double gTwoPiOverSampleRate = -999;
@@ -79,7 +77,8 @@ bool gShowDevModules = false;
 float gCornerRoundness = 1;
 std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels{};
 
-NVGcontext* gNanoVGRenderContexts[(int)NanoVGRenderContext::Num];
+std::array<NVGcontext*, (int)NanoVGRenderContext::Num> gNanoVGRenderContexts{};
+NVGcontext* gNanoVG = nullptr;
 
 std::random_device gRandomDevice;
 bespoke::core::Xoshiro256ss gRandom(gRandomDevice);

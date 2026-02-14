@@ -57,8 +57,6 @@ ofColor ofColor::magenta(255, 0, 255);
 ofColor ofColor::cyan(0, 255, 255);
 ofColor ofColor::clear(0, 0, 0, 0);
 
-NVGcontext* gNanoVG = nullptr;
-
 std::string ofToSamplePath(const std::string& path)
 {
    if (!path.empty() && (path[0] == '.' || juce::File::isAbsolutePath(path)))

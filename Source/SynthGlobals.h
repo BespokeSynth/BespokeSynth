@@ -80,6 +80,7 @@ class IUIControl;
 class IDrawableModule;
 class RollingBuffer;
 class ChannelBuffer;
+struct NVGcontext;
 
 typedef std::map<std::string, int> EnumMap;
 
@@ -119,7 +120,8 @@ enum class NanoVGRenderContext
    AbletonPush2Screen,
    Num
 };
-extern NVGcontext* gNanoVGRenderContexts[(int)NanoVGRenderContext::Num];
+extern std::array<NVGcontext*, (int)NanoVGRenderContext::Num> gNanoVGRenderContexts;
+extern NVGcontext* gNanoVG;
 
 extern std::random_device gRandomDevice;
 
