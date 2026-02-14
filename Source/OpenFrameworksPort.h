@@ -12,7 +12,6 @@
 class NVGcontext;
 
 extern NVGcontext* gNanoVG;
-extern NVGcontext* gFontBoundsNanoVG;
 
 struct ofColor
 {

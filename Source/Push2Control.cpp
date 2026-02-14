@@ -55,7 +55,6 @@ using namespace juce::gl;
 using namespace AbletonDevice;
 
 bool Push2Control::sDrawingPush2Display = false;
-NVGcontext* Push2Control::sVG = nullptr;
 NVGLUframebuffer* Push2Control::sFB = nullptr;
 IUIControl* Push2Control::sBindToUIControl = nullptr;
 namespace
@@ -319,14 +318,13 @@ void Push2Control::LoadState(FileStreamIn& in, int rev)
 //static
 void Push2Control::CreateStaticFramebuffer()
 {
-   sVG = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-   assert(sVG);
+   assert(gNanoVGRenderContexts[(int)NanoVGRenderContext::AbletonPush2Screen]);
 
    const auto width = ableton::Push2DisplayBitmap::kWidth;
    const auto height = ableton::Push2DisplayBitmap::kHeight;
    const int pixelRatio = 1;
 
-   sFB = nvgluCreateFramebuffer(sVG, width * pixelRatio, height * pixelRatio, 0);
+   sFB = nvgluCreateFramebuffer(gNanoVGRenderContexts[(int)NanoVGRenderContext::AbletonPush2Screen], width * pixelRatio, height * pixelRatio, 0);
    assert(sFB);
 }
 
@@ -344,9 +342,6 @@ bool Push2Control::Initialize()
    }
 
    mPixels = new unsigned char[GetNumDisplayPixels()];
-
-   mFontHandle = nvgCreateFont(sVG, ofToResourcePath("frabk.ttf").c_str(), ofToResourcePath("frabk.ttf").c_str());
-   mFontHandleBold = nvgCreateFont(sVG, ofToResourcePath("frabk_m.ttf").c_str(), ofToResourcePath("frabk_m.ttf").c_str());
 
    const std::vector<std::string>& devices = mDevice.GetPortList(false);
    for (int i = 0; i < devices.size(); ++i)
@@ -483,7 +478,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
 
          ofTranslate(-kColumnSpacing * mModuleViewOffsetSmoothed, 0);
 
-         nvgFontSize(sVG, 12);
+         nvgFontSize(gNanoVGRenderContexts[(int)NanoVGRenderContext::AbletonPush2Screen], 12);
          DrawControls(mButtonControls, false, 60);
          DrawControls(mSliderControls, true, 20);
       }
@@ -801,7 +796,7 @@ void Push2Control::DrawDisplayModuleControls()
       ofSetColor(IDrawableModule::GetColor(mDisplayModule->GetModuleCategory()));
       ofNoFill();
 
-      nvgFontSize(sVG, 16);
+      nvgFontSize(gNanoVGRenderContexts[(int)NanoVGRenderContext::AbletonPush2Screen], 16);
       bool screenDrawingHandled = mDisplayModule->DrawToPush2Screen();
       if (!screenDrawingHandled)
       {
@@ -1059,12 +1054,11 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
 
 void Push2Control::RenderPush2Display()
 {
-   auto mainVG = gNanoVG;
-   gNanoVG = sVG;
+   gNanoVG = gNanoVGRenderContexts[(int)NanoVGRenderContext::AbletonPush2Screen]; // swap all drawing to happen in push 2 render context
    sDrawingPush2Display = true;
-   DrawToFramebuffer(sVG, sFB, gTime / 300, kPixelRatio);
+   DrawToFramebuffer(gNanoVGRenderContexts[(int)NanoVGRenderContext::AbletonPush2Screen], sFB, gTime / 300, kPixelRatio);
    sDrawingPush2Display = false;
-   gNanoVG = mainVG;
+   gNanoVG = gNanoVGRenderContexts[(int)NanoVGRenderContext::Main];
 
    // Tells the bridge we're done with drawing and the frame can be sent to the display
    ThePushBridge.Flip(mPixels);

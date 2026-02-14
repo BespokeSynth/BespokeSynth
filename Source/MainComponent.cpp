@@ -39,8 +39,6 @@ public:
    , mLastFpsUpdateTime(0)
    , mFrameCountAccum(0)
    , mPixelRatio(1)
-   , mFontBoundsVG(nullptr)
-   , mVG(nullptr)
    {
       ofLog() << "bespoke synth " << GetBuildInfoString();
 
@@ -208,17 +206,16 @@ public:
       // glewInit();
 #endif
 
-      mVG = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-      mFontBoundsVG = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+      for (int i = 0; i < (int)NanoVGRenderContext::Num; ++i)
+      {
+         gNanoVGRenderContexts[i] = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+         if (gNanoVGRenderContexts[i] == nullptr)
+            printf("Could not init nanovg.\n");
+      }
+      gNanoVG = gNanoVGRenderContexts[(int)NanoVGRenderContext::Main];
 
-      if (mVG == nullptr)
-         printf("Could not init nanovg.\n");
-      if (mFontBoundsVG == nullptr)
-         printf("Could not init font bounds nanovg.\n");
-
+      mSynth.LoadResources();
       Push2Control::CreateStaticFramebuffer();
-
-      mSynth.LoadResources(mVG, mFontBoundsVG);
 
       /*for (auto deviceType : mGlobalManagers.mDeviceManager.getAvailableDeviceTypes())
       {
@@ -396,8 +393,8 @@ public:
 
    void shutdown() override
    {
-      nvgDeleteGLES2(mVG);
-      nvgDeleteGLES2(mFontBoundsVG);
+      for (int i = 0; i < (int)NanoVGRenderContext::Num; ++i)
+         nvgDeleteGLES2(gNanoVGRenderContexts[i]);
    }
 
    void SetStartupSaveStateFile(const juce::String& bskPath)
@@ -434,7 +431,7 @@ public:
       if (UserPrefs.motion_trails.Get() <= 0)
          glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-      nvgBeginFrame(mVG, width, height, mPixelRatio);
+      nvgBeginFrame(gNanoVG, width, height, mPixelRatio);
 
       if (UserPrefs.motion_trails.Get() > 0)
       {
@@ -443,15 +440,15 @@ public:
          ofRect(0, 0, width, height);
       }
 
-      nvgLineCap(mVG, NVG_ROUND);
-      nvgLineJoin(mVG, NVG_ROUND);
+      nvgLineCap(gNanoVG, NVG_ROUND);
+      nvgLineJoin(gNanoVG, NVG_ROUND);
       static float sSpacing = -.3f;
-      nvgTextLetterSpacing(mVG, sSpacing);
-      nvgTextLetterSpacing(mFontBoundsVG, sSpacing);
+      for (int i = 0; i < (int)NanoVGRenderContext::Num; ++i)
+         nvgTextLetterSpacing(gNanoVGRenderContexts[i], sSpacing);
 
-      mSynth.Draw(mVG);
+      mSynth.Draw();
 
-      nvgEndFrame(mVG);
+      nvgEndFrame(gNanoVG);
 
       mSynth.PostRender();
 
@@ -645,8 +642,6 @@ private:
 
    ModularSynth mSynth;
 
-   NVGcontext* mVG;
-   NVGcontext* mFontBoundsVG;
    int64 mLastFpsUpdateTime;
    int mFrameCountAccum;
    std::list<int> mPressedKeys;

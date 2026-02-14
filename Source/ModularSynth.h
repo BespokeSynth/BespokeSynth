@@ -39,7 +39,6 @@ class MidiDevice;
 class Sample;
 class PatchCable;
 class MidiController;
-class NVGcontext;
 class QuickSpawnMenu;
 class ADSRDisplay;
 class UserPrefsEditor;
@@ -78,10 +77,10 @@ public:
    virtual ~ModularSynth();
 
    void Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juce::AudioFormatManager* globalAudioFormatManager, juce::Component* mainComponent, juce::OpenGLContext* openGLContext);
-   void LoadResources(void* nanoVG, void* fontBoundsNanoVG);
+   void LoadResources();
    void InitIOBuffers(int inputChannelCount, int outputChannelCount);
    void Poll();
-   void Draw(void* vg);
+   void Draw();
    void PostRender();
 
    void Exit();

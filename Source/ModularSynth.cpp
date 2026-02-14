@@ -281,10 +281,8 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    mConsoleEntry->SetRequireEnter(true);
 }
 
-void ModularSynth::LoadResources(void* nanoVG, void* fontBoundsNanoVG)
+void ModularSynth::LoadResources()
 {
-   gNanoVG = (NVGcontext*)nanoVG;
-   gFontBoundsNanoVG = (NVGcontext*)fontBoundsNanoVG;
    LoadGlobalResources();
 
    if (!gFont.IsLoaded())
@@ -502,9 +500,8 @@ void ModularSynth::PanTo(float x, float y)
    mHideTooltipsUntilMouseMove = true;
 }
 
-void ModularSynth::Draw(void* vg)
+void ModularSynth::Draw()
 {
-   gNanoVG = (NVGcontext*)vg;
    sRenderThreadId = std::this_thread::get_id();
 
    ofNoFill();

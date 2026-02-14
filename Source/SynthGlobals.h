@@ -112,6 +112,15 @@ extern float gDrawScale;
 extern bool gShowDevModules;
 extern float gCornerRoundness;
 
+enum class NanoVGRenderContext
+{
+   Main,
+   FontBounds,
+   AbletonPush2Screen,
+   Num
+};
+extern NVGcontext* gNanoVGRenderContexts[(int)NanoVGRenderContext::Num];
+
 extern std::random_device gRandomDevice;
 
 extern bespoke::core::Xoshiro256ss gRandom;
