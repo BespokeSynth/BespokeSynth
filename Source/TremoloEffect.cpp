@@ -42,11 +42,13 @@ void TremoloEffect::CreateUIControls()
    FLOATSLIDER(mAmountSlider, "amount", &mAmount, 0, 1);
    FLOATSLIDER(mOffsetSlider, "offset", &mOffset, 0, 1);
    FLOATSLIDER(mDutySlider, "duty", &mDuty, 0, 1);
+   FLOATSLIDER(mFreeRateSlider, "free rate", &mFreeRate, 0, 20);
    DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 45);
    UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mOscSelector, "osc", (int*)(&mOscType), 45);
    ENDUIBLOCK(mWidth, mHeight);
 
+   mIntervalSelector->AddLabel("free", kInterval_Free);
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -103,6 +105,9 @@ void TremoloEffect::DrawModule()
    mOffsetSlider->Draw();
    mOscSelector->Draw();
    mDutySlider->Draw();
+   mFreeRateSlider->Draw();
+
+   mFreeRateSlider->SetShowing(mInterval == kInterval_Free);
 
    ofPushStyle();
    ofSetColor(0, 200, 0, gModuleDrawAlpha * .3f);
@@ -135,7 +140,7 @@ void TremoloEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double
    if (slider == mOffsetSlider)
       mLFO.SetOffset(mOffset);
    if (slider == mDutySlider)
-   {
       mLFO.SetPulseWidth(mDuty);
-   }
+   if (slider == mFreeRateSlider)
+      mLFO.SetFreeRate(mFreeRate);
 }
