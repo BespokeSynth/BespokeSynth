@@ -210,7 +210,7 @@ void ofResetClipWindow()
 void ofSetColor(float r, float g, float b, float a)
 {
    sStyleStack.GetStyle().color = ofColor(r, g, b, a);
-   if (Push2Control::sDrawingPush2Display)
+   if (gNanoVG != gNanoVGRenderContexts[(int)NanoVGRenderContext::Main])
    {
       nvgStrokeColor(gNanoVG, nvgRGBA(r, g, b, a));
       nvgFillColor(gNanoVG, nvgRGBA(r, g, b, a));
@@ -229,7 +229,7 @@ void ofSetColor(float r, float g, float b, float a)
 void ofSetColorGradient(const ofColor& colorA, const ofColor& colorB, ofVec2f gradientStart, ofVec2f gradientEnd)
 {
    sStyleStack.GetStyle().color = colorA;
-   if (Push2Control::sDrawingPush2Display)
+   if (gNanoVG != gNanoVGRenderContexts[(int)NanoVGRenderContext::Main])
    {
       nvgStrokeColor(gNanoVG, nvgRGBA(colorA.r, colorA.g, colorA.b, colorA.a));
       nvgFillColor(gNanoVG, nvgRGBA(colorA.r, colorA.g, colorA.b, colorA.a));

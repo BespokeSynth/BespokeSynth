@@ -440,11 +440,13 @@ public:
          ofRect(0, 0, width, height);
       }
 
-      nvgLineCap(gNanoVG, NVG_ROUND);
-      nvgLineJoin(gNanoVG, NVG_ROUND);
       static float sSpacing = -.3f;
       for (int i = 0; i < (int)NanoVGRenderContext::Num; ++i)
+      {
+         nvgLineCap(gNanoVGRenderContexts[i], NVG_ROUND);
+         nvgLineJoin(gNanoVGRenderContexts[i], NVG_ROUND);
          nvgTextLetterSpacing(gNanoVGRenderContexts[i], sSpacing);
+      }
 
       mSynth.Draw();
 

@@ -45,6 +45,8 @@ class UserPrefsEditor;
 class Minimap;
 class ScriptWarningPopup;
 class NoteOutputQueue;
+class WelcomeScreen;
+struct NVGLUframebuffer;
 
 enum LogEventType
 {
@@ -262,8 +264,8 @@ public:
    ofxJSONElement GetLayout();
    void SaveLayoutAsPopup();
    void SaveOutput();
-   void SaveState(std::string file, bool autosave);
    void LoadState(std::string file);
+   static void LoadStateHeader(FileStreamIn& in, unsigned char*& screenshotData, int& screenshotSize, std::string& jsonLayoutString);
    void SetStartupSaveStateFile(std::string bskPath);
    void SaveCurrentState();
    void SaveStatePopup();
@@ -292,9 +294,11 @@ public:
 
    static int sLoadingFileSaveStateRev;
    static int sLastLoadedFileSaveStateRev;
-   static constexpr int kSaveStateRev = 426;
+   static constexpr int kSaveStateRev = 427;
 
 private:
+   void SaveState(std::string file, bool autosave);
+   void CompleteQueuedSaveState();
    void ResetLayout();
    void ReconnectMidiDevices();
    void DrawConsole();
@@ -311,6 +315,15 @@ private:
    bool IsCurrentSaveStateATemplate() const;
 
    void ReadClipboardTextFromSystem();
+
+   struct QueuedSaveStateInfo
+   {
+      bool mQueued{ false };
+      std::string mFile{};
+      bool mAutosave{ false };
+      bool mWaitingForScreenshot{ true };
+   };
+   QueuedSaveStateInfo mQueuedSaveStateInfo{};
 
    int mIOBufferSize{ 0 };
 
@@ -351,6 +364,7 @@ private:
    QuickSpawnMenu* mQuickSpawn{ nullptr };
    std::unique_ptr<Minimap> mMinimap{ nullptr };
    UserPrefsEditor* mUserPrefsEditor{ nullptr };
+   WelcomeScreen* mWelcomeScreen{ nullptr };
 
    RollingBuffer* mGlobalRecordBuffer{ nullptr };
    int mRecordingLength{ 0 };
@@ -450,6 +464,11 @@ private:
 
    std::unique_ptr<juce::AudioPluginFormatManager> mAudioPluginFormatManager;
    std::unique_ptr<juce::KnownPluginList> mKnownPluginList;
+
+   static constexpr int kScreenshotWidth = 128;
+   static constexpr int kScreenshotHeight = 100;
+   NVGLUframebuffer* mScreenshotFrameBuffer{ nullptr };
+   unsigned char* mScreenshotPixels{ nullptr };
 };
 
 extern ModularSynth* TheSynth;
