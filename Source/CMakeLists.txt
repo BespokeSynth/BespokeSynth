@@ -511,6 +511,8 @@ target_sources(BespokeSynth PRIVATE
     PSMoveMgr.h
     PanicButton.cpp
     PanicButton.h
+    FileUtils.cpp
+    FileUtils.h
     Panner.cpp
     Panner.h
     PatchCable.cpp

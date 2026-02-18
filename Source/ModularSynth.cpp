@@ -1,4 +1,5 @@
 #include "ModularSynth.h"
+#include "FileUtils.h"
 #include "IAudioSource.h"
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
@@ -3103,16 +3104,18 @@ juce::Component* ModularSynth::GetFileChooserParent() const
 #endif
 }
 
+std::string defaultSavestatePath = "savestate/";
+
 void ModularSynth::SaveStatePopup()
 {
    File targetFile;
-   String savestateDirPath = ofToDataPath("savestate/");
    String templateName = "";
    String date = ofGetTimestampString("%Y-%m-%d_%H-%M");
    if (IsCurrentSaveStateATemplate())
       templateName = File(mCurrentSaveStatePath).getFileNameWithoutExtension().toStdString() + "_";
 
-   targetFile = File(savestateDirPath + templateName + date + ".bsk");
+   String savestateDirPath = getDirectoryOrDefault(mCurrentSaveStatePath, defaultSavestatePath);
+   targetFile = File(savestateDirPath).getChildFile(templateName + date + ".bsk");
 
    FileChooser chooser("Save current state as...", targetFile, "*.bsk", true, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
@@ -3126,7 +3129,14 @@ void ModularSynth::LoadStatePopup()
 
 void ModularSynth::LoadStatePopupImp()
 {
-   FileChooser chooser("Load state", File(ofToDataPath("savestate")), "*.bsk;*.bskt", true, false, GetFileChooserParent());
+   String defaultDirectoryOrFile;
+   if (!mCurrentSaveStatePath.empty()) {
+      defaultDirectoryOrFile = ofToDataPath(mCurrentSaveStatePath);
+   } else {
+      defaultDirectoryOrFile = ofToDataPath("savestate/");
+   }
+
+   FileChooser chooser("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", true, false, GetFileChooserParent());
    if (chooser.browseForFileToOpen())
       LoadState(chooser.getResult().getFullPathName().toStdString());
 }
