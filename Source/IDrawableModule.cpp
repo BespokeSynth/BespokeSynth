@@ -333,7 +333,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    const bool kDrawInnerFade = true;
-   if (kDrawInnerFade && !Push2Control::sDrawingPush2Display)
+   if (kDrawInnerFade && gNanoVG == gNanoVGRenderContexts[(int)NanoVGRenderContext::Main])
    {
       float fadeRoundness = 100;
       float fadeLength = w / 3;

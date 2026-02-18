@@ -29,13 +29,21 @@
 #include "VSTPlugin.h"
 #include "Prefab.h"
 #include "HelpDisplay.h"
-#include "nanovg/nanovg.h"
 #include "UserPrefsEditor.h"
 #include "Canvas.h"
 #include "EffectChain.h"
 #include "ClickButton.h"
 #include "UserPrefs.h"
 #include "NoteOutputQueue.h"
+#include "WelcomeScreen.h"
+
+#include "juce_opengl/juce_opengl.h"
+using namespace juce::gl;
+
+#include "nanovg/nanovg.h"
+#define NANOVG_GLES2_IMPLEMENTATION
+#include "nanovg/nanovg_gl.h"
+#include "nanovg/nanovg_gl_utils.h"
 
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_audio_formats/juce_audio_formats.h"
@@ -320,6 +328,9 @@ static int sFrameCount = 0;
 void ModularSynth::Poll()
 {
    sMainThreadId = std::this_thread::get_id();
+
+   if (mQueuedSaveStateInfo.mQueued && !mQueuedSaveStateInfo.mWaitingForScreenshot)
+      CompleteQueuedSaveState();
 
    if (mFatalError == "")
    {
@@ -862,6 +873,35 @@ void ModularSynth::Draw()
    }
    ofPopStyle();
 
+   /*if (mScreenshotPixels)
+   {
+      ofPushMatrix();
+      // get to screen space
+      //ofTranslate(-GetPosition().x, -GetPosition().y);
+      //ofTranslate(-TheSynth->GetDrawOffset().x, -TheSynth->GetDrawOffset().y);
+      //ofScale(1 / gDrawScale, 1 / gDrawScale, 1 / gDrawScale);
+
+      ofPushStyle();
+      ofFill();
+      const float kLcdX = 30;
+      const float kLcdY = 500;
+      const float kLcdPixelW = 1;
+      const float kLcdPixelH = 1;
+      const float kPixelSpacing = 0;
+      for (int col = 0; col < kScreenshotWidth; ++col)
+      {
+         for (int row = 0; row < kScreenshotHeight; ++row)
+         {
+            int index = (col + row * kScreenshotWidth) * 3;
+            ofSetColor(mScreenshotPixels[index + 0], mScreenshotPixels[index + 1], mScreenshotPixels[index + 2], 255);
+            ofRect(kLcdX + kLcdPixelW * col, kLcdY - kLcdPixelH * row, kLcdPixelW - kPixelSpacing, kLcdPixelH - kPixelSpacing, 0);
+         }
+      }
+      ofPopStyle();
+
+      ofPopMatrix();
+   }*/
+
    ++mFrameCount;
 }
 
@@ -869,6 +909,58 @@ void ModularSynth::PostRender()
 {
    mModuleContainer.PostRender();
    mUILayerModuleContainer.PostRender();
+
+   if (mQueuedSaveStateInfo.mQueued && mQueuedSaveStateInfo.mWaitingForScreenshot)
+   {
+      if (mScreenshotFrameBuffer == nullptr)
+      {
+         mScreenshotFrameBuffer = nvgluCreateFramebuffer(gNanoVGRenderContexts[(int)NanoVGRenderContext::Screenshot], kScreenshotWidth, kScreenshotHeight, 0);
+         assert(mScreenshotFrameBuffer);
+
+         mScreenshotPixels = new unsigned char[kScreenshotWidth * kScreenshotHeight * 3];
+      }
+
+      if (mScreenshotFrameBuffer != nullptr)
+      {
+         gNanoVG = gNanoVGRenderContexts[(int)NanoVGRenderContext::Screenshot];
+
+         int fboWidth, fboHeight;
+         nvgImageSize(gNanoVG, mScreenshotFrameBuffer->image, &fboWidth, &fboHeight);
+         int winWidth = (int)(fboWidth / 1);
+         int winHeight = (int)(fboHeight / 1);
+
+         nvgluBindFramebuffer(mScreenshotFrameBuffer);
+         glViewport(0, 0, fboWidth, fboHeight);
+         glClearColor(sBackgroundR, sBackgroundG, sBackgroundB, 0);
+         glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+         nvgBeginFrame(gNanoVG, winWidth, winHeight, 1);
+
+         ofPushStyle();
+         ofPushMatrix();
+
+         float screenScale = MIN(kScreenshotWidth / ofGetWidth(), kScreenshotHeight / ofGetHeight());
+         ofScale(screenScale * gDrawScale, screenScale * gDrawScale, screenScale * gDrawScale);
+         ofTranslate(TheSynth->GetDrawOffset().x, TheSynth->GetDrawOffset().y);
+         ofTranslate(fboWidth / 2 / gDrawScale, fboHeight / 2 / gDrawScale); //center on display
+
+         TheSynth->GetRootContainer()->DrawContents();
+
+         ofPopMatrix();
+         ofPopStyle();
+
+         nvgEndFrame(gNanoVG);
+
+         glFinish();
+         glReadBuffer(GL_COLOR_ATTACHMENT0);
+         glReadPixels(0, 0, winWidth, winHeight, GL_RGB, GL_UNSIGNED_BYTE, mScreenshotPixels);
+
+         nvgluBindFramebuffer(nullptr);
+
+         gNanoVG = gNanoVGRenderContexts[(int)NanoVGRenderContext::Main];
+      }
+
+      mQueuedSaveStateInfo.mWaitingForScreenshot = false;
+   }
 }
 
 void ModularSynth::DrawConsole()
@@ -1857,7 +1949,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
       if (canZoomCanvas)
          ZoomView(yScroll / 50, true);
    }
-   else if (gHoveredUIControl)
+   else if (gHoveredUIControl && dynamic_cast<ClickButton*>(gHoveredUIControl) == nullptr)
    {
 #if JUCE_WINDOWS
       yScroll += xScroll / 4; //taking advantage of logitech horizontal scroll wheel
@@ -2601,6 +2693,18 @@ void ModularSynth::ResetLayout()
       mUserPrefsEditor->Show();
       TheTitleBar->SetShowing(false);
    }
+   else
+   {
+      if (!mIsLoadingState && sFrameCount < 10 && UserPrefs.show_welcome_screen.Get())
+      {
+         mWelcomeScreen = new WelcomeScreen();
+         mWelcomeScreen->SetName("welcome");
+         mWelcomeScreen->CreateUIControls();
+         mWelcomeScreen->Init();
+         mWelcomeScreen->Show();
+         mModuleContainer.AddModule(mWelcomeScreen);
+      }
+   }
 
    GetDrawOffset().set(0, 0);
 
@@ -3029,6 +3133,18 @@ void ModularSynth::LoadStatePopupImp()
 
 void ModularSynth::SaveState(std::string file, bool autosave)
 {
+   mQueuedSaveStateInfo.mFile = file;
+   mQueuedSaveStateInfo.mAutosave = autosave;
+   mQueuedSaveStateInfo.mWaitingForScreenshot = true;
+   mQueuedSaveStateInfo.mQueued = true;
+}
+
+void ModularSynth::CompleteQueuedSaveState()
+{
+   std::string file = mQueuedSaveStateInfo.mFile;
+   bool autosave = mQueuedSaveStateInfo.mAutosave;
+   mQueuedSaveStateInfo.mQueued = false;
+
    if (!autosave)
    {
       mCurrentSaveStatePath = file;
@@ -3039,14 +3155,44 @@ void ModularSynth::SaveState(std::string file, bool autosave)
 
    mAudioThreadMutex.Lock("SaveState()");
 
+   mZoomer.WriteCurrentLocation(-1);
+
    //write to a temp file first, so we don't corrupt data if we crash mid-save
    std::string tmpFilePath = ofToDataPath("tmp");
 
    {
       FileStreamOut out(tmpFilePath);
 
-      mZoomer.WriteCurrentLocation(-1);
+      out << std::string("bskfile");
+      out << kSaveStateRev;
+
+      if (mScreenshotPixels != nullptr)
+      {
+         juce::Image image(juce::Image::RGB, kScreenshotWidth, kScreenshotHeight, true);
+         for (int ix = 0; ix < kScreenshotWidth; ++ix)
+         {
+            for (int iy = 0; iy < kScreenshotHeight; ++iy)
+            {
+               int pos = (ix + (kScreenshotHeight - 1 - iy) * kScreenshotWidth) * 3;
+               image.setPixelAt(ix, iy, juce::Colour(mScreenshotPixels[pos], mScreenshotPixels[pos + 1], mScreenshotPixels[pos + 2]));
+            }
+         }
+         juce::MemoryOutputStream stream;
+         juce::PNGImageFormat pngWriter;
+         pngWriter.writeImageToStream(image, stream);
+
+         int screenshotSize = (int)stream.getDataSize();
+         out << screenshotSize;
+         out.WriteGeneric(stream.getData(), screenshotSize);
+      }
+      else
+      {
+         int screenshotSize = 0;
+         out << screenshotSize;
+      }
+
       out << GetLayout().getRawString(true);
+
       mModuleContainer.SaveState(out);
       mUILayerModuleContainer.SaveState(out);
    }
@@ -3091,17 +3237,13 @@ void ModularSynth::LoadState(std::string file)
    LockRender(false);
    mAudioThreadMutex.Unlock();
 
-   //TODO(Ryan) here's a little hack to allow older BSK files that were saved in 32-bit to load.
-   //I guess this could bite me if someone ever has a very massive json. the number corresponds to a long-standing sanity check in FileStreamIn::operator>>(std::string &var), so this shouldn't break any current behavior.
-   //this should definitely be removed if anything about the structure of the BSK format changes.
-   uint64_t firstLength[1];
-   in.Peek(firstLength, sizeof(uint64_t));
-   if (firstLength[0] >= FileStreamIn::sMaxStringLength)
-      FileStreamIn::s32BitMode = true;
+   unsigned char* screenshotData = nullptr;
+   int screenshotSize = 0;
+   std::string jsonLayoutString;
 
-   std::string jsonString;
-   in >> jsonString;
-   bool layoutLoaded = LoadLayoutFromString(jsonString);
+   LoadStateHeader(in, screenshotData, screenshotSize, jsonLayoutString);
+
+   bool layoutLoaded = LoadLayoutFromString(jsonLayoutString);
 
    if (layoutLoaded)
    {
@@ -3127,6 +3269,47 @@ void ModularSynth::LoadState(std::string file)
    mIsLoadingState = false;
    LockRender(false);
    mAudioThreadMutex.Unlock();
+}
+
+//static
+void ModularSynth::LoadStateHeader(FileStreamIn& in, unsigned char*& screenshotData, int& screenshotSize, std::string& jsonLayoutString)
+{
+   // here's a little hack to allow older BSK files that were saved in 32-bit to load.
+   uint64_t firstLength[1];
+   in.Peek(firstLength, sizeof(uint64_t));
+   if (firstLength[0] >= FileStreamIn::sMaxStringLength)
+      FileStreamIn::s32BitMode = true;
+
+   std::string headerString;
+   in >> headerString;
+
+   if (headerString == "bskfile")
+   {
+      int fileRev;
+      in >> fileRev;
+      assert(fileRev <= ModularSynth::kSaveStateRev);
+      ModularSynth::sLoadingFileSaveStateRev = fileRev;
+      ModularSynth::sLastLoadedFileSaveStateRev = fileRev;
+
+      in >> screenshotSize;
+      if (screenshotSize > 0)
+      {
+         screenshotData = new unsigned char[screenshotSize];
+         in.ReadGeneric(screenshotData, screenshotSize);
+      }
+      else
+      {
+         screenshotData = nullptr;
+      }
+
+      in >> jsonLayoutString;
+   }
+   else
+   {
+      screenshotSize = 0;
+      screenshotData = nullptr;
+      jsonLayoutString = headerString;
+   }
 }
 
 bool ModularSynth::IsCurrentSaveStateATemplate() const
@@ -3582,6 +3765,8 @@ void ModularSynth::SetFatalError(std::string error)
          mUserPrefsEditor->Show();
       if (TheTitleBar != nullptr)
          TheTitleBar->SetShowing(false);
+      if (mWelcomeScreen != nullptr)
+         mWelcomeScreen->SetShowing(false);
    }
 }
 

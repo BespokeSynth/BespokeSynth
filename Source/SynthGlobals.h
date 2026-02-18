@@ -118,6 +118,7 @@ enum class NanoVGRenderContext
    Main,
    FontBounds,
    AbletonPush2Screen,
+   Screenshot,
    Num
 };
 extern std::array<NVGcontext*, (int)NanoVGRenderContext::Num> gNanoVGRenderContexts;

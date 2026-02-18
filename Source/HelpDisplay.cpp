@@ -121,8 +121,12 @@ void HelpDisplay::DrawModule()
    {
       if (mScreenshotState == ScreenshotState::WaitingForScreenshot)
       {
-         std::string typeName = mScreenshotsToProcess.begin()->mLabel;
-         mScreenshotsToProcess.pop_front();
+         std::string typeName = "type";
+         if (!mScreenshotsToProcess.empty())
+         {
+            typeName = mScreenshotsToProcess.begin()->mLabel;
+            mScreenshotsToProcess.pop_front();
+         }
 
          ofRectangle rect = mScreenshotModule->GetRect();
          rect.y -= IDrawableModule::TitleBarHeight();
@@ -369,19 +373,37 @@ std::string HelpDisplay::GetModuleTooltipFromName(std::string moduleTypeName)
    return moduleTypeName + ": " + tooltip;
 }
 
+//static
+void HelpDisplay::OpenTutorialVideoLink()
+{
+   juce::URL("https://youtu.be/SYBc8X2IxqM").launchInDefaultBrowser();
+}
+
+//static
+void HelpDisplay::OpenDocsLink()
+{
+   juce::URL("http://bespokesynth.com/docs").launchInDefaultBrowser();
+}
+
+//static
+void HelpDisplay::OpenDiscordLink()
+{
+   juce::URL("https://discord.gg/YdTMkvvpZZ").launchInDefaultBrowser();
+}
+
 void HelpDisplay::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mTutorialVideoLinkButton)
    {
-      juce::URL("https://youtu.be/SYBc8X2IxqM").launchInDefaultBrowser();
+      OpenTutorialVideoLink();
    }
    if (button == mDocsLinkButton)
    {
-      juce::URL("http://bespokesynth.com/docs").launchInDefaultBrowser();
+      OpenDocsLink();
    }
    if (button == mDiscordLinkButton)
    {
-      juce::URL("https://discord.gg/YdTMkvvpZZ").launchInDefaultBrowser();
+      OpenDiscordLink();
    }
    if (button == mCopyBuildInfoButton)
    {
@@ -582,6 +604,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
 void HelpDisplay::ScreenshotModule(IDrawableModule* module)
 {
    mScreenshotModule = module;
+   mScreenshotState = ScreenshotState::WaitingForScreenshot;
 }
 
 void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, std::string filename)

@@ -387,11 +387,6 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    glClear(juce::gl::GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
    nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
 
-   nvgLineCap(vg, NVG_ROUND);
-   nvgLineJoin(vg, NVG_ROUND);
-   static float sSpacing = -.3f;
-   nvgTextLetterSpacing(vg, sSpacing);
-
    mModules.clear();
    std::vector<IDrawableModule*> modules;
    TheSynth->GetAllModules(modules);
