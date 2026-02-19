@@ -465,8 +465,6 @@ private:
    std::unique_ptr<juce::AudioPluginFormatManager> mAudioPluginFormatManager;
    std::unique_ptr<juce::KnownPluginList> mKnownPluginList;
 
-   static constexpr int kScreenshotWidth = 128;
-   static constexpr int kScreenshotHeight = 100;
    NVGLUframebuffer* mScreenshotFrameBuffer{ nullptr };
    unsigned char* mScreenshotPixels{ nullptr };
 };

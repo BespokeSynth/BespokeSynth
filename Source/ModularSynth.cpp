@@ -883,18 +883,20 @@ void ModularSynth::Draw()
 
       ofPushStyle();
       ofFill();
-      const float kLcdX = 30;
-      const float kLcdY = 500;
-      const float kLcdPixelW = 1;
-      const float kLcdPixelH = 1;
+      const float kScreenshotPreviewX = 30;
+      const float kScreenshotPreviewY = 500;
+      const float kScreenshotPreviewPixelW = 1;
+      const float kScreenshotPreviewPixelH = 1;
       const float kPixelSpacing = 0;
-      for (int col = 0; col < kScreenshotWidth; ++col)
+      ofSetColor(255, 255, 255);
+      ofRect(kScreenshotPreviewX - 1, kScreenshotPreviewY - WelcomeScreen::kScreenshotHeight * kScreenshotPreviewPixelH, WelcomeScreen::kScreenshotWidth * kScreenshotPreviewPixelW + 2, WelcomeScreen::kScreenshotHeight * kScreenshotPreviewPixelH + 2, 0);
+      for (int col = 0; col < WelcomeScreen::kScreenshotWidth; ++col)
       {
-         for (int row = 0; row < kScreenshotHeight; ++row)
+         for (int row = 0; row < WelcomeScreen::kScreenshotHeight; ++row)
          {
-            int index = (col + row * kScreenshotWidth) * 3;
+            int index = (col + row * WelcomeScreen::kScreenshotWidth) * 3;
             ofSetColor(mScreenshotPixels[index + 0], mScreenshotPixels[index + 1], mScreenshotPixels[index + 2], 255);
-            ofRect(kLcdX + kLcdPixelW * col, kLcdY - kLcdPixelH * row, kLcdPixelW - kPixelSpacing, kLcdPixelH - kPixelSpacing, 0);
+            ofRect(kScreenshotPreviewX + kScreenshotPreviewPixelW * col, kScreenshotPreviewY - kScreenshotPreviewPixelH * row, kScreenshotPreviewPixelW - kPixelSpacing, kScreenshotPreviewPixelH - kPixelSpacing, 0);
          }
       }
       ofPopStyle();
@@ -914,10 +916,10 @@ void ModularSynth::PostRender()
    {
       if (mScreenshotFrameBuffer == nullptr)
       {
-         mScreenshotFrameBuffer = nvgluCreateFramebuffer(gNanoVGRenderContexts[(int)NanoVGRenderContext::Screenshot], kScreenshotWidth, kScreenshotHeight, 0);
+         mScreenshotFrameBuffer = nvgluCreateFramebuffer(gNanoVGRenderContexts[(int)NanoVGRenderContext::Screenshot], WelcomeScreen::kScreenshotWidth, WelcomeScreen::kScreenshotHeight, 0);
          assert(mScreenshotFrameBuffer);
 
-         mScreenshotPixels = new unsigned char[kScreenshotWidth * kScreenshotHeight * 3];
+         mScreenshotPixels = new unsigned char[WelcomeScreen::kScreenshotWidth * WelcomeScreen::kScreenshotHeight * 3];
       }
 
       if (mScreenshotFrameBuffer != nullptr)
@@ -938,10 +940,33 @@ void ModularSynth::PostRender()
          ofPushStyle();
          ofPushMatrix();
 
-         float screenScale = MIN(kScreenshotWidth / ofGetWidth(), kScreenshotHeight / ofGetHeight());
-         ofScale(screenScale * gDrawScale, screenScale * gDrawScale, screenScale * gDrawScale);
-         ofTranslate(TheSynth->GetDrawOffset().x, TheSynth->GetDrawOffset().y);
-         ofTranslate(fboWidth / 2 / gDrawScale, fboHeight / 2 / gDrawScale); //center on display
+         ofRectangle allModulesRect = TheTransport->GetRect(); // just picking a random module
+         std::vector<IDrawableModule*> allModules;
+         TheSynth->GetRootContainer()->GetAllModules(allModules);
+         for (auto* module : allModules)
+         {
+            if (module != nullptr && !module->IsDeleted() &&
+                module->GetOwningContainer() != nullptr && module->IsShowing())
+            {
+               ofRectangle rect = module->GetRect();
+
+               if (module->HasTitleBar())
+               {
+                  rect.y -= IDrawableModule::TitleBarHeight();
+                  rect.height += IDrawableModule::TitleBarHeight();
+               }
+
+               allModulesRect = ofRectangle::include(allModulesRect, rect);
+            }
+         }
+
+         allModulesRect.grow(15);
+
+         float screenScale = MIN(WelcomeScreen::kScreenshotWidth / allModulesRect.width, WelcomeScreen::kScreenshotHeight / allModulesRect.height);
+         ofScale(screenScale, screenScale, screenScale);
+         float xShift = allModulesRect.width / 2 + MAX(0, (allModulesRect.height - allModulesRect.width) * screenScale * 2);
+         float yShift = allModulesRect.height / 2 + MAX(0, (allModulesRect.width - allModulesRect.height) * screenScale * 2);
+         ofTranslate(-allModulesRect.getCenter().x + xShift, -allModulesRect.getCenter().y + yShift);
 
          TheSynth->GetRootContainer()->DrawContents();
 
@@ -3108,11 +3133,19 @@ void ModularSynth::SaveStatePopup()
    File targetFile;
    String savestateDirPath = ofToDataPath("savestate/");
    String templateName = "";
-   String date = ofGetTimestampString("%Y-%m-%d_%H-%M");
+   String date = ofGetTimestampString("%Y-%m-%d");
    if (IsCurrentSaveStateATemplate())
       templateName = File(mCurrentSaveStatePath).getFileNameWithoutExtension().toStdString() + "_";
 
-   targetFile = File(savestateDirPath + templateName + date + ".bsk");
+   int counter = 0;
+   do
+   {
+      if (counter == 0)
+         targetFile = File(savestateDirPath + templateName + date + ".bsk");
+      else
+         targetFile = File(savestateDirPath + templateName + date + "_" + ofToString(counter) + ".bsk");
+      ++counter;
+   } while (targetFile.existsAsFile());
 
    FileChooser chooser("Save current state as...", targetFile, "*.bsk", true, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
@@ -3168,12 +3201,12 @@ void ModularSynth::CompleteQueuedSaveState()
 
       if (mScreenshotPixels != nullptr)
       {
-         juce::Image image(juce::Image::RGB, kScreenshotWidth, kScreenshotHeight, true);
-         for (int ix = 0; ix < kScreenshotWidth; ++ix)
+         juce::Image image(juce::Image::RGB, WelcomeScreen::kScreenshotWidth, WelcomeScreen::kScreenshotHeight, true);
+         for (int ix = 0; ix < WelcomeScreen::kScreenshotWidth; ++ix)
          {
-            for (int iy = 0; iy < kScreenshotHeight; ++iy)
+            for (int iy = 0; iy < WelcomeScreen::kScreenshotHeight; ++iy)
             {
-               int pos = (ix + (kScreenshotHeight - 1 - iy) * kScreenshotWidth) * 3;
+               int pos = (ix + (WelcomeScreen::kScreenshotHeight - 1 - iy) * WelcomeScreen::kScreenshotWidth) * 3;
                image.setPixelAt(ix, iy, juce::Colour(mScreenshotPixels[pos], mScreenshotPixels[pos + 1], mScreenshotPixels[pos + 2]));
             }
          }
