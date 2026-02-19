@@ -50,8 +50,8 @@ WelcomeScreen::~WelcomeScreen()
 
 namespace
 {
-   const float kSaveStateButtonWidth = 150;
-   const float kSaveStateButtonHeight = 150;
+   const float kSaveStateButtonWidth = 200;
+   const float kSaveStateButtonHeight = 180;
    const float kSaveStateButtonStartX = 20;
    const float kSaveStateButtonPadX = 10;
    const float kSaveStateButtonPadY = 10;
@@ -132,7 +132,7 @@ void WelcomeScreen::DrawModule()
       ofPushMatrix();
 
       ofRectangle imageRect = rect;
-      imageRect.height *= 100.0f / 128.0f;
+      imageRect.height *= float(kScreenshotHeight) / kScreenshotWidth;
       constexpr float padding = 2;
       imageRect.x += padding;
       imageRect.y += padding;
@@ -146,9 +146,9 @@ void WelcomeScreen::DrawModule()
          std::string jsonLayoutString;
          ModularSynth::LoadStateHeader(in, screenshotData, screenshotSize, jsonLayoutString);
          if (screenshotData != nullptr)
-            mRecentFiles[i].mScreenshotImageHandle = nvgCreateImageMem(gNanoVG, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY, screenshotData, screenshotSize);
+            mRecentFiles[i].mScreenshotImageHandle = nvgCreateImageMem(gNanoVG, 0, screenshotData, screenshotSize);
          else
-            mRecentFiles[i].mScreenshotImageHandle = nvgCreateImage(gNanoVG, ofToResourcePath("bespoke_default.png").c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+            mRecentFiles[i].mScreenshotImageHandle = nvgCreateImage(gNanoVG, ofToResourcePath("bespoke_default.png").c_str(), 0);
       }
 
       if (mRecentFiles[i].mScreenshotImageHandle != -1)
@@ -161,9 +161,9 @@ void WelcomeScreen::DrawModule()
       }
 
       ofClipWindow(rect.x, rect.y, rect.width, rect.height, K(intersectWithExisting));
-      DrawTextNormal(mRecentFiles[i].mFile.getFileNameWithoutExtension().toStdString(), rect.x + 3, rect.getMaxY() - 15, 8);
+      DrawTextNormal(mRecentFiles[i].mFile.getFileNameWithoutExtension().toStdString(), rect.x + 3, rect.getMaxY() - 18);
       juce::RelativeTime timeSinceModified = juce::Time::getCurrentTime() - mRecentFiles[i].mFile.getLastModificationTime();
-      DrawTextNormal(("saved " + timeSinceModified.getApproximateDescription() + " ago").toStdString(), rect.x + 3, rect.getMaxY() - 6, 8);
+      DrawTextNormal(("saved " + timeSinceModified.getApproximateDescription() + " ago").toStdString(), rect.x + 3, rect.getMaxY() - 4, 10);
       ofPopMatrix();
    }
 

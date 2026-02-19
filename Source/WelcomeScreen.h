@@ -67,6 +67,9 @@ public:
 
    bool IsEnabled() const override { return true; }
 
+   static constexpr int kScreenshotWidth = 256;
+   static constexpr int kScreenshotHeight = 200;
+
 private:
    //IDrawableModule
    void DrawModule() override;
