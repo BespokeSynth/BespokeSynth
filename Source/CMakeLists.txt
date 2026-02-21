@@ -207,6 +207,7 @@ target_sources(BespokeSynth PRIVATE
     FilterViz.h
     FloatSliderLFOControl.cpp
     FloatSliderLFOControl.h
+    $<$<STREQUAL:${BESPOKE_FLUIDSYNTH},ON>:FluidSynthModule.cpp FluidSynthModule.h>
     FollowingSong.cpp
     FollowingSong.h
     FormantFilterEffect.cpp
@@ -835,6 +836,12 @@ target_compile_definitions(BespokeSynth PRIVATE
     JUCE_CATCH_UNHANDLED_EXCEPTIONS=0
     )
 
+if(BESPOKE_FLUIDSYNTH)
+    target_compile_definitions(BespokeSynth PRIVATE
+        BESPOKE_FLUIDSYNTH=1
+        )
+endif()
+
 if (APPLE)
     target_compile_definitions(BespokeSynth PRIVATE
         BESPOKE_MAC=1
@@ -944,6 +951,12 @@ target_link_libraries(BespokeSynth PRIVATE
     ${Python_LIBRARIES}
     $<$<BOOL:${MINGW}>:dbghelp>
     )
+
+if (BESPOKE_FLUIDSYNTH)
+    target_link_libraries(BespokeSynth PRIVATE
+        $<IF:$<STREQUAL:${BESPOKE_SYSTEM_FLUIDSYNTH},OFF>,bespoke::fluidsynth,fluidsynth>
+        )
+endif()
 
 bespoke_copy_resource_dir(BespokeSynth)
 bespoke_make_portable(BespokeSynth)

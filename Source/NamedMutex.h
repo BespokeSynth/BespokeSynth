@@ -31,6 +31,7 @@ class NamedMutex
 {
 public:
    void Lock(std::string locker);
+   bool TryLock(std::string locker);
    void Unlock();
 
 private:
@@ -47,4 +48,17 @@ public:
 
 private:
    NamedMutex* mMutex;
+};
+
+class ScopedTryMutex
+{
+public:
+   ScopedTryMutex(NamedMutex* mutex, std::string locker);
+   ~ScopedTryMutex();
+
+   bool IsLocked() { return mIsLocked; }
+
+private:
+   NamedMutex* mMutex;
+   bool mIsLocked;
 };

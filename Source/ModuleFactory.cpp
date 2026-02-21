@@ -280,6 +280,10 @@
 #include "VelocityToDuration.h"
 #include "TapTempo.h"
 
+#ifdef BESPOKE_FLUIDSYNTH
+#include "FluidSynthModule.h"
+#endif
+
 #include <juce_core/juce_core.h>
 
 #include "PulseRouter.h"
@@ -508,6 +512,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(StereoRotation, stereorotation, kModuleCategory_Audio);
    REGISTER(LatencyCalculatorSender, latencycalculator, kModuleCategory_Synth);
    REGISTER(LatencyCalculatorReceiver, latencycalculatorreceiver, kModuleCategory_Audio);
+#ifdef BESPOKE_FLUIDSYNTH
+   REGISTER(FluidSynth, fluidsynth, kModuleCategory_Synth);
+#endif
    REGISTER(AbletonMoveControl, abletonmovecontrol, kModuleCategory_Other);
    REGISTER(TrackOrganizer, trackorganizer, kModuleCategory_Other);
    REGISTER(ModulatorBinaryValue, binaryvalue, kModuleCategory_Modulator);

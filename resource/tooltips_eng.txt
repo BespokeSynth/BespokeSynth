@@ -2181,6 +2181,12 @@ latencycalculatorreceiver~place this at the receiving end of a signal generated 
 
 interface~create a custom collection of controls that refer to other controls. for detailed editing of the created controls, hover over the created control and press shift-enter to display an editor view.
 
+fluidsynth~software synthesizer based on FluidSynth with support for SF2 SoundFonts
+~volume~the gain setting of the synthesizer
+~select soundfont~pick a SoundFont from the filesystem
+~soundfont~the path to the current SoundFont
+~midi bank select~bank selection style for MIDI bank select events
+
 binaryvalue~convert modulated value to binary and send each bit to separate modulation cable
 ~input~input value
 ~code~code to use for conversion into binary representation
