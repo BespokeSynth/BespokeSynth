@@ -509,6 +509,10 @@ target_sources(BespokeSynth PRIVATE
     PSMoveController.h
     PSMoveMgr.cpp
     PSMoveMgr.h
+    PadSynth.cpp
+    PadSynth.h
+    PadSynthVoice.cpp
+    PadSynthVoice.h
     PanicButton.cpp
     PanicButton.h
     Panner.cpp

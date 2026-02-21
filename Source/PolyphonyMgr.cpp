@@ -29,6 +29,7 @@
 #include "KarplusStrongVoice.h"
 #include "SingleOscillatorVoice.h"
 #include "SampleVoice.h"
+#include "PadSynthVoice.h"
 #include "SynthGlobals.h"
 #include "Profiler.h"
 
@@ -76,6 +77,14 @@ void PolyphonyMgr::Init(VoiceType type, IVoiceParams* params)
       for (int i = 0; i < kNumVoices; ++i)
       {
          mVoices[i].mVoice = new SampleVoice(mOwner);
+         mVoices[i].mVoice->SetVoiceParams(params);
+      }
+   }
+   else if (type == kVoiceType_PadSynth)
+   {
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+         mVoices[i].mVoice = new PadSynthVoice(mOwner);
          mVoices[i].mVoice->SetVoiceParams(params);
       }
    }
