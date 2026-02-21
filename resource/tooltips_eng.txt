@@ -2158,6 +2158,7 @@ pulselimit~limit the number of pulses allowed to pass through
 ~reset~reset the counter of seen pulses
 ~limit~limit number of pulses to pass through
 
+
 audiosplitter~send an audio signal to multiple destinations
 
 acciaccatura~adds a quick grace note before playing the input pitch
@@ -2187,3 +2188,5 @@ binaryvalue~convert modulated value to binary and send each bit to separate modu
 
 velocitytoduration~use a note's velocity to set its duration
 ~max duration~duration (in measures) corresponding to the maximum velocity value
+
+chordbounds~finds lowest and highest notes among ones played at the same time
