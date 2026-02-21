@@ -161,6 +161,7 @@ import midicontroller
          example: m.send_sysex(bytes([0, 32, 41, 2, 12, 14, 1]) 
       m.add_script_listener(script)
       m.resync_controller_state()
+      m.set_catchcontrol(control, value)
 
 
 import linnstrument
