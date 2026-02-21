@@ -302,7 +302,10 @@ void SongBuilder::OnTimeEvent(double time)
 
    if (mSequenceStepIndex != -1)
    {
-      if (TheTransport->GetMeasure(time + TheTransport->GetListenerInfo(this)->mOffsetInfo.mOffset) >= mSequencerStepLength[mSequenceStepIndex] && !mSequencePaused)
+      int sequencerMeasure = GetSequencerMeasure();
+      int currentMeasure = TheTransport->GetMeasure(time + TheTransport->GetListenerInfo(this)->mOffsetInfo.mOffset);
+
+      if (currentMeasure >= sequencerMeasure && !mSequencePaused)
       {
          if (mLoopSequence && mSequenceStepIndex == mSequenceLoopEndIndex && mSequenceLoopEndIndex >= mSequenceLoopStartIndex)
             mSequenceStepIndex = mSequenceLoopStartIndex;
@@ -339,6 +342,25 @@ void SongBuilder::OnTimeEvent(double time)
       mWantResetClock = false;
       mJustResetClock = true;
    }
+}
+
+int SongBuilder::GetSequencerMeasure()
+{
+   int sequencerMeasure = 0;
+   if (mResetOnSceneChange || mLegacyTransportResetBehavior)
+   {
+      sequencerMeasure = mSequencerStepLength[mSequenceStepIndex];
+   }
+   else
+   {
+      // Calculate the current steps' ending measurement.
+      for (int i = 0; i <= mSequenceStepIndex; i++)
+      {
+         sequencerMeasure += mSequencerStepLength[i];
+      }
+   }
+
+   return sequencerMeasure;
 }
 
 void SongBuilder::OnPulse(double time, float velocity, int flags)
@@ -832,6 +854,7 @@ void SongBuilder::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 void SongBuilder::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadBool("reset_transport_every_sequencer_scene", moduleInfo, true);
+   mModuleSaveData.LoadBool("legacy_transport_reset_behavior", moduleInfo, true);
 
    if (IsSpawningOnTheFly(moduleInfo))
    {
@@ -854,6 +877,7 @@ void SongBuilder::LoadLayout(const ofxJSONElement& moduleInfo)
 void SongBuilder::SetUpFromSaveData()
 {
    mResetOnSceneChange = mModuleSaveData.GetBool("reset_transport_every_sequencer_scene");
+   mLegacyTransportResetBehavior = mModuleSaveData.GetBool("legacy_transport_reset_behavior");
 }
 
 void SongBuilder::SaveState(FileStreamOut& out)
