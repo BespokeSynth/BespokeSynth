@@ -2016,6 +2016,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~samplerate~what sample rate to use with your audio device (requires restart)
 ~buffersize~what buffer size to use with your audio device. lower values use require more CPU power, higher values add more latency. (requires restart)
 ~oversampling~global oversampling multiplier. uses additional CPU for higher-resolution audio processing. (requires restart)
+~wav_bit_depth~Bit depth to use when exporting audio to WAV files
 ~width~width of bespoke's window on startup
 ~height~height of bespoke's window on startup
 ~set_manual_window_position~should we force bespoke to a specific position on startup
