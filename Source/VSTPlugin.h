@@ -132,7 +132,9 @@ private:
    int mPresetFileIndex{ -1 };
    DropdownList* mPresetFileSelector{ nullptr };
    bool mPresetFileUpdateQueued{ false };
+   int mPresetFileLoadCountdown{ 0 };
    ClickButton* mSavePresetFileButton{ nullptr };
+   ClickButton* mResetPresetButton{ nullptr };
    std::vector<std::string> mPresetFilePaths;
    std::string mLastLoadedPresetFilePath{};
    ClickButton* mOpenEditorButton{ nullptr };
