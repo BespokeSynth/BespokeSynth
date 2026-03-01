@@ -36,6 +36,7 @@
 #include "UserPrefs.h"
 #include "NoteOutputQueue.h"
 #include "WelcomeScreen.h"
+#include "TrackOrganizer.h"
 
 #include "juce_opengl/juce_opengl.h"
 using namespace juce::gl;
@@ -264,6 +265,9 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    TheScale->Init();
    TheTransport->Init();
 
+   if (juce::File(GetWorkspaceDataPath()).existsAsFile())
+      mWorkspaceData.open(TheSynth->GetWorkspaceDataPath());
+
    DrumPlayer::SetUpHitDirectories();
 
    sBackgroundLissajousR = UserPrefs.lissajous_r.Get();
@@ -305,7 +309,7 @@ void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
       mOutputBuffers.push_back(new float[gBufferSize]);
 }
 
-
+//static
 std::string ModularSynth::GetUserPrefsPath()
 {
    std::string filename = "userprefs.json";
@@ -321,6 +325,13 @@ std::string ModularSynth::GetUserPrefsPath()
       }
    }
 
+   return ofToDataPath(filename);
+}
+
+//static
+std::string ModularSynth::GetWorkspaceDataPath()
+{
+   std::string filename = "workspace.json";
    return ofToDataPath(filename);
 }
 
@@ -2720,15 +2731,15 @@ void ModularSynth::ResetLayout()
    }
    else
    {
+      mWelcomeScreen = new WelcomeScreen();
+      mWelcomeScreen->SetName("welcome");
+      mWelcomeScreen->CreateUIControls();
+      mWelcomeScreen->Init();
       if (!mIsLoadingState && sFrameCount < 10 && UserPrefs.show_welcome_screen.Get())
-      {
-         mWelcomeScreen = new WelcomeScreen();
-         mWelcomeScreen->SetName("welcome");
-         mWelcomeScreen->CreateUIControls();
-         mWelcomeScreen->Init();
          mWelcomeScreen->Show();
-         mModuleContainer.AddModule(mWelcomeScreen);
-      }
+      else
+         mWelcomeScreen->SetShowing(false);
+      mModuleContainer.AddModule(mWelcomeScreen);
    }
 
    GetDrawOffset().set(0, 0);
@@ -3166,6 +3177,8 @@ void ModularSynth::LoadStatePopupImp()
 
 void ModularSynth::SaveState(std::string file, bool autosave)
 {
+   AddRecentFile(file, true);
+
    mQueuedSaveStateInfo.mFile = file;
    mQueuedSaveStateInfo.mAutosave = autosave;
    mQueuedSaveStateInfo.mWaitingForScreenshot = true;
@@ -3242,6 +3255,30 @@ void ModularSynth::SetStartupSaveStateFile(std::string bskPath)
    mStartupSaveStateFile = std::move(bskPath);
 }
 
+void ModularSynth::AddRecentFile(std::string file, bool saved)
+{
+   if (mWorkspaceData["recent_files"].isArray())
+   {
+      for (int i = 0; i < mWorkspaceData["recent_files"].size(); ++i)
+      {
+         if (mWorkspaceData["recent_files"][i]["file"] == file)
+         {
+            mWorkspaceData["recent_files"].removeIndex(i, nullptr);
+            break;
+         }
+      }
+
+      while (mWorkspaceData["recent_files"].size() > 10)
+         mWorkspaceData["recent_files"].removeIndex(0, nullptr);
+   }
+   ofxJSONElement fileInfo;
+   fileInfo["file"] = file;
+   fileInfo["time"] = juce::Time::getCurrentTime().toISO8601(true).toStdString();
+   fileInfo["saved"] = saved;
+   mWorkspaceData["recent_files"].append(fileInfo);
+   mWorkspaceData.save(GetWorkspaceDataPath());
+}
+
 void ModularSynth::LoadState(std::string file)
 {
    ofLog() << "LoadState() " << file;
@@ -3251,6 +3288,8 @@ void ModularSynth::LoadState(std::string file)
       LogEvent("couldn't find file " + file, kLogEventType_Error);
       return;
    }
+
+   AddRecentFile(file, false);
 
    if (mInitialized)
       TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup
@@ -3535,6 +3574,10 @@ void ModularSynth::OnConsoleInput(std::string command /* = "" */)
       {
          DumpStats(false, nullptr);
       }
+      else if (tokens[0] == "welcomescreen")
+      {
+         mWelcomeScreen->Show();
+      }
       else
       {
          ofLog() << "Creating: " << mConsoleText;
@@ -3699,6 +3742,20 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(ModuleFactory::Spawnable spaw
       {
       }
       break;
+   }
+
+   std::vector<IDrawableModule*> allModules;
+   TheSynth->GetAllModules(allModules);
+   for (auto checkModule : allModules)
+   {
+      TrackOrganizer* trackOrganizer = dynamic_cast<TrackOrganizer*>(checkModule);
+      if (trackOrganizer != nullptr && trackOrganizer->GetBoundingRect().contains(x, y))
+      {
+         std::vector<IDrawableModule*> container;
+         container.push_back(module);
+         trackOrganizer->GatherModules(container);
+         break;
+      }
    }
 
    return module;

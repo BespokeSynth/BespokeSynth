@@ -77,9 +77,11 @@ private:
 
    struct RecentFile
    {
-      int mScreenshotImageHandle{ -1 };
       juce::File mFile;
+      juce::Time mTime;
+      bool mRecentlyOpened{ false };
       ClickButton* mButton{ nullptr };
+      int mScreenshotImageHandle{ -1 };
    };
 
    std::vector<RecentFile> mRecentFiles;
@@ -87,5 +89,9 @@ private:
    ClickButton* mTutorialVideoLinkButton{ nullptr };
    ClickButton* mDocsLinkButton{ nullptr };
    ClickButton* mDiscordLinkButton{ nullptr };
+   ClickButton* mNewPatchButton{ nullptr };
+   ClickButton* mLoadPatchButton{ nullptr };
+   ClickButton* mShowHelpButton{ nullptr };
+   ClickButton* mShowSettingsButton{ nullptr };
    ClickButton* mCloseButton{ nullptr };
 };

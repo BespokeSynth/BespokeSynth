@@ -74,6 +74,7 @@ public:
    int GetColorIndex() const { return mColorIndex; }
    std::string GetTrackName() const { return mTrackName; }
    ofRectangle GetBoundingRect();
+   void GatherModules(const std::vector<IDrawableModule*>& modulesToAdd);
 
    void TextEntryComplete(TextEntry* entry) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
@@ -93,7 +94,6 @@ private:
 
    std::list<IDrawableModule*> GetAllTrackModules();
    bool ShouldShowCables() const;
-   void GatherModules(const std::vector<IDrawableModule*>& modulesToAdd);
 
    PatchCableSource* mSnapshotsCable{ nullptr };
    PatchCableSource* mSoundSelectorCable{ nullptr };

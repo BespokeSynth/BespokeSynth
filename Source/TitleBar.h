@@ -127,6 +127,7 @@ public:
    void Poll() override;
 
    HelpDisplay* GetHelpDisplay() { return mHelpDisplay; }
+   void ShowHelp();
 
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
@@ -162,6 +163,7 @@ private:
    ClickButton* mPlayPauseButton{ nullptr };
    ClickButton* mSaveLayoutButton{ nullptr };
    ClickButton* mResetLayoutButton{ nullptr };
+   ClickButton* mWelcomeScreenButton{ nullptr };
    ClickButton* mSaveStateButton{ nullptr };
    ClickButton* mSaveStateAsButton{ nullptr };
    ClickButton* mLoadStateButton{ nullptr };
