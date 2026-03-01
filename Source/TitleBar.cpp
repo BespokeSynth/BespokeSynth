@@ -36,6 +36,7 @@
 #include "VSTPlugin.h"
 #include "VSTScanner.h"
 #include "MidiController.h"
+#include "WelcomeScreen.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
 
@@ -142,8 +143,8 @@ void TitleBar::CreateUIControls()
    BUTTON_STYLE(mPlayPauseButton, "play/pause", ButtonDisplayStyle::kPause);
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(10);
-   BUTTON(mLoadStateButton, "load");
-   UIBLOCK_SHIFTRIGHT();
+   //BUTTON(mLoadStateButton, "load");
+   //UIBLOCK_SHIFTRIGHT();
    BUTTON(mSaveStateButton, "save");
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mSaveStateAsButton, "save as");
@@ -151,7 +152,8 @@ void TitleBar::CreateUIControls()
    UIBLOCK_SHIFTX(10);
    BUTTON(mWriteAudioButton, "write audio");
    UIBLOCK_NEWLINE();
-   BUTTON(mResetLayoutButton, "new patch");
+   //BUTTON(mResetLayoutButton, "new patch");
+   BUTTON(mWelcomeScreenButton, "load/new");
    UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mEventLookaheadCheckbox, "lookahead (exp.)", &Transport::sDoEventLookahead);
    UIBLOCK_SHIFTRIGHT();
@@ -368,10 +370,14 @@ void TitleBar::DrawModule()
    mSaveLayoutButton->Draw();
    mSaveStateButton->Draw();
    mSaveStateAsButton->Draw();
-   mLoadStateButton->Draw();
+   if (mLoadStateButton)
+      mLoadStateButton->Draw();
    mWriteAudioButton->Draw();
    mLoadLayoutDropdown->Draw();
-   mResetLayoutButton->Draw();
+   if (mResetLayoutButton)
+      mResetLayoutButton->Draw();
+   if (mWelcomeScreenButton)
+      mWelcomeScreenButton->Draw();
    if (TheSynth->IsAudioPaused())
       mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPlay);
    else
@@ -591,17 +597,7 @@ void TitleBar::ButtonClicked(ClickButton* button, double time)
    if (button == mWriteAudioButton)
       TheSynth->SaveOutput();
    if (button == mDisplayHelpButton)
-   {
-      float x, y, w, h, butW, butH;
-      mDisplayHelpButton->GetPosition(x, y);
-      mDisplayHelpButton->GetDimensions(butW, butH);
-      mHelpDisplay->GetDimensions(w, h);
-      mHelpDisplay->SetPosition(x - w + butW, y + butH);
-      mHelpDisplay->SetOwningContainer(GetOwningContainer());
-      mHelpDisplay->Show();
-      TheSynth->PushModalFocusItem(mHelpDisplay);
-      sShowInitialHelpOverlay = false;
-   }
+      ShowHelp();
    if (button == mDisplayUserPrefsEditorButton)
       TheSynth->GetUserPrefsEditor()->Show();
    if (button == mHomeButton)
@@ -613,8 +609,23 @@ void TitleBar::ButtonClicked(ClickButton* button, double time)
       mNewPatchConfirmPopup.SetPosition(buttonRect.x, buttonRect.y + buttonRect.height + 2);
       TheSynth->PushModalFocusItem(&mNewPatchConfirmPopup);
    }
+   if (button == mWelcomeScreenButton)
+      TheSynth->GetWelcomeScreen()->Show();
    if (button == mPlayPauseButton)
       TheSynth->SetAudioPaused(!TheSynth->IsAudioPaused());
+}
+
+void TitleBar::ShowHelp()
+{
+   float x, y, w, h, butW, butH;
+   mDisplayHelpButton->GetPosition(x, y);
+   mDisplayHelpButton->GetDimensions(butW, butH);
+   mHelpDisplay->GetDimensions(w, h);
+   mHelpDisplay->SetPosition(x - w + butW, y + butH);
+   mHelpDisplay->SetOwningContainer(GetOwningContainer());
+   mHelpDisplay->Show();
+   TheSynth->PushModalFocusItem(mHelpDisplay);
+   sShowInitialHelpOverlay = false;
 }
 
 void NewPatchConfirmPopup::CreateUIControls()

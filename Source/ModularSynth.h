@@ -216,6 +216,7 @@ public:
    bool ShouldDimModule(IDrawableModule* module);
    LocationZoomer* GetLocationZoomer() { return &mZoomer; }
    IDrawableModule* GetModuleAtCursor(int offsetX = 0, int offsetY = 0);
+   WelcomeScreen* GetWelcomeScreen() { return mWelcomeScreen; }
 
    void RegisterPatchCable(PatchCable* cable);
    void UnregisterPatchCable(PatchCable* cable);
@@ -257,6 +258,7 @@ public:
    void SetIsLoadingState(bool loading) { mIsLoadingState = loading; }
 
    static std::string GetUserPrefsPath();
+   static std::string GetWorkspaceDataPath();
    static void CrashHandler(void*);
    static void DumpStats(bool isCrash, void* crashContext);
 
@@ -313,6 +315,7 @@ private:
    bool FindCircularDependencySearch(std::list<IAudioSource*> chain, IAudioSource* searchFrom);
    void ClearCircularDependencyMarkers();
    bool IsCurrentSaveStateATemplate() const;
+   void AddRecentFile(std::string file, bool saved);
 
    void ReadClipboardTextFromSystem();
 
@@ -467,6 +470,8 @@ private:
 
    NVGLUframebuffer* mScreenshotFrameBuffer{ nullptr };
    unsigned char* mScreenshotPixels{ nullptr };
+
+   ofxJSONElement mWorkspaceData;
 };
 
 extern ModularSynth* TheSynth;

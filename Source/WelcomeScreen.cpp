@@ -31,6 +31,9 @@
 #include "UserPrefs.h"
 #include "PatchCable.h"
 #include "HelpDisplay.h"
+#include "TitleBar.h"
+#include "UIControlMacros.h"
+#include "UserPrefsEditor.h"
 
 #include "juce_opengl/juce_opengl.h"
 using namespace juce::gl;
@@ -53,6 +56,7 @@ namespace
    const float kSaveStateButtonWidth = 200;
    const float kSaveStateButtonHeight = 180;
    const float kSaveStateButtonStartX = 20;
+   const float kSaveStateButtonStartY = 110;
    const float kSaveStateButtonPadX = 10;
    const float kSaveStateButtonPadY = 10;
 }
@@ -61,44 +65,90 @@ void WelcomeScreen::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mDocsLinkButton = new ClickButton(this, "bespokesynth.com/docs", 111, 31);
-   mDiscordLinkButton = new ClickButton(this, "bespoke discord", 324, 31);
-   mTutorialVideoLinkButton = new ClickButton(this, "youtu.be/SYBc8X2IxqM", 176, 50);
+   UIBLOCK(kSaveStateButtonStartX, 30);
+   BUTTON(mNewPatchButton, "new patch");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mLoadPatchButton, "load patch");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mShowHelpButton, "help");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mShowSettingsButton, "settings");
+   UIBLOCK_SHIFTRIGHT();
+   ENDUIBLOCK0();
+
+   mDocsLinkButton = new ClickButton(this, "bespokesynth.com/docs", 111, 53);
+   mDiscordLinkButton = new ClickButton(this, "bespoke discord", 324, 53);
+   mTutorialVideoLinkButton = new ClickButton(this, "youtu.be/SYBc8X2IxqM", 176, 72);
 
    mWidth = ofGetWidth() / TheSynth->GetUIScale() - 100;
    mHeight = ofGetHeight() / TheSynth->GetUIScale() - 200;
 
+   const int kMaxDesiredFiles = 10;
+
    int x = kSaveStateButtonStartX;
-   int y = 100;
+   int y = kSaveStateButtonStartY + kSaveStateButtonPadY;
+
    using namespace juce;
-   File dir(ofToDataPath("savestate"));
-   Array<File> files;
-   dir.findChildFiles(files, File::findFiles, false);
-   std::sort(files.begin(), files.end(),
-             [](const File& lhs, const File& rhs)
-             {
-                return lhs.getLastModificationTime().toMilliseconds() > rhs.getLastModificationTime().toMilliseconds();
-             });
-   for (auto& file : files)
+
+   ofxJSONElement workspaceData;
+   workspaceData.open(TheSynth->GetWorkspaceDataPath());
+   for (int i = 0; i < workspaceData["recent_files"].size(); ++i)
    {
-      if (mRecentFiles.size() >= 10 || y + kSaveStateButtonHeight + 20 > mHeight)
+      RecentFile recentFile;
+      recentFile.mFile = File(workspaceData["recent_files"][i]["file"].asString());
+      recentFile.mTime = Time::fromISO8601(workspaceData["recent_files"][i]["time"].asString());
+      recentFile.mRecentlyOpened = !workspaceData["recent_files"][i]["saved"].asBool();
+      mRecentFiles.insert(mRecentFiles.begin(), recentFile);
+   }
+
+   if (mRecentFiles.size() < kMaxDesiredFiles)
+   {
+      File dir(ofToDataPath("savestate"));
+      Array<File> files;
+      dir.findChildFiles(files, File::findFiles, false);
+      std::sort(files.begin(), files.end(),
+                [](const File& lhs, const File& rhs)
+                {
+                   return lhs.getLastModificationTime().toMilliseconds() > rhs.getLastModificationTime().toMilliseconds();
+                });
+
+      for (int i = 0; i < files.size() && mRecentFiles.size() < kMaxDesiredFiles; ++i)
+      {
+         if (files[i].getFileExtension() != ".bsk")
+            continue;
+
+         bool alreadyInList = false;
+         for (int j = 0; j < mRecentFiles.size(); ++j)
+         {
+            if (mRecentFiles[j].mFile == files[i])
+               alreadyInList = true;
+         }
+
+         if (alreadyInList)
+            continue;
+
+         RecentFile recentFile;
+         recentFile.mFile = files[i];
+         recentFile.mTime = files[i].getLastModificationTime();
+         recentFile.mRecentlyOpened = false;
+         mRecentFiles.push_back(recentFile);
+      }
+   }
+
+   for (auto& recentFile : mRecentFiles)
+   {
+      if (y + kSaveStateButtonHeight + 20 > mHeight)
          break;
 
-      if (file.getFileExtension() == ".bsk")
-      {
-         RecentFile recentFile;
-         recentFile.mFile = file;
-         recentFile.mButton = new ClickButton(this, ("recentfile" + ofToString((int)mRecentFiles.size())).c_str(), x, y);
-         recentFile.mButton->SetOverrideDisplayName("");
-         recentFile.mButton->SetDimensions(kSaveStateButtonWidth, kSaveStateButtonHeight);
-         mRecentFiles.push_back(recentFile);
+      recentFile.mButton = new ClickButton(this, ("recentfile" + ofToString((int)mRecentFiles.size())).c_str(), x, y);
+      recentFile.mButton->SetOverrideDisplayName("");
+      recentFile.mButton->SetDimensions(kSaveStateButtonWidth, kSaveStateButtonHeight);
 
-         x += kSaveStateButtonWidth + kSaveStateButtonPadX;
-         if (x + kSaveStateButtonWidth + kSaveStateButtonPadX > mWidth)
-         {
-            x = kSaveStateButtonStartX;
-            y += kSaveStateButtonHeight + kSaveStateButtonPadY;
-         }
+      x += kSaveStateButtonWidth + kSaveStateButtonPadX;
+      if (x + kSaveStateButtonWidth + kSaveStateButtonPadX > mWidth)
+      {
+         x = kSaveStateButtonStartX;
+         y += kSaveStateButtonHeight + kSaveStateButtonPadY;
       }
    }
 
@@ -110,23 +160,42 @@ void WelcomeScreen::Show()
    SetPosition(50 / TheSynth->GetUIScale() - TheSynth->GetDrawOffset().x, 150 / TheSynth->GetUIScale() - TheSynth->GetDrawOffset().y);
 
    SetShowing(true);
+   TheSynth->MoveToFront(this);
 }
 
 void WelcomeScreen::DrawModule()
 {
+   ofPushStyle();
+   ofFill();
+   ofColor color = GetColor(kModuleCategory_Other);
+   color.r *= .25f;
+   color.g *= .25f;
+   color.b *= .25f;
+   ofSetColor(color);
+   ofRect(0, 0, mWidth, mHeight);
+   ofPopStyle();
+
    DrawTextBold("welcome to bespoke!", 15, 20, 18);
 
-   DrawTextNormal("documentation:", 20, 43);
+   mNewPatchButton->Draw();
+   mLoadPatchButton->Draw();
+   mShowHelpButton->Draw();
+   mShowSettingsButton->Draw();
+
+   DrawTextNormal("documentation:", 20, 65);
    mDocsLinkButton->Draw();
-   DrawTextNormal("join the ", 280, 43);
+   DrawTextNormal("join the ", 280, 65);
    mDiscordLinkButton->Draw();
-   DrawTextNormal("video overview available at:", 20, 62);
+   DrawTextNormal("video overview available at:", 20, 84);
    mTutorialVideoLinkButton->Draw();
 
-   DrawTextBold("recent files:", kSaveStateButtonStartX, 90);
+   DrawTextBold("recent files:", kSaveStateButtonStartX, kSaveStateButtonStartY);
 
    for (int i = 0; i < (int)mRecentFiles.size(); ++i)
    {
+      if (mRecentFiles[i].mButton == nullptr)
+         continue;
+
       mRecentFiles[i].mButton->Draw();
       ofRectangle rect = mRecentFiles[i].mButton->GetRect(K(local));
       ofPushMatrix();
@@ -162,8 +231,13 @@ void WelcomeScreen::DrawModule()
 
       ofClipWindow(rect.x, rect.y, rect.width, rect.height, K(intersectWithExisting));
       DrawTextNormal(mRecentFiles[i].mFile.getFileNameWithoutExtension().toStdString(), rect.x + 3, rect.getMaxY() - 18);
-      juce::RelativeTime timeSinceModified = juce::Time::getCurrentTime() - mRecentFiles[i].mFile.getLastModificationTime();
-      DrawTextNormal(("saved " + timeSinceModified.getApproximateDescription() + " ago").toStdString(), rect.x + 3, rect.getMaxY() - 4, 10);
+      juce::RelativeTime timeSince = juce::Time::getCurrentTime() - mRecentFiles[i].mTime;
+      juce::String prefix;
+      if (mRecentFiles[i].mRecentlyOpened)
+         prefix = "opened ";
+      else
+         prefix = "saved ";
+      DrawTextNormal((prefix + timeSince.getApproximateDescription() + " ago").toStdString(), rect.x + 3, rect.getMaxY() - 4, 10);
       ofPopMatrix();
    }
 
@@ -185,17 +259,19 @@ void WelcomeScreen::ButtonClicked(ClickButton* button, double time)
    }
 
    if (button == mTutorialVideoLinkButton)
-   {
       HelpDisplay::OpenTutorialVideoLink();
-   }
    if (button == mDocsLinkButton)
-   {
       HelpDisplay::OpenDocsLink();
-   }
    if (button == mDiscordLinkButton)
-   {
       HelpDisplay::OpenDiscordLink();
-   }
+   if (button == mNewPatchButton)
+      TheSynth->ReloadInitialLayout();
+   if (button == mLoadPatchButton)
+      TheSynth->LoadStatePopup();
+   if (button == mShowHelpButton)
+      TheTitleBar->ShowHelp();
+   if (button == mShowSettingsButton)
+      TheSynth->GetUserPrefsEditor()->Show();
 
    if (button == mCloseButton)
       SetShowing(false);
