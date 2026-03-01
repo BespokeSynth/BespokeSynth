@@ -89,6 +89,10 @@ void NoteStepper::PlayNote(NoteMessage note)
       if (note.time > mLastNoteOnTime + 10 || !mAllowChords) //slop, to make a chord count as a single step
          mCurrentDestinationIndex = (mCurrentDestinationIndex + 1) % mLength;
 
+      //prevent exceeding maximum number of destinations even if user sets a large step number
+      if (mCurrentDestinationIndex >= kMaxDestinations)
+         return;
+
       selectedDestination = mCurrentDestinationIndex;
       mLastNoteOnTime = note.time;
 
