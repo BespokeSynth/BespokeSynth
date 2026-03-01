@@ -3,7 +3,7 @@
 # Default value for CMAKE_BUILD_TYPE
 default_build_type := "Debug"
 # Tell cmake to use parallel execution of <number of cpu cores> minus this number
-parallel_build_ignore_cpus := "2"
+parallel_build_ignore_cpus := "0"
 
 # Compile (default)
 [positional-arguments]
@@ -42,7 +42,7 @@ run type=default_build_type *bespoke_args:
    # Check if we haven't compiled yet
    bespoke_exe=./ignore/build/Source/BespokeSynth_artefacts/"$1"/BespokeSynth
    if ! [ -f "$bespoke_exe" ]; then
-      just _echo_do just bulid
+      just _echo_do just build "$1"
    fi
 
    # Run the program
