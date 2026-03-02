@@ -63,6 +63,8 @@ private:
    FloatSlider* mAmountSlider{ nullptr };
    float mOffset{ 0 };
    FloatSlider* mOffsetSlider{ nullptr };
+   float mFreeRate{ 1 };
+   FloatSlider* mFreeRateSlider{ nullptr };
 
    LFO mLFO;
    NoteInterval mInterval{ NoteInterval::kInterval_16n };
