@@ -1936,6 +1936,7 @@ plugin~a hosted plugin instance, such as a VST
 ~load parameter~This shows the number of parameters exposed by the plugin. If you click here, up to a 100 parameters are attempted to be added to the parameter dropdown list. If you hold `shift` while clicking, the parameter sliders will be added as well. If you hold `control` the parameter list will be reset and recreated as if the plugin was spawned new.
 ~preset~choose from saved plugin presets
 ~save as~save the current plugin settings as a preset to load again later
+~reset~reload the currently selected preset from disk, resetting all parameters to their original saved values
 ~panic~send "all notes off" and "all sounds off" to this plugin in order to silence it immediately
 ~ + ~Manually add a new Stereo output from the plugin
 ~  -  ~Remove the last manually added Stereo output from the plugin

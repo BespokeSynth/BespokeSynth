@@ -361,9 +361,11 @@ void VSTPlugin::CreateUIControls()
    mPanicButton = new ClickButton(this, "panic", mOpenEditorButton, kAnchor_Right_Padded);
    mRemoveExtraOutputButton = new ClickButton(this, "  -  ", 83, 38);
    mAddExtraOutputButton = new ClickButton(this, " + ", mRemoveExtraOutputButton, kAnchor_Right);
+   mResetPresetButton = new ClickButton(this, "reset", -1, -1);
 
    mPresetFileSelector->DrawLabel(true);
    mSavePresetFileButton->PositionTo(mPresetFileSelector, kAnchor_Right);
+   mResetPresetButton->PositionTo(mSavePresetFileButton, kAnchor_Below);
 
    mMidiOutCable = new AdditionalNoteCable();
    mMidiOutCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
@@ -658,9 +660,6 @@ void VSTPlugin::Poll()
       }
    }
 
-   for (auto& parameterSlider : mParameterSliders)
-      parameterSlider.mValue = parameterSlider.mParameter->getValue();
-
    if (mChangeGestureParameterIndex != -1)
    {
       if (mChangeGestureParameterIndex < (int)mParameterSliders.size() && !mParameterSliders[mChangeGestureParameterIndex].mInSelectorList)
@@ -685,6 +684,12 @@ void VSTPlugin::Poll()
    if (mPresetFileUpdateQueued)
    {
       mPresetFileUpdateQueued = false;
+      mPresetFileLoadCountdown = 2; //load twice: some plugins need a second setStateInformation call for JUCE's parameter cache to fully sync
+   }
+
+   if (mPresetFileLoadCountdown > 0)
+   {
+      --mPresetFileLoadCountdown;
       if (mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
       {
          mLastLoadedPresetFilePath = mPresetFilePaths[mPresetFileIndex];
@@ -693,6 +698,7 @@ void VSTPlugin::Poll()
          if (!resourceFile.existsAsFile())
          {
             DBG("File doesn't exist ...");
+            mPresetFileLoadCountdown = 0;
             return;
          }
 
@@ -701,6 +707,7 @@ void VSTPlugin::Poll()
          if (!input->openedOk())
          {
             DBG("Failed to open file");
+            mPresetFileLoadCountdown = 0;
             return;
          }
 
@@ -741,6 +748,9 @@ void VSTPlugin::Poll()
          }
       }
    }
+
+   for (auto& parameterSlider : mParameterSliders)
+      parameterSlider.mValue = parameterSlider.mParameter->getValue();
 }
 void VSTPlugin::audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details)
 {
@@ -1123,6 +1133,7 @@ void VSTPlugin::DrawModule()
    mPanicButton->Draw();
    mRemoveExtraOutputButton->Draw();
    mAddExtraOutputButton->Draw();
+   mResetPresetButton->Draw();
    mShowParameterDropdown->Draw();
 
    ofPushStyle();
@@ -1247,6 +1258,14 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
          return;
       }
       mWantLoadParameters = true;
+      return;
+   }
+
+   if (button == mResetPresetButton && mPlugin != nullptr)
+   {
+      RefreshPresetFiles();
+      if (mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
+         mPresetFileUpdateQueued = true;
       return;
    }
 
