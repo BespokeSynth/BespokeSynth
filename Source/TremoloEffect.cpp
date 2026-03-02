@@ -64,6 +64,9 @@ void TremoloEffect::CreateUIControls()
    mOscSelector->AddLabel("-saw", kOsc_NegSaw);
    mOscSelector->AddLabel("squ", kOsc_Square);
    mOscSelector->AddLabel("tri", kOsc_Tri);
+
+   mFreeRateSlider->SetMode(FloatSlider::kBezier);
+   mFreeRateSlider->SetBezierControl(1);
 }
 
 void TremoloEffect::ProcessAudio(double time, ChannelBuffer* buffer)
