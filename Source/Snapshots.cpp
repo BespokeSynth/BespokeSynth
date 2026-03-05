@@ -1062,6 +1062,14 @@ void Snapshots::SaveState(FileStreamOut& out)
             out << snapshot.mGridContents[i];
          out << snapshot.mString;
       }
+
+      out << (int)coll.mModuleData.size();
+      for (auto& moduleData : coll.mModuleData)
+      {
+         out << moduleData.mModulePath;
+         out << moduleData.mData;
+      }
+
       out << coll.mLabel;
    }
 
@@ -1126,6 +1134,19 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
             in >> snapshotData.mGridContents[k];
          in >> snapshotData.mString;
       }
+
+      if (rev >= 6)
+      {
+         int numModuleDatas;
+         in >> numModuleDatas;
+         mSnapshotCollection[i].mModuleData.resize(numModuleDatas);
+         for (auto& moduleData : mSnapshotCollection[i].mModuleData)
+         {
+            in >> moduleData.mModulePath;
+            in >> moduleData.mData;
+         }
+      }
+
       in >> mSnapshotCollection[i].mLabel;
       if (rev < 2 && mSnapshotCollection[i].mLabel.empty())
          mSnapshotCollection[i].mLabel = ofToString(i);
