@@ -264,7 +264,7 @@ void CanvasElement::AddElementUIControl(IUIControl* control)
    control->SetCableTargetable(false);
    control->SetShowing(false);
 
-   mCanvas->GetControls()->RemoveUIControl(control);  // will be added/removed as needed
+   mCanvas->GetControls()->RemoveUIControl(control); // will be added/removed as needed
 }
 
 void CanvasElement::CheckboxUpdated(std::string label, bool value, double time)
