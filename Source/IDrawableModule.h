@@ -42,6 +42,10 @@ class PatchCable;
 class PatchCableSource;
 class ModuleContainer;
 class UIGrid;
+namespace juce
+{
+   class FileOutputStream;
+}
 
 enum ModuleCategory
 {
@@ -199,6 +203,7 @@ public:
    virtual bool HasPush2OverrideControls() const { return false; }
    virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const {}
    virtual bool DrawToPush2Screen() { return false; }
+   virtual void DumpDebugData(std::string input, juce::FileOutputStream& file) {}
 
    //IPatchable
    PatchCableSource* GetPatchCableSource(int index = 0) override

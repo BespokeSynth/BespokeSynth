@@ -419,6 +419,23 @@ void Snapshots::PlayNote(NoteMessage note)
    }
 }
 
+void Snapshots::DumpDebugData(std::string input, juce::FileOutputStream& out)
+{
+   out.writeText("num snapshots " + ofToString(mSnapshotCollection.size()) + "\n", true, true, nullptr);
+   for (int i = 0; i < mSnapshotCollection.size(); ++i)
+   {
+      out.writeText("snapshot " + ofToString(i) + ":\n", true, true, nullptr);
+      out.writeText("  num items: " + ofToString(mSnapshotCollection[i].mSnapshots.size()) + "\n", true, true, nullptr);
+      int j = 0;
+      for (auto& item : mSnapshotCollection[i].mSnapshots)
+      {
+         out.writeText("      item " + ofToString(j) + ": " + item.mControlPath + "\n", true, true, nullptr);
+         ++j;
+      }
+      out.writeText("  num SnapshotModuleDatas: " + ofToString(mSnapshotCollection[i].mModuleData.size()) + "\n", true, true, nullptr);
+   }
+}
+
 void Snapshots::SetSnapshot(int idx, double time)
 {
    if (!mAllowSetOnAudioThread && IsAudioThread())

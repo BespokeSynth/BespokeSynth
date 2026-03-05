@@ -60,6 +60,7 @@ public:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void KeyPressed(int key, bool isRepeat) override;
+   void DumpDebugData(std::string input, juce::FileOutputStream& out) override;
 
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
