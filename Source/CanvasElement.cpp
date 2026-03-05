@@ -263,6 +263,8 @@ void CanvasElement::AddElementUIControl(IUIControl* control)
    // Block modulation cables from targeting these controls.
    control->SetCableTargetable(false);
    control->SetShowing(false);
+
+   mCanvas->GetControls()->RemoveUIControl(control);  // will be added/removed as needed
 }
 
 void CanvasElement::CheckboxUpdated(std::string label, bool value, double time)
