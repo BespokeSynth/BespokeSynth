@@ -3578,6 +3578,26 @@ void ModularSynth::OnConsoleInput(std::string command /* = "" */)
       {
          mWelcomeScreen->Show();
       }
+      else if (tokens[0] == "dump" && tokens.size() >= 2)
+      {
+         IDrawableModule* module = mModuleContainer.FindModule(tokens[1]);
+         if (module)
+         {
+            FileOutputStream output(File(ofToDataPath("dump_" + tokens[1] + "_" + ofGetTimestampString("%Y-%m-%d_%H-%M") + ".txt")));
+
+            if (output.openedOk())
+            {
+               output.setNewLineString("\n");
+
+               std::string param = "";
+               if (tokens.size() >= 3)
+                  param = tokens[2];
+               module->DumpDebugData(param, output);
+
+               output.flush();
+            }
+         }
+      }
       else
       {
          ofLog() << "Creating: " << mConsoleText;

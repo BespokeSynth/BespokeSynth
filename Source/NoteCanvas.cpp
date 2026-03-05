@@ -1175,6 +1175,15 @@ void NoteCanvas::SetRecording(bool rec)
       mInputNotes[pitch] = nullptr;
 }
 
+void NoteCanvas::DumpDebugData(std::string input, juce::FileOutputStream& out)
+{
+   out.writeText("num notes " + ofToString(mCanvas->GetElements().size()) + "\n", true, true, nullptr);
+   for (int i = 0; i < mCanvas->GetElements().size(); ++i)
+   {
+      out.writeText("   note " + ofToString(i) + ": " + ofToString(mCanvas->GetElements()[i]->mRow) + "\n", true, true, nullptr);
+   }
+}
+
 void NoteCanvas::ClipNotes()
 {
    bool anyHighlighted = false;

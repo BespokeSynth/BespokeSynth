@@ -57,6 +57,7 @@ public:
    void Poll() override;
    bool IsResizable() const override { return true; /*mDisplayMode == DisplayMode::Grid;*/ }
    void Resize(float w, float h) override;
+   void DumpDebugData(std::string input, juce::FileOutputStream& out) override;
 
    bool HasSnapshot(int index) const;
    int GetCurrentSnapshot() const { return mCurrentSnapshot; }
