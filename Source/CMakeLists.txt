@@ -449,6 +449,8 @@ target_sources(BespokeSynth PRIVATE
     NoteLatch.h
     NoteLooper.cpp
     NoteLooper.h
+    ChordBounds.cpp
+    ChordBounds.h
     NoteOctaver.cpp
     NoteOctaver.h
     NoteOutputQueue.cpp
