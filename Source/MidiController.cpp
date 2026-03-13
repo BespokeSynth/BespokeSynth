@@ -375,6 +375,13 @@ void MidiController::OnTransportAdvanced(float amount)
    mQueuedMessageMutex.unlock();
 }
 
+void MidiController::OnCatchControl(int control, float value)
+{
+
+   GetLayoutControl(control, kMidiMessage_Control).mCatchFlag = true;
+   GetLayoutControl(control, kMidiMessage_Control).mCatchValue = value / 127.0f;
+}
+
 void MidiController::OnMidiNote(MidiNote& note)
 {
    if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && note.mChannel != (int)mChannelFilter))
@@ -496,6 +503,16 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
 {
    assert(mEnabled);
 
+   float mPrevLastValue = GetLayoutControl(control, messageType).mLastValue;
+   float mCatchValue = GetLayoutControl(control, messageType).mCatchValue;
+   if (GetLayoutControl(control, messageType).mCatchFlag)
+   {
+      if (GetLayoutControl(control, messageType).mLastActivityTime > 0 && // skip catch check if no previous value received for control
+          // value matches exactly OR value crossed the catchValue upward OR value crossed the CatchValue downward
+          (value == mCatchValue || (mPrevLastValue < mCatchValue && value > mCatchValue) || (mPrevLastValue > mCatchValue && value < mCatchValue)))
+         GetLayoutControl(control, messageType).mCatchFlag = false;
+   }
+
    mLastActivityBound = false;
    //if (value > 0)
    mLastActivityTime = gTime;
@@ -519,6 +536,12 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
       mLastInput += ofToString(control);
 
    mLastInput += ", value: " + ofToString(value, 2) + " (" + ofToString(rawValue) + "), channel: " + ofToString(channel);
+
+   if (GetLayoutControl(control, messageType).mCatchFlag) // no midi messages while waiting to catch the control value
+   {
+      mLastInput += " (catch filter active)";
+      return;
+   }
 
    if (mBindMode && gBindToUIControl)
    {
@@ -1192,9 +1215,21 @@ void MidiController::DrawModule()
 
                ofCircle(center.x, center.y, control.mDimensions.x / 2);
                ofPushStyle();
-               ofSetColor(255, 255, 255, gModuleDrawAlpha);
+               if (control.mCatchFlag)
+                  ofSetColor(128, 128, 128, gModuleDrawAlpha);
+               else
+                  ofSetColor(255, 255, 255, gModuleDrawAlpha);
                float angle = ofLerp(.1f, .9f, value) * FTWO_PI;
-               ofLine(center.x, center.y, center.x - sinf(angle) * control.mDimensions.x / 2, center.y + cosf(angle) * control.mDimensions.x / 2);
+               if ((control.mCatchFlag && control.mLastActivityTime > 0) || !control.mCatchFlag)
+                  // draw line when in catch mode and previous data has been received
+                  // or draw line when not in catch mode
+                  ofLine(center.x, center.y, center.x - sinf(angle) * control.mDimensions.x / 2, center.y + cosf(angle) * control.mDimensions.x / 2);
+               if (control.mCatchFlag) // draw catchvalue
+               {
+                  ofSetColor(255, 255, 255, gModuleDrawAlpha);
+                  angle = ofLerp(.1f, .9f, control.mCatchValue) * FTWO_PI;
+                  ofLine(center.x, center.y, center.x - sinf(angle) * control.mDimensions.x / 2, center.y + cosf(angle) * control.mDimensions.x / 2);
+               }
                ofPopStyle();
             }
 
@@ -1208,16 +1243,46 @@ void MidiController::DrawModule()
                ofPushStyle();
                ofSetColor(255, 255, 255, gModuleDrawAlpha);
                ofFill();
-               if (control.mDimensions.x > control.mDimensions.y)
-                  ofLine(control.mPosition.x + value * control.mDimensions.x,
-                         control.mPosition.y,
-                         control.mPosition.x + value * control.mDimensions.x,
-                         control.mPosition.y + control.mDimensions.y);
+               if (control.mCatchFlag)
+                  ofSetColor(128, 128, 128, gModuleDrawAlpha);
                else
-                  ofLine(control.mPosition.x,
-                         control.mPosition.y + (1 - value) * control.mDimensions.y,
-                         control.mPosition.x + control.mDimensions.x,
-                         control.mPosition.y + (1 - value) * control.mDimensions.y);
+                  ofSetColor(255, 255, 255, gModuleDrawAlpha);
+               if (control.mDimensions.x > control.mDimensions.y)
+               {
+                  if ((control.mCatchFlag && control.mLastActivityTime > 0) || !control.mCatchFlag)
+                     // draw line when in catch mode and previous data has been received
+                     // or draw line when not in catch mode
+                     ofLine(control.mPosition.x + value * control.mDimensions.x,
+                            control.mPosition.y,
+                            control.mPosition.x + value * control.mDimensions.x,
+                            control.mPosition.y + control.mDimensions.y);
+                  if (control.mCatchFlag) // draw catchvalue
+                  {
+                     ofSetColor(255, 255, 255, gModuleDrawAlpha);
+                     ofLine(control.mPosition.x + control.mCatchValue * control.mDimensions.x,
+                            control.mPosition.y,
+                            control.mPosition.x + control.mCatchValue * control.mDimensions.x,
+                            control.mPosition.y + control.mDimensions.y);
+                  }
+               }
+               else
+               {
+                  if ((control.mCatchFlag && control.mLastActivityTime > 0) || !control.mCatchFlag)
+                     // draw line when in catch mode and previous data has been received
+                     // or draw line when not in catch mode
+                     ofLine(control.mPosition.x,
+                            control.mPosition.y + (1 - value) * control.mDimensions.y,
+                            control.mPosition.x + control.mDimensions.x,
+                            control.mPosition.y + (1 - value) * control.mDimensions.y);
+                  if (control.mCatchFlag) // draw catchvalue
+                  {
+                     ofSetColor(255, 255, 255, gModuleDrawAlpha);
+                     ofLine(control.mPosition.x,
+                            control.mPosition.y + (1 - control.mCatchValue) * control.mDimensions.y,
+                            control.mPosition.x + control.mDimensions.x,
+                            control.mPosition.y + (1 - control.mCatchValue) * control.mDimensions.y);
+                  }
+               }
                ofPopStyle();
             }
 
