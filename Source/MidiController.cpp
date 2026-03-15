@@ -2809,7 +2809,8 @@ void UIControlConnection::Poll()
          mUIControlPathEntry->SetInErrorMode(true);
       if (PatchCable::sActivePatchCable == nullptr)
       {
-         if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
+         if ((mPageless || mPage == mUIOwner->GetPage()) &&
+             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->ClearPatchCables();
       }
    }
