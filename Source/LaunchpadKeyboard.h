@@ -147,6 +147,9 @@ private:
    int mRootNote{ 4 }; // 4 = E
 
    std::array<int, 128> mCurrentNotes{};
+   std::array<bool, 128> mActiveChordPitches{}; // tracks all pitches in the currently playing chord
+   int mActiveChordX{ -1 }; // grid X of the active chord button
+   int mActiveChordY{ -1 }; // grid Y of the active chord button
    std::array<bool, 128> mPreviewNotes{};
    int mOctave{ 3 };
    IntSlider* mOctaveSlider{ nullptr };
