@@ -141,8 +141,7 @@ void AudioRouter::RadioButtonUpdated(RadioButton* radio, int oldVal, double time
 {
    if (radio == mRouteSelector)
    {
-      if (mRouteIndex >= mDestinationCables.size())
-         mRouteIndex = mDestinationCables.size() - 1;
+      mRouteIndex = ofClamp(mRouteIndex, 0, (int)mDestinationCables.size() - 1);
    }
 }
 
