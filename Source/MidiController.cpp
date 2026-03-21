@@ -2796,7 +2796,8 @@ void UIControlConnection::Poll()
       else if (mUIControl != nullptr)
       {
          StringCopy(mUIControlPathInput, mUIControl->Path().c_str(), MAX_TEXTENTRY_LENGTH);
-         if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
+         if ((mPageless || mPage == mUIOwner->GetPage()) &&
+             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->SetTarget(mUIControl);
       }
       if (mUIControlPathEntry != nullptr)
@@ -2808,7 +2809,8 @@ void UIControlConnection::Poll()
          mUIControlPathEntry->SetInErrorMode(true);
       if (PatchCable::sActivePatchCable == nullptr)
       {
-         if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
+         if ((mPageless || mPage == mUIOwner->GetPage()) &&
+             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->ClearPatchCables();
       }
    }
