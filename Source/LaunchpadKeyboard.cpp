@@ -338,7 +338,7 @@ void LaunchpadKeyboard::PlayKeyboardNote(double time, int pitch, int velocity)
    {
       if (velocity == 0)
          time += .001f; //TODO(Ryan) gross hack. need to handle the case better of receiving a note-on followed by a note-off for one pitch at the exact same time. right now it causes stuck notes.
-      PlayNoteOutput(NoteMessage(time, pitch, velocity, 0, ModulationParameters(mModulation.GetPitchBend(0), mModulation.GetModWheel(0), mModulation.GetPressure(0), 0)));
+      PlayNoteOutput(NoteMessage(time, pitch, velocity, -1, ModulationParameters(mModulation.GetPitchBend(0), mModulation.GetModWheel(0), mModulation.GetPressure(0), 0)));
    }
 
    if (mDrawDebug)
