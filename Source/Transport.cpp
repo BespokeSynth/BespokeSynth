@@ -767,6 +767,10 @@ bool Transport::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contro
                SetMeasureTime(GetMeasureTime(gTime) - 1.0f / mTimeSigTop);
             if (x == 1) //shift forward 1 beat
                SetMeasureTime(GetMeasureTime(gTime) + 1.0f / mTimeSigTop);
+            if (x == 2) //shift backward 1 measure
+               SetMeasureTime(GetMeasureTime(gTime) - 1.0f);
+            if (x == 3) //shift forward 1 measure
+               SetMeasureTime(GetMeasureTime(gTime) + 1.0f);
          }
       }
 
@@ -805,6 +809,8 @@ void Transport::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
          {
             if (x == 0 || x == 1)
                pushColor = AbletonDevice::kColorYellowGold;
+            if (x == 2 || x == 3)
+               pushColor = AbletonDevice::kColorOrange;
          }
 
          abletonGrid->SetLed(x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex(), pushColor);

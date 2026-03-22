@@ -146,7 +146,7 @@ private:
    bool mRecord{ false };
    Checkbox* mRecordCheckbox{ nullptr };
    bool mStopQueued{ false };
-   NoteInterval mInterval{ NoteInterval::kInterval_8n };
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };
    bool mFreeRecord{ false };
    Checkbox* mFreeRecordCheckbox{ nullptr };

@@ -130,6 +130,8 @@ private:
    void DetermineTrackControlLayout();
    bool WasPeekHold(int controlIndex) const { return gTime - mControlState[controlIndex].mLastChangeTime > 300; }
    void ZoomToTrack(TrackOrganizer* track);
+   void OnTrackRowExited(int newRow, int oldRow);
+   void ShowSoundSelector();
 
    const int kTrackRowGlobal = -1;
    const int kTrackRowMixer = -2;

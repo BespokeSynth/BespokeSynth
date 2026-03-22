@@ -64,6 +64,8 @@ SongBuilder::SongBuilder()
    mColors.push_back(TargetColor("blue", ofColor::blue * kColorDim));
    mColors.push_back(TargetColor("purple", ofColor::purple * kColorDim));
    mColors.push_back(TargetColor("magenta", ofColor::magenta * kColorDim));
+   for (auto& color : mColors)
+      color.color.a = 255;
 
    mTransportPriority = ITimeListener::kTransportPriorityVeryEarly;
 }
@@ -965,6 +967,7 @@ void SongBuilder::AddTarget()
 {
    ControlTarget* target = new ControlTarget();
    target->CreateUIControls(this);
+   target->mColorIndex = rand() % target->mColorSelector->GetNumValues();
    mTargets.push_back(target);
 
    for (int i = 0; i < (int)mScenes.size(); ++i)
@@ -1223,12 +1226,30 @@ void SongBuilder::ControlValue::CreateUIControls(SongBuilder* owner)
 
 void SongBuilder::ControlValue::Draw(float x, float y, int sceneIndex, ControlTarget* target)
 {
-   ofPushStyle();
-   ofFill();
-   ofSetColor(target->GetColor() * .7f);
-   ofRect(x, y + 2, kColumnWidth, kRowHeight - 4);
-   ofPopStyle();
+   bool isInactive = false;
 
+   if (target->mDisplayType == ControlTarget::DisplayType::TextEntry)
+      isInactive = mValueEntry->ShouldDisplayAsInactive();
+   if (target->mDisplayType == ControlTarget::DisplayType::Checkbox)
+      isInactive = mCheckbox->ShouldDisplayAsInactive();
+   if (target->mDisplayType == ControlTarget::DisplayType::Dropdown)
+      isInactive = mValueSelector->ShouldDisplayAsInactive();
+
+   if (isInactive)
+      IUIControl::sCurrentOverrideColor = ofColor(100, 100, 100);
+   else
+      IUIControl::sCurrentOverrideColor = target->GetColor();
+
+   if (target->mDisplayType != ControlTarget::DisplayType::Dropdown)
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(IUIControl::sCurrentOverrideColor * .7f);
+      ofRect(x, y + 2, kColumnWidth, kRowHeight - 4);
+      ofPopStyle();
+   }
+
+   IUIControl::sUseOverrideColor = true;
    mValueEntry->SetPosition(x + 7, y + 3);
    mValueEntry->Draw();
    mCheckbox->SetPosition(x + 20, y + 3);
@@ -1238,6 +1259,7 @@ void SongBuilder::ControlValue::Draw(float x, float y, int sceneIndex, ControlTa
    mCheckbox->SetShowing(target->GetTarget() && target->mDisplayType == ControlTarget::DisplayType::Checkbox);
    mValueSelector->SetShowing(target->GetTarget() && target->mDisplayType == ControlTarget::DisplayType::Dropdown);
    mValueSelector->Draw();
+   IUIControl::sUseOverrideColor = false;
 }
 
 void SongBuilder::ControlValue::CleanUp()
