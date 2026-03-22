@@ -474,6 +474,11 @@ bool DropdownList::CanBeTargetedBy(PatchCableSource* source) const
    return IUIControl::CanBeTargetedBy(source);
 }
 
+bool DropdownList::ShouldDisplayAsInactive() const
+{
+   return IsInactiveValue(GetDisplayValue(*mVar));
+}
+
 void DropdownList::OnPulse(double time, float velocity, int flags)
 {
    int length = static_cast<int>(mElements.size());

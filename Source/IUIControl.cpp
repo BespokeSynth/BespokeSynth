@@ -34,6 +34,10 @@
 IUIControl* IUIControl::sLastHoveredUIControl = nullptr;
 //static
 bool IUIControl::sLastUIHoverWasSetManually = false;
+//static
+ofColor IUIControl::sCurrentOverrideColor = ofColor(0, 0, 0);
+//static
+bool IUIControl::sUseOverrideColor = false;
 
 IUIControl::~IUIControl()
 {
@@ -196,11 +200,18 @@ void IUIControl::PositionTo(IUIControl* anchor, AnchorDirection direction)
 
 void IUIControl::GetColors(ofColor& color, ofColor& textColor)
 {
-   IDrawableModule* module = dynamic_cast<IDrawableModule*>(GetParent());
-   if (module)
-      color = IDrawableModule::GetColor(module->GetModuleCategory());
+   if (sUseOverrideColor)
+   {
+      color = sCurrentOverrideColor;
+   }
    else
-      color = ofColor::white;
+   {
+      IDrawableModule* module = dynamic_cast<IDrawableModule*>(GetParent());
+      if (module)
+         color = IDrawableModule::GetColor(module->GetModuleCategory());
+      else
+         color = ofColor::white;
+   }
    float h, s, b;
    color.getHsb(h, s, b);
    color.setHsb(h, s * .4f, ofLerp(b, 0, .6f));
@@ -222,6 +233,14 @@ void IUIControl::RemoveFromOwner()
    assert(owner);
    if (owner)
       owner->RemoveUIControl(this);
+}
+
+//static
+bool IUIControl::IsInactiveValue(std::string valueLabel)
+{
+   if (valueLabel == "0" || valueLabel == "none" || valueLabel == "off")
+      return true;
+   return false;
 }
 
 //static

@@ -63,6 +63,7 @@ public:
    bool IsButtonControl() override { return true; }
    void SetBoxSize(float size) { mHeight = size; }
    bool CanBeTargetedBy(PatchCableSource* source) const override;
+   bool ShouldDisplayAsInactive() const override { return GetValue() == 0; }
 
    bool CheckNeedsDraw() override;
 

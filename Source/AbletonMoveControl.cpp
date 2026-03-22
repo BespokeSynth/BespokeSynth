@@ -921,7 +921,12 @@ void AbletonMoveControl::UpdateLeds()
       SetLed(i + kStepButtonLedSection, 0);
    }
 
-   SetLed(kPlayButton, TheSynth->IsAudioPaused() ? 127 : 120);
+   bool soundSelectorAvailable = false;
+   TrackOrganizer* trackRow = GetActiveTrackRow();
+   IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
+   if (soundSelector != nullptr)
+      soundSelectorAvailable = true;
+
    SetLed(kUpButton, 0);
    SetLed(kDownButton, 0);
    SetLed(kLeftButton, 0);
@@ -951,12 +956,22 @@ void AbletonMoveControl::UpdateLeds()
 
       Snapshots* snapshots = activeTrackRow != nullptr ? activeTrackRow->GetSnapshots() : nullptr;
       if (snapshots != nullptr)
-         SetLed(kDotButton, activeTrackRow->GetColorIndex());
+      {
+         if (mShiftHeld && soundSelectorAvailable)
+            SetLed(kDotButton, activeTrackRow->GetColorIndex(), 0);
+         else
+            SetLed(kDotButton, activeTrackRow->GetColorIndex());
+      }
       else
+      {
          SetLed(kDotButton, 0);
+      }
    }
 
-   SetLed(kMoveDeleteButton, 0);
+   if (mSelectedTrackRow == kTrackRowTransport)
+      SetLed(kMoveDeleteButton, 20, TheSynth->IsAudioPaused() ? 127 : -1);
+   else
+      SetLed(kMoveDeleteButton, 0);
 
    if (ShouldDisplaySnapshotView())
    {
@@ -976,12 +991,15 @@ void AbletonMoveControl::UpdateLeds()
                   int snapshotIdx = col + mSnapshotOffset;
                   if (snapshots->GetCurrentSnapshot() == snapshotIdx)
                   {
-                     colors[col] = kColorWhite;
-                     colors2[col] = kColorDarkGrey;
+                     colors[col] = GetButtonState(kDotButton) ? kColorRed : kColorWhite;
+                     if (IUIControl::IsInactiveValue(snapshots->GetLabel(snapshotIdx)))
+                        colors2[col] = kColorDarkGrey;
+                     else
+                        colors2[col] = trackRow->GetColorIndex();
                   }
                   else if (snapshots->HasSnapshot(snapshotIdx))
                   {
-                     if (snapshots->GetLabel(snapshotIdx) == "off" || snapshots->GetLabel(snapshotIdx) == "none" || snapshots->GetLabel(snapshotIdx) == "0")
+                     if (IUIControl::IsInactiveValue(snapshots->GetLabel(snapshotIdx)))
                         colors[col] = kColorDarkGrey;
                      else
                         colors[col] = trackRow->GetColorIndex();
@@ -1006,12 +1024,6 @@ void AbletonMoveControl::UpdateLeds()
          SetLed(i, kColorOff);
    }
 
-   bool soundSelectorAvailable = false;
-   TrackOrganizer* trackRow = GetActiveTrackRow();
-   IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
-   if (soundSelector != nullptr)
-      soundSelectorAvailable = true;
-
    SetLed(kShiftButton, 127, mShiftHeld || mBottomRowMode ? 0 : -1);
 
    if (mAutoZoomToTrack)
@@ -1020,13 +1032,6 @@ void AbletonMoveControl::UpdateLeds()
       SetLed(kLedNew, 10);
    else
       SetLed(kLedNew, 0);
-
-   if (mDisplayModule == TheTransport)
-      SetLed(kLedTempo, 127, 30);
-   else if (mBottomRowMode)
-      SetLed(kLedTempo, 10);
-   else
-      SetLed(kLedTempo, 0);
 
    if (mShowSoundSelector)
       SetLed(kLedGroove, 127, 30);
@@ -1055,7 +1060,7 @@ void AbletonMoveControl::UpdateLeds()
       SetLed(kButtonSettings, kColorOff);
       SetLed(kButtonBranch, kColorOff);
       SetLed(kButtonDowel, kColorOff);
-      SetLed(kButtonTempo, kColorLightGrey, 0);
+      SetLed(kButtonTempo, kColorOff, 0);
       SetLed(kButtonMetronome, kColorOff);
       SetLed(kButtonGroove, soundSelectorAvailable ? kColorLightGrey : kColorOff, 0);
       SetLed(kButtonLayout, kColorOff);
@@ -1089,6 +1094,7 @@ void AbletonMoveControl::UpdateLeds()
 
    SetLed(kBackButton, 127, mSelectedTrackRow == kTrackRowGlobal ? 20 : -1);
    SetLed(kHamburgerButton, 127, mSelectedTrackRow == kTrackRowMixer ? 20 : -1);
+   SetLed(kPlayButton, TheSynth->IsAudioPaused() ? kColorRed : kColorGreen, mSelectedTrackRow == kTrackRowTransport ? kColorBrightBlue : -1);
 
    int recordColor1 = kColorOff;
    int recordColor2 = -1;
@@ -1333,6 +1339,30 @@ void AbletonMoveControl::DetermineTrackControlLayout()
    }
 }
 
+void AbletonMoveControl::ShowSoundSelector()
+{
+   mShowSoundSelector = true;
+   mSoundSelectorIndex = 0;
+   SetDisplayModule(nullptr);
+
+   TrackOrganizer* trackRow = GetActiveTrackRow();
+   IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
+   if (soundSelector != nullptr)
+   {
+      int numValues = soundSelector->GetNumValues();
+      for (int i = 0; i < numValues; ++i)
+      {
+         float normalized = float(i) / (numValues - 1);
+         int value = soundSelector->GetValueForMidiCC(normalized);
+         if (value == soundSelector->GetValue())
+         {
+            mSoundSelectorIndex = i;
+            break;
+         }
+      }
+   }
+}
+
 int AbletonMoveControl::GetControlOffset() const
 {
    return int(GetModuleViewOffset()) * kNumMainEncoders;
@@ -1406,46 +1436,11 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
             mAutoZoomToTrack = !mAutoZoomToTrack;
          handled = true;
       }
-      if (note.mPitch == kButtonTempo)
-      {
-         if (note.mVelocity > 0)
-         {
-            SetActiveTrackRow(kTrackRowTransport, false);
-         }
-         else
-         {
-            bool wasHold = WasPeekHold(note.mPitch);
-
-            //if we held it, then we were just "peeking" into the transport page, so switch back
-            if (wasHold)
-               SetActiveTrackRow(mPreviousSelectedTrackRow, false);
-         }
-         handled = true;
-      }
       if (note.mPitch == kButtonGroove)
       {
          if (note.mVelocity > 0)
          {
-            mShowSoundSelector = true;
-            mSoundSelectorIndex = 0;
-            SetDisplayModule(nullptr);
-
-            TrackOrganizer* trackRow = GetActiveTrackRow();
-            IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
-            if (soundSelector != nullptr)
-            {
-               int numValues = soundSelector->GetNumValues();
-               for (int i = 0; i < numValues; ++i)
-               {
-                  float normalized = float(i) / (numValues - 1);
-                  int value = soundSelector->GetValueForMidiCC(normalized);
-                  if (value == soundSelector->GetValue())
-                  {
-                     mSoundSelectorIndex = i;
-                     break;
-                  }
-               }
-            }
+            ShowSoundSelector();
          }
          handled = true;
       }
@@ -1462,6 +1457,8 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
             //if we held it, then we were just "peeking" into the scale page, so switch back
             if (wasHold)
                SetActiveTrackRow(mPreviousSelectedTrackRow, false);
+            else
+               OnTrackRowExited(kTrackRowScale, mPreviousSelectedTrackRow);
          }
          handled = true;
       }
@@ -1797,6 +1794,8 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
          //if we held it, then we were just "peeking" into the other track, so switch back
          if (wasHold)
             SetActiveTrackRow(mPreviousSelectedTrackRow, false);
+         else
+            OnTrackRowExited(index, mPreviousSelectedTrackRow);
 
          //if we quickly pressed a button for a track we were already holding, reset module index within row
          if (!wasHold && index == mPreviousSelectedTrackRow)
@@ -1819,6 +1818,8 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
          //if we held it, then we were just "peeking" into the global page, so switch back
          if (wasHold)
             SetActiveTrackRow(mPreviousSelectedTrackRow, false);
+         else
+            OnTrackRowExited(kTrackRowGlobal, mPreviousSelectedTrackRow);
 
          //if we quickly pressed a button for a track we were already holding, reset global module index within row
          if (!wasHold && mPreviousSelectedTrackRow == kTrackRowGlobal)
@@ -1838,6 +1839,25 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
          //if we held it, then we were just "peeking" into the global page, so switch back
          if (wasHold)
             SetActiveTrackRow(mPreviousSelectedTrackRow, false);
+         else
+            OnTrackRowExited(kTrackRowMixer, mPreviousSelectedTrackRow);
+      }
+   }
+   else if (control.mControl == kPlayButton)
+   {
+      if (control.mValue > 0)
+      {
+         SetActiveTrackRow(kTrackRowTransport, false);
+      }
+      else
+      {
+         bool wasHold = WasPeekHold(control.mControl);
+
+         //if we held it, then we were just "peeking" into the global page, so switch back
+         if (wasHold)
+            SetActiveTrackRow(mPreviousSelectedTrackRow, false);
+         else
+            OnTrackRowExited(kTrackRowTransport, mPreviousSelectedTrackRow);
       }
    }
    else if (control.mControl == kClickyEncoderButton)
@@ -2100,13 +2120,8 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
    }
    else if (control.mControl == kDotButton)
    {
-      if (control.mValue == 0) //on release
-      {
-         auto* trackRow = GetActiveTrackRow();
-         Snapshots* snapshots = trackRow != nullptr ? trackRow->GetSnapshots() : nullptr;
-         if (snapshots != nullptr)
-            snapshots->StoreSnapshot(snapshots->GetCurrentSnapshot(), false);
-      }
+      if (control.mValue > 0 && mShiftHeld)
+         ShowSoundSelector();
    }
    /*else if (control.mControl == kScaleButton)
    {
@@ -2170,14 +2185,17 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
          }
       }
    }*/
-   else if (control.mControl == kPlayButton)
+   else if (control.mControl == kMoveDeleteButton)
    {
-      if (control.mValue > 0)
+      if (mSelectedTrackRow == kTrackRowTransport)
       {
-         if (TheSynth->IsAudioPaused())
-            TheTransport->Reset();
-         else
-            TheSynth->SetAudioPaused(true);
+         if (control.mValue > 0)
+         {
+            if (TheSynth->IsAudioPaused())
+               TheTransport->Reset();
+            else
+               TheSynth->SetAudioPaused(true);
+         }
       }
    }
    else if (control.mControl == kCircleButton)
@@ -2409,6 +2427,17 @@ void AbletonMoveControl::SetActiveTrackRow(int row, bool resetModuleIndex)
    }
 
    DetermineTrackControlLayout();
+}
+
+void AbletonMoveControl::OnTrackRowExited(int newRow, int oldRow)
+{
+   if (oldRow >= 0 && oldRow < mTrackCables.size())
+   {
+      TrackOrganizer* oldTrackRow = dynamic_cast<TrackOrganizer*>(mTrackCables[oldRow]->GetTarget());
+      auto* recorder = oldTrackRow != nullptr ? oldTrackRow->GetRecorder() : nullptr;
+      if (recorder != nullptr)
+         recorder->SetRecording(false);
+   }
 }
 
 int AbletonMoveControl::GetGridControllerOption1Control() const

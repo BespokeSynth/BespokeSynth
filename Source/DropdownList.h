@@ -155,6 +155,7 @@ public:
    void Increment(float amount) override;
    void Poll() override;
    bool CanBeTargetedBy(PatchCableSource* source) const override;
+   bool ShouldDisplayAsInactive() const override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
 

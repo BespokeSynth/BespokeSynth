@@ -101,17 +101,22 @@ public:
    virtual float GetModulationRangeMax() const { return 1; }
    virtual bool ShouldSerializeForSnapshot() const { return false; }
    virtual IModulator* GetModulator() { return nullptr; }
+   virtual bool ShouldDisplayAsInactive() const { return false; }
    void SetControlVisualizer(IControlVisualizer* visualizer) { mControlVisualizer = visualizer; }
    IControlVisualizer* GetControlVisualizer() const { return mControlVisualizer; }
 
    static void SetNewManualHoverViaTab(int direction);
    static void SetNewManualHoverViaArrow(ofVec2f direction);
    static bool WasLastHoverSetManually() { return sLastUIHoverWasSetManually; }
+   static bool IsInactiveValue(std::string valueLabel);
 
    static void DestroyCablesTargetingControls(std::vector<IUIControl*> controls);
 
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;
+
+   static ofColor sCurrentOverrideColor;
+   static bool sUseOverrideColor;
 
 protected:
    ~IUIControl() override;
