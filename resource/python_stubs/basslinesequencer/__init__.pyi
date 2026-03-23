@@ -1,0 +1,13 @@
+from __future__ import annotations
+
+def get(path) -> basslinesequencer:
+   pass
+
+class basslinesequencer:
+   Off: ...
+   Ghost: ...
+   Normal: ...
+   Accent: ...
+   def set_step(this, step, tone, velocity, tie):
+      pass
+
