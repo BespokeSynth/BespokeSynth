@@ -44,6 +44,7 @@
 #include "BassLineSequencer.h"
 #include "ControlInterface.h"
 #include "Beats.h"
+#include "AbletonDeviceShared.h"
 
 #include "leathers/push"
 #include "leathers/unused-value"
@@ -175,10 +176,14 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
       }
       return paths;
    });
+   ///example: bespoke.set_background_text('"' + '"\n"'.join(bespoke.get_controls("transport")) + '"', 14, 0, 50, 1, 1, 1)
    m.def("location_recall", [](char location)
    {
       TheSynth->GetLocationZoomer()->MoveToLocation(location);
    });
+   ///move to saved location (0-255). "1" - "9" match the minimap and function key shortcuts: SHIFT+"1" - "9"
+   ///example: bespoke.location_recall("1")
+   ///example: bespoke.location_recall(49)
    m.def("location_store", [](char location)
    {
       TheSynth->GetLocationZoomer()->WriteCurrentLocation(location);
@@ -217,25 +222,6 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       {
          module.PlayNoteFromScript(pitch, velocity, pan, output_index);
       }, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
-      .def("set", [](ScriptModule& module, std::string path, float value)
-      {
-         IUIControl* control = module.GetUIControl(path);
-         if (control != nullptr)
-            module.ScheduleUIControlValue(control, value, 0);
-      })
-      .def("set_text", [](ScriptModule& module, std::string path, std::string value)
-      {
-         auto control = dynamic_cast<TextEntry*>(module.GetUIControl(path));
-         if (control != nullptr)
-            control->SetText(value);
-      })
-      ///example: me.set("oscillator~pw", .2)
-      .def("schedule_set", [](ScriptModule& module, float delay, std::string path, float value)
-      {
-         IUIControl* control = module.GetUIControl(path);
-         if (control != nullptr)
-            module.ScheduleUIControlValue(control, value, delay);
-      })
       .def("get", [](ScriptModule& module, std::string path)
       {
          IUIControl* control = module.GetUIControl(path);
@@ -243,6 +229,14 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
             return control->GetValue();
          return 0.0f;
       })
+      ///example: pulsewidth = me.get("oscillator~pulsewidth")
+      .def("set", [](ScriptModule& module, std::string path, float value)
+      {
+         IUIControl* control = module.GetUIControl(path);
+         if (control != nullptr)
+            module.ScheduleUIControlValue(control, value, 0);
+      })
+      ///example: me.set("oscillator~pw", .2)
       .def("get_text", [](ScriptModule& module, std::string path) -> std::string
       {
          auto control = dynamic_cast<TextEntry*>(module.GetUIControl(path));
@@ -250,7 +244,20 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
             return control->GetText();
          return "";
       })
-      ///example: pulsewidth = me.get("oscillator~pulsewidth")
+      ///example: comment = me.get_text("comment~comment")
+      .def("set_text", [](ScriptModule& module, std::string path, std::string text)
+      {
+         auto control = dynamic_cast<TextEntry*>(module.GetUIControl(path));
+         if (control != nullptr)
+            control->SetText(text);
+      })
+      ///example: me.set_text("comment~comment", "hello!")
+      .def("schedule_set", [](ScriptModule& module, float delay, std::string path, float value)
+      {
+         IUIControl* control = module.GetUIControl(path);
+         if (control != nullptr)
+            module.ScheduleUIControlValue(control, value, delay);
+      })
       .def("get_path_prefix", [](ScriptModule& module)
       {
          std::string path = module.Path();
@@ -263,6 +270,8 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
             return std::string("");
          }
       })
+      ///returns prefix if script is run in prefab (example: prefab~), or return empty string if run on main screen
+      ///example: active = me.get(me.get_path_prefix() + 'notesequencer~enabled')
       .def("adjust", [](ScriptModule& module, std::string path, float amount)
       {
          IUIControl* control = module.GetUIControl(path);
@@ -736,19 +745,19 @@ PYBIND11_EMBEDDED_MODULE(vstplugin, m)
       return ret;
    }, py::return_value_policy::reference);
    py::class_<VSTPlugin, IDrawableModule> vstpluginClass(m, "vstplugin");
-   vstpluginClass
-      .def("send_cc", [](VSTPlugin& vstplugin, int ctl, int value, int channel)
-   {
-      vstplugin.SendMidi(juce::MidiMessage::controllerEvent(std::clamp(channel, 1, 16), ctl, value));
-   })
-      .def("send_program_change", [](VSTPlugin& vstplugin, int program, int channel)
-   {
-      vstplugin.SendMidi(juce::MidiMessage::programChange(std::clamp(channel, 1, 16), program));
-   })
-      .def("send_data", [](VSTPlugin& vstplugin, int a, int b, int c)
-   {
-      vstplugin.SendMidi(juce::MidiMessage(a, b, c));
-   });
+      vstpluginClass
+         .def("send_cc", [](VSTPlugin& vstplugin, int ctl, int value, int channel)
+      {
+         vstplugin.SendMidi(juce::MidiMessage::controllerEvent(std::clamp(channel, 1, 16), ctl, value));
+      })
+         .def("send_program_change", [](VSTPlugin& vstplugin, int program, int channel)
+      {
+         vstplugin.SendMidi(juce::MidiMessage::programChange(std::clamp(channel, 1, 16), program));
+      })
+         .def("send_data", [](VSTPlugin& vstplugin, int a, int b, int c)
+      {
+         vstplugin.SendMidi(juce::MidiMessage(a, b, c));
+      });
 }
 
 PYBIND11_EMBEDDED_MODULE(snapshots, m)
@@ -804,18 +813,18 @@ PYBIND11_EMBEDDED_MODULE(interface, m)
       return ret;
    }, py::return_value_policy::reference);
    py::class_<ControlInterface, IDrawableModule>(m, "interface")
-   .def("add_float_slider", [](ControlInterface& interface, std::string name, float defaultValue, float min, float max)
-   {
-      interface.AddFloatSlider(name, defaultValue, min, max);
-   })
-   .def("add_int_slider", [](ControlInterface& interface, std::string name, int defaultValue, int min, int max)
-   {
-      interface.AddIntSlider(name, defaultValue, min, max);
-   })
-   .def("clear_controls", [](ControlInterface& interface)
-   {
-      interface.ClearAllControls();
-   });
+      .def("add_float_slider", [](ControlInterface& interface, std::string name, float defaultValue, float min, float max)
+      {
+         interface.AddFloatSlider(name, defaultValue, min, max);
+      })
+      .def("add_int_slider", [](ControlInterface& interface, std::string name, int defaultValue, int min, int max)
+      {
+         interface.AddIntSlider(name, defaultValue, min, max);
+      })
+      .def("clear_controls", [](ControlInterface& interface)
+      {
+         interface.ClearAllControls();
+      });
 }
 
 PYBIND11_EMBEDDED_MODULE(beats, m)
@@ -829,16 +838,37 @@ PYBIND11_EMBEDDED_MODULE(beats, m)
       return ret;
    }, py::return_value_policy::reference);
    py::class_<Beats, IDrawableModule>(m, "beats")
-   .def("add_sample", [](Beats& beats, std::string sample)
+      .def("add_sample", [](Beats& beats, std::string sample)
+      {
+         std::vector<std::string> files;
+         files.push_back(sample);
+         beats.FilesDropped(files, 0, 0);
+      })
+      .def("clear", [](Beats& beats)
+      {
+         beats.ClearSamples();
+      });
+}
+
+PYBIND11_EMBEDDED_MODULE(abletongriddevice, m)
+{
+   m.def("get_current", []()
    {
-      std::vector<std::string> files;
-      files.push_back(sample);
-      beats.FilesDropped(files, 0, 0);
-   })
-   .def("clear", [](Beats& beats)
-   {
-      beats.ClearSamples();
-   });
+      return ScriptModule::sCurrentAbletonGridDevice;
+   }, py::return_value_policy::reference);
+   py::class_<IAbletonGridDevice>(m, "abletongriddevice")
+      .def("set_led", [](IAbletonGridDevice& grid, int index, int color, int flashColor = -1)
+      {
+         grid.SetLed(index, color, flashColor);
+      }, "index"_a, "color"_a, "flashColor"_a = -1)
+      .def("get_button_state", [](IAbletonGridDevice& grid, int buttonIndex)
+      {
+         return grid.GetButtonState(buttonIndex);
+      })
+      .def("display_screen_message", [](IAbletonGridDevice& grid, std::string message, float durationMs = 500)
+      {
+         grid.DisplayScreenMessage(message, durationMs);
+      }, "message"_a, "durationMs"_a = 500);
 }
 
 PYBIND11_EMBEDDED_MODULE(module, m)
@@ -988,5 +1018,7 @@ PYBIND11_EMBEDDED_MODULE(module, m)
          TheTitleBar->GetDimensions(w, h);
          TheSynth->SetDrawOffset(ofVec2f(-module_rect.x + ofGetWidth() / gDrawScale / 2 - module_rect.width / 2, -module_rect.y + ofGetHeight() / gDrawScale / 2 - (module_rect.height - h / 2) / 2));
       });
+      ///description: zoom = 0: zoom module to full screen, zoom = 0.1 - 8: zoom to specified zoomlevel
+      ///example: ns = me.get("notesequencer"); ns.set_focus(2)
 }
 

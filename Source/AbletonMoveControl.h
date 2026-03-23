@@ -35,6 +35,7 @@
 #include "AbletonMoveLCD.h"
 #include "AbletonDeviceShared.h"
 #include "pybind11/attr.h"
+#include "LockFreeQueue.h"
 
 class IUIControl;
 class Snapshots;
@@ -132,6 +133,11 @@ private:
    void ZoomToTrack(TrackOrganizer* track);
    void OnTrackRowExited(int newRow, int oldRow);
    void ShowSoundSelector();
+
+   void OnMidiNote_Consume(MidiNote& note);
+   void OnMidiControl_Consume(MidiControl& control);
+   void OnMidiPitchBend_Consume(MidiPitchBend& pitchBend);
+   void OnMidiPressure_Consume(MidiPressure& pressure);
 
    const int kTrackRowGlobal = -1;
    const int kTrackRowMixer = -2;
@@ -234,4 +240,9 @@ private:
    MidiDevice mDevice;
 
    std::string mPushBridgeInitErrMsg;
+
+   LockFreeQueue<MidiNote> mQueuedNoteMessages{};
+   LockFreeQueue<MidiControl> mQueuedControlMessages{};
+   LockFreeQueue<MidiPitchBend> mQueuedPitchBendMessages{};
+   LockFreeQueue<MidiPressure> mQueuedPressureMessages{};
 };

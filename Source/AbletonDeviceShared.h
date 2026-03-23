@@ -472,6 +472,7 @@ namespace AbletonDevice
 class IAbletonGridDevice
 {
 public:
+   virtual ~IAbletonGridDevice() {}
    virtual void SetLed(int index, int color, int flashColor = -1) = 0;
    virtual bool GetButtonState(int index) const = 0;
    virtual int GetGridControllerOption1Control() const = 0;

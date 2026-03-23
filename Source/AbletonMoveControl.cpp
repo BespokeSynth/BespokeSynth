@@ -1188,6 +1188,22 @@ void AbletonMoveControl::RenderPush2Display()
 
 void AbletonMoveControl::Poll()
 {
+   MidiNote noteMessage;
+   while (mQueuedNoteMessages.consume(noteMessage))
+      OnMidiNote_Consume(noteMessage);
+
+   MidiControl controlMessage;
+   while (mQueuedControlMessages.consume(controlMessage))
+      OnMidiControl_Consume(controlMessage);
+
+   MidiPitchBend pitchBend;
+   while (mQueuedPitchBendMessages.consume(pitchBend))
+      OnMidiPitchBend_Consume(pitchBend);
+
+   MidiPressure pressureMessage;
+   while (mQueuedPressureMessages.consume(pressureMessage))
+      OnMidiPressure_Consume(pressureMessage);
+
    bool controlsChanged = false;
    if (mDisplayModule != nullptr && mDisplayModule->HasPush2OverrideControls())
    {
@@ -1422,6 +1438,11 @@ void AbletonMoveControl::SetGridControlInterface(IAbletonGridController* control
 }
 
 void AbletonMoveControl::OnMidiNote(MidiNote& note)
+{
+   mQueuedNoteMessages.produce(note);
+}
+
+void AbletonMoveControl::OnMidiNote_Consume(MidiNote& note)
 {
    //ofLog() << "AbletonMoveControl::OnMidiNote() " << note.mPitch << " " << note.mVelocity;
 
@@ -1665,6 +1686,11 @@ void AbletonMoveControl::OnMidiNote(MidiNote& note)
 }
 
 void AbletonMoveControl::OnMidiControl(MidiControl& control)
+{
+   mQueuedControlMessages.produce(control);
+}
+
+void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
 {
    //ofLog() << "AbletonMoveControl::OnMidiControl() " << control.mControl << " " << control.mValue;
    control.mControl += 128;
@@ -2243,6 +2269,11 @@ void AbletonMoveControl::OnMidiControl(MidiControl& control)
 
 void AbletonMoveControl::OnMidiPitchBend(MidiPitchBend& pitchBend)
 {
+   mQueuedPitchBendMessages.produce(pitchBend);
+}
+
+void AbletonMoveControl::OnMidiPitchBend_Consume(MidiPitchBend& pitchBend)
+{
    if (mGridControlInterface != nullptr)
    {
       bool handled = mGridControlInterface->OnAbletonGridControl(this, kPitchBendIndex, pitchBend.mValue);
@@ -2258,6 +2289,11 @@ void AbletonMoveControl::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
 void AbletonMoveControl::OnMidiPressure(MidiPressure& pressure)
 {
+   mQueuedPressureMessages.produce(pressure);
+}
+
+void AbletonMoveControl::OnMidiPressure_Consume(MidiPressure& pressure)
+{
    if (mGridControlInterface != nullptr)
    {
       bool handled = mGridControlInterface->OnAbletonGridControl(this, kChannelPressureIndex + pressure.mChannel, pressure.mPressure);
@@ -2265,7 +2301,6 @@ void AbletonMoveControl::OnMidiPressure(MidiPressure& pressure)
          return;
    }
 }
-
 
 void AbletonMoveControl::ZoomToTrack(TrackOrganizer* track)
 {

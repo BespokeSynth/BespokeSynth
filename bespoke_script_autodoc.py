@@ -33,6 +33,9 @@ docLine("   on_note(pitch, velocity): called by note input")
 docLine("   on_grid_button(col, row, velocity): called by grid input")
 docLine("   on_osc(message): called by external osc source, after registering with me.connect_osc_input(port)")
 docLine("   on_midi(messageType, control, value, channel): called by midicontroller, after registering with add_script_listener(me.me())")
+docLine("   on_sysex(data): called by midicontroller when send_sysex option is set, after registering with add_script_listener(me.me())")
+docLine("   on_ableton_grid_control(grid, controlIndex, value): called when a control is adjusted when targeted as a current ableton grid controller")
+docLine("   update_ableton_grid_leds(grid): called every frame when targeted as a current ableton grid controller, for updating LEDs")
 
 currentModule = ""
 inStaticMethods = True

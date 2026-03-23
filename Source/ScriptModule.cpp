@@ -82,6 +82,8 @@ false;
 #endif
 //static
 bool ScriptModule::sHasLoadedUntrustedScript = false;
+//static
+IAbletonGridDevice* ScriptModule::sCurrentAbletonGridDevice = nullptr;
 
 //static
 ofxJSONElement ScriptModule::sStyleJSON;
@@ -917,6 +919,26 @@ void ScriptModule::oscMessageReceived(const OSCMessage& msg)
    RunCode(gTime, "on_osc(\"" + messageString + "\")");
 }
 
+bool ScriptModule::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
+{
+   if (controlIndex >= AbletonDevice::kChannelPressureIndex && controlIndex < AbletonDevice::kChannelPressureIndex + AbletonDevice::kNumChannelPressureIndices)
+      return false; //don't spam with pressure messages
+
+   sCurrentAbletonGridDevice = abletonGrid;
+   RunCode(gTime, "on_ableton_grid_control(abletongriddevice.get_current(), " + ofToString(controlIndex) + ", " + ofToString(midiValue) + ")", K(hasReturnValue));
+
+   if (mLastError == "")
+      return mLastReturnValueBool;
+   else
+      return false;
+}
+
+void ScriptModule::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
+{
+   sCurrentAbletonGridDevice = abletonGrid;
+   RunCode(gTime, "update_ableton_grid_leds(abletongriddevice.get_current())");
+}
+
 void ScriptModule::SysExReceived(const uint8_t* data, int data_size)
 {
    // Avoid code injection by preventing the sysex payload to be interpreted as Python
@@ -1224,7 +1246,7 @@ std::pair<int, int> ScriptModule::RunScript(double time, int lineStart /*=-1*/, 
    return std::make_pair(executionStartLine, executionEndLine);
 }
 
-void ScriptModule::RunCode(double time, std::string code)
+void ScriptModule::RunCode(double time, std::string code, bool hasReturnValue /*= false*/)
 {
    //should only be called from main thread
 
@@ -1248,7 +1270,23 @@ void ScriptModule::RunCode(double time, std::string code)
    try
    {
       FixUpCode(code);
-      py::exec(code, py::globals());
+
+      if (hasReturnValue)
+      {
+         py::object ret = py::eval(code, py::globals());
+
+         py::type returnType = py::type::of(ret);
+         if (py::isinstance<py::bool_>(ret))
+            mLastReturnValueBool = ret.cast<bool>();
+         else if (py::isinstance<py::int_>(ret))
+            mLastReturnValueInt = ret.cast<int>();
+         else if (py::isinstance<py::float_>(ret))
+            mLastReturnValueFloat = ret.cast<float>();
+      }
+      else
+      {
+         py::exec(code, py::globals());
+      }
 
       mCodeEntry->SetError(false);
       mLastError = "";

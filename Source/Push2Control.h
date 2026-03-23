@@ -33,6 +33,7 @@
 #include "TitleBar.h"
 #include "DropdownList.h"
 #include "AbletonDeviceShared.h"
+#include "LockFreeQueue.h"
 
 class NVGcontext;
 class NVGLUframebuffer;
@@ -70,6 +71,7 @@ public:
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
+   void OnMidiPressure(MidiPressure& pressure) override;
 
    MidiDevice* GetDevice() override { return &mDevice; }
 
@@ -135,6 +137,11 @@ private:
    bool AllowRepatch() const;
    void UpdateRoutingModules();
    void SetGridControlInterface(IAbletonGridController* controller, IDrawableModule* module);
+
+   void OnMidiNote_Consume(MidiNote& note);
+   void OnMidiControl_Consume(MidiControl& control);
+   void OnMidiPitchBend_Consume(MidiPitchBend& pitchBend);
+   void OnMidiPressure_Consume(MidiPressure& pressure);
 
    unsigned char* mPixels{ nullptr };
    const int kPixelRatio = 1;
@@ -226,4 +233,9 @@ private:
    int mPendingSpawnPitch{ -1 };
    int mSelectedGridSpawnListIndex{ -1 };
    std::string mPushBridgeInitErrMsg;
+
+   LockFreeQueue<MidiNote> mQueuedNoteMessages{};
+   LockFreeQueue<MidiControl> mQueuedControlMessages{};
+   LockFreeQueue<MidiPitchBend> mQueuedPitchBendMessages{};
+   LockFreeQueue<MidiPressure> mQueuedPressureMessages{};
 };

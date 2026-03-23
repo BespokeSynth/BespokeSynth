@@ -397,8 +397,6 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    }
    mModules = SortModules(mModules);
 
-   SetModuleGridLights();
-
    mModuleViewOffsetSmoothed = ofLerp(mModuleViewOffsetSmoothed, mModuleViewOffset, .3f);
    mModuleListOffsetSmoothed = ofLerp(mModuleListOffsetSmoothed, round(mModuleListOffset), .3f);
 
@@ -1061,6 +1059,24 @@ void Push2Control::RenderPush2Display()
 
 void Push2Control::Poll()
 {
+   MidiNote noteMessage;
+   while (mQueuedNoteMessages.consume(noteMessage))
+      OnMidiNote_Consume(noteMessage);
+
+   MidiControl controlMessage;
+   while (mQueuedControlMessages.consume(controlMessage))
+      OnMidiControl_Consume(controlMessage);
+
+   MidiPitchBend pitchBend;
+   while (mQueuedPitchBendMessages.consume(pitchBend))
+      OnMidiPitchBend_Consume(pitchBend);
+
+   MidiPressure pressureMessage;
+   while (mQueuedPressureMessages.consume(pressureMessage))
+      OnMidiPressure_Consume(pressureMessage);
+
+   SetModuleGridLights();
+
    if (mPendingSpawnPitch != -1)
    {
       int padNum = mPendingSpawnPitch - 36;
@@ -1303,6 +1319,11 @@ void Push2Control::SetGridControlInterface(IAbletonGridController* controller, I
 
 void Push2Control::OnMidiNote(MidiNote& note)
 {
+   mQueuedNoteMessages.produce(note);
+}
+
+void Push2Control::OnMidiNote_Consume(MidiNote& note)
+{
    mButtonState[note.mPitch] = note.mVelocity > 0;
 
    if (mGridControlInterface != nullptr)
@@ -1504,6 +1525,11 @@ void Push2Control::OnMidiNote(MidiNote& note)
 }
 
 void Push2Control::OnMidiControl(MidiControl& control)
+{
+   mQueuedControlMessages.produce(control);
+}
+
+void Push2Control::OnMidiControl_Consume(MidiControl& control)
 {
    control.mControl += 128;
 
@@ -2011,6 +2037,11 @@ void Push2Control::OnMidiControl(MidiControl& control)
 
 void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
 {
+   mQueuedPitchBendMessages.produce(pitchBend);
+}
+
+void Push2Control::OnMidiPitchBend_Consume(MidiPitchBend& pitchBend)
+{
    if (mGridControlInterface != nullptr)
    {
       bool handled = mGridControlInterface->OnAbletonGridControl(this, kPitchBendIndex, pitchBend.mValue);
@@ -2022,6 +2053,21 @@ void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
    TheSynth->SetZoomLevel(pow(2, value * 2 - 1) + .1f);
 
    //ofLog() << "pitchbend " << pitchBend.mChannel << " " << pitchBend.mValue;
+}
+
+void Push2Control::OnMidiPressure(MidiPressure& pressure)
+{
+   mQueuedPressureMessages.produce(pressure);
+}
+
+void Push2Control::OnMidiPressure_Consume(MidiPressure& pressure)
+{
+   if (mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl(this, kChannelPressureIndex + pressure.mChannel, pressure.mPressure);
+      if (handled)
+         return;
+   }
 }
 
 int Push2Control::GetGridControllerOption1Control() const

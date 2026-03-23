@@ -11,6 +11,8 @@ script module inputs:
    on_osc(message): called by external osc source, after registering with me.connect_osc_input(port)
    on_midi(messageType, control, value, channel): called by midicontroller, after registering with add_script_listener(me.me())
    on_sysex(data): called by midicontroller when send_sysex option is set, after registering with add_script_listener(me.me())
+   on_ableton_grid_control(grid, controlIndex, value): called when a control is adjusted when targeted as a current ableton grid controller
+   update_ableton_grid_leds(grid): called every frame when targeted as a current ableton grid controller, for updating LEDs
 
 
 globals:
@@ -36,7 +38,8 @@ globals:
    bespoke.get_modules()
    bespoke.get_controls(path)
       example: bespoke.set_background_text('"' + '"\n"'.join(bespoke.get_controls("transport")) + '"', 14, 0, 50, 1, 1, 1)
-   bespoke.location_recall(location): move to saved location (0-255). "1" - "9" match the minimap and function key shortcuts: SHIFT+"1" - "9"
+   bespoke.location_recall(location)
+      move to saved location (0-255). "1" - "9" match the minimap and function key shortcuts: SHIFT+"1" - "9"
       example: bespoke.location_recall("1")
       example: bespoke.location_recall(49)
    bespoke.location_store(location)
@@ -62,9 +65,10 @@ script-relative:
    me.get_text(path)
       example: comment = me.get_text("comment~comment")
    me.set_text(path, text)
-      example: me.set_text("comment~comment", "BespokeSynth is Awesome!")
+      example: me.set_text("comment~comment", "hello!")
    me.schedule_set(delay, path, value)
-   me.get_path_prefix(): returns prefix if script is run in prefab (example: prefab~), or return empty string if run on main screen
+   me.get_path_prefix()
+      returns prefix if script is run in prefab (example: prefab~), or return empty string if run on main screen
       example: active = me.get(me.get_path_prefix() + 'notesequencer~enabled')
    me.adjust(path, amount)
    me.highlight_line(lineNum, scriptModuleIndex)
@@ -96,6 +100,13 @@ import drumsequencer
    instance:
       d.set(step, pitch, velocity)
       d.get(step, pitch)
+
+
+import basslinesequencer
+   static:
+      basslinesequencer.get(path)
+   instance:
+      b.set_step(step, tone, velocity, tie)
 
 
 import grid
@@ -219,8 +230,36 @@ import snapshots
       s.has_snapshot(index)
       s.set_snapshot(index)
       s.store_snapshot(index, label)
-         optional: label
+         optional: label = ""
       s.delete_snapshot(index)
+
+
+import interface
+   static:
+      interface.get(path)
+   instance:
+      i.add_float_slider(name, defaultValue, min, max)
+      i.add_int_slider(name, defaultValue, min, max)
+      i.clear_controls()
+
+
+import beats
+   static:
+      beats.get(path)
+   instance:
+      b.add_sample(sample)
+      b.clear()
+
+
+import abletongriddevice
+   static:
+      abletongriddevice.get_current()
+   instance:
+      a.set_led(index, color, flashColor -1)
+         optional: flashColor = -1
+      a.get_button_state(buttonIndex)
+      a.display_screen_message(message, durationMs 500)
+         optional: durationMs = 500
 
 
 import module
@@ -239,6 +278,7 @@ import module
       m.get_target()
       m.get_targets()
       m.set_name(name)
+      m.get_name()
       m.delete()
       m.set(path, value)
       m.get(path)
