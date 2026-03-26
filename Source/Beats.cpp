@@ -199,7 +199,7 @@ void Beats::GetModuleDimensions(float& width, float& height)
    width = BEAT_COLUMN_WIDTH * (int)mBeatColumns.size();
    height = 0;
    for (size_t i = 0; i < mBeatColumns.size(); ++i)
-      height = MAX(height, 143 + 15 * (mBeatColumns[i]->GetNumSamples() + 1));
+      height = MAX(height, 177 + 15 * (mBeatColumns[i]->GetNumSamples() + 1));
 }
 
 void Beats::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
@@ -278,10 +278,11 @@ bool Beats::LoadOldControl(FileStreamIn& in, std::string& oldName)
    return false;
 }
 
-void BeatData::RecalcPos(double time)
+void BeatData::RecalcPos(double time, int offsetSamples)
 {
    float measurePos = TheTransport->GetMeasure(time) % mNumBars + TheTransport->GetMeasurePos(time);
    float pos = ofMap(measurePos / mNumBars, 0, 1, 0, mSample->LengthInSamples(), true);
+   pos = FloatWrap(pos + offsetSamples, mSample->LengthInSamples());
    mSample->SetPlayPosition(pos);
 }
 
@@ -293,6 +294,9 @@ BeatColumn::BeatColumn(Beats* owner, int index)
       mLowpass[i].SetFilterType(kFilterType_Lowpass);
    for (size_t i = 0; i < mHighpass.size(); ++i)
       mHighpass[i].SetFilterType(kFilterType_Highpass);
+
+   for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
+      mPitchShifter[i] = new PitchShifter(1024);
 }
 
 BeatColumn::~BeatColumn()
@@ -301,6 +305,9 @@ BeatColumn::~BeatColumn()
    mVolumeSlider->Delete();
    for (size_t i = 0; i < mSamples.size(); ++i)
       delete mSamples[i].mSample;
+
+   for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
+      delete mPitchShifter[i];
 }
 
 void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
@@ -310,8 +317,17 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
       float volSq = mVolume * mVolume * .25f * mSamples[mSampleIndex].mVolume;
       Sample* beat = mSamples[mSampleIndex].mSample;
 
+      float pitchShift = mPitchShift * mSamples[mSampleIndex].mPitchShift;
+      int latencyOffsetSamples = 0;
+      if (pitchShift != 1)
+      {
+         for (int ch = 0; ch < ChannelBuffer::kMaxNumChannels; ++ch)
+            mPitchShifter[ch]->SetRatio(pitchShift);
+         latencyOffsetSamples = mPitchShifter[0]->GetLatencyInSamples();
+      }
+
       float speed = (beat->LengthInSamples() / beat->GetSampleRateRatio()) * gInvSampleRateMs / TheTransport->MsPerBar() / mSamples[mSampleIndex].mNumBars;
-      mSamples[mSampleIndex].RecalcPos(time);
+      mSamples[mSampleIndex].RecalcPos(time, latencyOffsetSamples);
       beat->SetRate(speed);
 
       int numChannels = 2;
@@ -324,6 +340,10 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
          {
             float panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
             double channelTime = time;
+
+            if (pitchShift != 1)
+               mPitchShifter[ch]->Process(gWorkChannelBuffer.GetChannel(ch), bufferSize);
+
             for (int i = 0; i < bufferSize; ++i)
             {
                float filter = mFilterRamp.Value(channelTime);
@@ -410,21 +430,26 @@ void BeatColumn::Draw(int x, int y)
    mFilterSlider->Draw();
    mPanSlider->SetPosition(x, y + 72);
    mPanSlider->Draw();
+   mPitchShiftSlider->SetPosition(x, y + 88);
+   mPitchShiftSlider->Draw();
    ofPushStyle();
    ofSetColor(ofColor::white, 10);
    ofFill();
-   ofRect(x, y + 93, BEAT_COLUMN_WIDTH - 6, 34);
+   ofRect(x, y + 110, BEAT_COLUMN_WIDTH - 6, 51);
    ofPopStyle();
-   mClipVolumeSlider->PositionTo(mPanSlider, kAnchor_Below_Padded);
+   mClipVolumeSlider->PositionTo(mPitchShiftSlider, kAnchor_Below_Padded);
    mClipVolumeSlider->SetShowing(mSampleIndex != -1);
    mClipVolumeSlider->Draw();
    mClipNumBarsSlider->PositionTo(mClipVolumeSlider, kAnchor_Below);
    mClipNumBarsSlider->SetShowing(mSampleIndex != -1);
    mClipNumBarsSlider->Draw();
-   mDeleteButton->PositionTo(mClipNumBarsSlider, kAnchor_Right_Padded);
+   mDeleteButton->PositionTo(mClipVolumeSlider, kAnchor_Right_Padded);
    mDeleteButton->SetShowing(mSampleIndex != -1);
    mDeleteButton->Draw();
-   mSelector->PositionTo(mClipNumBarsSlider, kAnchor_Below_Padded);
+   mClipPitchShiftSlider->PositionTo(mClipNumBarsSlider, kAnchor_Below);
+   mClipPitchShiftSlider->SetShowing(mSampleIndex != -1);
+   mClipPitchShiftSlider->Draw();
+   mSelector->PositionTo(mClipPitchShiftSlider, kAnchor_Below_Padded);
    mSelector->Draw();
 }
 
@@ -438,10 +463,12 @@ void BeatColumn::CreateUIControls()
    mVolumeSlider = new FloatSlider(mOwner, ("volume" + suffix).c_str(), 0, 0, controlWidth, 15, &mVolume, 0, 1.5f, 2);
    mFilterSlider = new FloatSlider(mOwner, ("filter" + suffix).c_str(), 0, 0, controlWidth, 15, &mFilter, -1, 1, 2);
    mPanSlider = new FloatSlider(mOwner, ("pan" + suffix).c_str(), 0, 0, controlWidth, 15, &mPan, -1, 1, 2);
+   mPitchShiftSlider = new FloatSlider(mOwner, ("pitch shift" + suffix).c_str(), 0, 0, controlWidth, 15, &mPitchShift, 0, 2, 2);
    mSelector = new RadioButton(mOwner, ("selector" + suffix).c_str(), 0, 0, &mSampleIndex);
    mDeleteButton = new ClickButton(mOwner, ("delete" + suffix).c_str(), 0, 0);
    mClipVolumeSlider = new FloatSlider(mOwner, ("clip volume" + suffix).c_str(), 0, 0, controlWidth, 15, &mDummyClipVolume, 0, 2, 2);
    mClipNumBarsSlider = new IntSlider(mOwner, ("clip bars" + suffix).c_str(), 0, 0, 95, 15, &mDummyClipNumBars, 1, 8);
+   mClipPitchShiftSlider = new FloatSlider(mOwner, ("clip pitch" + suffix).c_str(), 0, 0, controlWidth, 15, &mDummyClipPitchShift, 0, 2, 2);
 
    mSelector->SetForcedWidth(controlWidth);
 
@@ -477,11 +504,13 @@ void BeatColumn::UpdateClipSliders()
    {
       mClipVolumeSlider->SetVar(&mSamples[mSampleIndex].mVolume);
       mClipNumBarsSlider->SetVar(&mSamples[mSampleIndex].mNumBars);
+      mClipPitchShiftSlider->SetVar(&mSamples[mSampleIndex].mPitchShift);
    }
    else
    {
       mClipVolumeSlider->SetVar(&mDummyClipVolume);
       mClipNumBarsSlider->SetVar(&mDummyClipNumBars);
+      mClipPitchShiftSlider->SetVar(&mDummyClipPitchShift);
    }
 }
 

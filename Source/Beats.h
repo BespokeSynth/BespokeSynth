@@ -39,6 +39,7 @@
 #include "Ramp.h"
 #include "ChannelBuffer.h"
 #include "INoteReceiver.h"
+#include "PitchShifter.h"
 
 class Beats;
 
@@ -47,11 +48,12 @@ class Beats;
 struct BeatData
 {
    void LoadBeat(Sample* sample);
-   void RecalcPos(double time);
+   void RecalcPos(double time, int offsetSamples);
 
    Sample* mSample{ nullptr };
    float mVolume{ 1.0f };
    int mNumBars{ 1 };
+   float mPitchShift{ 1.0f };
 };
 
 class BeatColumn
@@ -85,6 +87,8 @@ private:
    FloatSlider* mFilterSlider{ nullptr };
    std::array<BiquadFilter, 2> mLowpass;
    std::array<BiquadFilter, 2> mHighpass;
+   float mPitchShift{ 1 };
+   FloatSlider* mPitchShiftSlider{ nullptr };
    Beats* mOwner{ nullptr };
    Ramp mFilterRamp;
    std::vector<BeatData> mSamples;
@@ -93,8 +97,12 @@ private:
    ClickButton* mDeleteButton{ nullptr };
    FloatSlider* mClipVolumeSlider{ nullptr };
    IntSlider* mClipNumBarsSlider{ nullptr };
+   FloatSlider* mClipPitchShiftSlider{ nullptr };
    float mDummyClipVolume{ 0 };
    int mDummyClipNumBars{ 1 };
+   float mDummyClipPitchShift{ 1 };
+
+   PitchShifter* mPitchShifter[ChannelBuffer::kMaxNumChannels];
 };
 
 class Beats : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITimeListener, public IButtonListener, public IRadioButtonListener, public INoteReceiver
