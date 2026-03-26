@@ -98,7 +98,8 @@ void WelcomeScreen::CreateUIControls()
       recentFile.mFile = File(workspaceData["recent_files"][i]["file"].asString());
       recentFile.mTime = Time::fromISO8601(workspaceData["recent_files"][i]["time"].asString());
       recentFile.mRecentlyOpened = !workspaceData["recent_files"][i]["saved"].asBool();
-      mRecentFiles.insert(mRecentFiles.begin(), recentFile);
+      if (recentFile.mFile.existsAsFile())
+         mRecentFiles.insert(mRecentFiles.begin(), recentFile);
    }
 
    if (mRecentFiles.size() < kMaxDesiredFiles)
