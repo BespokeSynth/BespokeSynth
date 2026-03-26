@@ -393,7 +393,17 @@ void DropdownList::OnClicked(float x, float y, bool right)
    mTotalColumns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
    int maxDisplayColumns = std::max(1, int((ofGetWidth() / GetModuleParent()->GetOwningContainer()->GetDrawScale()) / mMaxItemWidth));
    mDisplayColumns = std::min(mTotalColumns, maxDisplayColumns);
-   mCurrentPagedColumn = 0;
+
+   int selectedIndex = FindItemIndex(*mVar);
+   if (selectedIndex >= 0 && selectedIndex < (int)mElements.size() && mMaxPerColumn > 0)
+   {
+      int column = selectedIndex / mMaxPerColumn;
+      mCurrentPagedColumn = (column / mDisplayColumns) * mDisplayColumns;
+   }
+   else
+   {
+      mCurrentPagedColumn = 0;
+   }
 
    bool paged = (mDisplayColumns < mTotalColumns);
 
