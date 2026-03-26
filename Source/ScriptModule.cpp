@@ -903,6 +903,9 @@ void ScriptModule::ConnectOscInput(int port)
 
 void ScriptModule::oscMessageReceived(const OSCMessage& msg)
 {
+   if (mLastError != "")
+      return;
+
    std::string address = msg.getAddressPattern().toString().toStdString();
    std::string messageString = address;
 
@@ -921,6 +924,9 @@ void ScriptModule::oscMessageReceived(const OSCMessage& msg)
 
 bool ScriptModule::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
+   if (mLastError != "")
+      return false;
+
    if (controlIndex >= AbletonDevice::kChannelPressureIndex && controlIndex < AbletonDevice::kChannelPressureIndex + AbletonDevice::kNumChannelPressureIndices)
       return false; //don't spam with pressure messages
 
@@ -935,12 +941,18 @@ bool ScriptModule::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int con
 
 void ScriptModule::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 {
+   if (mLastError != "")
+      return;
+
    sCurrentAbletonGridDevice = abletonGrid;
    RunCode(gTime, "update_ableton_grid_leds(abletongriddevice.get_current())");
 }
 
 void ScriptModule::SysExReceived(const uint8_t* data, int data_size)
 {
+   if (mLastError != "")
+      return;
+
    // Avoid code injection by preventing the sysex payload to be interpreted as Python
    // - convert the sysex payload to hex
    // - use bytes.fromhex in Python to parse it
@@ -954,6 +966,9 @@ void ScriptModule::SysExReceived(const uint8_t* data, int data_size)
 
 void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float value, int channel)
 {
+   if (mLastError != "")
+      return;
+
    mMidiMessageQueueMutex.lock();
    mMidiMessageQueue.push_back("on_midi(" + ofToString((int)messageType) + ", " + ofToString(control) + ", " + ofToString(value) + ", " + ofToString(channel) + ")");
    mMidiMessageQueueMutex.unlock();
@@ -1355,6 +1370,8 @@ void ScriptModule::FixUpCode(std::string& code)
    ofStringReplace(code, "on_osc(", "on_osc__" + prefix + "(");
    ofStringReplace(code, "on_midi(", "on_midi__" + prefix + "(");
    ofStringReplace(code, "on_sysex(", "on_sysex__" + prefix + "(");
+   ofStringReplace(code, "on_ableton_grid_control(", "on_ableton_grid_control__" + prefix + "(");
+   ofStringReplace(code, "update_ableton_grid_leds(", "update_ableton_grid_leds__" + prefix + "(");
    ofStringReplace(code, "this.", GetThisName() + ".");
    ofStringReplace(code, "me.", GetThisName() + ".");
 }
