@@ -23,3 +23,6 @@
 	path = libs/exprtk
 	url = https://github.com/ArashPartow/exprtk.git
 	branch = cmake
+[submodule "libs/fluidsynth"]
+	path = libs/fluidsynth
+	url = https://github.com/FluidSynth/fluidsynth
