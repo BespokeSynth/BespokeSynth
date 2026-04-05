@@ -80,8 +80,7 @@ public:
    //IAbletonGridController
    bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
-   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) override;
-   bool HasHighPriorityAbletonMoveScreenUpdate(IAbletonGridDevice* abletonGrid) override;
+   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass) override;
 
    //IInputRecordable
    void SetRecording(bool record) override;

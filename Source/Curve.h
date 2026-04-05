@@ -50,6 +50,7 @@ public:
    void AddPoint(CurvePoint point);
    void AddPointAtEnd(CurvePoint point); //only use this if you are sure that there are no points already added at an earlier time
    float Evaluate(float time, bool holdEndForLoop = false);
+   float EvaluateAtPercent(float percent, bool holdEndForLoop = false);
    void Render() override;
    void SetExtents(float start, float end)
    {
@@ -81,7 +82,7 @@ protected:
 
 private:
    bool IsAtCapacity() { return mNumCurvePoints >= (int)mPoints.size(); }
-   int FindIndexForTime(float time);
+   int FindIndexForTime(float time) const;
    std::array<CurvePoint, 5000> mPoints;
    int mNumCurvePoints{ 0 };
    float mWidth{ 200 };

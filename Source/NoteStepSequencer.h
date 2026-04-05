@@ -91,7 +91,7 @@ public:
    //IAbletonGridController
    bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
-   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) override;
+   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass) override;
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;

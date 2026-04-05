@@ -171,8 +171,7 @@ public:
    //IAbletonGridController
    bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
-   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) override;
-   bool HasHighPriorityAbletonMoveScreenUpdate(IAbletonGridDevice* abletonGrid) override { return true; }
+   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;

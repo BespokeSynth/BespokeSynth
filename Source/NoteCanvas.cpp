@@ -910,17 +910,20 @@ void NoteCanvas::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
    }
 }
 
-bool NoteCanvas::HasHighPriorityAbletonMoveScreenUpdate(IAbletonGridDevice* abletonGrid)
+bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass)
 {
-   if (!mCurrentEditElements.empty() && abletonGrid->GetButtonState(AbletonDevice::kClickyEncoderTouch))
-      return true;
-   if (abletonGrid->GetButtonState(AbletonDevice::kLoopButton))
-      return true;
-   return false;
-}
+   if (drawPass == LCDDrawPass::Overlay)
+      return false;
 
-bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd)
-{
+   bool hasHighPriorityDrawReason = false;
+   if (!mCurrentEditElements.empty() && abletonGrid->GetButtonState(AbletonDevice::kClickyEncoderTouch))
+      hasHighPriorityDrawReason = true;
+   if (abletonGrid->GetButtonState(AbletonDevice::kLoopButton))
+      hasHighPriorityDrawReason = true;
+
+   if (drawPass == LCDDrawPass::HighPriority && !hasHighPriorityDrawReason)
+      return false;
+
    if (!mCurrentEditElements.empty())
    {
       /*if (abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch))

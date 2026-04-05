@@ -37,6 +37,7 @@
 #include "IModulator.h"
 #include "IPulseReceiver.h"
 #include "TextEntry.h"
+#include "AbletonDeviceShared.h"
 
 struct LFOSettings
 {
@@ -88,6 +89,7 @@ public:
    bool InLowResMode() const { return mLFOSettings.mLowResMode; }
    bool HasSpecialDelete() const override { return true; }
    void DoSpecialDelete() override;
+   void DrawToAbletonMoveScreen(AbletonMoveLCD* screen);
    bool DrawToPush2Screen() override;
 
    //IModulator
@@ -129,6 +131,7 @@ private:
    float GetLFOValue(int samplesIn = 0, float forcePhase = -1);
    float GetTargetMin() const;
    float GetTargetMax() const;
+   void GetCurrentPhaseDrawPosition(float& xNormalized, float& yNormalized);
 
    LFOSettings mLFOSettings;
 

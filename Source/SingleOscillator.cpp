@@ -359,16 +359,16 @@ void SingleOscillator::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUICont
    }
    else
    {
-      float lastY = -1;
+      int lastY = -1;
       for (float x = 0; x < AbletonMoveLCD::kMoveDisplayWidth; ++x)
       {
          float phase = x / AbletonMoveLCD::kMoveDisplayWidth * FTWO_PI;
          phase += gTime * .005f;
          float value = GetDrawValue(phase);
-         float newY = ofMap(value, -1, 1, 10, AbletonMoveLCD::kMoveDisplayHeight - 10);
+         int newY = int(ofMap(value, -1, 1, 10, AbletonMoveLCD::kMoveDisplayHeight - 10));
          if (lastY == -1)
             lastY = newY;
-         if (lastY < newY)
+         if (lastY <= newY)
          {
             for (int y = lastY; y <= newY; ++y)
                screen->TogglePixel(x, y);
