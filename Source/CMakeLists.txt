@@ -257,6 +257,7 @@ target_sources(BespokeSynth PRIVATE
     IMidiVoice.h
     IModulator.cpp
     IModulator.h
+    IModuleDecorator.h
     INonstandardController.h
     INoteReceiver.cpp
     INoteReceiver.h
