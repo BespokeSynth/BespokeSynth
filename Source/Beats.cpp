@@ -443,7 +443,7 @@ void BeatColumn::Draw(int x, int y)
    mClipNumBarsSlider->PositionTo(mClipVolumeSlider, kAnchor_Below);
    mClipNumBarsSlider->SetShowing(mSampleIndex != -1);
    mClipNumBarsSlider->Draw();
-   mDeleteButton->PositionTo(mClipVolumeSlider, kAnchor_Right_Padded);
+   mDeleteButton->PositionTo(mClipNumBarsSlider, kAnchor_Right_Padded);
    mDeleteButton->SetShowing(mSampleIndex != -1);
    mDeleteButton->Draw();
    mClipPitchShiftSlider->PositionTo(mClipNumBarsSlider, kAnchor_Below);
