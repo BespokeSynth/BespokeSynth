@@ -133,6 +133,8 @@ private:
    void ZoomToTrack(TrackOrganizer* track);
    void OnTrackRowExited(int newRow, int oldRow);
    void ShowSoundSelector();
+   void StartControlRecorder(int controlIndex);
+   void DrawKnobDisplay(int controlIndex);
 
    void OnMidiNote_Consume(MidiNote& note);
    void OnMidiControl_Consume(MidiControl& control);
@@ -153,6 +155,7 @@ private:
 
    IDrawableModule* mDisplayModule{ nullptr };
    std::string mDisplayModuleContext{};
+   ControlRecorder* mCurrentControlRecorder{ nullptr };
    std::vector<IUIControl*> mControls;
    bool mDisplayModuleIsShowingOverrideControls{ false };
 

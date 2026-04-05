@@ -911,13 +911,16 @@ void NoteStepSequencer::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
       abletonGrid->SetLed(AbletonDevice::kMoveDeleteButton, 127);
 }
 
-bool NoteStepSequencer::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd)
+bool NoteStepSequencer::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass)
 {
-   /*if (abletonGrid->GetButtonState(kMidiMessage_Note, AbletonDevice::kVolumeEncoderTouch))
+   if (drawPass == LCDDrawPass::Normal)
    {
-      lcd->DrawText(("view offset: " + ofToString(mGridControlOffsetX)).c_str(), 5, 13, LCDFONT_STYLE_REGULAR);
-      return true;
-   }*/
+      /*if (abletonGrid->GetButtonState(kMidiMessage_Note, AbletonDevice::kVolumeEncoderTouch))
+      {
+         lcd->DrawText(("view offset: " + ofToString(mGridControlOffsetX)).c_str(), 5, 13, LCDFONT_STYLE_REGULAR);
+         return true;
+      }*/
+   }
    return false;
 }
 

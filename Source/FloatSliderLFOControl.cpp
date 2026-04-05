@@ -179,6 +179,14 @@ void FloatSliderLFOControl::DrawModule()
    }
    ofEndShape(false);
 
+   float xNormalized;
+   float yNormalized;
+   GetCurrentPhaseDrawPosition(xNormalized, yNormalized);
+   ofCircle(xNormalized * width + x, yNormalized * height + y, 2);
+}
+
+void FloatSliderLFOControl::GetCurrentPhaseDrawPosition(float& xNormalized, float& yNormalized)
+{
    float currentPhase = mLFO.CalculatePhase(0, false);
    float squeeze;
    if (mLFO.GetOsc()->GetShuffle() == 0)
@@ -199,8 +207,51 @@ void FloatSliderLFOControl::DrawModule()
       currentPhase = 0;
       displayPhase = 0;
    }
-   ofCircle(displayPhase / squeeze * width + x,
-            ofMap(GetLFOValue(0, mLFO.TransformPhase(currentPhase)), GetTargetMax(), GetTargetMin(), 0, height) + y, 2);
+
+   xNormalized = displayPhase / squeeze;
+   yNormalized = ofLerp(GetTargetMax(), GetTargetMin(), GetLFOValue(0, mLFO.TransformPhase(currentPhase)));
+}
+
+void FloatSliderLFOControl::DrawToAbletonMoveScreen(AbletonMoveLCD* screen)
+{
+   int lastY = -1;
+   for (float x = 0; x < AbletonMoveLCD::kMoveDisplayWidth; ++x)
+   {
+      float phase = x / AbletonMoveLCD::kMoveDisplayWidth;
+      if (mLFO.GetOsc()->GetShuffle() > 0)
+         phase *= 2;
+      if (mLFO.GetOsc()->GetType() != kOsc_Perlin)
+         phase += 1 - mLFOSettings.mLFOOffset;
+      float value = GetLFOValue(0, mLFO.TransformPhase(phase));
+      int newY = int(ofMap(value,
+                           GetTargetMax(), GetTargetMin(),
+                           10, AbletonMoveLCD::kMoveDisplayHeight - 10));
+
+      if (lastY == -1)
+         lastY = newY;
+      if (lastY <= newY)
+      {
+         for (int y = lastY; y <= newY; ++y)
+            screen->TogglePixel(x, y);
+      }
+      else
+      {
+         for (int y = lastY; y >= newY; --y)
+            screen->TogglePixel(x, y);
+      }
+
+      lastY = newY;
+   }
+
+   if (Active())
+   {
+      float xNormalized;
+      float yNormalized;
+      GetCurrentPhaseDrawPosition(xNormalized, yNormalized);
+
+      screen->DrawRect(ofLerp(0, AbletonMoveLCD::kMoveDisplayWidth, xNormalized),
+                       ofLerp(10, AbletonMoveLCD::kMoveDisplayHeight - 10, yNormalized), 3, 3, false);
+   }
 }
 
 bool FloatSliderLFOControl::DrawToPush2Screen()

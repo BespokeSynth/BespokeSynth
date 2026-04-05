@@ -841,25 +841,28 @@ void Transport::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
    }
 }
 
-bool Transport::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd)
+bool Transport::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass)
 {
-   bool showTapTempo = mTapTempoDetector.GetLastTapTime() > gTime - 3000 && mTapTempoDetector.HasEnoughSamples();
-   if (abletonGrid->GetButtonState(AbletonDevice::kClickyEncoderTouch) ||
-       abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch) ||
-       showTapTempo)
+   if (drawPass == LCDDrawPass::HighPriority)
    {
-      lcd->DrawLCDText(("tempo: " + ofToString(mTempo, 2)).c_str(), 5, 13, LCDFONT_STYLE_REGULAR);
-
-      if (abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch))
-         lcd->DrawLCDText(("nudge: " + ofToString(mNudgeFactor, 2)).c_str(), 5, 26, LCDFONT_STYLE_REGULAR);
-
-      if (showTapTempo)
+      bool showTapTempo = mTapTempoDetector.GetLastTapTime() > gTime - 3000 && mTapTempoDetector.HasEnoughSamples();
+      if (abletonGrid->GetButtonState(AbletonDevice::kClickyEncoderTouch) ||
+          abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch) ||
+          showTapTempo)
       {
-         lcd->DrawLCDText(("calculated tempo: " + ofToString(int(round(mTapTempoDetector.GetCalculatedTempo())))).c_str(), 5, 45, LCDFONT_STYLE_REGULAR);
-         lcd->DrawLCDText(("std dev: " + ofToString(mTapTempoDetector.GetCalculationStandardDeviation(), 2)).c_str(), 5, 58, LCDFONT_STYLE_REGULAR);
-      }
+         lcd->DrawLCDText(("tempo: " + ofToString(mTempo, 2)).c_str(), 5, 13, LCDFONT_STYLE_REGULAR);
 
-      return true;
+         if (abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch))
+            lcd->DrawLCDText(("nudge: " + ofToString(mNudgeFactor, 2)).c_str(), 5, 26, LCDFONT_STYLE_REGULAR);
+
+         if (showTapTempo)
+         {
+            lcd->DrawLCDText(("calculated tempo: " + ofToString(int(round(mTapTempoDetector.GetCalculatedTempo())))).c_str(), 5, 45, LCDFONT_STYLE_REGULAR);
+            lcd->DrawLCDText(("std dev: " + ofToString(mTapTempoDetector.GetCalculationStandardDeviation(), 2)).c_str(), 5, 58, LCDFONT_STYLE_REGULAR);
+         }
+
+         return true;
+      }
    }
 
    return false;

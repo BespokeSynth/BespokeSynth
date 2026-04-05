@@ -492,10 +492,16 @@ public:
 class IAbletonGridController
 {
 public:
+   enum class LCDDrawPass
+   {
+      HighPriority,
+      Normal,
+      Overlay
+   };
+
    virtual ~IAbletonGridController() {}
    virtual void OnAbletonGridConnect(IAbletonGridDevice* abletonGrid) {}
    virtual bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) = 0;
    virtual void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) = 0;
-   virtual bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) { return false; }
-   virtual bool HasHighPriorityAbletonMoveScreenUpdate(IAbletonGridDevice* abletonGrid) { return false; }
+   virtual bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass) { return false; }
 };

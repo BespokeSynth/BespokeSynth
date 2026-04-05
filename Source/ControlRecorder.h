@@ -52,6 +52,8 @@ public:
 
    void SetRecording(bool on);
    float GetLength() const { return mLength; }
+   float GetValue(float percent) { return mCurve.EvaluateAtPercent(percent); }
+   float GetPlaybackTime(double time) const;
 
    //IDrawableModule
    void Init() override;
@@ -84,7 +86,6 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
 private:
-   float GetPlaybackTime(double time);
    void RecordPoint();
    void Clear();
 
