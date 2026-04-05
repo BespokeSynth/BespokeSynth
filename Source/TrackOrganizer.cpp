@@ -190,8 +190,7 @@ std::list<IDrawableModule*> TrackOrganizer::GetAllTrackModules()
 ofRectangle TrackOrganizer::GetBoundingRect()
 {
    ofRectangle allModulesRect = GetRect();
-   std::list<IDrawableModule*> trackModules = GetAllTrackModules();
-   for (auto* module : trackModules)
+   for (auto* module : mAllModules)
    {
       if (module != nullptr && !module->IsDeleted() &&
           module->GetOwningContainer() != nullptr && module->IsShowing())
@@ -249,7 +248,7 @@ void TrackOrganizer::PreDrawModuleUnclipped()
    }
 }
 
-void TrackOrganizer::DrawModuleUnclipped()
+void TrackOrganizer::DrawModuleDecoration(IDrawableModule* module)
 {
    //colorize connected modules to match track color
    ofPushStyle();
@@ -262,32 +261,27 @@ void TrackOrganizer::DrawModuleUnclipped()
    ofSetColor(color);
    ofSetLineWidth(3);
    ofNoFill();
-   std::list<IDrawableModule*> trackModules = GetAllTrackModules();
-   for (auto* module : trackModules)
+
+   if (!module->IsDeleted() && module->GetOwningContainer() != nullptr && module->IsShowing())
    {
-      if (module != nullptr && !module->IsDeleted() &&
-          module->GetOwningContainer() != nullptr && module->IsShowing())
+      ofRectangle rect = module->GetRect();
+      rect.x = 0;
+      rect.y = 0;
+
+      if (module->HasTitleBar())
       {
-         ofPushMatrix();
-
-         ofVec2f pos = GetPosition();
-         ofTranslate(-pos.x, -pos.y);
-         ofRectangle rect = module->GetRect();
-
-         if (module->HasTitleBar())
-         {
-            rect.y -= IDrawableModule::TitleBarHeight();
-            rect.height += IDrawableModule::TitleBarHeight();
-         }
-
-         ofRect(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6, 6);
-
-         ofPopMatrix();
+         rect.y -= IDrawableModule::TitleBarHeight();
+         rect.height += IDrawableModule::TitleBarHeight();
       }
+
+      ofRect(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6, 6);
    }
 
    ofPopStyle();
+}
 
+void TrackOrganizer::DrawModuleUnclipped()
+{
    std::string tooltip = "";
    PatchCableSource* hoverCable = nullptr;
 
@@ -385,7 +379,7 @@ void TrackOrganizer::Poll()
 
    if (mSelectModulesOnMouseRelease && !TheSynth->IsMouseButtonHeld(1))
    {
-      TheSynth->SetGroupSelectedModules(GetAllTrackModules());
+      TheSynth->SetGroupSelectedModules(mAllModules);
       mSelectModulesOnMouseRelease = false;
    }
 
@@ -411,6 +405,16 @@ void TrackOrganizer::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
       if (gain)
          gain->SetShowLevelMeter(true);
    }
+
+   std::list<IDrawableModule*> allModules = GetAllTrackModules();
+   for (auto* module : allModules)
+      module->AddModuleDecorator(this);
+   for (auto* module : mAllModules)
+   {
+      if (!ListContains(module, allModules))
+         module->RemoveModuleDecorator(this);
+   }
+   mAllModules = allModules;
 }
 
 void TrackOrganizer::KeyPressed(int key, bool isRepeat)
@@ -423,10 +427,9 @@ void TrackOrganizer::KeyPressed(int key, bool isRepeat)
 
 void TrackOrganizer::GatherModules(const std::vector<IDrawableModule*>& modulesToAdd)
 {
-   auto trackModules = GetAllTrackModules();
    for (auto* module : modulesToAdd)
    {
-      if (module != this && !ListContains(module, trackModules))
+      if (module != this && !ListContains(module, mAllModules))
       {
          //TODO(Ryan) smartly determine which category to put each module in, based upon type and chain position
          if (mSnapshotsCable->GetTarget() == nullptr && dynamic_cast<Snapshots*>(module))

@@ -30,6 +30,7 @@
 #include "TextEntry.h"
 #include "DropdownList.h"
 #include "ClickButton.h"
+#include "IModuleDecorator.h"
 
 class Snapshots;
 class IAbletonGridController;
@@ -37,7 +38,7 @@ class IInputRecordable;
 class Amplifier;
 class AudioSend;
 
-class TrackOrganizer : public IDrawableModule, public ITextEntryListener, public IDropdownListener, public IButtonListener
+class TrackOrganizer : public IDrawableModule, public ITextEntryListener, public IDropdownListener, public IButtonListener, public IModuleDecorator
 {
 public:
    TrackOrganizer();
@@ -75,6 +76,9 @@ public:
    std::string GetTrackName() const { return mTrackName; }
    ofRectangle GetBoundingRect();
    void GatherModules(const std::vector<IDrawableModule*>& modulesToAdd);
+
+   //IModuleDecorator
+   void DrawModuleDecoration(IDrawableModule* module) override;
 
    void TextEntryComplete(TextEntry* entry) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
@@ -115,4 +119,6 @@ private:
    DropdownList* mColorSelector{ nullptr };
    int mColorIndex{ 0 };
    ClickButton* mSelectModulesButton{ nullptr };
+
+   std::list<IDrawableModule*> mAllModules;
 };
