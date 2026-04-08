@@ -1572,14 +1572,22 @@ void AbletonMoveControl::SetGridControlInterface(IAbletonGridController* control
 
 void AbletonMoveControl::OnMidiNote(MidiNote& note)
 {
+   mControlState[note.mPitch].mButtonState = note.mVelocity > 0;
+
+   if (!ShouldDisplaySnapshotView() && !mBottomRowMode && mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl_InputThread(this, note.mPitch, note.mVelocity);
+      if (handled)
+         return;
+   }
+
+   // queue up the message to be handled in OnMidiNote_Consume()
    mQueuedNoteMessages.produce(note);
 }
 
 void AbletonMoveControl::OnMidiNote_Consume(MidiNote& note)
 {
    //ofLog() << "AbletonMoveControl::OnMidiNote() " << note.mPitch << " " << note.mVelocity;
-
-   mControlState[note.mPitch].mButtonState = note.mVelocity > 0;
 
    bool handled = false;
    if (mBottomRowMode)
@@ -1784,15 +1792,24 @@ void AbletonMoveControl::OnMidiNote_Consume(MidiNote& note)
 
 void AbletonMoveControl::OnMidiControl(MidiControl& control)
 {
+   control.mControl += 128;
+
+   mControlState[control.mControl].mButtonState = control.mValue > 0;
+
+   if (!ShouldDisplaySnapshotView() && !mBottomRowMode && mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl_InputThread(this, control.mControl, control.mValue);
+      if (handled)
+         return;
+   }
+
+   // queue up the message to be handled in OnMidiControl_Consume()
    mQueuedControlMessages.produce(control);
 }
 
 void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
 {
    //ofLog() << "AbletonMoveControl::OnMidiControl() " << control.mControl << " " << control.mValue;
-   control.mControl += 128;
-
-   mControlState[control.mControl].mButtonState = control.mValue > 0;
 
    for (int i = 0; i < kNumTrackButtons; ++i)
    {
@@ -2412,6 +2429,13 @@ void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
 
 void AbletonMoveControl::OnMidiPitchBend(MidiPitchBend& pitchBend)
 {
+   if (mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl_InputThread(this, kPitchBendIndex, pitchBend.mValue);
+      if (handled)
+         return;
+   }
+
    mQueuedPitchBendMessages.produce(pitchBend);
 }
 
@@ -2432,6 +2456,13 @@ void AbletonMoveControl::OnMidiPitchBend_Consume(MidiPitchBend& pitchBend)
 
 void AbletonMoveControl::OnMidiPressure(MidiPressure& pressure)
 {
+   if (mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl_InputThread(this, kChannelPressureIndex + pressure.mChannel, pressure.mPressure);
+      if (handled)
+         return;
+   }
+
    mQueuedPressureMessages.produce(pressure);
 }
 

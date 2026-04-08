@@ -501,7 +501,8 @@ public:
 
    virtual ~IAbletonGridController() {}
    virtual void OnAbletonGridConnect(IAbletonGridDevice* abletonGrid) {}
-   virtual bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) = 0;
+   virtual bool OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) { return false; }
+   virtual bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) { return false; }
    virtual void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) = 0;
    virtual bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass) { return false; }
 };

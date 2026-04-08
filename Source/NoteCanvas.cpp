@@ -344,7 +344,7 @@ std::string NoteCanvas::GetCurrentEditMeasureString() const
    return "measure: " + ofToString(mEditMeasureOffset + 1) + " / " + ofToString(mNumMeasures);
 }
 
-bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
+bool NoteCanvas::OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
    /*if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
    {
@@ -716,7 +716,7 @@ bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contr
          return true;
       }
 
-      return mGridKeyboardInterface->OnAbletonGridControl(abletonGrid, controlIndex, midiValue);
+      return mGridKeyboardInterface->OnAbletonGridControl_InputThread(abletonGrid, controlIndex, midiValue);
    }
 
    return false;

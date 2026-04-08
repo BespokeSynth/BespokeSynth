@@ -705,7 +705,7 @@ void Transport::OnDrumEvent(NoteInterval drumEvent)
    }
 }
 
-bool Transport::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
+bool Transport::OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
    if (controlIndex == AbletonDevice::kClickyEncoderTurn)
    {
