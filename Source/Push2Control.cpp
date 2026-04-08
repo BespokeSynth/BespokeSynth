@@ -1319,13 +1319,21 @@ void Push2Control::SetGridControlInterface(IAbletonGridController* controller, I
 
 void Push2Control::OnMidiNote(MidiNote& note)
 {
+   mButtonState[note.mPitch] = note.mVelocity > 0;
+
+   if (mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl_InputThread(this, note.mPitch, note.mVelocity);
+      if (handled)
+         return;
+   }
+
+   // queue up the message to be handled in OnMidiNote_Consume()
    mQueuedNoteMessages.produce(note);
 }
 
 void Push2Control::OnMidiNote_Consume(MidiNote& note)
 {
-   mButtonState[note.mPitch] = note.mVelocity > 0;
-
    if (mGridControlInterface != nullptr)
    {
       bool handled = mGridControlInterface->OnAbletonGridControl(this, note.mPitch, note.mVelocity);
@@ -1526,15 +1534,24 @@ void Push2Control::OnMidiNote_Consume(MidiNote& note)
 
 void Push2Control::OnMidiControl(MidiControl& control)
 {
+   control.mControl += 128;
+
+   mButtonState[control.mControl] = control.mValue > 0;
+
+   if (mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl_InputThread(this, control.mControl, control.mValue);
+      if (handled)
+         return;
+   }
+
+   // queue up the message to be handled in OnMidiControl_Consume()
+
    mQueuedControlMessages.produce(control);
 }
 
 void Push2Control::OnMidiControl_Consume(MidiControl& control)
 {
-   control.mControl += 128;
-
-   mButtonState[control.mControl] = control.mValue > 0;
-
    if (mGridControlInterface != nullptr)
    {
       bool handled = mGridControlInterface->OnAbletonGridControl(this, control.mControl, control.mValue);
@@ -2037,6 +2054,13 @@ void Push2Control::OnMidiControl_Consume(MidiControl& control)
 
 void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
 {
+   if (mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl_InputThread(this, kPitchBendIndex, pitchBend.mValue);
+      if (handled)
+         return;
+   }
+
    mQueuedPitchBendMessages.produce(pitchBend);
 }
 
@@ -2057,6 +2081,13 @@ void Push2Control::OnMidiPitchBend_Consume(MidiPitchBend& pitchBend)
 
 void Push2Control::OnMidiPressure(MidiPressure& pressure)
 {
+   if (mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl_InputThread(this, kChannelPressureIndex + pressure.mChannel, pressure.mPressure);
+      if (handled)
+         return;
+   }
+
    mQueuedPressureMessages.produce(pressure);
 }
 
