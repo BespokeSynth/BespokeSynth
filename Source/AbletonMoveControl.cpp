@@ -461,7 +461,24 @@ void AbletonMoveControl::DrawToFramebuffer()
 
    bool needToDraw = true;
 
-   if (needToDraw && mShowSoundSelector)
+   if (mCurrentControlRecorder != nullptr)
+   {
+      int displayKnobIndex = GetDisplayKnobIndex();
+      if (displayKnobIndex != -1)
+      {
+         int controlIndex = displayKnobIndex + GetControlOffset();
+         DrawKnobDisplay(controlIndex);
+      }
+      needToDraw = false;
+   }
+
+   if (needToDraw && mGridControlInterface != nullptr)
+   {
+      if (mGridControlInterface->UpdateAbletonMoveScreen(this, &mLCD, IAbletonGridController::LCDDrawPass::HighPriority))
+         needToDraw = false;
+   }
+
+   if (needToDraw && mShowSoundSelector && GetDisplayKnobIndex() == -1)
    {
       TrackOrganizer* trackRow = GetActiveTrackRow();
       IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
@@ -483,23 +500,6 @@ void AbletonMoveControl::DrawToFramebuffer()
          }
       }
       needToDraw = false;
-   }
-
-   if (mCurrentControlRecorder != nullptr)
-   {
-      int displayKnobIndex = GetDisplayKnobIndex();
-      if (displayKnobIndex != -1)
-      {
-         int controlIndex = displayKnobIndex + GetControlOffset();
-         DrawKnobDisplay(controlIndex);
-      }
-      needToDraw = false;
-   }
-
-   if (needToDraw && mGridControlInterface != nullptr)
-   {
-      if (mGridControlInterface->UpdateAbletonMoveScreen(this, &mLCD, IAbletonGridController::LCDDrawPass::HighPriority))
-         needToDraw = false;
    }
 
    //scroll module offset
@@ -1463,7 +1463,6 @@ void AbletonMoveControl::ShowSoundSelector()
 {
    mShowSoundSelector = true;
    mSoundSelectorIndex = 0;
-   SetDisplayModule(nullptr);
 
    TrackOrganizer* trackRow = GetActiveTrackRow();
    IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
