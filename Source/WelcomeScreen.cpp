@@ -103,6 +103,24 @@ void WelcomeScreen::CreateUIControls()
          mRecentFiles.insert(mRecentFiles.begin(), recentFile);
    }
 
+   //include the most recent autosave as the first entry
+   File autosaveDir(ofToDataPath("savestate/autosave"));
+   Array<File> autosaveFiles;
+   autosaveDir.findChildFiles(autosaveFiles, File::findFiles, false, "*.bsk;*.bskt");
+   if (!autosaveFiles.isEmpty())
+   {
+      std::sort(autosaveFiles.begin(), autosaveFiles.end(),
+                [](const File& lhs, const File& rhs)
+                {
+                   return lhs.getLastModificationTime().toMilliseconds() > rhs.getLastModificationTime().toMilliseconds();
+                });
+      RecentFile recentFile;
+      recentFile.mFile = autosaveFiles[0];
+      recentFile.mTime = autosaveFiles[0].getLastModificationTime();
+      recentFile.mRecentlyOpened = false;
+      mRecentFiles.insert(mRecentFiles.begin(), recentFile);
+   }
+
    if (mRecentFiles.size() < kMaxDesiredFiles)
    {
       File dir(ofToDataPath("savestate"));
