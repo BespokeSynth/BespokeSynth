@@ -1,0 +1,35 @@
+{
+	"channelfilter": 16,
+	"groups": [
+		{
+			"rows": 1,
+			"cols": 2,
+			"position": [0, 0],
+			"dimensions": [22, 14],
+			"spacing": [28],
+			"controls": [103, 102],
+			"messageType": "control",
+			"drawType": "button"
+		},
+		{
+			"rows": 2,
+			"cols": 2,
+			"position": [80, 0],
+			"dimensions": [22, 22],
+			"spacing": [28, 28],
+			"controls": [74, 77, 75, 76],
+			"messageType": "control",
+			"drawType": "button"
+		},
+		{
+			"rows": 2,
+			"cols": 1,
+			"position": [108, 64],
+			"dimensions": [22, 14],
+			"spacing": [0, 20],
+			"controls": [118, 117],
+			"messageType": "control",
+			"drawType": "button"
+		}
+	]
+}
