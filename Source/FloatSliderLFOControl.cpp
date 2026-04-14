@@ -209,7 +209,7 @@ void FloatSliderLFOControl::GetCurrentPhaseDrawPosition(float& xNormalized, floa
    }
 
    xNormalized = displayPhase / squeeze;
-   yNormalized = ofLerp(GetTargetMax(), GetTargetMin(), GetLFOValue(0, mLFO.TransformPhase(currentPhase)));
+   yNormalized = ofMap(GetLFOValue(0, mLFO.TransformPhase(currentPhase)), GetTargetMax(), GetTargetMin(), 0, 1);
 }
 
 void FloatSliderLFOControl::DrawToAbletonMoveScreen(AbletonMoveLCD* screen)
