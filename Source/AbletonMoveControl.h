@@ -171,6 +171,7 @@ private:
    std::array<PatchCableSource*, kNumPages> mGlobalGridInterfaceCables{};
    int mGlobalModuleIndex{ 0 };
    float mGlobalModuleViewOffset{ 0.0f };
+   float mModalModuleViewOffset{ 0.0f };
 
    struct TrackLayoutEntry
    {
