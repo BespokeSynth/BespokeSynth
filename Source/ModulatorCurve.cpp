@@ -36,6 +36,7 @@ namespace
 }
 
 ModulatorCurve::ModulatorCurve()
+: IDrawableModule(kMinWidth, kMinHeight)
 {
    mEnvelopeControl.SetADSR(&mAdsr);
    mEnvelopeControl.SetViewLength(kAdsrTime);
@@ -63,6 +64,14 @@ void ModulatorCurve::CreateUIControls()
 
 ModulatorCurve::~ModulatorCurve()
 {
+}
+
+void ModulatorCurve::Resize(float w, float h)
+{
+   mWidth = MAX(w, kMinWidth);
+   mHeight = MAX(h, kMinHeight);
+   mEnvelopeControl.SetDimensions(ofVec2f(mWidth - 6, mHeight - 21));
+   mInputSlider->SetDimensions(mWidth - 6, mInputSlider->GetRect(true).height);
 }
 
 void ModulatorCurve::DrawModule()
