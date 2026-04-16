@@ -806,6 +806,7 @@ void ModuleFactory::GetPrefabs(std::vector<ModuleFactory::Spawnable>& prefabs)
          prefabs.push_back(spawnable);
       }
    }
+   std::sort(prefabs.begin(), prefabs.end(), Spawnable::CompareAlphabetical);
 }
 
 //static
