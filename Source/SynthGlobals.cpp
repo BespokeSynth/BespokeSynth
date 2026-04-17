@@ -845,6 +845,8 @@ float GetRightPanGain(float pan)
    return ofClamp(pan, -1, 1) + 1;
 }
 
+//void DrawFallbackText(const char* text, float posX, float posY) --> Moved to DrawFallbackText.cpp
+
 bool EvaluateExpression(std::string expressionStr, float currentValue, float& output)
 {
    exprtk::symbol_table<float> symbolTable;
