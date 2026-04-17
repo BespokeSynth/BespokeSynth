@@ -164,6 +164,7 @@ target_sources(BespokeSynth PRIVATE
     DotGrid.h
     DotSequencer.cpp
     DotSequencer.h
+    DrawFallbackText.cpp
     DropdownList.cpp
     DropdownList.h
     DrumPlayer.cpp
