@@ -41,7 +41,7 @@
 
 class ofxJSONElement;
 
-class Sampler : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IButtonListener
+class Sampler : public IAudioProcessor, public INoteReceiver, public IPulseReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IButtonListener
 {
 public:
    Sampler();
@@ -49,7 +49,7 @@ public:
    static IDrawableModule* Create() { return new Sampler(); }
    static bool AcceptsAudio() { return true; }
    static bool AcceptsNotes() { return true; }
-   static bool AcceptsPulses() { return false; }
+   static bool AcceptsPulses() { return true; }
 
    void CreateUIControls() override;
 
@@ -65,6 +65,9 @@ public:
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
+
+   //IPulseReciever
+   void OnPulse(double time, float velocity, int flags) override;
 
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
@@ -96,6 +99,7 @@ private:
    void DrawModule() override;
    void DrawModuleUnclipped() override;
 
+private:
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    SampleVoiceParams mVoiceParams;
