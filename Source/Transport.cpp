@@ -456,6 +456,14 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
       }
       case kInterval_CustomDivisor:
       {
+         if (listenerInfo->mCustomDivisor <= 1)
+         {
+            pos *= double(mTimeSigTop) / mTimeSigBottom;
+            int ret = measure;
+            if (remainderMs != nullptr)
+               *remainderMs = (pos + measure % 1) * MsPerBar();
+            return ret;
+         }
          double ret = pos * listenerInfo->mCustomDivisor;
          if (remainderMs != nullptr)
          {
