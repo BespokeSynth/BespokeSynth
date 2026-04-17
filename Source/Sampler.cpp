@@ -264,9 +264,11 @@ void Sampler::OnPulse(double time, float velocity, int flags)
 {
    NoteMessage note;
    note.time = time;
-
-   if (velocity != 1)
-      note.velocity = velocity;
+   //Pretty much all pulses come in velocity 1, which is insignificant.
+   //Pending improved support (or full deprecation) on pulse velocity. All pulses here play at full power.
+   //Reason for this is so there's no accidental jump to MAX velocity in lower leaning LFOs.
+   //if (velocity != 1)
+   //   note.velocity = velocity;
    note.velocity = 127;
    note.pitch = 48;
    PlayNote(note);
