@@ -147,6 +147,8 @@ struct UIControlConnection
       connection->mPage = mPage;
       connection->mPageless = mPageless;
       connection->m14BitMode = m14BitMode;
+      connection->mFeedbackValues = mFeedbackValues;
+      StringCopy(connection->mFeedbackValuesInput, mFeedbackValuesInput, MAX_TEXTENTRY_LENGTH);
       return connection;
    }
 
@@ -180,6 +182,8 @@ struct UIControlConnection
    bool mPageless{ false };
    std::string mShouldRetryForUIControlAt{ "" };
    bool m14BitMode{ false };
+   std::vector<int> mFeedbackValues;
+   char mFeedbackValuesInput[MAX_TEXTENTRY_LENGTH]{};
 
    static bool sDrawCables;
 
@@ -202,6 +206,7 @@ struct UIControlConnection
    Checkbox* mScaleOutputCheckbox{ nullptr };
    Checkbox* mBlinkCheckbox{ nullptr };
    Checkbox* m14BitModeCheckbox{ nullptr };
+   TextEntry* mFeedbackValuesEntry{ nullptr };
    TextEntry* mIncrementalEntry{ nullptr };
    Checkbox* mTwoWayCheckbox{ nullptr };
    DropdownList* mFeedbackDropdown{ nullptr };
