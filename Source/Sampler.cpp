@@ -260,6 +260,18 @@ void Sampler::UpdateForNewSample()
    mVoiceParams.mSustainLoopEnd = -1;
 }
 
+void Sampler::OnPulse(double time, float velocity, int flags)
+{
+   NoteMessage note;
+   note.time = time;
+
+   if (velocity != 1)
+      note.velocity = velocity;
+   note.velocity = 127;
+   note.pitch = mVoiceParams.mSamplePitch;
+   PlayNote(note);
+}
+
 void Sampler::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    mSample.LockDataMutex(true);
