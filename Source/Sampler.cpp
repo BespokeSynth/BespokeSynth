@@ -271,7 +271,34 @@ void Sampler::OnPulse(double time, float velocity, int flags)
    //   note.velocity = velocity;
    note.velocity = 127;
    note.pitch = 48;
+
+   int repeatFlagInfo = -1;
+   if (flags & kPulseFlag_Reset) //Stops all sound.
+   {
+      mPolyMgr.KillAll();
+      note.velocity = 0;
+   }
+   else if (flags & kPulseFlag_Random) //Plays the sample at a random pos
+   {
+      repeatFlagInfo = mVoiceParams.mStartSample;
+      int range = mVoiceParams.mStopSample - mVoiceParams.mStartSample;
+      mVoiceParams.mStartSample = mVoiceParams.mStartSample + (gRandom() % range);
+   }
+   else if (flags & kPulseFlag_Repeat) //Replays on the last voice channel.
+   {
+      note.voiceIdx = mMostRecentVoiceIdx;
+   }
+   else if (flags & kPulseFlag_Backward)
+   {
+      //Obvious, but not supported. Pending polyphonic player/SampleVoice support.
+   }
+
    PlayNote(note);
+
+   if (repeatFlagInfo != -1)
+   {
+      mVoiceParams.mStartSample = repeatFlagInfo;
+   }
 }
 
 void Sampler::FilesDropped(std::vector<std::string> files, int x, int y)
