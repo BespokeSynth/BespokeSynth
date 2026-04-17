@@ -268,7 +268,7 @@ void Sampler::OnPulse(double time, float velocity, int flags)
    if (velocity != 1)
       note.velocity = velocity;
    note.velocity = 127;
-   note.pitch = mVoiceParams.mSamplePitch;
+   note.pitch = 48;
    PlayNote(note);
 }
 
