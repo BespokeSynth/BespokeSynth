@@ -210,6 +210,9 @@ void WelcomeScreen::DrawModule()
       imageRect.y += padding;
       imageRect.width -= padding * 2;
       imageRect.height -= padding * 2;
+      //Demo projects have special treatment.
+      std::string demoScreenshot = TryGetDemoFileScreenshot(project.mFile.getFileName());
+      bool isDemo = !demoScreenshot.empty();
       if (project.mScreenshotImageHandle == -1)
       {
          FileStreamIn in(ofToDataPath(mRecentFiles[i].mFile.getFullPathName().toStdString()));
@@ -217,9 +220,6 @@ void WelcomeScreen::DrawModule()
          int screenshotSize = 0;
          std::string jsonLayoutString;
          ModularSynth::LoadStateHeader(in, screenshotData, screenshotSize, jsonLayoutString);
-         //Demo projects use custom screenshots.
-         std::string demoScreenshot = TryGetDemoFileScreenshot(project.mFile.getFileName());
-         bool isDemo = !demoScreenshot.empty();
          if (!isDemo)
          {
             if (screenshotData != nullptr)
@@ -243,7 +243,10 @@ void WelcomeScreen::DrawModule()
       }
 
       ofClipWindow(rect.x, rect.y, rect.width, rect.height, K(intersectWithExisting));
-      DrawTextNormal(project.mFile.getFileNameWithoutExtension().toStdString(), rect.x + 3, rect.getMaxY() - 18);
+      auto nameStr = project.mFile.getFileNameWithoutExtension().toStdString();
+      if (isDemo)
+         nameStr = nameStr.erase(2, 6);
+      DrawTextNormal(nameStr, rect.x + 3, rect.getMaxY() - 18);
       juce::RelativeTime timeSince = juce::Time::getCurrentTime() - mRecentFiles[i].mTime;
       juce::String prefix;
       if (project.mRecentlyOpened)
