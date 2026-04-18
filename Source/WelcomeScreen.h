@@ -59,6 +59,7 @@ public:
    void TextEntryComplete(TextEntry* entry) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
+   static std::string TryGetDemoFileScreenshot(juce::String fileName);
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
 
    bool IsSaveable() override { return false; }
