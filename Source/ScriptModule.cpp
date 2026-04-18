@@ -570,7 +570,7 @@ void ScriptModule::Poll()
          {
             //if (mPendingNoteInput[i].time < time)
             //   ofLog() << "trying to run script triggered by note too late!";
-            RunCode(mPendingNoteInput[i].time, "on_note(" + ofToString(mPendingNoteInput[i].pitch) + ", " + ofToString(mPendingNoteInput[i].velocity) + ")");
+            RunCode(mPendingNoteInput[i].time, "on_note(" + ofToString(mPendingNoteInput[i].pitch) + ", " + ofToString(mPendingNoteInput[i].velocity) + ", " + ofToString(mPendingNoteInput[i].pan) + ")");
          }
          mPendingNoteInput[i].time = -1;
       }
@@ -1195,6 +1195,7 @@ void ScriptModule::PlayNote(NoteMessage note)
          mPendingNoteInput[i].time = note.time;
          mPendingNoteInput[i].pitch = note.pitch;
          mPendingNoteInput[i].velocity = note.velocity;
+         mPendingNoteInput[i].pan = note.modulation.pan;
          break;
       }
    }
@@ -1366,6 +1367,7 @@ void ScriptModule::FixUpCode(std::string& code)
    std::string prefix = GetMethodPrefix();
    ofStringReplace(code, "on_pulse(", "on_pulse__" + prefix + "(");
    ofStringReplace(code, "on_note(", "on_note__" + prefix + "(");
+   ofStringReplace(code, "def on_note__" + prefix + "(pitch, velocity)", "def on_note__" + prefix + "(pitch, velocity, pan=0)");
    ofStringReplace(code, "on_grid_button(", "on_grid_button__" + prefix + "(");
    ofStringReplace(code, "on_osc(", "on_osc__" + prefix + "(");
    ofStringReplace(code, "on_midi(", "on_midi__" + prefix + "(");
