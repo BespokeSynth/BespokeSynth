@@ -197,7 +197,9 @@ void WelcomeScreen::DrawModule()
       if (mRecentFiles[i].mButton == nullptr)
          continue;
 
-      mRecentFiles[i].mButton->Draw();
+      auto& project = mRecentFiles[i];
+
+      project.mButton->Draw();
       ofRectangle rect = mRecentFiles[i].mButton->GetRect(K(local));
       ofPushMatrix();
 
@@ -208,20 +210,30 @@ void WelcomeScreen::DrawModule()
       imageRect.y += padding;
       imageRect.width -= padding * 2;
       imageRect.height -= padding * 2;
-      if (mRecentFiles[i].mScreenshotImageHandle == -1)
+      if (project.mScreenshotImageHandle == -1)
       {
          FileStreamIn in(ofToDataPath(mRecentFiles[i].mFile.getFullPathName().toStdString()));
          unsigned char* screenshotData = nullptr;
          int screenshotSize = 0;
          std::string jsonLayoutString;
          ModularSynth::LoadStateHeader(in, screenshotData, screenshotSize, jsonLayoutString);
-         if (screenshotData != nullptr)
-            mRecentFiles[i].mScreenshotImageHandle = nvgCreateImageMem(gNanoVG, 0, screenshotData, screenshotSize);
+         //Demo projects use custom screenshots.
+         std::string demoScreenshot = TryGetDemoFileScreenshot(project.mFile.getFileName());
+         bool isDemo = !demoScreenshot.empty();
+         if (!isDemo)
+         {
+            if (screenshotData != nullptr)
+               project.mScreenshotImageHandle = nvgCreateImageMem(gNanoVG, 0, screenshotData, screenshotSize);
+            else
+               project.mScreenshotImageHandle = nvgCreateImage(gNanoVG, ofToResourcePath("bespoke_default.png").c_str(), 0);
+         }
          else
-            mRecentFiles[i].mScreenshotImageHandle = nvgCreateImage(gNanoVG, ofToResourcePath("bespoke_default.png").c_str(), 0);
+         {
+               project.mScreenshotImageHandle = nvgCreateImage(gNanoVG, ofToResourcePath("example_project_images/"+demoScreenshot).c_str(), 0);
+         }
       }
 
-      if (mRecentFiles[i].mScreenshotImageHandle != -1)
+      if (project.mScreenshotImageHandle != -1)
       {
          NVGpaint pattern = nvgImagePattern(gNanoVG, imageRect.x, imageRect.y, imageRect.width, imageRect.height, 0, mRecentFiles[i].mScreenshotImageHandle, 1.0f);
          nvgBeginPath(gNanoVG);
@@ -231,10 +243,10 @@ void WelcomeScreen::DrawModule()
       }
 
       ofClipWindow(rect.x, rect.y, rect.width, rect.height, K(intersectWithExisting));
-      DrawTextNormal(mRecentFiles[i].mFile.getFileNameWithoutExtension().toStdString(), rect.x + 3, rect.getMaxY() - 18);
+      DrawTextNormal(project.mFile.getFileNameWithoutExtension().toStdString(), rect.x + 3, rect.getMaxY() - 18);
       juce::RelativeTime timeSince = juce::Time::getCurrentTime() - mRecentFiles[i].mTime;
       juce::String prefix;
-      if (mRecentFiles[i].mRecentlyOpened)
+      if (project.mRecentlyOpened)
          prefix = "opened ";
       else
          prefix = "saved ";
@@ -276,6 +288,27 @@ void WelcomeScreen::ButtonClicked(ClickButton* button, double time)
 
    if (button == mCloseButton)
       SetShowing(false);
+}
+
+std::string WelcomeScreen::TryGetDemoFileScreenshot(juce::String fileName)
+{
+   if (fileName == "example__looper_recorder.bsk")
+      return "example__looper_recorder.png";
+   if (fileName == "example__scripting.bsk")
+      return "example__scripting.png";
+   if (fileName == "example__feedback.bsk")
+      return "example__feedback.png";
+   if (fileName == "example__feedback_distortion_pluck_bass_echo.bsk")
+      return "example__feedback_distortion_pluck_bass_echo.png";
+   if (fileName == "example__drumsynth_chance_sequence.bsk")
+      return "example__drumsynth_chance_sequence.png";
+   if (fileName == "example__sequencing_sequencers.bsk")
+      return "example__sequencing_sequencers.png";
+   if (fileName == "example__arpeggiation.bsk")
+      return "example__arpeggiation.png";
+   if (fileName == "example__dj_turntables.bsk")
+      return "example__dj_turntables.png";
+   return "";
 }
 
 void WelcomeScreen::CheckboxUpdated(Checkbox* checkbox, double time)
