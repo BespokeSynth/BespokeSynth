@@ -229,7 +229,7 @@ void WelcomeScreen::DrawModule()
          }
          else
          {
-               project.mScreenshotImageHandle = nvgCreateImage(gNanoVG, ofToResourcePath("example_project_images/"+demoScreenshot).c_str(), 0);
+            project.mScreenshotImageHandle = nvgCreateImage(gNanoVG, ofToResourcePath("example_project_images/" + demoScreenshot).c_str(), 0);
          }
       }
 
