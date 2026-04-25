@@ -667,6 +667,7 @@ target_sources(BespokeSynth PRIVATE
     SignalClamp.h
     SignalGenerator.cpp
     SignalGenerator.h
+    SimplexFont.h
     SingleOscillator.cpp
     SingleOscillator.h
     SingleOscillatorVoice.cpp
