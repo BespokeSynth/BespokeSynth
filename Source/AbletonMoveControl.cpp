@@ -40,9 +40,8 @@
 #include "Looper.h"
 #include "NoteLooper.h"
 #include "ControlRecorder.h"
-#include "push2/JuceToPush2DisplayBridge.h"
-#include "push2/Push2-Bitmap.h"
-#include "push2/../../Push2-Display.h"
+#include "abletonmove/JuceToMoveDisplayBridge.h"
+#include "abletonmove/../../Move-Display.h"
 #include "AbletonDeviceShared.h"
 #include "TrackOrganizer.h"
 #include "IInputRecordable.h"
@@ -57,7 +56,7 @@ using namespace AbletonDevice;
 IUIControl* AbletonMoveControl::sBindToUIControl = nullptr;
 namespace
 {
-   ableton::Push2DisplayBridge ThePushBridge; // The bridge allowing to use juce::graphics for push
+   abletonmove::MoveDisplayBridge TheMoveBridge; // The bridge allowing to use juce::graphics for push
 }
 
 AbletonMoveControl::AbletonMoveControl()
@@ -145,7 +144,7 @@ void AbletonMoveControl::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   if (!ThePushBridge.IsInitialized())
+   if (!TheMoveBridge.IsInitialized())
    {
       ofSetColor(255, 0, 0, gModuleDrawAlpha);
       DrawTextNormal(mPushBridgeInitErrMsg, 3, 15);
@@ -289,8 +288,8 @@ void AbletonMoveControl::DrawDisplayModuleRect(ofRectangle rect, float thickness
 
 void AbletonMoveControl::PostRender()
 {
-   if (ThePushBridge.IsInitialized())
-      RenderPush2Display();
+   if (TheMoveBridge.IsInitialized())
+      RenderMoveDisplay();
 }
 
 void AbletonMoveControl::KeyPressed(int key, bool isRepeat)
@@ -302,7 +301,7 @@ void AbletonMoveControl::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
-   if (!ThePushBridge.IsInitialized())
+   if (!TheMoveBridge.IsInitialized())
    {
       Initialize();
    }
@@ -349,9 +348,9 @@ bool AbletonMoveControl::Initialize()
 {
    mLCD.Init();
 
-   if (!ThePushBridge.IsInitialized())
+   if (!TheMoveBridge.IsInitialized())
    {
-      if (auto result = ThePushBridge.Init(ableton::DeviceType::Move); result.Failed())
+      if (auto result = TheMoveBridge.Init(); result.Failed())
       {
          mPushBridgeInitErrMsg = result.GetDescription();
          ofLog() << mPushBridgeInitErrMsg;
@@ -1274,35 +1273,35 @@ void AbletonMoveControl::UpdateLeds()
    SetLed(kCaptureButton, 127);
 }
 
-void AbletonMoveControl::RenderPush2Display()
+void AbletonMoveControl::RenderMoveDisplay()
 {
    DrawToFramebuffer();
 
    uint8_t* lcdPixels = mLCD.GetPixels();
 
-   uint16_t* pixels = ThePushBridge.GetDisplay()->GetRawBitmap();
-   memset(pixels, 0, sizeof(uint16_t) * mLCD.GetNumDisplayPixels());
-   const int kPixelBlockRows = 8;
-   const int kPixelBlockColumns = 64;
-   const int kPixelBlockCellWidth = 2;
-   const int kPixelBlockCellHeight = 8;
+   unsigned char* pixels = TheMoveBridge.GetDisplay()->GetRawBitmap();
+   memset(pixels, 0, sizeof(unsigned char) * TheMoveBridge.GetDisplay()->GetBitmapSize());
+   constexpr int kPixelBlockRows = 8;
+   constexpr int kPixelBlockColumns = 128;
+   constexpr int kPixelBlockCellHeight = 8;
    for (int row = 0; row < kPixelBlockRows; ++row)
    {
       for (int col = 0; col < kPixelBlockColumns; ++col)
       {
          int cellIndex = col + row * kPixelBlockColumns;
-         int pixelXStart = col * kPixelBlockCellWidth;
-         int pixelYStart = row * kPixelBlockCellHeight;
-         for (int i = 0; i < kPixelBlockCellWidth * kPixelBlockCellHeight; ++i)
+         pixels[cellIndex] = 0;
+         for (int i = 0; i < kPixelBlockCellHeight; ++i)
          {
-            int pixelX = pixelXStart + i / kPixelBlockCellHeight;
-            int pixelY = pixelYStart + i % kPixelBlockCellHeight;
+            int pixelX = col;
+            int pixelY = row * kPixelBlockCellHeight + i;
             int pixelIndex = (pixelX + pixelY * AbletonMoveLCD::kMoveDisplayWidth) * 4;
             if (lcdPixels[pixelIndex] > 100)
                pixels[cellIndex] |= 1 << i;
          }
       }
    }
+
+   TheMoveBridge.GetDisplay()->SendBitmapToDevice();
 }
 
 void AbletonMoveControl::Poll()

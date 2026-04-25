@@ -107,7 +107,7 @@ private:
 
    bool Initialize();
    void DrawToFramebuffer();
-   void RenderPush2Display();
+   void RenderMoveDisplay();
    void UpdateLeds();
    void SendLeds(bool force);
 
