@@ -23,7 +23,7 @@
 
 static int sSimplexFont[95][112] = {
       0,
-      16, /* Ascii 32 */
+      16, /* Ascii 32 **/
       -1,
       -1,
       -1,
