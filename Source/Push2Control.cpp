@@ -1275,7 +1275,7 @@ void Push2Control::SwitchToBookmarkedModule(int slotIndex)
       SetDisplayModule(mBookmarkSlots[slotIndex], true);
 }
 
-void Push2Control::SetLed(int index, int color, int flashColor /*=-1*/)
+void Push2Control::SetLed(int index, int color, int flashColor /*=-1*/, LedPriority priority /*= LedPriority::Normal*/)
 {
    assert(index >= 0 && index < 128 * 2);
 

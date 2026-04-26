@@ -661,6 +661,8 @@ target_sources(BespokeSynth PRIVATE
     ScriptStatus.h
     SeaOfGrain.cpp
     SeaOfGrain.h
+    SessionOrganizer.cpp
+    SessionOrganizer.h
     Selector.cpp
     Selector.h
     SignalClamp.cpp

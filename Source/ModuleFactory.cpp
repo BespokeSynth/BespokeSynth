@@ -280,6 +280,7 @@
 #include "VelocityToDuration.h"
 #include "TapTempo.h"
 #include "ZeroCrossRate.h"
+#include "SessionOrganizer.h"
 
 #include <juce_core/juce_core.h>
 
@@ -515,6 +516,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(VelocityToDuration, velocitytoduration, kModuleCategory_Note);
    REGISTER(TapTempo, taptempo, kModuleCategory_Other);
    REGISTER(ZeroCrossRate, zerocrossrate, kModuleCategory_Modulator);
+   REGISTER(SessionOrganizer, sessionorganizer, kModuleCategory_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

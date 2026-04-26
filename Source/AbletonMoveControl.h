@@ -36,11 +36,13 @@
 #include "AbletonDeviceShared.h"
 #include "pybind11/attr.h"
 #include "LockFreeQueue.h"
+#include "SessionOrganizer.h"
 
 class IUIControl;
 class Snapshots;
 class ControlRecorder;
 class TrackOrganizer;
+class SessionOrganizer;
 
 class AbletonMoveControl : public IDrawableModule, public MidiDeviceListener, public IDropdownListener, public IAbletonGridDevice
 {
@@ -57,7 +59,7 @@ public:
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
 
-   void SetLed(int index, int color, int flashColor = -1) override;
+   void SetLed(int index, int color, int flashColor = -1, LedPriority priority = LedPriority::Normal) override;
    void SetLedFlashColor(int index, int flashColor = -1);
    bool GetButtonState(int index) const override;
    void SetDisplayModule(IDrawableModule* module, bool addToHistory = true) override;
@@ -76,6 +78,9 @@ public:
    void OnMidiPressure(MidiPressure& pressure) override;
 
    MidiDevice* GetDevice() override { return &mDevice; }
+
+   //IPatchable
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
@@ -131,6 +136,7 @@ private:
    void DetermineTrackControlLayout();
    bool WasPeekHold(int controlIndex) const { return gTime - mControlState[controlIndex].mLastChangeTime > 300; }
    void ZoomToTrack(TrackOrganizer* track);
+   void ZoomToModule(IDrawableModule* module);
    void OnTrackRowExited(int newRow, int oldRow);
    void ShowSoundSelector();
    void StartControlRecorder(int controlIndex);
@@ -159,7 +165,8 @@ private:
    std::vector<IUIControl*> mControls;
    bool mDisplayModuleIsShowingOverrideControls{ false };
 
-   std::array<PatchCableSource*, 8> mTrackCables{ nullptr };
+   SessionOrganizer* mSessionOrganizer{ nullptr };
+   PatchCableSource* mSessionOrganizerCable;
    int mTrackRowOffset{ 0 };
    int mSelectedTrackRow{ kTrackRowMixer };
    int mPreviousSelectedTrackRow{ -1 };
@@ -199,6 +206,7 @@ private:
 
    bool mShiftHeld{ false };
    int mMostRecentlyTouchedKnobIndex{ -1 };
+   std::array<double, AbletonDevice::kNumMainEncoders> mLastTouchedKnobTime{};
    int mLastAdjustedKnobIndex{ -1 };
    double mLastAdjustedKnobTime{ -1 };
    double mLastResetTime{ -1 };
@@ -209,6 +217,7 @@ private:
    bool mAutoZoomToTrack{ false };
    bool mPageWithinModules{ false };
    bool mBottomRowMode{ false };
+   bool mRequireTouchForKnobAdjustment{ false };
 
    IAbletonGridController* mGridControlInterface{ nullptr };
 
@@ -235,6 +244,7 @@ private:
    {
       LedState mQueuedLedState{};
       LedState mLedState{};
+      LedPriority mLedPriority{ LedPriority::None };
       int mButtonState{ 0 };
       double mLastChangeTime{ 0.0 };
    };

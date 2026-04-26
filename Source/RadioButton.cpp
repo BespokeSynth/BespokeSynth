@@ -150,8 +150,6 @@ void RadioButton::Render()
 
    DrawBeacon(mX + mWidth / 2, mY + mHeight / 2);
 
-   float w, h;
-   GetDimensions(w, h);
    ofFill();
    ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
    ofRect(mX + 1, mY + 1, mWidth, mHeight);
@@ -161,6 +159,9 @@ void RadioButton::Render()
    {
       ofColor color, textColor;
       IUIControl::GetColors(color, textColor);
+
+      if (IsInactiveValue(mElements[i].mLabel))
+         color = ofColor(80, 80, 80);
 
       bool active = false;
       if (mVar)
@@ -173,42 +174,65 @@ void RadioButton::Render()
 
       if (active)
       {
-         float color_h, color_s, color_b;
-         color.getHsb(color_h, color_s, color_b);
-         color.setHsb(42, color_s, color_b);
+         float h, s, b;
+         color.getHsb(h, s, b);
+         color.setHsb(h, s * 2.0f, b * 1.5f);
          textColor.set(255, 255, 0, gModuleDrawAlpha);
       }
 
       ofFill();
-      if (active)
-         color.setBrightness(ofLerp(color.getBrightness(), 255, .3f));
       ofSetColor(color);
 
-      float x, y;
-
-      if (mDirection == kRadioVertical)
-      {
-         x = mX;
-         y = mY + i * radioSpacing;
-         ofRect(x, y, w, radioSpacing);
-      }
-      else
-      {
-         x = mX + mElementWidth * i;
-         y = mY;
-         ofRect(x, y, mElementWidth, radioSpacing);
-      }
+      ofRectangle rect = GetElementRect(i);
+      ofRect(rect);
 
       ofNoFill();
 
       ofSetColor(textColor);
       //ofRect(mX,mY+i*radioSpacing,w,15);
-      DrawTextNormal(mElements[i].mLabel, x + 2, y + 12);
+      DrawTextNormal(mElements[i].mLabel, rect.x + 2, rect.y + 12);
    }
+
+   for (int i = 0; i < mElements.size(); ++i)
+   {
+      bool active = false;
+      if (mVar)
+      {
+         if (mMultiSelect)
+            active = (1 << mElements[i].mValue) & *mVar;
+         else
+            active = mElements[i].mValue == *mVar;
+      }
+
+      if (active)
+      {
+         ofSetColor(255, 255, 255);
+         ofNoFill();
+         ofRectangle rect = GetElementRect(i);
+         ofRect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+      }
+   }
+
    ofPopMatrix();
    ofPopStyle();
 
-   DrawHover(mX, mY, w, h);
+   DrawHover(mX, mY, mWidth, mHeight);
+}
+
+ofRectangle RadioButton::GetElementRect(int index) const
+{
+   if (mDirection == kRadioVertical)
+   {
+      float x = mX;
+      float y = mY + index * radioSpacing;
+      return ofRectangle(x, y, mWidth, radioSpacing);
+   }
+   else
+   {
+      float x = mX + mElementWidth * index;
+      float y = mY;
+      return ofRectangle(x, y, mElementWidth, radioSpacing);
+   }
 }
 
 bool RadioButton::MouseMoved(float x, float y)

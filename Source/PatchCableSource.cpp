@@ -447,7 +447,8 @@ ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
             ret = ofVec2f(0, -1);
             break;
          case Direction::kNone:
-            ret = ofVec2f(0, 0);
+            ofVec2f toDest = ofVec2f(dest.x - mX, dest.y - mY);
+            ret = toDest / sqrtf(toDest.lengthSquared());
             break;
       }
 

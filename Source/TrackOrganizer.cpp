@@ -65,6 +65,10 @@ void TrackOrganizer::CreateUIControls()
    int cableX = 12;
    int cableY = 60;
 
+   mEnabledCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mEnabledCable->SetManualPosition(cableX, cableY);
+   cableX += 12;
+
    mSnapshotsCable = new PatchCableSource(this, kConnectionType_Special);
    mSnapshotsCable->AddTypeFilter("snapshots");
    mSnapshotsCable->SetColor(cableColor);
@@ -136,8 +140,11 @@ void TrackOrganizer::CreateUIControls()
    mSoundSelectorCable = new PatchCableSource(this, kConnectionType_UIControl);
    mSoundSelectorCable->SetManualPosition(cableX, cableY);
    AddPatchCableSource(mSoundSelectorCable);
+   cableY += 12;
 
    AddPatchCableSource(mSendCable);
+
+   AddPatchCableSource(mEnabledCable);
 }
 
 void TrackOrganizer::DrawModule()
@@ -232,7 +239,7 @@ void TrackOrganizer::PreDrawModuleUnclipped()
 
       if (mDrawTrackName)
       {
-         ofSetColor(255, 255, 255);
+         ofSetColor(GetColor());
          DrawTextBold(mTrackName, allModulesRect.x + 10, allModulesRect.y + 23, 21);
       }
 
@@ -297,7 +304,13 @@ void TrackOrganizer::DrawModuleUnclipped()
       tooltip = "sound selector";
    }
 
-   for (int i = 0; i < (size_t)mControlModuleCables.size(); ++i)
+   if (mEnabledCable->IsHovered())
+   {
+      hoverCable = mEnabledCable;
+      tooltip = "enabled";
+   }
+
+   for (int i = 0; i < (int)mControlModuleCables.size(); ++i)
    {
       if (mControlModuleCables[i]->IsHovered())
       {
@@ -514,6 +527,24 @@ IUIControl* TrackOrganizer::GetSoundSelector() const
    return dynamic_cast<IUIControl*>(mSoundSelectorCable->GetTarget());
 }
 
+IUIControl* TrackOrganizer::GetEnabledControl() const
+{
+   return dynamic_cast<IUIControl*>(mEnabledCable->GetTarget());
+}
+
+bool TrackOrganizer::IsTrackEnabled() const
+{
+   if (IUIControl* enabledControl = GetEnabledControl())
+      return enabledControl->GetValue() > 0;
+   return true;
+}
+
+void TrackOrganizer::SetTrackEnabled(bool enabled)
+{
+   if (IUIControl* enabledControl = GetEnabledControl())
+      enabledControl->SetValue(enabled ? 1 : 0, gTime);
+}
+
 IInputRecordable* TrackOrganizer::GetRecorder() const
 {
    return dynamic_cast<IInputRecordable*>(mRecorderCable->GetTarget());
@@ -527,6 +558,11 @@ Amplifier* TrackOrganizer::GetGain() const
 AudioSend* TrackOrganizer::GetSend() const
 {
    return dynamic_cast<AudioSend*>(mSendCable->GetTarget());
+}
+
+ofColor TrackOrganizer::GetColor() const
+{
+   return AbletonDevice::kColors[mColorIndex].color;
 }
 
 void TrackOrganizer::LoadLayout(const ofxJSONElement& moduleInfo)

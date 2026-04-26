@@ -66,12 +66,16 @@ public:
    IAbletonGridController* GetCurrentGridInterface() const;
    Snapshots* GetSnapshots() const;
    IUIControl* GetSoundSelector() const;
+   IUIControl* GetEnabledControl() const;
+   bool IsTrackEnabled() const;
+   void SetTrackEnabled(bool enabled);
    int GetNumPages() const { return (int)mControlModuleCables.size(); }
    std::vector<IDrawableModule*> GetControlModules() const;
    std::vector<IAbletonGridController*> GetGridInterfaces() const;
    IInputRecordable* GetRecorder() const;
    Amplifier* GetGain() const;
    AudioSend* GetSend() const;
+   ofColor GetColor() const;
    int GetColorIndex() const { return mColorIndex; }
    std::string GetTrackName() const { return mTrackName; }
    ofRectangle GetBoundingRect();
@@ -108,6 +112,7 @@ private:
    PatchCableSource* mGainCable{ nullptr };
    PatchCableSource* mSendCable{ nullptr };
    PatchCableSource* mOtherTrackModulesCable{ nullptr };
+   PatchCableSource* mEnabledCable{ nullptr };
    int mModuleIndex{ 0 };
    float mModuleViewOffset{ 0.0f };
    bool mSelectModulesOnMouseRelease{ false };

@@ -469,11 +469,19 @@ namespace AbletonDevice
 }
 #include "leathers/pop"
 
+enum class LedPriority
+{
+   None = 4,
+   Low = 3,
+   Normal = 2,
+   High = 1
+};
+
 class IAbletonGridDevice
 {
 public:
    virtual ~IAbletonGridDevice() {}
-   virtual void SetLed(int index, int color, int flashColor = -1) = 0;
+   virtual void SetLed(int index, int color, int flashColor = -1, LedPriority priority = LedPriority::Normal) = 0;
    virtual bool GetButtonState(int index) const = 0;
    virtual int GetGridControllerOption1Control() const = 0;
    virtual int GetGridControllerOption2Control() const = 0;

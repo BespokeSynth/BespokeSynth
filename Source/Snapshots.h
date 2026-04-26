@@ -61,6 +61,7 @@ public:
 
    bool HasSnapshot(int index) const;
    int GetCurrentSnapshot() const { return mCurrentSnapshot; }
+   int* GetCurrentSnapshotVar() { return &mCurrentSnapshot; }
    bool IsTargetingModule(IDrawableModule* module) const;
    void AddSnapshotTarget(IDrawableModule* target);
    void SetSnapshot(int idx, double time);
