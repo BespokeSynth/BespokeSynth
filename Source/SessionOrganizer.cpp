@@ -362,4 +362,3 @@ void SessionOrganizer::TrackColumn::Poll(SessionOrganizer* sessionOrganizer, int
       }
    }
 }
-

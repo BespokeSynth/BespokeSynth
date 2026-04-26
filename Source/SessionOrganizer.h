@@ -75,6 +75,7 @@ private:
       RadioButton* mSnapshotSelector{ nullptr };
       FloatSlider* mGainSlider{ nullptr };
       FloatSlider* mSendSlider{ nullptr };
+
    private:
       int mDummySnapshot;
       float mDummyGain;
