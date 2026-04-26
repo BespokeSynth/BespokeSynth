@@ -128,7 +128,7 @@ void AbletonLink::OnTransportAdvanced(float amount)
          double measureTime = (mLastReceivedBeat + mBeatOffset) / quantum;
          double localMeasureTime = TheTransport->GetMeasureTime(gTime);
          double difference = measureTime - localMeasureTime;
-         if (abs(difference) > .01f)
+         if (abs(difference) > .01f && (mSyncMode == SyncMode::SendAndReceive || mSyncMode == SyncMode::ReceiveOnly))
          {
             //too far off, correct
             TheTransport->SetMeasureTime(measureTime);
