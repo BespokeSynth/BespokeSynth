@@ -85,6 +85,7 @@ void AbletonLink::CreateUIControls()
    BUTTON(mShiftBeatForwardButton, "+beat");
    ENDUIBLOCK(mWidth, mHeight);
 
+   mSyncModeSelector->AddLabel("off", (int)SyncMode::Off);
    mSyncModeSelector->AddLabel("send + receive", (int)SyncMode::SendAndReceive);
    mSyncModeSelector->AddLabel("send only", (int)SyncMode::SendOnly);
    mSyncModeSelector->AddLabel("receive only", (int)SyncMode::ReceiveOnly);
@@ -98,7 +99,7 @@ void AbletonLink::Poll()
 
 void AbletonLink::OnTransportAdvanced(float amount)
 {
-   if (mEnabled && mLink.get() != nullptr)
+   if (mEnabled && mSyncMode != SyncMode::Off && mLink.get() != nullptr)
    {
       if ((mSyncMode == SyncMode::SendAndReceive || mSyncMode == SyncMode::SendOnly) && mTempo != TheTransport->GetTempo())
       {
@@ -108,11 +109,10 @@ void AbletonLink::OnTransportAdvanced(float amount)
          mLink->commitAudioSessionState(sessionState);
       }
 
-      auto& deviceManager = TheSynth->GetAudioDeviceManager();
-      if (deviceManager.getCurrentAudioDevice() != nullptr)
+      if (juce::AudioIODevice* device = TheSynth->GetAudioDeviceManager().getCurrentAudioDevice())
       {
-         auto sampleRate = deviceManager.getCurrentAudioDevice()->getCurrentSampleRate();
-         auto bufferSize = deviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples();
+         auto sampleRate = device->getCurrentSampleRate();
+         auto bufferSize = device->getCurrentBufferSizeSamples();
 
          const auto hostTimeUs = sHostTimeFilter.sampleTimeToHostTime(mSampleTime);
          const auto outputLatencyUs = std::chrono::microseconds{ std::llround(1.0e6 * bufferSize / sampleRate) };
@@ -128,16 +128,22 @@ void AbletonLink::OnTransportAdvanced(float amount)
          double measureTime = (mLastReceivedBeat + mBeatOffset) / quantum;
          double localMeasureTime = TheTransport->GetMeasureTime(gTime);
          double difference = measureTime - localMeasureTime;
-         if (abs(difference) > .01f && (mSyncMode == SyncMode::SendAndReceive || mSyncMode == SyncMode::ReceiveOnly))
+         if (abs(difference) > .01f)
          {
             //too far off, correct
-            TheTransport->SetMeasureTime(measureTime);
-            TheTransport->SetTempo(mTempo);
-            ofLog() << "correcting transport position for ableton link";
+            if (mSyncMode == SyncMode::SendAndReceive || mSyncMode == SyncMode::ReceiveOnly)
+            {
+               TheTransport->SetMeasureTime(measureTime);
+               TheTransport->SetTempo(mTempo);
+               ofLog() << "correcting transport position for ableton link";
+            }
+            else if (mSyncMode == SyncMode::SendOnly)
+            {
+               sessionState.forceBeatAtTime(localMeasureTime * quantum, adjustedTimeUs, quantum);
+               mLink->commitAudioSessionState(sessionState);
+               ofLog() << "adjusting ableton link session time to match transport";
+            }
          }
-
-         // Timeline modifications are complete, commit the results
-         //mLink->commitAudioSessionState(sessionState);
 
          mSampleTime += gBufferSize;
       }

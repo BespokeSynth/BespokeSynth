@@ -68,6 +68,7 @@ private:
 
    enum class SyncMode
    {
+      Off,
       SendAndReceive,
       SendOnly,
       ReceiveOnly
@@ -77,7 +78,7 @@ private:
    FloatSlider* mOffsetMsSlider{ nullptr };
    ClickButton* mShiftBeatBackwardButton{ nullptr };
    ClickButton* mShiftBeatForwardButton{ nullptr };
-   SyncMode mSyncMode{ SyncMode::SendAndReceive };
+   SyncMode mSyncMode{ SyncMode::Off };
    DropdownList* mSyncModeSelector{ nullptr };
 
    std::unique_ptr<ableton::Link> mLink;
