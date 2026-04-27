@@ -45,7 +45,6 @@ void SaveStateLoader::CreateUIControls()
    {
       BUTTON(mLoadButtons[i].mButton, ("load " + ofToString(i)).c_str());
       mLoadButtons[i].mButton->SetOverrideDisplayName("<select file>");
-      mLoadButtons[i].mButton->UpdateWidth();
    }
    ENDUIBLOCK0();
 }
@@ -121,7 +120,6 @@ void SaveStateLoader::UpdateButtonLabel(int index)
    {
       juce::File file(mLoadButtons[index].mFilePath);
       mLoadButtons[index].mButton->SetOverrideDisplayName(("load " + file.getFileName()).toRawUTF8());
-      mLoadButtons[index].mButton->UpdateWidth();
    }
 }
 

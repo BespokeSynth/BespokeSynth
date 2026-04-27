@@ -145,6 +145,16 @@ std::string DropdownList::GetLabel(int val) const
    return "";
 }
 
+bool DropdownList::HasLabel(int val) const
+{
+   for (int i = 0; i < mElements.size(); ++i)
+   {
+      if (mElements[i].mValue == val)
+         return true;
+   }
+   return false;
+}
+
 void DropdownList::Poll()
 {
    if (*mVar != mLastSetValue)
@@ -383,7 +393,17 @@ void DropdownList::OnClicked(float x, float y, bool right)
    mTotalColumns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
    int maxDisplayColumns = std::max(1, int((ofGetWidth() / GetModuleParent()->GetOwningContainer()->GetDrawScale()) / mMaxItemWidth));
    mDisplayColumns = std::min(mTotalColumns, maxDisplayColumns);
-   mCurrentPagedColumn = 0;
+
+   int selectedIndex = FindItemIndex(*mVar);
+   if (selectedIndex >= 0 && selectedIndex < (int)mElements.size() && mMaxPerColumn > 0)
+   {
+      int column = selectedIndex / mMaxPerColumn;
+      mCurrentPagedColumn = (column / mDisplayColumns) * mDisplayColumns;
+   }
+   else
+   {
+      mCurrentPagedColumn = 0;
+   }
 
    bool paged = (mDisplayColumns < mTotalColumns);
 
@@ -462,6 +482,11 @@ bool DropdownList::CanBeTargetedBy(PatchCableSource* source) const
    if (source->GetConnectionType() == kConnectionType_Pulse)
       return true;
    return IUIControl::CanBeTargetedBy(source);
+}
+
+bool DropdownList::ShouldDisplayAsInactive() const
+{
+   return IsInactiveValue(GetDisplayValue(*mVar));
 }
 
 void DropdownList::OnPulse(double time, float velocity, int flags)

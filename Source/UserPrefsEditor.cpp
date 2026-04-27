@@ -114,6 +114,8 @@ void UserPrefsEditor::Show()
       mSaveButton->SetLabel("save and exit");
       mCancelButton->SetShowing(false);
    }
+
+   TheSynth->MoveToFront(this);
 }
 
 void UserPrefsEditor::CreatePrefsFileIfNonexistent()

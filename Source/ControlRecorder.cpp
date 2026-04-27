@@ -90,7 +90,7 @@ void ControlRecorder::Poll()
       RecordPoint();
 }
 
-float ControlRecorder::GetPlaybackTime(double time)
+float ControlRecorder::GetPlaybackTime(double time) const
 {
    float measureTime = TheTransport->GetMeasureTime(time) - mRecordStartOffset;
    if (!mQuantizeLength)

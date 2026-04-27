@@ -110,6 +110,7 @@ private:
    void CalcSliderVal();
    void UpdateDimensions();
    void SetValueDirect(float value, double time, bool forceUpdate);
+   ofRectangle GetElementRect(int index) const;
 
    void OnClicked(float x, float y, bool right) override;
 

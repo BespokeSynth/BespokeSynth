@@ -159,6 +159,21 @@ void AbletonMoveLCD::DrawRect(int x, int y, int width, int height, bool filled)
    }
 }
 
+void AbletonMoveLCD::DrawArrow(int pointX, int pointY, int arrowSize, bool left, bool fill)
+{
+   for (int arrowX = 0; arrowX < arrowSize; ++arrowX)
+   {
+      for (int arrowY = 0; arrowY < arrowSize; ++arrowY)
+      {
+         if (arrowX == arrowY || (fill && arrowY < arrowX) || arrowX == arrowSize - 1)
+         {
+            DrawPixel(pointX + arrowX * (left ? 1 : -1), pointY - arrowY);
+            DrawPixel(pointX + arrowX * (left ? 1 : -1), pointY + arrowY);
+         }
+      }
+   }
+}
+
 void AbletonMoveLCD::ClearRect(int x, int y, int width, int height)
 {
    for (int penX = x; penX < x + width && penX >= 0 && penX < kMoveDisplayWidth; ++penX)

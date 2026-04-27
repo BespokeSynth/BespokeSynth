@@ -84,7 +84,7 @@ void Arpeggiator::DrawModule()
    ofSetColor(200, 200, 200, gModuleDrawAlpha);
    std::string chord;
    for (int i = 0; i < mChord.size(); ++i)
-      chord += GetArpNoteDisplay(mChord[i].pitch) + " ";
+      chord += GetArpNoteDisplay(mChord[i].mPitch) + " ";
    DrawTextNormal(chord, 5, 16);
    ofSetColor(0, 255, 0, gModuleDrawAlpha);
    std::string pad;
@@ -92,12 +92,12 @@ void Arpeggiator::DrawModule()
    {
       if (i != mArpIndex)
       {
-         pad += GetArpNoteDisplay(mChord[i].pitch) + " ";
+         pad += GetArpNoteDisplay(mChord[i].mPitch) + " ";
       }
       else
       {
          float w = gFont.GetStringWidth(pad, 13);
-         DrawTextNormal(GetArpNoteDisplay(mChord[i].pitch), 6 + w, 16);
+         DrawTextNormal(GetArpNoteDisplay(mChord[i].mPitch), 6 + w, 16);
          break;
       }
    }
@@ -163,7 +163,7 @@ void Arpeggiator::PlayNote(NoteMessage note)
       mChordMutex.lock();
       for (auto iter = mChord.begin(); iter != mChord.end(); ++iter)
       {
-         if (iter->pitch == note.pitch)
+         if (iter->mPitch == note.pitch)
          {
             mChord.erase(iter);
             break;
@@ -238,8 +238,8 @@ void Arpeggiator::OnTimeEvent(double time)
    }
    if (mChord.size())
    {
-      ArpNote current = mChord[mArpIndex];
-      int outPitch = current.pitch;
+      ArpNote& current = mChord[mArpIndex];
+      int outPitch = current.mPitch;
 
       outPitch += mCurrentOctaveOffset * TheScale->GetPitchesPerOctave();
 
@@ -249,8 +249,13 @@ void Arpeggiator::OnTimeEvent(double time)
          PlayNoteOutput(NoteMessage(time, mLastPitch, 0));
          offPitch = -1;
       }
-      float pressure = current.modulation.pressure ? current.modulation.pressure->GetValue(0) : 0;
-      PlayNoteOutput(NoteMessage(time, outPitch, ofClamp(current.vel + 127 * pressure, 0, 127), current.voiceIdx, current.modulation));
+      int velocity = current.mInitialVelocity;
+      int pressure = current.mModulation.pressure ? current.mModulation.pressure->GetValue(0) * 127 : 0;
+      if (pressure >= current.mInitialVelocity) //"release" velocity to pressure control if we press harder than our initial strike
+         current.mPressureControlledVelocity = true;
+      if (pressure > 0 && current.mPressureControlledVelocity)
+         velocity = pressure;
+      PlayNoteOutput(NoteMessage(time, outPitch, velocity, current.mVoiceIdx, current.mModulation));
       mLastPitch = outPitch;
    }
    if (offPitch != -1)

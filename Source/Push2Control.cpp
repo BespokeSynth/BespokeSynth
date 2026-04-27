@@ -55,7 +55,6 @@ using namespace juce::gl;
 using namespace AbletonDevice;
 
 bool Push2Control::sDrawingPush2Display = false;
-NVGcontext* Push2Control::sVG = nullptr;
 NVGLUframebuffer* Push2Control::sFB = nullptr;
 IUIControl* Push2Control::sBindToUIControl = nullptr;
 namespace
@@ -319,14 +318,13 @@ void Push2Control::LoadState(FileStreamIn& in, int rev)
 //static
 void Push2Control::CreateStaticFramebuffer()
 {
-   sVG = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-   assert(sVG);
+   assert(gNanoVGRenderContexts[(int)NanoVGRenderContext::AbletonPush2Screen]);
 
    const auto width = ableton::Push2DisplayBitmap::kWidth;
    const auto height = ableton::Push2DisplayBitmap::kHeight;
    const int pixelRatio = 1;
 
-   sFB = nvgluCreateFramebuffer(sVG, width * pixelRatio, height * pixelRatio, 0);
+   sFB = nvgluCreateFramebuffer(gNanoVGRenderContexts[(int)NanoVGRenderContext::AbletonPush2Screen], width * pixelRatio, height * pixelRatio, 0);
    assert(sFB);
 }
 
@@ -344,9 +342,6 @@ bool Push2Control::Initialize()
    }
 
    mPixels = new unsigned char[GetNumDisplayPixels()];
-
-   mFontHandle = nvgCreateFont(sVG, ofToResourcePath("frabk.ttf").c_str(), ofToResourcePath("frabk.ttf").c_str());
-   mFontHandleBold = nvgCreateFont(sVG, ofToResourcePath("frabk_m.ttf").c_str(), ofToResourcePath("frabk_m.ttf").c_str());
 
    const std::vector<std::string>& devices = mDevice.GetPortList(false);
    for (int i = 0; i < devices.size(); ++i)
@@ -392,11 +387,6 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    glClear(juce::gl::GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
    nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
 
-   nvgLineCap(vg, NVG_ROUND);
-   nvgLineJoin(vg, NVG_ROUND);
-   static float sSpacing = -.3f;
-   nvgTextLetterSpacing(vg, sSpacing);
-
    mModules.clear();
    std::vector<IDrawableModule*> modules;
    TheSynth->GetAllModules(modules);
@@ -406,8 +396,6 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
          mModules.push_back(modules[i]);
    }
    mModules = SortModules(mModules);
-
-   SetModuleGridLights();
 
    mModuleViewOffsetSmoothed = ofLerp(mModuleViewOffsetSmoothed, mModuleViewOffset, .3f);
    mModuleListOffsetSmoothed = ofLerp(mModuleListOffsetSmoothed, round(mModuleListOffset), .3f);
@@ -483,7 +471,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
 
          ofTranslate(-kColumnSpacing * mModuleViewOffsetSmoothed, 0);
 
-         nvgFontSize(sVG, 12);
+         nvgFontSize(gNanoVGRenderContexts[(int)NanoVGRenderContext::AbletonPush2Screen], 12);
          DrawControls(mButtonControls, false, 60);
          DrawControls(mSliderControls, true, 20);
       }
@@ -801,7 +789,7 @@ void Push2Control::DrawDisplayModuleControls()
       ofSetColor(IDrawableModule::GetColor(mDisplayModule->GetModuleCategory()));
       ofNoFill();
 
-      nvgFontSize(sVG, 16);
+      nvgFontSize(gNanoVGRenderContexts[(int)NanoVGRenderContext::AbletonPush2Screen], 16);
       bool screenDrawingHandled = mDisplayModule->DrawToPush2Screen();
       if (!screenDrawingHandled)
       {
@@ -1059,12 +1047,11 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
 
 void Push2Control::RenderPush2Display()
 {
-   auto mainVG = gNanoVG;
-   gNanoVG = sVG;
+   gNanoVG = gNanoVGRenderContexts[(int)NanoVGRenderContext::AbletonPush2Screen]; // swap all drawing to happen in push 2 render context
    sDrawingPush2Display = true;
-   DrawToFramebuffer(sVG, sFB, gTime / 300, kPixelRatio);
+   DrawToFramebuffer(gNanoVGRenderContexts[(int)NanoVGRenderContext::AbletonPush2Screen], sFB, gTime / 300, kPixelRatio);
    sDrawingPush2Display = false;
-   gNanoVG = mainVG;
+   gNanoVG = gNanoVGRenderContexts[(int)NanoVGRenderContext::Main];
 
    // Tells the bridge we're done with drawing and the frame can be sent to the display
    ThePushBridge.Flip(mPixels);
@@ -1072,6 +1059,24 @@ void Push2Control::RenderPush2Display()
 
 void Push2Control::Poll()
 {
+   MidiNote noteMessage;
+   while (mQueuedNoteMessages.consume(noteMessage))
+      OnMidiNote_Consume(noteMessage);
+
+   MidiControl controlMessage;
+   while (mQueuedControlMessages.consume(controlMessage))
+      OnMidiControl_Consume(controlMessage);
+
+   MidiPitchBend pitchBend;
+   while (mQueuedPitchBendMessages.consume(pitchBend))
+      OnMidiPitchBend_Consume(pitchBend);
+
+   MidiPressure pressureMessage;
+   while (mQueuedPressureMessages.consume(pressureMessage))
+      OnMidiPressure_Consume(pressureMessage);
+
+   SetModuleGridLights();
+
    if (mPendingSpawnPitch != -1)
    {
       int padNum = mPendingSpawnPitch - 36;
@@ -1270,7 +1275,7 @@ void Push2Control::SwitchToBookmarkedModule(int slotIndex)
       SetDisplayModule(mBookmarkSlots[slotIndex], true);
 }
 
-void Push2Control::SetLed(int index, int color, int flashColor /*=-1*/)
+void Push2Control::SetLed(int index, int color, int flashColor /*=-1*/, LedPriority priority /*= LedPriority::Normal*/)
 {
    assert(index >= 0 && index < 128 * 2);
 
@@ -1316,6 +1321,19 @@ void Push2Control::OnMidiNote(MidiNote& note)
 {
    mButtonState[note.mPitch] = note.mVelocity > 0;
 
+   if (mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl_InputThread(this, note.mPitch, note.mVelocity);
+      if (handled)
+         return;
+   }
+
+   // queue up the message to be handled in OnMidiNote_Consume()
+   mQueuedNoteMessages.produce(note);
+}
+
+void Push2Control::OnMidiNote_Consume(MidiNote& note)
+{
    if (mGridControlInterface != nullptr)
    {
       bool handled = mGridControlInterface->OnAbletonGridControl(this, note.mPitch, note.mVelocity);
@@ -1520,6 +1538,20 @@ void Push2Control::OnMidiControl(MidiControl& control)
 
    mButtonState[control.mControl] = control.mValue > 0;
 
+   if (mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl_InputThread(this, control.mControl, control.mValue);
+      if (handled)
+         return;
+   }
+
+   // queue up the message to be handled in OnMidiControl_Consume()
+
+   mQueuedControlMessages.produce(control);
+}
+
+void Push2Control::OnMidiControl_Consume(MidiControl& control)
+{
    if (mGridControlInterface != nullptr)
    {
       bool handled = mGridControlInterface->OnAbletonGridControl(this, control.mControl, control.mValue);
@@ -2024,6 +2056,18 @@ void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
 {
    if (mGridControlInterface != nullptr)
    {
+      bool handled = mGridControlInterface->OnAbletonGridControl_InputThread(this, kPitchBendIndex, pitchBend.mValue);
+      if (handled)
+         return;
+   }
+
+   mQueuedPitchBendMessages.produce(pitchBend);
+}
+
+void Push2Control::OnMidiPitchBend_Consume(MidiPitchBend& pitchBend)
+{
+   if (mGridControlInterface != nullptr)
+   {
       bool handled = mGridControlInterface->OnAbletonGridControl(this, kPitchBendIndex, pitchBend.mValue);
       if (handled)
          return;
@@ -2033,6 +2077,28 @@ void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
    TheSynth->SetZoomLevel(pow(2, value * 2 - 1) + .1f);
 
    //ofLog() << "pitchbend " << pitchBend.mChannel << " " << pitchBend.mValue;
+}
+
+void Push2Control::OnMidiPressure(MidiPressure& pressure)
+{
+   if (mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl_InputThread(this, kChannelPressureIndex + pressure.mChannel, pressure.mPressure);
+      if (handled)
+         return;
+   }
+
+   mQueuedPressureMessages.produce(pressure);
+}
+
+void Push2Control::OnMidiPressure_Consume(MidiPressure& pressure)
+{
+   if (mGridControlInterface != nullptr)
+   {
+      bool handled = mGridControlInterface->OnAbletonGridControl(this, kChannelPressureIndex + pressure.mChannel, pressure.mPressure);
+      if (handled)
+         return;
+   }
 }
 
 int Push2Control::GetGridControllerOption1Control() const

@@ -60,6 +60,7 @@ public:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void KeyPressed(int key, bool isRepeat) override;
+   void DumpDebugData(std::string input, juce::FileOutputStream& out) override;
 
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
@@ -77,16 +78,17 @@ public:
    void CanvasUpdated(Canvas* canvas) override;
 
    //IAbletonGridController
+   bool OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
-   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) override;
-   bool HasHighPriorityAbletonMoveScreenUpdate(IAbletonGridDevice* abletonGrid) override;
+   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass) override;
 
    //IInputRecordable
    void SetRecording(bool record) override;
    bool IsRecording() const override { return mRecord; }
    void ClearRecording() override { Clear(NextBufferTime(false)); }
    void CancelRecording() override { SetRecording(false); }
+   float GetRecordingLengthMeasures() const override { return mNumMeasures; }
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
@@ -116,7 +118,9 @@ private:
    void QuantizeNotes();
    void LoadMidi();
    void SaveMidi();
-   bool ToggleEditPitch(int pitch);
+   bool RemoveEditPitch(int pitch);
+   bool AddEditPitch(int pitch, bool atEveryMeasure);
+   bool ToggleEditPitch(int pitch, bool atEveryMeasure);
    void DoubleLoop();
    void CopyNotesToClipboard(int stepIndex);
    std::string GetCurrentEditMeasureString() const;
@@ -142,7 +146,7 @@ private:
    bool mRecord{ false };
    Checkbox* mRecordCheckbox{ nullptr };
    bool mStopQueued{ false };
-   NoteInterval mInterval{ NoteInterval::kInterval_8n };
+   NoteInterval mInterval{ NoteInterval::kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };
    bool mFreeRecord{ false };
    Checkbox* mFreeRecordCheckbox{ nullptr };
@@ -152,6 +156,7 @@ private:
    LaunchpadKeyboard* mGridKeyboardInterface{ nullptr };
 
    int mEditMeasureOffset{ 0 };
+   float mEditMeasureOffsetSlider{ 0.0f };
    double mEditHoldTime{ 0.0 };
    double mCopyHoldTime{ 0.0 };
    int mEditHoldStep{ -1 };

@@ -31,6 +31,8 @@
 class FileStreamIn;
 class FileStreamOut;
 class PatchCableSource;
+class IModulator;
+class IControlVisualizer;
 
 #define HIDDEN_UICONTROL 9999
 
@@ -38,7 +40,8 @@ enum AnchorDirection
 {
    kAnchor_Below,
    kAnchor_Right,
-   kAnchor_Right_Padded
+   kAnchor_Right_Padded,
+   kAnchor_Below_Padded
 };
 
 class IUIControl : public IClickable
@@ -46,7 +49,7 @@ class IUIControl : public IClickable
 public:
    IUIControl()
    {}
-   virtual void Delete() { delete this; }
+   virtual void Delete() { mIsDeleted = true; }
    void AddRemoteController() { ++mRemoteControlCount; }
    void RemoveRemoteController() { --mRemoteControlCount; }
    virtual void SetFromMidiCC(float slider, double time, bool setViaModulator) = 0;
@@ -97,24 +100,34 @@ public:
    virtual float GetModulationRangeMin() const { return 0; }
    virtual float GetModulationRangeMax() const { return 1; }
    virtual bool ShouldSerializeForSnapshot() const { return false; }
+   virtual IModulator* GetModulator() { return nullptr; }
+   virtual bool ShouldDisplayAsInactive() const { return false; }
+   void SetControlVisualizer(IControlVisualizer* visualizer) { mControlVisualizer = visualizer; }
+   IControlVisualizer* GetControlVisualizer() const { return mControlVisualizer; }
 
    static void SetNewManualHoverViaTab(int direction);
    static void SetNewManualHoverViaArrow(ofVec2f direction);
    static bool WasLastHoverSetManually() { return sLastUIHoverWasSetManually; }
+   static bool IsInactiveValue(std::string valueLabel);
 
    static void DestroyCablesTargetingControls(std::vector<IUIControl*> controls);
 
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;
 
+   static ofColor sCurrentOverrideColor;
+   static bool sUseOverrideColor;
+
 protected:
-   virtual ~IUIControl();
+   ~IUIControl() override;
 
    int mRemoteControlCount{ 0 };
    bool mCableTargetable{ true };
    bool mNoHover{ false };
    bool mShouldSaveState{ true };
    bool mSnapshotHighlight{ false };
+   bool mIsDeleted{ false };
+   IControlVisualizer* mControlVisualizer{ nullptr };
 
    static IUIControl* sLastHoveredUIControl;
    static bool sLastUIHoverWasSetManually;

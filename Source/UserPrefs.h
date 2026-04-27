@@ -311,6 +311,7 @@ public:
    UserPrefBool wrap_mouse_on_pan{ "wrap_mouse_on_pan", true, UserPrefCategory::General };
    UserPrefBool autosave{ "autosave", false, UserPrefCategory::General };
    UserPrefBool show_tooltips_on_load{ "show_tooltips_on_load", true, UserPrefCategory::General };
+   UserPrefBool show_welcome_screen{ "show_welcome_screen", true, UserPrefCategory::General };
    UserPrefBool show_minimap{ "show_minimap", false, UserPrefCategory::General };
    UserPrefFloat minimap_margin{ "minimap_margin", 10, 0, 50, UserPrefCategory::General };
    UserPrefDropdownString minimap_corner{ "minimap_corner", "Top right", 150, UserPrefCategory::General };

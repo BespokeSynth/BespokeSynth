@@ -63,12 +63,6 @@ void Checkbox::SetDisplayText(bool display)
    UpdateWidth();
 }
 
-void Checkbox::SetOverrideDisplayName(std::string name)
-{
-   IUIControl::SetOverrideDisplayName(name);
-   UpdateWidth();
-}
-
 void Checkbox::UpdateWidth()
 {
    if (mDisplayText)

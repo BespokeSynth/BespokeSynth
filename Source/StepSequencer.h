@@ -137,7 +137,7 @@ public:
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
-   void SendPressure(int pitch, int pressure) override;
+   void SendPressure(int channel, int pressure) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IPulseReceiver

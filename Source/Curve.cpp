@@ -62,7 +62,7 @@ void Curve::AddPointAtEnd(CurvePoint point)
    ++mNumCurvePoints;
 }
 
-int Curve::FindIndexForTime(float time)
+int Curve::FindIndexForTime(float time) const
 {
    int max = mNumCurvePoints - 1;
    int left = 0;
@@ -83,6 +83,11 @@ int Curve::FindIndexForTime(float time)
    return -1;
 }
 
+float Curve::EvaluateAtPercent(float percent, bool holdEndForLoop)
+{
+   return Evaluate(ofLerp(mStart, mEnd, percent), holdEndForLoop);
+}
+
 float Curve::Evaluate(float time, bool holdEndForLoop)
 {
    float retVal = mDefaultValue;
@@ -99,7 +104,7 @@ float Curve::Evaluate(float time, bool holdEndForLoop)
 
       int beforeIndex = 0;
       int quickCheckIndex = mLastEvalIndex;
-      if (quickCheckIndex < mNumCurvePoints &&
+      if (quickCheckIndex >= 0 && quickCheckIndex < mNumCurvePoints &&
           mPoints[quickCheckIndex].mTime < time &&
           (quickCheckIndex == mNumCurvePoints - 1 || mPoints[quickCheckIndex + 1].mTime >= time))
       {
@@ -136,7 +141,7 @@ void Curve::Render()
    ofBeginShape();
    for (int i = 0; i < mWidth; ++i)
    {
-      float val = Evaluate(ofMap(float(i) / mWidth, 0, 1, mStart, mEnd));
+      float val = EvaluateAtPercent(float(i) / mWidth);
 
       if (i > 0)
       {

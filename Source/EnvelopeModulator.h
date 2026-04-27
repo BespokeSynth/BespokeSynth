@@ -48,7 +48,6 @@ public:
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return true; }
    bool ShouldSuppressAutomaticOutputCable() override { return true; }
-   void Delete() { delete this; }
    void DrawModule() override;
 
    void Start(double time, const ::ADSR& adsr);

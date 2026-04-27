@@ -39,13 +39,14 @@ class MidiDevice;
 class Sample;
 class PatchCable;
 class MidiController;
-class NVGcontext;
 class QuickSpawnMenu;
 class ADSRDisplay;
 class UserPrefsEditor;
 class Minimap;
 class ScriptWarningPopup;
 class NoteOutputQueue;
+class WelcomeScreen;
+struct NVGLUframebuffer;
 
 enum LogEventType
 {
@@ -78,10 +79,10 @@ public:
    virtual ~ModularSynth();
 
    void Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juce::AudioFormatManager* globalAudioFormatManager, juce::Component* mainComponent, juce::OpenGLContext* openGLContext);
-   void LoadResources(void* nanoVG, void* fontBoundsNanoVG);
+   void LoadResources();
    void InitIOBuffers(int inputChannelCount, int outputChannelCount);
    void Poll();
-   void Draw(void* vg);
+   void Draw();
    void PostRender();
 
    void Exit();
@@ -215,6 +216,7 @@ public:
    bool ShouldDimModule(IDrawableModule* module);
    LocationZoomer* GetLocationZoomer() { return &mZoomer; }
    IDrawableModule* GetModuleAtCursor(int offsetX = 0, int offsetY = 0);
+   WelcomeScreen* GetWelcomeScreen() { return mWelcomeScreen; }
 
    void RegisterPatchCable(PatchCable* cable);
    void UnregisterPatchCable(PatchCable* cable);
@@ -239,6 +241,7 @@ public:
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
    static std::thread::id GetMainThreadID() { return sMainThreadId; }
    static std::thread::id GetAudioThreadID() { return sAudioThreadId; }
+   static std::thread::id GetRenderThreadID() { return sRenderThreadId; }
    NoteOutputQueue* GetNoteOutputQueue() { return mNoteOutputQueue; }
 
    IDrawableModule* CreateModule(const ofxJSONElement& moduleInfo);
@@ -255,6 +258,7 @@ public:
    void SetIsLoadingState(bool loading) { mIsLoadingState = loading; }
 
    static std::string GetUserPrefsPath();
+   static std::string GetWorkspaceDataPath();
    static void CrashHandler(void*);
    static void DumpStats(bool isCrash, void* crashContext);
 
@@ -262,8 +266,8 @@ public:
    ofxJSONElement GetLayout();
    void SaveLayoutAsPopup();
    void SaveOutput();
-   void SaveState(std::string file, bool autosave);
    void LoadState(std::string file);
+   static void LoadStateHeader(FileStreamIn& in, unsigned char*& screenshotData, int& screenshotSize, std::string& jsonLayoutString);
    void SetStartupSaveStateFile(std::string bskPath);
    void SaveCurrentState();
    void SaveStatePopup();
@@ -292,9 +296,11 @@ public:
 
    static int sLoadingFileSaveStateRev;
    static int sLastLoadedFileSaveStateRev;
-   static constexpr int kSaveStateRev = 426;
+   static constexpr int kSaveStateRev = 427;
 
 private:
+   void SaveState(std::string file, bool autosave);
+   void CompleteQueuedSaveState();
    void ResetLayout();
    void ReconnectMidiDevices();
    void DrawConsole();
@@ -309,8 +315,18 @@ private:
    bool FindCircularDependencySearch(std::list<IAudioSource*> chain, IAudioSource* searchFrom);
    void ClearCircularDependencyMarkers();
    bool IsCurrentSaveStateATemplate() const;
+   void AddRecentFile(std::string file, bool saved);
 
    void ReadClipboardTextFromSystem();
+
+   struct QueuedSaveStateInfo
+   {
+      bool mQueued{ false };
+      std::string mFile{};
+      bool mAutosave{ false };
+      bool mWaitingForScreenshot{ true };
+   };
+   QueuedSaveStateInfo mQueuedSaveStateInfo{};
 
    int mIOBufferSize{ 0 };
 
@@ -351,6 +367,7 @@ private:
    QuickSpawnMenu* mQuickSpawn{ nullptr };
    std::unique_ptr<Minimap> mMinimap{ nullptr };
    UserPrefsEditor* mUserPrefsEditor{ nullptr };
+   WelcomeScreen* mWelcomeScreen{ nullptr };
 
    RollingBuffer* mGlobalRecordBuffer{ nullptr };
    int mRecordingLength{ 0 };
@@ -372,6 +389,7 @@ private:
    NamedMutex mAudioThreadMutex;
    static std::thread::id sMainThreadId;
    static std::thread::id sAudioThreadId;
+   static std::thread::id sRenderThreadId;
    NoteOutputQueue* mNoteOutputQueue{ nullptr };
 
    bool mAudioPaused{ false };
@@ -449,6 +467,11 @@ private:
 
    std::unique_ptr<juce::AudioPluginFormatManager> mAudioPluginFormatManager;
    std::unique_ptr<juce::KnownPluginList> mKnownPluginList;
+
+   NVGLUframebuffer* mScreenshotFrameBuffer{ nullptr };
+   unsigned char* mScreenshotPixels{ nullptr };
+
+   ofxJSONElement mWorkspaceData;
 };
 
 extern ModularSynth* TheSynth;

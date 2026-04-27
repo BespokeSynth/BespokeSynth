@@ -384,14 +384,16 @@ void NoteTable::PlayColumn(NoteMessage note)
 
 void NoteTable::UpdateGridControllerLights(bool force)
 {
-   if (mGridControlTarget->GetGridController())
+   if (auto* grid = mGridControlTarget->GetGridController())
    {
-      for (int x = 0; x < mGridControlTarget->GetGridController()->NumCols(); ++x)
+      int numCols = grid->NumCols();
+      int numRows = grid->NumRows();
+      for (int x = 0; x < numCols; ++x)
       {
-         for (int y = 0; y < mGridControlTarget->GetGridController()->NumRows(); ++y)
+         for (int y = 0; y < numRows; ++y)
          {
             int column = x + mGridControlOffsetX;
-            int row = y - mGridControlOffsetY;
+            int row = mGridControlOffsetY + (numRows - 1 - y);
 
             GridColor color = GridColor::kGridColorOff;
             if (column < mLength)
@@ -404,7 +406,7 @@ void NoteTable::UpdateGridControllerLights(bool force)
                      color = GridColor::kGridColor1Bright;
                }
             }
-            mGridControlTarget->GetGridController()->SetLight(x, y, color, force);
+            grid->SetLight(x, y, color, force);
          }
       }
    }
@@ -418,7 +420,7 @@ void NoteTable::OnControllerPageSelected()
 void NoteTable::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
    int col = x + mGridControlOffsetX;
-   int row = y - mGridControlOffsetY;
+   int row = mGridControlOffsetY + (grid->NumRows() - 1 - y);
    if (grid == mGridControlTarget->GetGridController() && col >= 0 && col < mLength && velocity > 0)
    {
       mGrid->SetVal(col, row, mGrid->GetVal(col, row) > 0 ? 0 : 1);

@@ -84,7 +84,7 @@ public:
    }
    void SetBezierControl(float control) { mBezierControl = control; }
    void SetModulator(IModulator* modulator);
-   IModulator* GetModulator() { return mModulator; }
+   IModulator* GetModulator() override { return mModulator; }
    float& GetModulatorMin() { return mModulatorMin; }
    float& GetModulatorMax() { return mModulatorMax; }
    bool ModulatorUsesLiteralValue() const override { return true; }

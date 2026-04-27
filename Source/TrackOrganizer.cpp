@@ -31,6 +31,7 @@
 #include "LaunchpadKeyboard.h"
 #include "IInputRecordable.h"
 #include "Amplifier.h"
+#include "AudioSend.h"
 #include "UIControlMacros.h"
 
 #include <cstring>
@@ -63,6 +64,10 @@ void TrackOrganizer::CreateUIControls()
 
    int cableX = 12;
    int cableY = 60;
+
+   mEnabledCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mEnabledCable->SetManualPosition(cableX, cableY);
+   cableX += 12;
 
    mSnapshotsCable = new PatchCableSource(this, kConnectionType_Special);
    mSnapshotsCable->AddTypeFilter("snapshots");
@@ -104,6 +109,12 @@ void TrackOrganizer::CreateUIControls()
    AddPatchCableSource(mGainCable);
    cableX += 12;
 
+   mSendCable = new PatchCableSource(this, kConnectionType_Special);
+   mSendCable->AddTypeFilter("send");
+   mSendCable->SetColor(cableColor);
+   mSendCable->SetManualPosition(cableX, cableY);
+   cableX += 12;
+
    cableX += 10;
 
    mOtherTrackModulesCable = new PatchCableSource(this, kConnectionType_Special);
@@ -120,6 +131,20 @@ void TrackOrganizer::CreateUIControls()
       mGridInterfaceCables[i]->SetManualPosition(controlModuleCablePos.x + i * 12, controlModuleCablePos.y + 12);
       AddPatchCableSource(mGridInterfaceCables[i]);
    }
+
+   ofVec2f snapshotCablePosition = mSnapshotsCable->GetManualPosition();
+   cableX = snapshotCablePosition.x;
+   cableY = snapshotCablePosition.y;
+   cableY += 12;
+
+   mSoundSelectorCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mSoundSelectorCable->SetManualPosition(cableX, cableY);
+   AddPatchCableSource(mSoundSelectorCable);
+   cableY += 12;
+
+   AddPatchCableSource(mSendCable);
+
+   AddPatchCableSource(mEnabledCable);
 }
 
 void TrackOrganizer::DrawModule()
@@ -172,8 +197,7 @@ std::list<IDrawableModule*> TrackOrganizer::GetAllTrackModules()
 ofRectangle TrackOrganizer::GetBoundingRect()
 {
    ofRectangle allModulesRect = GetRect();
-   std::list<IDrawableModule*> trackModules = GetAllTrackModules();
-   for (auto* module : trackModules)
+   for (auto* module : mAllModules)
    {
       if (module != nullptr && !module->IsDeleted() &&
           module->GetOwningContainer() != nullptr && module->IsShowing())
@@ -215,7 +239,7 @@ void TrackOrganizer::PreDrawModuleUnclipped()
 
       if (mDrawTrackName)
       {
-         ofSetColor(255, 255, 255);
+         ofSetColor(GetColor());
          DrawTextBold(mTrackName, allModulesRect.x + 10, allModulesRect.y + 23, 21);
       }
 
@@ -231,7 +255,7 @@ void TrackOrganizer::PreDrawModuleUnclipped()
    }
 }
 
-void TrackOrganizer::DrawModuleUnclipped()
+void TrackOrganizer::DrawModuleDecoration(IDrawableModule* module)
 {
    //colorize connected modules to match track color
    ofPushStyle();
@@ -244,32 +268,27 @@ void TrackOrganizer::DrawModuleUnclipped()
    ofSetColor(color);
    ofSetLineWidth(3);
    ofNoFill();
-   std::list<IDrawableModule*> trackModules = GetAllTrackModules();
-   for (auto* module : trackModules)
+
+   if (!module->IsDeleted() && module->GetOwningContainer() != nullptr && module->IsShowing())
    {
-      if (module != nullptr && !module->IsDeleted() &&
-          module->GetOwningContainer() != nullptr && module->IsShowing())
+      ofRectangle rect = module->GetRect();
+      rect.x = 0;
+      rect.y = 0;
+
+      if (module->HasTitleBar())
       {
-         ofPushMatrix();
-
-         ofVec2f pos = GetPosition();
-         ofTranslate(-pos.x, -pos.y);
-         ofRectangle rect = module->GetRect();
-
-         if (module->HasTitleBar())
-         {
-            rect.y -= IDrawableModule::TitleBarHeight();
-            rect.height += IDrawableModule::TitleBarHeight();
-         }
-
-         ofRect(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6, 6);
-
-         ofPopMatrix();
+         rect.y -= IDrawableModule::TitleBarHeight();
+         rect.height += IDrawableModule::TitleBarHeight();
       }
+
+      ofRect(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6, 6);
    }
 
    ofPopStyle();
+}
 
+void TrackOrganizer::DrawModuleUnclipped()
+{
    std::string tooltip = "";
    PatchCableSource* hoverCable = nullptr;
 
@@ -279,7 +298,19 @@ void TrackOrganizer::DrawModuleUnclipped()
       tooltip = "snapshots";
    }
 
-   for (int i = 0; i < (size_t)mControlModuleCables.size(); ++i)
+   if (mSoundSelectorCable->IsHovered())
+   {
+      hoverCable = mSoundSelectorCable;
+      tooltip = "sound selector";
+   }
+
+   if (mEnabledCable->IsHovered())
+   {
+      hoverCable = mEnabledCable;
+      tooltip = "enabled";
+   }
+
+   for (int i = 0; i < (int)mControlModuleCables.size(); ++i)
    {
       if (mControlModuleCables[i]->IsHovered())
       {
@@ -303,6 +334,12 @@ void TrackOrganizer::DrawModuleUnclipped()
    {
       hoverCable = mGainCable;
       tooltip = "gain";
+   }
+
+   if (mSendCable->IsHovered())
+   {
+      hoverCable = mSendCable;
+      tooltip = "send";
    }
 
    if (mOtherTrackModulesCable->IsHovered())
@@ -355,7 +392,7 @@ void TrackOrganizer::Poll()
 
    if (mSelectModulesOnMouseRelease && !TheSynth->IsMouseButtonHeld(1))
    {
-      TheSynth->SetGroupSelectedModules(GetAllTrackModules());
+      TheSynth->SetGroupSelectedModules(mAllModules);
       mSelectModulesOnMouseRelease = false;
    }
 
@@ -381,6 +418,16 @@ void TrackOrganizer::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
       if (gain)
          gain->SetShowLevelMeter(true);
    }
+
+   std::list<IDrawableModule*> allModules = GetAllTrackModules();
+   for (auto* module : allModules)
+      module->AddModuleDecorator(this);
+   for (auto* module : mAllModules)
+   {
+      if (!ListContains(module, allModules))
+         module->RemoveModuleDecorator(this);
+   }
+   mAllModules = allModules;
 }
 
 void TrackOrganizer::KeyPressed(int key, bool isRepeat)
@@ -393,10 +440,9 @@ void TrackOrganizer::KeyPressed(int key, bool isRepeat)
 
 void TrackOrganizer::GatherModules(const std::vector<IDrawableModule*>& modulesToAdd)
 {
-   auto trackModules = GetAllTrackModules();
    for (auto* module : modulesToAdd)
    {
-      if (module != this && !ListContains(module, trackModules))
+      if (module != this && !ListContains(module, mAllModules))
       {
          //TODO(Ryan) smartly determine which category to put each module in, based upon type and chain position
          if (mSnapshotsCable->GetTarget() == nullptr && dynamic_cast<Snapshots*>(module))
@@ -407,6 +453,8 @@ void TrackOrganizer::GatherModules(const std::vector<IDrawableModule*>& modulesT
             mRecorderCable->SetTarget(module);
          else if (mGainCable->GetTarget() == nullptr && dynamic_cast<Amplifier*>(module))
             mGainCable->SetTarget(module);
+         else if (mSendCable->GetTarget() == nullptr && dynamic_cast<AudioSend*>(module))
+            mSendCable->SetTarget(module);
          else
             mOtherTrackModulesCable->AddPatchCable(module);
       }
@@ -474,6 +522,29 @@ Snapshots* TrackOrganizer::GetSnapshots() const
    return dynamic_cast<Snapshots*>(mSnapshotsCable->GetTarget());
 }
 
+IUIControl* TrackOrganizer::GetSoundSelector() const
+{
+   return dynamic_cast<IUIControl*>(mSoundSelectorCable->GetTarget());
+}
+
+IUIControl* TrackOrganizer::GetEnabledControl() const
+{
+   return dynamic_cast<IUIControl*>(mEnabledCable->GetTarget());
+}
+
+bool TrackOrganizer::IsTrackEnabled() const
+{
+   if (IUIControl* enabledControl = GetEnabledControl())
+      return enabledControl->GetValue() > 0;
+   return true;
+}
+
+void TrackOrganizer::SetTrackEnabled(bool enabled)
+{
+   if (IUIControl* enabledControl = GetEnabledControl())
+      enabledControl->SetValue(enabled ? 1 : 0, gTime);
+}
+
 IInputRecordable* TrackOrganizer::GetRecorder() const
 {
    return dynamic_cast<IInputRecordable*>(mRecorderCable->GetTarget());
@@ -482,6 +553,16 @@ IInputRecordable* TrackOrganizer::GetRecorder() const
 Amplifier* TrackOrganizer::GetGain() const
 {
    return dynamic_cast<Amplifier*>(mGainCable->GetTarget());
+}
+
+AudioSend* TrackOrganizer::GetSend() const
+{
+   return dynamic_cast<AudioSend*>(mSendCable->GetTarget());
+}
+
+ofColor TrackOrganizer::GetColor() const
+{
+   return AbletonDevice::kColors[mColorIndex].color;
 }
 
 void TrackOrganizer::LoadLayout(const ofxJSONElement& moduleInfo)

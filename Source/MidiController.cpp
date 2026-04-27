@@ -436,7 +436,7 @@ void MidiController::OnMidiPressure(MidiPressure& pressure)
 
    mModulation.GetPressure(voiceIdx)->SetValue(pressure.mPressure / 127.0f);
 
-   mNoteOutput.SendPressure(pressure.mPitch, pressure.mPressure);
+   mNoteOutput.SendPressure(pressure.mChannel, pressure.mPressure);
 }
 
 void MidiController::OnMidiProgramChange(MidiProgramChange& program)
@@ -2796,7 +2796,8 @@ void UIControlConnection::Poll()
       else if (mUIControl != nullptr)
       {
          StringCopy(mUIControlPathInput, mUIControl->Path().c_str(), MAX_TEXTENTRY_LENGTH);
-         if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
+         if ((mPageless || mPage == mUIOwner->GetPage()) &&
+             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->SetTarget(mUIControl);
       }
       if (mUIControlPathEntry != nullptr)
@@ -2808,7 +2809,8 @@ void UIControlConnection::Poll()
          mUIControlPathEntry->SetInErrorMode(true);
       if (PatchCable::sActivePatchCable == nullptr)
       {
-         if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
+         if ((mPageless || mPage == mUIOwner->GetPage()) &&
+             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->ClearPatchCables();
       }
    }

@@ -103,6 +103,7 @@ public:
       mManualPositionY = y;
       mAutomaticPositioning = false;
    }
+   void EnableAutomaticPositioning() { mAutomaticPositioning = true; }
    ofVec2f GetManualPosition() const
    {
       return ofVec2f(mManualPositionX, mManualPositionY);

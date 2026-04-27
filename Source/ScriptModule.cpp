@@ -82,6 +82,8 @@ false;
 #endif
 //static
 bool ScriptModule::sHasLoadedUntrustedScript = false;
+//static
+IAbletonGridDevice* ScriptModule::sCurrentAbletonGridDevice = nullptr;
 
 //static
 ofxJSONElement ScriptModule::sStyleJSON;
@@ -901,6 +903,9 @@ void ScriptModule::ConnectOscInput(int port)
 
 void ScriptModule::oscMessageReceived(const OSCMessage& msg)
 {
+   if (mLastError != "")
+      return;
+
    std::string address = msg.getAddressPattern().toString().toStdString();
    std::string messageString = address;
 
@@ -917,8 +922,37 @@ void ScriptModule::oscMessageReceived(const OSCMessage& msg)
    RunCode(gTime, "on_osc(\"" + messageString + "\")");
 }
 
+bool ScriptModule::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
+{
+   if (mLastError != "")
+      return false;
+
+   if (controlIndex >= AbletonDevice::kChannelPressureIndex && controlIndex < AbletonDevice::kChannelPressureIndex + AbletonDevice::kNumChannelPressureIndices)
+      return false; //don't spam with pressure messages
+
+   sCurrentAbletonGridDevice = abletonGrid;
+   RunCode(gTime, "on_ableton_grid_control(abletongriddevice.get_current(), " + ofToString(controlIndex) + ", " + ofToString(midiValue) + ")", K(hasReturnValue));
+
+   if (mLastError == "")
+      return mLastReturnValueBool;
+   else
+      return false;
+}
+
+void ScriptModule::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
+{
+   if (mLastError != "")
+      return;
+
+   sCurrentAbletonGridDevice = abletonGrid;
+   RunCode(gTime, "update_ableton_grid_leds(abletongriddevice.get_current())");
+}
+
 void ScriptModule::SysExReceived(const uint8_t* data, int data_size)
 {
+   if (mLastError != "")
+      return;
+
    // Avoid code injection by preventing the sysex payload to be interpreted as Python
    // - convert the sysex payload to hex
    // - use bytes.fromhex in Python to parse it
@@ -932,6 +966,9 @@ void ScriptModule::SysExReceived(const uint8_t* data, int data_size)
 
 void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float value, int channel)
 {
+   if (mLastError != "")
+      return;
+
    mMidiMessageQueueMutex.lock();
    mMidiMessageQueue.push_back("on_midi(" + ofToString((int)messageType) + ", " + ofToString(control) + ", " + ofToString(value) + ", " + ofToString(channel) + ")");
    mMidiMessageQueueMutex.unlock();
@@ -1224,7 +1261,7 @@ std::pair<int, int> ScriptModule::RunScript(double time, int lineStart /*=-1*/, 
    return std::make_pair(executionStartLine, executionEndLine);
 }
 
-void ScriptModule::RunCode(double time, std::string code)
+void ScriptModule::RunCode(double time, std::string code, bool hasReturnValue /*= false*/)
 {
    //should only be called from main thread
 
@@ -1248,7 +1285,23 @@ void ScriptModule::RunCode(double time, std::string code)
    try
    {
       FixUpCode(code);
-      py::exec(code, py::globals());
+
+      if (hasReturnValue)
+      {
+         py::object ret = py::eval(code, py::globals());
+
+         py::type returnType = py::type::of(ret);
+         if (py::isinstance<py::bool_>(ret))
+            mLastReturnValueBool = ret.cast<bool>();
+         else if (py::isinstance<py::int_>(ret))
+            mLastReturnValueInt = ret.cast<int>();
+         else if (py::isinstance<py::float_>(ret))
+            mLastReturnValueFloat = ret.cast<float>();
+      }
+      else
+      {
+         py::exec(code, py::globals());
+      }
 
       mCodeEntry->SetError(false);
       mLastError = "";
@@ -1317,6 +1370,8 @@ void ScriptModule::FixUpCode(std::string& code)
    ofStringReplace(code, "on_osc(", "on_osc__" + prefix + "(");
    ofStringReplace(code, "on_midi(", "on_midi__" + prefix + "(");
    ofStringReplace(code, "on_sysex(", "on_sysex__" + prefix + "(");
+   ofStringReplace(code, "on_ableton_grid_control(", "on_ableton_grid_control__" + prefix + "(");
+   ofStringReplace(code, "update_ableton_grid_leds(", "update_ableton_grid_leds__" + prefix + "(");
    ofStringReplace(code, "this.", GetThisName() + ".");
    ofStringReplace(code, "me.", GetThisName() + ".");
 }

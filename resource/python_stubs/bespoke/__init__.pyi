@@ -54,6 +54,9 @@ def random(seed, index):
 def get_modules():
    pass
 
+def get_controls(path):
+   pass
+
 def location_recall(location):
    pass
 

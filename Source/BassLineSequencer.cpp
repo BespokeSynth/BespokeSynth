@@ -1150,18 +1150,34 @@ void BassLineSequencer::SetUpFromSaveData()
       mEditPage = GetPageCount() - 1;
 }
 
-void BassLineSequencer::SaveState(FileStreamOut& out)
+void BassLineSequencer::SaveSequenceData(FileStreamOut& out)
 {
-   out << GetModuleSaveStateRev();
-
-   IDrawableModule::SaveState(out);
-
    for (auto& step : mSteps)
    {
       out << step.mTone;
       out << step.mVelocity;
       out << step.mTie;
    }
+}
+
+void BassLineSequencer::LoadSequenceData(FileStreamIn& in)
+{
+   for (auto& step : mSteps)
+   {
+      in >> step.mTone;
+      in >> step.mVelocity;
+      in >> step.mTie;
+   }
+}
+
+void BassLineSequencer::SaveState(FileStreamOut& out)
+{
+   out << GetModuleSaveStateRev();
+
+   IDrawableModule::SaveState(out);
+
+   SaveSequenceData(out);
+
    out << mHasExternalPulseSource;
    out << mWidth;
    out << mHeight;
@@ -1171,12 +1187,7 @@ void BassLineSequencer::LoadState(FileStreamIn& in, int rev)
 {
    IDrawableModule::LoadState(in, rev);
 
-   for (auto& step : mSteps)
-   {
-      in >> step.mTone;
-      in >> step.mVelocity;
-      in >> step.mTie;
-   }
+   LoadSequenceData(in);
 
    in >> mHasExternalPulseSource;
 
@@ -1189,6 +1200,16 @@ void BassLineSequencer::LoadState(FileStreamIn& in, int rev)
    }
 
    UpdateStepControls();
+}
+
+void BassLineSequencer::SaveSnapshotData(FileStreamOut& out, int snapshotIndex)
+{
+   SaveSequenceData(out);
+}
+
+void BassLineSequencer::LoadSnapshotData(FileStreamIn& in, int snapshotIndex)
+{
+   LoadSequenceData(in);
 }
 
 void BassLineSequencer::StepControl::Move(float x, float y)

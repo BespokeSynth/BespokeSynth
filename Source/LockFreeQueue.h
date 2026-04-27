@@ -85,5 +85,5 @@ private:
    };
 
    Node* first{ nullptr };
-   Atomic<Node*> divider, last;
+   juce::Atomic<Node*> divider, last;
 };

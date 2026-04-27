@@ -81,7 +81,7 @@ public:
    void OnTimeEvent(double time) override;
 
    //IAbletonGridController
-   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
+   bool OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -147,6 +147,9 @@ private:
    int mRootNote{ 4 }; // 4 = E
 
    std::array<int, 128> mCurrentNotes{};
+   std::array<bool, 128> mActiveChordPitches{}; // tracks all pitches in the currently playing chord
+   int mActiveChordX{ -1 }; // grid X of the active chord button
+   int mActiveChordY{ -1 }; // grid Y of the active chord button
    std::array<bool, 128> mPreviewNotes{};
    int mOctave{ 3 };
    IntSlider* mOctaveSlider{ nullptr };
@@ -169,4 +172,6 @@ private:
    GridControlTarget* mGridControlTarget{ nullptr };
    int mRows{ 8 };
    int mCols{ 8 };
+
+   Modulations mModulation{ true };
 };

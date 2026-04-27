@@ -189,7 +189,7 @@ void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserC
             control->Init(this);
 
             control->mInfo["path"] = targetUIControl->Path(false, false, GetParent());
-            control->mInfo["display_name"] = targetUIControl->Name();
+            control->mInfo["display_name"] = targetUIControl->GetDisplayName();
             control->mInfo["x"] = controlPos.x;
             control->mInfo["y"] = controlPos.y;
 
@@ -628,6 +628,9 @@ void ControlInterface::ControlElement::SetUpControl()
          mRadioButton->SetVar(mIntVar);
       mUIControl = mRadioButton;
    }
+
+   if (mUIControl != nullptr && mAttachedToUIControl != nullptr)
+      mUIControl->SetControlVisualizer(mAttachedToUIControl->GetControlVisualizer());
 
    ApplyInfoToControl();
 }

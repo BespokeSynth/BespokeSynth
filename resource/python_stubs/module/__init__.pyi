@@ -28,6 +28,9 @@ class module:
    def set_target(this, targetPath):
       pass
 
+   def set_target(this, cableSourceIndex, targetPath):
+      pass
+
    def get_target(this, ):
       pass
 
@@ -35,6 +38,9 @@ class module:
       pass
 
    def set_name(this, name):
+      pass
+
+   def get_name(this, ):
       pass
 
    def delete(this, ):

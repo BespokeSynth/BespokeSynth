@@ -99,7 +99,7 @@ void TextEntry::Delete()
 {
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == this)
       IKeyboardFocusListener::ClearActiveKeyboardFocus(false);
-   delete this;
+   IUIControl::Delete();
 }
 
 void TextEntry::Render()
@@ -206,7 +206,9 @@ void TextEntry::Render()
 
 void TextEntry::GetDimensions(float& width, float& height)
 {
-   if (mFlexibleWidth)
+   if (mOverrideWidth > 0)
+      width = mOverrideWidth;
+   else if (mFlexibleWidth)
       width = MAX(30.0f, gFontFixedWidth.GetStringWidth(mString, 12) + 4);
    else
       width = mCharWidth * 9;
