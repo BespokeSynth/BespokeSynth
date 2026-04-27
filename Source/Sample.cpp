@@ -170,7 +170,7 @@ bool Sample::WriteDataToFile(const std::string& path, float** data, int numSampl
    assert(outputTo != nullptr);
    bool b1{ false };
    auto writer = std::unique_ptr<juce::AudioFormatWriter>(
-   wavFormat->createWriterFor(outputTo.release(), gSampleRate, channels, UserPrefs.wav_bit_depth.Get(), b1, 0));
+   wavFormat->createWriterFor(outputTo.release(), gSampleRate, channels, UserPrefs.output_wav_bit_depth.Get(), b1, 0));
    writer->writeFromFloatArrays(data, channels, numSamples);
 
    return true;
