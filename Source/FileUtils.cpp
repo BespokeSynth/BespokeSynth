@@ -3,11 +3,10 @@
 
 juce::String getDirectoryOrDefault(std::string currentPath, std::string defaultPath)
 {
-   if (currentPath != "") {
+   if (currentPath != "")
       return juce::File(ofToDataPath(currentPath)).getParentDirectory().getFullPathName();
-   } else {
+   else
       return ofToDataPath(defaultPath);
-   }
 }
 
 // TODO: factor stateless methods like FileTimeComparator and ofToDataPath out of ModularSynth.cpp to here for unit testability

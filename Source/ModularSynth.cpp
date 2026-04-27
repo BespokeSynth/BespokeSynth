@@ -3027,11 +3027,10 @@ void ModularSynth::LoadStatePopup()
 void ModularSynth::LoadStatePopupImp()
 {
    String defaultDirectoryOrFile;
-   if (!mCurrentSaveStatePath.empty()) {
+   if (!mCurrentSaveStatePath.empty())
       defaultDirectoryOrFile = ofToDataPath(mCurrentSaveStatePath);
-   } else {
+   else
       defaultDirectoryOrFile = ofToDataPath("savestate/");
-   }
 
    FileChooser chooser("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", true, false, GetFileChooserParent());
    if (chooser.browseForFileToOpen())
