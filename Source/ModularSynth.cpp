@@ -3001,8 +3001,6 @@ juce::Component* ModularSynth::GetFileChooserParent() const
 #endif
 }
 
-std::string defaultSavestatePath = "savestate/";
-
 void ModularSynth::SaveStatePopup()
 {
    File targetFile;
@@ -3011,7 +3009,7 @@ void ModularSynth::SaveStatePopup()
    if (IsCurrentSaveStateATemplate())
       templateName = File(mCurrentSaveStatePath).getFileNameWithoutExtension().toStdString() + "_";
 
-   String savestateDirPath = getDirectoryOrDefault(mCurrentSaveStatePath, defaultSavestatePath);
+   String savestateDirPath = getDirectoryOrDefault(mCurrentSaveStatePath, "savestate/");
    targetFile = File(savestateDirPath).getChildFile(templateName + date + ".bsk");
 
    FileChooser chooser("Save current state as...", targetFile, "*.bsk", true, false, GetFileChooserParent());
