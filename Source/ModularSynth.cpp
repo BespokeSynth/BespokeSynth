@@ -459,6 +459,10 @@ void ModularSynth::Poll()
       mArrangeDependenciesWhenLoadCompletes = false;
    }
 
+   LogEventItem logEvent;
+   while (mMultithreadEventQueue.consume(logEvent))
+      LogEvent(logEvent.text, logEvent.type);
+
    if (gHoveredUIControl != nullptr && gHoveredUIControl->IsShowing() == false)
       gHoveredUIControl = nullptr;
 
@@ -3039,19 +3043,23 @@ void ModularSynth::ClearHeldSample()
 
 void ModularSynth::LogEvent(std::string event, LogEventType type)
 {
-   if (type == kLogEventType_Warning)
+   if (IsMainThread())
    {
-      !ofLog() << "warning: " << event;
-   }
-   else if (type == kLogEventType_Error)
-   {
-      !ofLog() << "error: " << event;
-      mErrors.push_back(event);
-   }
+      if (type == kLogEventType_Warning)
+         !ofLog() << "warning: " << event;
+      if (type == kLogEventType_Error)
+         !ofLog() << "error: " << event;
 
-   mEvents.push_back(LogEventItem(gTime, event, type));
-   if (mEvents.size() > 30)
-      mEvents.pop_front();
+      if (type == kLogEventType_Error)
+         mErrors.push_back(event);
+      mEvents.push_back(LogEventItem(gTime, event, type));
+      if (mEvents.size() > 30)
+         mEvents.pop_front();
+   }
+   else
+   {
+      mMultithreadEventQueue.produce(LogEventItem(gTime, event, type));
+   }
 }
 
 IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)

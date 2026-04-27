@@ -14,6 +14,7 @@
 #include "EffectFactory.h"
 #include "ModuleContainer.h"
 #include "Minimap.h"
+#include "LockFreeQueue.h"
 #include <thread>
 
 #ifdef BESPOKE_LINUX
@@ -374,6 +375,7 @@ private:
 
    struct LogEventItem
    {
+      LogEventItem() {}
       LogEventItem(double _time, std::string _text, LogEventType _type)
       : time(_time)
       , text(_text)
@@ -385,6 +387,7 @@ private:
    };
    std::list<LogEventItem> mEvents;
    std::list<std::string> mErrors;
+   LockFreeQueue<LogEventItem> mMultithreadEventQueue;
 
    NamedMutex mAudioThreadMutex;
    static std::thread::id sMainThreadId;
