@@ -61,6 +61,17 @@ namespace
    const float kSaveStateButtonPadY = 10;
 }
 
+
+bool WelcomeScreen::AlreadyHasFile(const juce::File& file)
+{
+   for (const auto& recentFile : mRecentFiles)
+   {
+      if (recentFile.mFile == file)
+         return true;
+   }
+   return false;
+}
+
 void WelcomeScreen::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
@@ -98,8 +109,7 @@ void WelcomeScreen::CreateUIControls()
       recentFile.mFile = File(workspaceData["recent_files"][i]["file"].asString());
       recentFile.mTime = Time::fromISO8601(workspaceData["recent_files"][i]["time"].asString());
       recentFile.mRecentlyOpened = !workspaceData["recent_files"][i]["saved"].asBool();
-      if (recentFile.mFile.existsAsFile() &&
-          recentFile.mFile.getParentDirectory().getFileName() != "autosave")
+      if (recentFile.mFile.existsAsFile())
          mRecentFiles.insert(mRecentFiles.begin(), recentFile);
    }
 
@@ -114,11 +124,19 @@ void WelcomeScreen::CreateUIControls()
                 {
                    return lhs.getLastModificationTime().toMilliseconds() > rhs.getLastModificationTime().toMilliseconds();
                 });
-      RecentFile recentFile;
-      recentFile.mFile = autosaveFiles[0];
-      recentFile.mTime = autosaveFiles[0].getLastModificationTime();
-      recentFile.mRecentlyOpened = false;
-      mRecentFiles.insert(mRecentFiles.begin(), recentFile);
+      RecentFile autosaveFile;
+      autosaveFile.mFile = autosaveFiles[0];
+      autosaveFile.mTime = autosaveFiles[0].getLastModificationTime();
+      autosaveFile.mRecentlyOpened = false;
+      for (auto iter = mRecentFiles.begin(); iter != mRecentFiles.end(); ++iter)
+      {
+         if (autosaveFile.mTime > iter->mTime)
+         {
+            if (!AlreadyHasFile(autosaveFile.mFile))
+               mRecentFiles.insert(iter, autosaveFile);
+            break;
+         }
+      }
    }
 
    if (mRecentFiles.size() < kMaxDesiredFiles)
@@ -137,14 +155,7 @@ void WelcomeScreen::CreateUIControls()
          if (files[i].getFileExtension() != ".bsk")
             continue;
 
-         bool alreadyInList = false;
-         for (int j = 0; j < mRecentFiles.size(); ++j)
-         {
-            if (mRecentFiles[j].mFile == files[i])
-               alreadyInList = true;
-         }
-
-         if (alreadyInList)
+         if (AlreadyHasFile(files[i]))
             continue;
 
          RecentFile recentFile;

@@ -75,6 +75,8 @@ private:
    void DrawModule() override;
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
+   bool AlreadyHasFile(const juce::File& file);
+
    struct RecentFile
    {
       juce::File mFile;
