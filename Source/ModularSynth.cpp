@@ -400,7 +400,7 @@ void ModularSynth::Poll()
       }
       else if (gHoveredUIControl != nullptr && gHoveredUIControl->IsMouseDown())
       {
-         if (GetKeyModifiers() == kModifier_Shift)
+         if (IsKeyModifierComboHeld(KeyModifierCombo::FineTune))
             desiredCursor = MouseCursor::CrosshairCursor;
          else if (gHoveredUIControl->GetModulator() != nullptr && gHoveredUIControl->GetModulator()->Active())
             desiredCursor = MouseCursor::UpDownLeftRightResizeCursor;
@@ -419,7 +419,7 @@ void ModularSynth::Poll()
       {
          desiredCursor = MouseCursor::DraggingHandCursor;
       }
-      else if (GetKeyModifiers() == kModifier_Shift)
+      else if (IsKeyModifierComboHeld(KeyModifierCombo::FineTune))
       {
          desiredCursor = MouseCursor::PointingHandCursor;
       }
@@ -1127,7 +1127,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    {
       if (key == OF_KEY_DOWN || key == OF_KEY_UP || key == OF_KEY_LEFT || key == OF_KEY_RIGHT)
       {
-         if (GetKeyModifiers() != kModifier_Command)
+         if (!IsKeyModifierComboHeld(KeyModifierCombo::AdjustControlFocus))
          {
             float inc;
             if (key == OF_KEY_LEFT)
@@ -1139,7 +1139,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
                inc = -1;
             else
                inc = 1;
-            if (GetKeyModifiers() & kModifier_Shift)
+            if (IsKeyModifierComboHeld(KeyModifierCombo::FineTune))
                inc *= .01f;
             gHoveredUIControl->Increment(inc);
          }
@@ -1237,7 +1237,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
 
    if (key == OF_KEY_LEFT || key == OF_KEY_RIGHT || key == OF_KEY_UP || key == OF_KEY_DOWN)
    {
-      if (GetKeyModifiers() == kModifier_Command)
+      if (IsKeyModifierComboHeld(KeyModifierCombo::AdjustControlFocus))
       {
          ofVec2f dir;
          if (key == OF_KEY_LEFT)
@@ -1339,7 +1339,24 @@ bool ModularSynth::IsMouseButtonHeld(int button) const
 
 bool ModularSynth::ShouldShowGridSnap() const
 {
-   return (mMoveModule || (!mGroupSelectedModules.empty() && IsMouseButtonHeld(1))) && (GetKeyModifiers() & kModifier_Command);
+   return (mMoveModule || (!mGroupSelectedModules.empty() && IsMouseButtonHeld(1))) && (IsKeyModifierComboHeld(KeyModifierCombo::GridSnap) || IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter));
+}
+
+bool ModularSynth::IsKeyModifierComboHeld(KeyModifierCombo combo) const
+{
+   if (combo == KeyModifierCombo::FineTune)
+      return GetKeyModifiers() == kModifier_Shift;
+   if (combo == KeyModifierCombo::GridSnap)
+      return GetKeyModifiers() == kModifier_Command;
+   if (combo == KeyModifierCombo::GridSnapCenter)
+      return GetKeyModifiers() == (kModifier_Command | kModifier_Alt);
+   if (combo == KeyModifierCombo::AdjustMinMax)
+      return GetKeyModifiers() == kModifier_Command;
+   if (combo == KeyModifierCombo::AdjustControlFocus)
+      return GetKeyModifiers() == kModifier_Command;
+   if (combo == KeyModifierCombo::AdjustSmooth)
+      return GetKeyModifiers() == kModifier_Alt;
+   return false;
 }
 
 void ModularSynth::SetGroupSelectedModules(std::list<IDrawableModule*> modules)
@@ -1408,7 +1425,7 @@ void ModularSynth::MouseMoved(int intX, int intY)
       {
          newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
          newY = round((newY - mMoveModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mMoveModule->TitleBarHeight();
-         if (GetKeyModifiers() & kModifier_Shift) // Snap to center of the module
+         if (IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter)) // Snap to center of the module
          {
             newX -= std::fmod(mMoveModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
             newY -= std::fmod(mMoveModule->GetRect().height / 2, UserPrefs.grid_snap_size.Get());
@@ -1727,7 +1744,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       {
          newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
          newY = round((newY - mLastClickedModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mLastClickedModule->TitleBarHeight();
-         if (GetKeyModifiers() & kModifier_Shift) // Snap to center of the module
+         if (IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter)) // Snap to center of the module
          {
             newX -= std::fmod(mLastClickedModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
             newY -= std::fmod(mLastClickedModule->GetRect().height / 2, UserPrefs.grid_snap_size.Get());
@@ -1752,7 +1769,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       {
          newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
          newY = round((newY - mMoveModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mMoveModule->TitleBarHeight();
-         if (GetKeyModifiers() & kModifier_Shift) // Snap to center of the module
+         if (IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter)) // Snap to center of the module
          {
             newX -= std::fmod(mMoveModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
             newY -= std::fmod(mMoveModule->GetRect().height / 2, UserPrefs.grid_snap_size.Get());
@@ -2010,7 +2027,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
          }
          float val = textEntry->GetValue();
          float change = yScroll > 0 ? 1 : -1;
-         if (GetKeyModifiers() & kModifier_Shift)
+         if (IsKeyModifierComboHeld(KeyModifierCombo::FineTune))
             change *= .01f;
          float min, max;
          textEntry->GetRange(min, max);
@@ -2028,7 +2045,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
       if (dropDownList)
       {
          auto increment = (yScroll > 0 ? 1. : -1.) / dropDownList->GetNumValues();
-         if (GetKeyModifiers() & kModifier_Shift)
+         if (IsKeyModifierComboHeld(KeyModifierCombo::FineTune))
             increment *= 3 * UserPrefs.scroll_multiplier_vertical.Get();
          if (gHoveredUIControl->InvertScrollDirection())
             increment *= -1;
@@ -2045,7 +2062,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
          movementScale = 200.0f / w;
       }
 
-      if (GetKeyModifiers() & kModifier_Shift)
+      if (IsKeyModifierComboHeld(KeyModifierCombo::FineTune))
          movementScale *= .01f;
 
       if (clickButton)

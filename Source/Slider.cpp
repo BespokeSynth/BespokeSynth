@@ -247,7 +247,7 @@ void FloatSlider::Render()
       ofPopStyle();
    }
 
-   if (gHoveredUIControl == this && (GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr && !IUIControl::WasLastHoverSetManually())
+   if (gHoveredUIControl == this && TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::AdjustMinMax) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr && !IUIControl::WasLastHoverSetManually())
    {
       ofPushStyle();
       ofFill();
@@ -308,7 +308,7 @@ void FloatSlider::OnClicked(float x, float y, bool right)
       return;
    }
 
-   if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && !IUIControl::WasLastHoverSetManually())
+   if (TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::AdjustMinMax) && mAllowMinMaxAdjustment && !IUIControl::WasLastHoverSetManually())
    {
       bool adjustMax;
       if (x > mWidth / 2)
@@ -365,7 +365,7 @@ void FloatSlider::SetValueForMouse(float x, float y)
 {
    float* var = GetModifyValue();
    float fX = x;
-   if (GetKeyModifiers() & kModifier_Shift)
+   if (TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::FineTune))
    {
       if (mFineRefX == -999)
       {
@@ -419,7 +419,7 @@ void FloatSlider::SetValueForMouse(float x, float y)
 
 bool FloatSlider::AdjustSmooth() const
 {
-   return (GetKeyModifiers() & kModifier_Alt) &&
+   return TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::AdjustSmooth) &&
           mComputeHasBeenCalledOnce; //no smoothing if we're not calling Compute()
 }
 
@@ -712,7 +712,7 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
 
       float evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *GetModifyValue(), evaluated);
-      if (expressionValid && ((evaluated >= mMin && evaluated <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
+      if (expressionValid && ((evaluated >= mMin && evaluated <= mMax) || (GetKeyModifiers() == kModifier_Shift)))
          SetValue(evaluated, NextBufferTime(false));
    }
    if (entry == mMaxEntry)
@@ -1009,7 +1009,7 @@ void IntSlider::Render()
       ofPopStyle();
    }
 
-   if (gHoveredUIControl == this && (GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr && !IUIControl::WasLastHoverSetManually())
+   if (gHoveredUIControl == this && TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::AdjustMinMax) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr && !IUIControl::WasLastHoverSetManually())
    {
       ofPushStyle();
       ofFill();
@@ -1040,7 +1040,7 @@ void IntSlider::OnClicked(float x, float y, bool right)
    if (right)
       return;
 
-   if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && !IUIControl::WasLastHoverSetManually())
+   if (TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::AdjustMinMax) && mAllowMinMaxAdjustment && !IUIControl::WasLastHoverSetManually())
    {
       bool adjustMax;
       if (x > mWidth / 2)
@@ -1083,7 +1083,7 @@ void IntSlider::SetValueForMouse(float x, float y)
 {
    int oldVal = *mVar;
    float fX = x;
-   if (GetKeyModifiers() & kModifier_Shift)
+   if (TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::FineTune))
    {
       if (mFineRefX == -999)
       {
@@ -1201,7 +1201,7 @@ void IntSlider::TextEntryComplete(TextEntry* entry)
       float evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *mVar, evaluated);
       int evaluatedInt = round(evaluated);
-      if (expressionValid && ((evaluatedInt >= mMin && evaluatedInt <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
+      if (expressionValid && ((evaluatedInt >= mMin && evaluatedInt <= mMax) || (GetKeyModifiers() == kModifier_Shift)))
          SetValue(evaluatedInt, NextBufferTime(false));
    }
    if (entry == mMaxEntry)

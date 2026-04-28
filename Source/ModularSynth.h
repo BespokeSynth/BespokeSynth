@@ -55,6 +55,16 @@ enum LogEventType
    kLogEventType_Error
 };
 
+enum class KeyModifierCombo
+{
+   FineTune,
+   GridSnap,
+   GridSnapCenter,
+   AdjustMinMax,
+   AdjustControlFocus,
+   AdjustSmooth,
+};
+
 class ConsoleListener : public IDrawableModule, public ITextEntryListener
 {
 public:
@@ -174,6 +184,7 @@ public:
    ModuleContainer* GetUIContainer() { return &mUILayerModuleContainer; }
    bool ShouldShowGridSnap() const;
    bool MouseMovedSignificantlySincePressed() const { return mMouseMovedSignificantlySincePressed; }
+   bool IsKeyModifierComboHeld(KeyModifierCombo combo) const;
 
    void ZoomView(float zoomAmount, bool fromMouse);
    void SetZoomLevel(float zoomLevel);
