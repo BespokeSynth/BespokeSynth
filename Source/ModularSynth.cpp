@@ -769,6 +769,7 @@ void ModularSynth::Draw()
          else if (gHoveredModule == GetTopModalFocusItem() && dynamic_cast<DropdownListModal*>(gHoveredModule))
          {
             DropdownListModal* list = dynamic_cast<DropdownListModal*>(gHoveredModule);
+            //Render the header's dropdown tooltips
             if (list->GetOwner()->GetModuleParent() == TheTitleBar)
             {
                std::string moduleTypeName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
@@ -776,6 +777,7 @@ void ModularSynth::Draw()
                tooltip = helpDisplay->GetModuleTooltipFromName(moduleTypeName);
                tooltipContainer = &mUILayerModuleContainer;
             }
+            //Render the effectchain's tooltips, and ONLY the effectchain
             else if (dynamic_cast<EffectChain*>(list->GetOwner()->GetParent()) != nullptr)
             {
                std::string effectName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();

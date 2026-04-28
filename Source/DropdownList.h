@@ -29,12 +29,17 @@
 #include "IDrawableModule.h"
 #include "ClickButton.h"
 #include "IPulseReceiver.h"
-#include "PatchCableSource.h"
 
+typedef void (*DropdownRenderFn)(ofRectangle renderRect, bool isHovering, bool isDrawnOnDropdownList, void* args);
 struct DropdownListElement
 {
-   std::string mLabel;
-   int mValue{ 0 };
+   std::string mLabel; //Text on the dropdown
+   int mValue{ 0 }; //Value of the dropdown, used for array indexing and modulation.
+   std::string mTooltipTag{}; //Localized Tooltip
+
+   float mReservedWidth{ 0.0f }; //Try to reserve additional space for special rendering
+   DropdownRenderFn mRenderer{ nullptr }; //If set, will call this function on draw, for custom rendering. Still draws the label.
+   void* mRenderArgs{ nullptr }; //Stores an argument for use. Sent into the function call.
 };
 
 class DropdownList;
@@ -104,10 +109,13 @@ public:
    DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width = -1);
    DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, float width = -1);
    IDropdownListener* GetOwner() { return mOwner; }
-   void AddLabel(std::string label, int value);
+   void AddLabel(const std::string& label, int value);
+   void AddLabel(const DropdownListElement& item);
    void RemoveLabel(int value);
-   void SetLabel(std::string label, int value);
+   void SetLabel(const std::string& label, int value);
+   void SetLabel(const DropdownListElement& item, int value);
    std::string GetLabel(int val) const;
+   DropdownListElement GetLabelObject(int val) const;
    bool HasLabel(int val) const;
    void SetDisplayStyle(DropdownDisplayStyle style) { mDisplayStyle = style; }
    void Render() override;
