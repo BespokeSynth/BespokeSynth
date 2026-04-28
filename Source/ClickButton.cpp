@@ -41,6 +41,7 @@ ClickButton::ClickButton(IButtonListener* owner, const char* label, int x, int y
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
    SetShouldSaveState(false);
+   SetIsRandomizable(false);
 }
 
 ClickButton::ClickButton(IButtonListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDirection, ButtonDisplayStyle displayStyle /*= ButtonDisplayStyle::kText*/)

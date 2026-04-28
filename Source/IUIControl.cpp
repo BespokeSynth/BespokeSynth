@@ -104,7 +104,18 @@ void IUIControl::DrawHover(float x, float y, float w, float h)
    if (Push2Control::sDrawingPush2Display)
       return;
 
-   if (gHoveredUIControl == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr && TheSynth->GetGroupSelectedModules().empty())
+   if (IsRandomizeControl())
+   {
+      ofPushStyle();
+      ofNoFill();
+      ofSetLineWidth(2);
+      ofColor randomizeColor;
+      randomizeColor.setHsb(FloatWrap(gTime / 500, 1) * 255, 150, 255);
+      ofSetColor(randomizeColor);
+      ofRect(x, y, w, h, 4);
+      ofPopStyle();
+   }
+   else if (gHoveredUIControl == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr && TheSynth->GetGroupSelectedModules().empty())
    {
       ofPushStyle();
       ofNoFill();
@@ -227,6 +238,28 @@ void IUIControl::GetColors(ofColor& color, ofColor& textColor)
    }
 }
 
+void IUIControl::Randomize()
+{
+   if (IsRandomizable())
+      SetFromMidiCC(ofRandom(1), NextBufferTime(false), true);
+}
+
+bool IUIControl::IsRandomizeControl()
+{
+   if (IsRandomizable() && TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::Randomize))
+   {
+      if (gHoveredUIControl == this)
+         return true;
+
+      if (IDrawableModule* randomizeModule = TheSynth->GetHoveredRandomizeModule())
+      {
+         if (GetModuleParent() == randomizeModule)
+            return true;
+      }
+   }
+   return false;
+}
+
 void IUIControl::RemoveFromOwner()
 {
    IDrawableModule* owner = dynamic_cast<IDrawableModule*>(GetParent());
@@ -238,7 +271,7 @@ void IUIControl::RemoveFromOwner()
 //static
 bool IUIControl::IsInactiveValue(std::string valueLabel)
 {
-   if (valueLabel == "0" || valueLabel == "none" || valueLabel == "off")
+   if (valueLabel == "0" || valueLabel == "none" || valueLabel == "off" || valueLabel == "")
       return true;
    return false;
 }

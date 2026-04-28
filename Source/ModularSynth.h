@@ -64,6 +64,7 @@ enum class KeyModifierCombo
    AdjustMinMax,
    AdjustControlFocus,
    AdjustSmooth,
+   Randomize,
 };
 
 class ConsoleListener : public IDrawableModule, public ITextEntryListener
@@ -186,6 +187,7 @@ public:
    bool ShouldShowGridSnap() const;
    bool MouseMovedSignificantlySincePressed() const { return mMouseMovedSignificantlySincePressed; }
    bool IsKeyModifierComboHeld(KeyModifierCombo combo) const;
+   IDrawableModule* GetHoveredRandomizeModule() const;
 
    void ZoomView(float zoomAmount, bool fromMouse);
    void SetZoomLevel(float zoomLevel);

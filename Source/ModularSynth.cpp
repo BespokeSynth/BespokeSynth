@@ -1360,7 +1360,19 @@ bool ModularSynth::IsKeyModifierComboHeld(KeyModifierCombo combo) const
       return GetKeyModifiers() == kModifier_Command;
    if (combo == KeyModifierCombo::AdjustSmooth)
       return GetKeyModifiers() == kModifier_Alt;
+   if (combo == KeyModifierCombo::Randomize)
+      return GetKeyModifiers() == (kModifier_Shift | kModifier_Command);
    return false;
+}
+
+IDrawableModule* ModularSynth::GetHoveredRandomizeModule() const
+{
+   if (IsKeyModifierComboHeld(KeyModifierCombo::Randomize))
+   {
+      if (gHoveredModule && gHoveredUIControl == nullptr)
+         return gHoveredModule;
+   }
+   return nullptr;
 }
 
 void ModularSynth::SetGroupSelectedModules(std::list<IDrawableModule*> modules)
@@ -1845,6 +1857,18 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
          gBindToUIControl = nullptr;
       else
          gBindToUIControl = gHoveredUIControl;
+      return;
+   }
+
+   if (gHoveredUIControl != nullptr && IsKeyModifierComboHeld(KeyModifierCombo::Randomize))
+   {
+      gHoveredUIControl->Randomize();
+      return;
+   }
+
+   if (IDrawableModule* randomizeModule = GetHoveredRandomizeModule())
+   {
+      randomizeModule->RandomizeModule();
       return;
    }
 

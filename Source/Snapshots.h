@@ -113,7 +113,6 @@ private:
    void SetGridSize(float w, float h);
    bool IsConnectedToPath(std::string path) const;
    void RandomizeTargets();
-   void RandomizeControl(IUIControl* control);
    void UpdateListGrid();
    void ResizeSnapshotCollection(int size);
 

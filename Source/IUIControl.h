@@ -104,6 +104,10 @@ public:
    virtual bool ShouldDisplayAsInactive() const { return false; }
    void SetControlVisualizer(IControlVisualizer* visualizer) { mControlVisualizer = visualizer; }
    IControlVisualizer* GetControlVisualizer() const { return mControlVisualizer; }
+   virtual void Randomize();
+   bool IsRandomizable() const { return mIsRandomizable; }
+   void SetIsRandomizable(bool randomizable) { mIsRandomizable = randomizable; }
+   bool IsRandomizeControl();
 
    static void SetNewManualHoverViaTab(int direction);
    static void SetNewManualHoverViaArrow(ofVec2f direction);
@@ -128,6 +132,7 @@ protected:
    bool mSnapshotHighlight{ false };
    bool mIsDeleted{ false };
    IControlVisualizer* mControlVisualizer{ nullptr };
+   bool mIsRandomizable{ true };
 
    static IUIControl* sLastHoveredUIControl;
    static bool sLastUIHoverWasSetManually;

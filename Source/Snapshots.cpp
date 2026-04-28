@@ -553,21 +553,12 @@ void Snapshots::SetSnapshot(int idx, double time)
 void Snapshots::RandomizeTargets()
 {
    for (int i = 0; i < mSnapshotControls.size(); ++i)
-      RandomizeControl(mSnapshotControls[i]);
+      mSnapshotControls[i]->Randomize();
    for (int i = 0; i < mSnapshotModules.size(); ++i)
    {
-      for (auto* control : mSnapshotModules[i]->GetUIControls())
-         RandomizeControl(control);
+      if (mSnapshotModules[i] != nullptr && !mSnapshotModules[i]->IsDeleted())
+         mSnapshotModules[i]->RandomizeModule();
    }
-}
-
-void Snapshots::RandomizeControl(IUIControl* control)
-{
-   if (strcmp(control->Name(), "enabled") == 0) //don't randomize enabled/disable checkbox, too annoying
-      return;
-   if (dynamic_cast<ClickButton*>(control) != nullptr)
-      return;
-   control->SetFromMidiCC(ofRandom(1), NextBufferTime(false), true);
 }
 
 void Snapshots::OnTransportAdvanced(float amount)
