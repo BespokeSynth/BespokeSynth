@@ -133,7 +133,7 @@ void DropdownList::CalculateWidth()
    mMaxItemWidth = mWidth;
    for (int i = 0; i < mElements.size(); ++i)
    {
-      int width = GetStringWidth(mElements[i].mLabel)+mElements[i].mReservedWidth + (mDrawTriangle ? 15 : 3);
+      int width = GetStringWidth(mElements[i].mLabel) + mElements[i].mReservedWidth + (mDrawTriangle ? 15 : 3);
       if (width > mMaxItemWidth)
          mMaxItemWidth = width;
    }
@@ -224,7 +224,7 @@ void DropdownList::Render()
       DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12);
       if (dropdownLabel.mRenderer)
       {
-         dropdownLabel.mRenderer(ofRectangle(mX,mY,mWidth,mHeight),false,false,dropdownLabel.mRenderArgs);
+         dropdownLabel.mRenderer(ofRectangle(mX, mY, mWidth, mHeight), false, true, dropdownLabel.mRenderArgs);
       }
       ofPopMatrix();
       if (mDrawTriangle)
@@ -312,11 +312,12 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
       if (col >= displayColumns)
          break;
 
-      ofRectangle labelRect {
+      ofRectangle labelRect{
          static_cast<float>(mMaxItemWidth * col),
          (i % maxPerColumn) * kItemSpacing + pageHeaderShift,
          static_cast<float>(mMaxItemWidth),
-         kItemSpacing};
+         kItemSpacing
+      };
       bool isHovering = i == hoverIndex;
 
       if (isHovering)
@@ -340,9 +341,10 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
          ofSetColor(255, 255, 255);
 
       DrawTextNormal(mElements[i].mLabel, 1 + mMaxItemWidth * col, (i % maxPerColumn) * kItemSpacing + 12 + pageHeaderShift);
+
       if (mElements[i].mRenderer)
       {
-         mElements[i].mRenderer(labelRect,isHovering,true,mElements[i].mRenderArgs);
+         mElements[i].mRenderer(labelRect, isHovering, false, mElements[i].mRenderArgs);
       }
    }
    ofSetColor(255, 255, 255);
@@ -635,7 +637,7 @@ DropdownListElement DropdownList::GetDisplayLabel(int val) const
    if (itemIndex >= 0 && itemIndex < mElements.size())
       return mElements[itemIndex];
 
-   return {mUnknownItemString};
+   return { mUnknownItemString };
 }
 
 void DropdownList::CalcSliderVal()

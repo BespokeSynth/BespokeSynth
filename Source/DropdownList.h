@@ -30,7 +30,7 @@
 #include "ClickButton.h"
 #include "IPulseReceiver.h"
 
-typedef void (*DropdownRenderFn)(ofRectangle renderRect, bool isHovering, bool isDrawnOnDropdownList, void* args);
+typedef void (*DropdownRenderFn)(ofRectangle renderRect, bool isHovering, bool drawnOnButtonBody, const std::string& args);
 struct DropdownListElement
 {
    std::string mLabel; //Text on the dropdown
@@ -43,7 +43,7 @@ struct DropdownListElement
 
    float mReservedWidth{ 0.0f }; //Try to reserve additional space for special rendering
    DropdownRenderFn mRenderer{ nullptr }; //If set, will call this function on draw, for custom rendering. Still draws the label.
-   void* mRenderArgs{ nullptr }; //Stores an argument for use. Sent into the function call.
+   std::string mRenderArgs; //Stores an argument for use. Sent into the function call.
 };
 
 class DropdownList;

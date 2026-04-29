@@ -1122,8 +1122,49 @@ void SongBuilder::ControlTarget::CreateUIControls(SongBuilder* owner)
    mCycleDisplayTypeButton->SetCableTargetable(false);
 
    for (int i = 0; i < (int)owner->mColors.size(); ++i)
-      mColorSelector->AddLabel(owner->mColors[i].name, i);
+   {
+      DropdownListElement label;
+      label.mValue = i;
+      label.mLabel = owner->mColors[i].name;
+      label.mRenderArgs = owner->mColors[i].name;
+      label.mRenderer = DrawColourCircle;
+      mColorSelector->AddLabel(label);
+   }
    mColorSelector->SetDrawTriangle(false);
+}
+
+void SongBuilder::DrawColourCircle(ofRectangle renderRect, bool isHovering, bool drawnOnBody, const std::string& args)
+{
+   if (drawnOnBody)
+      return;
+   ofPushStyle();
+
+    ofColor drawCol;
+    if (args == "grey")
+       drawCol = ofColor::grey;
+    else if (args == "red")
+       drawCol = ofColor::red;
+    else if (args == "orange")
+       drawCol = ofColor::orange;
+    else if (args == "yellow")
+       drawCol = ofColor::yellow;
+    else if (args == "green")
+       drawCol = ofColor::green;
+    else if (args == "cyan")
+       drawCol = ofColor::cyan;
+    else if (args == "blue")
+       drawCol = ofColor::blue;
+    else if (args == "purple")
+       drawCol = ofColor::purple;
+    else if (args == "magenta")
+       drawCol = ofColor::magenta;
+    else
+       drawCol = ofColor::black;
+
+   float hHalf = renderRect.height / 2.0f;
+   ofSetColor(drawCol);
+   ofCircle(renderRect.x+renderRect.width-hHalf,renderRect.y+hHalf,4.5f);
+   ofPopStyle();
 }
 
 void SongBuilder::ControlTarget::Draw(float x, float y, int numRows)
