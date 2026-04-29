@@ -51,8 +51,8 @@ public:
    static void OpenDocsLink();
    static void OpenDiscordLink();
 
-   std::string GetUIControlTooltip(IUIControl* control);//Returns the tooltip of this control.
-   std::string GetModuleTooltip(IDrawableModule* module);//Returns the tooltip of this module.
+   std::string GetUIControlTooltip(IUIControl* control); //Returns the tooltip of this control.
+   std::string GetModuleTooltip(IDrawableModule* module); //Returns the tooltip of this module.
    std::string GetModuleTooltipFromName(std::string moduleTypeName); //Returns the tooltip of the module with this name.
    std::string GetControlSubTooltip(IUIControl* control, const std::string& subTooltip);
 

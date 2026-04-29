@@ -211,8 +211,7 @@ private:
    bool mAutoCalculateWidth{ false };
    bool mDrawTriangle{ true };
    double mLastScrolledTime{ -9999 };
-   mutable int mIndexDisplayCache { -1 };
+   mutable int mIndexDisplayCache{ -1 };
    std::vector<int> mSeparators;
    DropdownDisplayStyle mDisplayStyle{ DropdownDisplayStyle::kNormal };
-
 };

@@ -1139,31 +1139,31 @@ void SongBuilder::DrawColourCircle(ofRectangle renderRect, bool isHovering, bool
       return;
    ofPushStyle();
 
-    ofColor drawCol;
-    if (args == "grey")
-       drawCol = ofColor::grey;
-    else if (args == "red")
-       drawCol = ofColor::red;
-    else if (args == "orange")
-       drawCol = ofColor::orange;
-    else if (args == "yellow")
-       drawCol = ofColor::yellow;
-    else if (args == "green")
-       drawCol = ofColor::green;
-    else if (args == "cyan")
-       drawCol = ofColor::cyan;
-    else if (args == "blue")
-       drawCol = ofColor::blue;
-    else if (args == "purple")
-       drawCol = ofColor::purple;
-    else if (args == "magenta")
-       drawCol = ofColor::magenta;
-    else
-       drawCol = ofColor::black;
+   ofColor drawCol;
+   if (args == "grey")
+      drawCol = ofColor::grey;
+   else if (args == "red")
+      drawCol = ofColor::red;
+   else if (args == "orange")
+      drawCol = ofColor::orange;
+   else if (args == "yellow")
+      drawCol = ofColor::yellow;
+   else if (args == "green")
+      drawCol = ofColor::green;
+   else if (args == "cyan")
+      drawCol = ofColor::cyan;
+   else if (args == "blue")
+      drawCol = ofColor::blue;
+   else if (args == "purple")
+      drawCol = ofColor::purple;
+   else if (args == "magenta")
+      drawCol = ofColor::magenta;
+   else
+      drawCol = ofColor::black;
 
    float hHalf = renderRect.height / 2.0f;
    ofSetColor(drawCol);
-   ofCircle(renderRect.x+renderRect.width-hHalf,renderRect.y+hHalf,4.5f);
+   ofCircle(renderRect.x + renderRect.width - hHalf, renderRect.y + hHalf, 4.5f);
    ofPopStyle();
 }
 

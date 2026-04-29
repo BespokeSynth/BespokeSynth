@@ -781,8 +781,7 @@ void ModularSynth::Draw()
             if (!label.mTooltipAddress.empty())
                tooltip = helpDisplay->GetTooltipFromAddress(label.mTooltipAddress);
             else
-               tooltip = helpDisplay->GetControlSubTooltip(modal->GetOwner(),label.mLabel);
-
+               tooltip = helpDisplay->GetControlSubTooltip(modal->GetOwner(), label.mLabel);
          }
          else if (GetMouseY(&mModuleContainer) < gHoveredModule->GetPosition().y && gHoveredModule->HasTitleBar()) //this means we're hovering over the module's title bar
          {
