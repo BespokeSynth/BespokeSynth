@@ -73,10 +73,17 @@ private:
 
    void RenderScreenshot(int x, int y, int width, int height, std::string filename);
 
+   struct UIControlSubTooltipInfo
+   {
+      std::string name;
+      std::string tooltip;
+   };
+
    struct UIControlTooltipInfo
    {
       std::string controlName;
       std::string tooltip;
+      std::list<UIControlSubTooltipInfo> subTooltips;
    };
 
    struct ModuleTooltipInfo

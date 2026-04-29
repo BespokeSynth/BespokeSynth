@@ -198,6 +198,7 @@ void HelpDisplay::LoadTooltips()
 
    ModuleTooltipInfo moduleInfo;
    UIControlTooltipInfo controlInfo;
+   UIControlSubTooltipInfo subTooltipInfo;
 
    juce::File tooltipsFile(ofToResourcePath(UserPrefs.tooltips.Get()));
    if (tooltipsFile.existsAsFile())
@@ -211,19 +212,31 @@ void HelpDisplay::LoadTooltips()
          {
             juce::String line = lines[i].replace("\\n", "\n");
             std::vector<std::string> tokens = ofSplitString(line.toStdString(), "~");
-            if (tokens.size() == 2)
+            if (tokens.size() == 2) //2 tokens, ex: module~this is a module that does X.
             {
+               if (!controlInfo.controlName.empty())
+               {
+                  moduleInfo.controlTooltips.push_back(controlInfo);
+                  controlInfo.controlName.clear();
+               }
                if (!moduleInfo.module.empty())
                   sTooltips.push_back(moduleInfo); //add this one and start a new one
                moduleInfo.module = tokens[0];
                moduleInfo.tooltip = tokens[1];
                moduleInfo.controlTooltips.clear();
             }
-            else if (tokens.size() == 3)
+            else if (tokens.size() == 3) //3 tokens, ex: ~control~this dial does Y.
             {
+               if (!controlInfo.controlName.empty())
+                  moduleInfo.controlTooltips.push_back(controlInfo);
                controlInfo.controlName = tokens[1];
                controlInfo.tooltip = tokens[2];
-               moduleInfo.controlTooltips.push_back(controlInfo);
+            }
+            else if (tokens.size() == 4) //4 tokens, ex: ~~labelB~this dropdown does Z
+            {
+               subTooltipInfo.name = tokens[2];
+               subTooltipInfo.tooltip = tokens[3];
+               controlInfo.subTooltips.push_back(subTooltipInfo);
             }
          }
       }

@@ -73,6 +73,7 @@ void DropdownList::AddLabel(const DropdownListElement& item)
    CalculateWidth();
    mHeight = kItemSpacing;
    CalcSliderVal();
+   mIndexDisplayCache = -1;
 }
 
 void DropdownList::RemoveLabel(int value)
@@ -85,7 +86,7 @@ void DropdownList::RemoveLabel(int value)
 
          CalculateWidth();
          mHeight = kItemSpacing;
-
+         mIndexDisplayCache = -1;
          CalcSliderVal();
          break;
       }
@@ -102,7 +103,7 @@ void DropdownList::SetLabel(const std::string& label, int value)
 
          CalculateWidth();
          mHeight = kItemSpacing;
-
+         mIndexDisplayCache = -1;
          CalcSliderVal();
          return;
       }
@@ -119,6 +120,7 @@ void DropdownList::SetLabel(const DropdownListElement& item, int value)
 
          CalculateWidth();
          mHeight = kItemSpacing;
+         mIndexDisplayCache = -1;
          CalcSliderVal();
          return;
       }
@@ -218,7 +220,12 @@ void DropdownList::Render()
 
       ofPushMatrix();
       ofClipWindow(mX, mY, w - (mDrawTriangle ? 12 : 0), h, true);
-      DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12);
+      auto dropdownLabel = GetDisplayLabel(*mVar);
+      DrawTextNormal(GetDisplayValue(dropdownLabel.mValue), mX + 2 + xOffset, mY + 12);
+      if (dropdownLabel.mRenderer)
+      {
+         dropdownLabel.mRenderer(ofRectangle(mX,mY,mWidth,mHeight),false,false,dropdownLabel.mRenderArgs);
+      }
       ofPopMatrix();
       if (mDrawTriangle)
       {
@@ -565,7 +572,7 @@ void DropdownList::SetIndex(int i, double time, bool forceUpdate)
 
 void DropdownList::SetValue(float value, double time, bool forceUpdate /*= false*/)
 {
-   int intValue = (int)value;
+   int intValue = static_cast<int>(value);
    if (intValue != *mVar || forceUpdate)
    {
       int oldVal = *mVar;
@@ -586,7 +593,7 @@ float DropdownList::GetMidiValue() const
    return mSliderVal;
 }
 
-int DropdownList::FindItemIndex(float val) const
+int DropdownList::FindItemIndex(const int val) const
 {
    for (int i = 0; i < mElements.size(); ++i)
    {
@@ -599,12 +606,36 @@ int DropdownList::FindItemIndex(float val) const
 
 std::string DropdownList::GetDisplayValue(float val) const
 {
-   int itemIndex = FindItemIndex(val);
+   int itemIndex;
+   if (mIndexDisplayCache != static_cast<int>(val))
+   {
+      itemIndex = FindItemIndex(val);
+      mIndexDisplayCache = static_cast<int>(val);
+   }
+   else
+      itemIndex = mIndexDisplayCache;
 
    if (itemIndex >= 0 && itemIndex < mElements.size())
       return mElements[itemIndex].mLabel;
    else
       return mUnknownItemString.c_str();
+}
+
+DropdownListElement DropdownList::GetDisplayLabel(int val) const
+{
+   int itemIndex;
+   if (mIndexDisplayCache != val)
+   {
+      itemIndex = FindItemIndex(val);
+      mIndexDisplayCache = val;
+   }
+   else
+      itemIndex = mIndexDisplayCache;
+
+   if (itemIndex >= 0 && itemIndex < mElements.size())
+      return mElements[itemIndex];
+
+   return {mUnknownItemString};
 }
 
 void DropdownList::CalcSliderVal()

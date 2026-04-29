@@ -159,6 +159,7 @@ public:
    float GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
    std::string GetDisplayValue(float val) const override;
+   DropdownListElement GetDisplayLabel(int val) const;
    bool InvertScrollDirection() override { return true; }
    void Increment(float amount) override;
    void Poll() override;
@@ -181,7 +182,7 @@ protected:
 private:
    void OnClicked(float x, float y, bool right) override;
    void CalcSliderVal();
-   int FindItemIndex(float val) const;
+   int FindItemIndex(int val) const;
    void CalculateWidth();
    ofVec2f GetModalListPosition() const;
 
@@ -205,6 +206,10 @@ private:
    bool mAutoCalculateWidth{ false };
    bool mDrawTriangle{ true };
    double mLastScrolledTime{ -9999 };
+   mutable int mIndexDisplayCache { -1 };
+   mutable std::string mCachedElementLabel;
+   mutable std::string mCachedElementTooltip;
    std::vector<int> mSeparators;
    DropdownDisplayStyle mDisplayStyle{ DropdownDisplayStyle::kNormal };
+
 };
