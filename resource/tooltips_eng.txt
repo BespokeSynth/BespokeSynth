@@ -2003,8 +2003,8 @@ scale~controls the global scale used by various modules
 ~~super locrian~1 b2 #2 3 b5 #5 b7\n\nmood: altered, edgy, dissonant, unstable, aggressive\ngenres: jazz, fusion, modern classical, experimental, soundtrack
 ~~neapolitan min~1 b2 b3 4 5 b6 7\n\nmood: dark, noble, dramatic, mysterious, old-world\ngenres: classical, film, neoclassical, gothic, metal
 ~~neapolitan maj~1 b2 b3 4 5 6 7\n\nmood: bright but tense, ceremonial, mysterious, stately, exotic\ngenres: classical, film, prog, neoclassical, soundtrack
-~~enigmatic minor~1 b2 b3 #4 5 b7 7\n\nmood: cryptic, haunting, unstable, cerebral, suspenseful\ngenres: film, avant-garde, progressive rock, experimental, modern classical
-~~enigmatic~1 b2 3 #4 #5 b7 7\n\nmood: mysterious, surreal, floating, ornate, enigmatic\ngenres: film, classical, avant-garde, ambient, soundtrack
+~~enigmatic minor~1 b2 b3 #4 5 #6 7\n\nmood: cryptic, haunting, unstable, cerebral, suspenseful\ngenres: film, avant-garde, progressive rock, experimental, modern classical
+~~enigmatic~1 b2 3 #4 #5 #6 7\n\nmood: mysterious, surreal, floating, ornate, enigmatic\ngenres: film, classical, avant-garde, ambient, soundtrack
 ~~composite~1 b2 3 #4 5 b6 7\n\nmood: uncanny, angular, tense, futuristic, dramatic\ngenres: fusion, experimental, soundtrack, prog, modern classical
 ~~bhairav~1 b2 3 4 5 b6 7\n\nmood: austere, devotional, grave, majestic, meditative\ngenres: Indian classical, world, soundtrack, drone, fusion
 ~~hungarian min~1 2 b3 #4 5 b6 7\n\nmood: fiery, dramatic, exotic, dark, virtuosic\ngenres: gypsy jazz, metal, classical, soundtrack, prog
@@ -2013,7 +2013,7 @@ scale~controls the global scale used by various modules
 ~~asc minor~1 2 b3 4 5 6 7\n\nmood: lyrical, modern, upward, polished, bittersweet\ngenres: jazz, fusion, film, progressive rock, contemporary classical
 ~~diminished~1 b2 #2 3 #4 5 6 b7\n\nmood: symmetrical, tense, restless, angular, suspenseful\ngenres: jazz, metal, fusion, soundtrack, experimental
 ~~whole-half~1 2 b3 4 b5 b6 6 7\n\nmood: symmetrical, eerie, slick, tense, chromatic\ngenres: jazz, fusion, soundtrack, metal, experimental
-~~whole tone~1 2 3 #4 #5 b7\n\nmood: dreamy, floating, ambiguous, impressionistic, surreal\ngenres: impressionism, jazz, film, ambient, fusion
+~~whole tone~1 2 3 #4 #5 #6\n\nmood: dreamy, floating, ambiguous, impressionistic, surreal\ngenres: impressionism, jazz, film, ambient, fusion
 ~~minor blues~1 b3 4 b5 5 b7\n\nmood: bluesy, raw, soulful, gritty, expressive\ngenres: blues, rock, jazz, funk, soul
 ~~minor penta~1 b3 4 5 b7\n\nmood: bluesy, soulful, earthy, tense but open\ngenres: blues, rock, R&B, soul, funk, gospel
 ~~major penta~1 2 3 5 6\n\nmood: bright, open, uplifting, simple, melodic\ngenres: folk, country, pop, gospel, rock
@@ -2026,7 +2026,7 @@ scale~controls the global scale used by various modules
 ~~iwato~1 b2 4 b5 b7\n\nmood: austere, eerie, hollow, minimal, suspenseful\ngenres: Japanese traditional, soundtrack, ambient, horror, experimental
 ~~kumoi~1 2 b3 5 6\n\nmood: gentle, wistful, airy, reflective, pastoral\ngenres: Japanese folk, ambient, soundtrack, new age, world
 ~~pelog~1 b2 b3 3 5 b6\n\nmood: earthy, ceremonial, unusual, colorful, hypnotic\ngenres: gamelan, world, experimental, soundtrack, ambient
-~~spanish~1 b2 b3 3 4 b5 b6 b7\n\nmood: fiery, dramatic, passionate, tense, exotic\ngenres: flamenco, Latin, metal, jazz, soundtrack
+~~spanish~1 b2 b3 3 4 #4 b6 b7\n\nmood: fiery, dramatic, passionate, tense, exotic\ngenres: flamenco, Latin, metal, jazz, soundtrack
 ~~chromatic~1 b2 2 b3 3 4 b5 5 #5 6 b7 7\n\nmood: tense, fluid, disorienting, colorful, unrestricted\ngenres: jazz, experimental, modern classical, film, avant-garde
 ~degree~
 ~intonation~which method to use to tune the scale

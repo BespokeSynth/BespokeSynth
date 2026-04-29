@@ -35,7 +35,11 @@ struct DropdownListElement
 {
    std::string mLabel; //Text on the dropdown
    int mValue{ 0 }; //Value of the dropdown, used for array indexing and modulation.
-   std::string mTooltipAddress{}; //Custom tooltip address. Format: "module~control~subcontrol"
+
+   //Custom tooltip address. Format: "module~control~subcontrol"
+   //Can point to any tooltip in the tooltip files.
+   //By default displays this if present --> thismodule~thisdropdown~thislabel~tooltip. If not present, no tooltip is shown.
+   std::string mTooltipAddress{};
 
    float mReservedWidth{ 0.0f }; //Try to reserve additional space for special rendering
    DropdownRenderFn mRenderer{ nullptr }; //If set, will call this function on draw, for custom rendering. Still draws the label.

@@ -61,7 +61,13 @@ void EffectChain::Init()
    mEffectTypesToSpawn = TheSynth->GetEffectFactory()->GetSpawnableEffects();
    mEffectSpawnList->SetUnknownItemString("add effect:");
    for (int i = 0; i < mEffectTypesToSpawn.size(); ++i)
-      mEffectSpawnList->AddLabel(mEffectTypesToSpawn[i].c_str(), i);
+   {
+      DropdownListElement label;
+      label.mValue = i;
+      label.mLabel = mEffectTypesToSpawn[i];
+      label.mTooltipAddress = mEffectTypesToSpawn[i];
+      mEffectSpawnList->AddLabel(label);
+   }
 
    mInitialized = true;
 }
