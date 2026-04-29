@@ -221,7 +221,7 @@ void DropdownList::Render()
       ofPushMatrix();
       ofClipWindow(mX, mY, w - (mDrawTriangle ? 12 : 0), h, true);
       auto dropdownLabel = GetDisplayLabel(*mVar);
-      DrawTextNormal(GetDisplayValue(dropdownLabel.mValue), mX + 2 + xOffset, mY + 12);
+      DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12);
       if (dropdownLabel.mRenderer)
       {
          dropdownLabel.mRenderer(ofRectangle(mX,mY,mWidth,mHeight),false,false,dropdownLabel.mRenderArgs);
