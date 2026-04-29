@@ -35,7 +35,7 @@ struct DropdownListElement
 {
    std::string mLabel; //Text on the dropdown
    int mValue{ 0 }; //Value of the dropdown, used for array indexing and modulation.
-   std::string mTooltipTag{}; //Localized Tooltip
+   std::string mTooltipAddress{}; //Custom tooltip address. Format: "module~control~subcontrol"
 
    float mReservedWidth{ 0.0f }; //Try to reserve additional space for special rendering
    DropdownRenderFn mRenderer{ nullptr }; //If set, will call this function on draw, for custom rendering. Still draws the label.
@@ -77,6 +77,7 @@ public:
    DropdownList* GetOwner() const { return mOwner; }
    bool MouseMoved(float x, float y) override;
    std::string GetHoveredLabel();
+   DropdownListElement GetHoveredLabelObject();
    float GetMouseX() { return mMouseX; }
    float GetMouseY() { return mMouseY; }
    void SetShowPagingControls(bool show);
@@ -207,8 +208,6 @@ private:
    bool mDrawTriangle{ true };
    double mLastScrolledTime{ -9999 };
    mutable int mIndexDisplayCache { -1 };
-   mutable std::string mCachedElementLabel;
-   mutable std::string mCachedElementTooltip;
    std::vector<int> mSeparators;
    DropdownDisplayStyle mDisplayStyle{ DropdownDisplayStyle::kNormal };
 

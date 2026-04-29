@@ -744,6 +744,14 @@ std::string DropdownListModal::GetHoveredLabel()
    return "";
 }
 
+DropdownListElement DropdownListModal::GetHoveredLabelObject()
+{
+   int index = mOwner->GetItemIndexAt((int)mMouseX, (int)mMouseY);
+   if (index >= 0 && index < mOwner->GetNumValues())
+      return mOwner->GetElement(index);
+   return {};
+}
+
 bool DropdownListModal::MouseMoved(float x, float y)
 {
    IDrawableModule::MouseMoved(x, y);
