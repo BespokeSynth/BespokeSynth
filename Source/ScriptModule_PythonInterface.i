@@ -682,7 +682,7 @@ namespace
 {
    void StartEnvelope(EnvelopeModulator& envelope, double time, const std::vector< std::tuple<float,float> >& stages)
    {
-      ::ADSR adsr;
+      ADSR adsr;
       adsr.SetNumStages((int)stages.size());
       adsr.GetHasSustainStage() = false;
       for (int i=0; i<adsr.GetNumStages() && i<(int)stages.size(); ++i)

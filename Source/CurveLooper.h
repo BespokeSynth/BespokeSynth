@@ -87,7 +87,7 @@ private:
    DropdownList* mLengthSelector{ nullptr };
    PatchCableSource* mControlCable{ nullptr };
    EnvelopeControl mEnvelopeControl{ ofVec2f(5, 25), ofVec2f(mWidth - 10, mHeight - 30), nullptr };
-   ::ADSR mAdsr;
+   ADSR mAdsr;
    ClickButton* mRandomizeButton{ nullptr };
    float mFreeRate{ 1000 };
    FloatSlider* mFreeRateSlider{ nullptr };
