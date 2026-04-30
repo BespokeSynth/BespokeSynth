@@ -236,7 +236,10 @@ void HelpDisplay::LoadTooltips()
             {
                subTooltipInfo.name = tokens[2];
                subTooltipInfo.tooltip = tokens[3];
-               controlInfo.subTooltips.push_back(subTooltipInfo);
+               if (tokens[1] != "*")
+                  controlInfo.subTooltips.push_back(subTooltipInfo);
+               else
+                  moduleInfo.globalSubTooltips.push_back(subTooltipInfo);
             }
          }
       }
@@ -395,6 +398,20 @@ std::string HelpDisplay::GetControlSubTooltip(IUIControl* control, const std::st
          if (sub.name == subTooltip)
          {
             return sub.name + ": " + (!sub.tooltip.empty() ? sub.tooltip : kNoTooltipFound);
+         }
+      }
+   }
+   //If nothing found, then we look in the module's shared subTooltip record.
+   if (auto mod = control->GetModuleParent())
+   {
+      if (const auto mInfo = FindModuleInfo(mod->GetTypeName()))
+      {
+         for (auto& sub : mInfo->globalSubTooltips)
+         {
+            if (sub.name == subTooltip)
+            {
+               return sub.name + ": " + (!sub.tooltip.empty() ? sub.tooltip : kNoTooltipFound);
+            }
          }
       }
    }

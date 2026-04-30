@@ -1126,43 +1126,31 @@ void SongBuilder::ControlTarget::CreateUIControls(SongBuilder* owner)
       DropdownListElement label;
       label.mValue = i;
       label.mLabel = owner->mColors[i].name;
-      label.mRenderArgs = owner->mColors[i].name;
-      label.mRenderer = DrawColourCircle;
+      ofColor col = owner->mColors[i].color;
+      std::string args;
+      args.push_back(static_cast<char>(col.r));
+      args.push_back(static_cast<char>(col.g));
+      args.push_back(static_cast<char>(col.b));
+      args.push_back(static_cast<char>(col.a));
+      label.mCustomRenderArgs = args;
+      label.mCustomRenderer = DrawColourCircle;
       mColorSelector->AddLabel(label);
    }
    mColorSelector->SetDrawTriangle(false);
 }
 
-void SongBuilder::DrawColourCircle(ofRectangle renderRect, bool isHovering, bool drawnOnBody, const std::string& args)
+void SongBuilder::DrawColourCircle(ofRectangle renderRect, bool isHovering, bool isDrawingOnPopup, const std::string& args)
 {
-   if (drawnOnBody)
+   if (!isDrawingOnPopup)
       return;
    ofPushStyle();
 
-   ofColor drawCol;
-   if (args == "grey")
-      drawCol = ofColor::grey;
-   else if (args == "red")
-      drawCol = ofColor::red;
-   else if (args == "orange")
-      drawCol = ofColor::orange;
-   else if (args == "yellow")
-      drawCol = ofColor::yellow;
-   else if (args == "green")
-      drawCol = ofColor::green;
-   else if (args == "cyan")
-      drawCol = ofColor::cyan;
-   else if (args == "blue")
-      drawCol = ofColor::blue;
-   else if (args == "purple")
-      drawCol = ofColor::purple;
-   else if (args == "magenta")
-      drawCol = ofColor::magenta;
-   else
-      drawCol = ofColor::black;
-
+   int r = static_cast<unsigned char>(args[0]);
+   int g = static_cast<unsigned char>(args[1]);
+   int b = static_cast<unsigned char>(args[2]);
+   int a = static_cast<unsigned char>(args[3]);
    float hHalf = renderRect.height / 2.0f;
-   ofSetColor(drawCol);
+   ofSetColor(ofColor(r, g, b, a));
    ofCircle(renderRect.x + renderRect.width - hHalf, renderRect.y + hHalf, 4.5f);
    ofPopStyle();
 }

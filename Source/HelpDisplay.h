@@ -99,6 +99,7 @@ private:
       std::string module;
       std::string tooltip;
       std::list<UIControlTooltipInfo> controlTooltips;
+      std::list<UIControlSubTooltipInfo> globalSubTooltips;
    };
 
    void LoadHelp();

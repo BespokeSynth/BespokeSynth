@@ -30,7 +30,7 @@
 #include "ClickButton.h"
 #include "IPulseReceiver.h"
 
-typedef void (*DropdownRenderFn)(ofRectangle renderRect, bool isHovering, bool drawnOnButtonBody, const std::string& args);
+typedef void (*DropdownRenderFn)(ofRectangle renderRect, bool isHovering, bool isDrawingOnPopup, const std::string& args);
 struct DropdownListElement
 {
    std::string mLabel; //Text on the dropdown
@@ -42,8 +42,8 @@ struct DropdownListElement
    std::string mTooltipAddress{};
 
    float mReservedWidth{ 0.0f }; //Try to reserve additional space for special rendering
-   DropdownRenderFn mRenderer{ nullptr }; //If set, will call this function on draw, for custom rendering. Still draws the label.
-   std::string mRenderArgs; //Stores an argument for use. Sent into the function call.
+   DropdownRenderFn mCustomRenderer{ nullptr }; //If set, will call this function on draw, for custom rendering. Still draws the label.
+   std::string mCustomRenderArgs; //Stores an argument for use. Sent into the function call.
 };
 
 class DropdownList;
@@ -80,8 +80,8 @@ public:
    bool ShouldClipContents() override { return false; }
    DropdownList* GetOwner() const { return mOwner; }
    bool MouseMoved(float x, float y) override;
-   std::string GetHoveredLabel();
-   DropdownListElement GetHoveredLabelObject();
+   std::string GetHoveredLabel() const;
+   DropdownListElement GetHoveredLabelObject() const;
    float GetMouseX() { return mMouseX; }
    float GetMouseY() { return mMouseY; }
    void SetShowPagingControls(bool show);
@@ -211,7 +211,6 @@ private:
    bool mAutoCalculateWidth{ false };
    bool mDrawTriangle{ true };
    double mLastScrolledTime{ -9999 };
-   mutable int mIndexDisplayCache{ -1 };
    std::vector<int> mSeparators;
    DropdownDisplayStyle mDisplayStyle{ DropdownDisplayStyle::kNormal };
 };

@@ -1000,6 +1000,13 @@ feedback~feed delayed audio back into earlier in the signal chain. use the "feed
 eq~multi-band equalizer, to adjust output levels at frequency ranges
 ~enabled*~enable this band?
 ~type*~what type of filter should this band use
+~*~lp~low pass
+~*~hp~high pass
+~*~bp~band pass
+~*~pk~peak
+~*~nt~notch
+~*~hs~high shelf
+~*~ls~low shelf
 ~f*~frequency cutoff for this band
 ~g*~gain for this band
 ~q*~resonance for this band
@@ -1991,43 +1998,43 @@ splitter~splits a stereo signal into two mono signals, or duplicates a mono sign
 scale~controls the global scale used by various modules
 ~root~root note of the scale
 ~scale~which set of notes to use
-~~ionian~1 2 3 4 5 6 7\n\nmood: bright, balanced, clear, confident, resolved\ngenres: pop, classical, folk, singer-songwriter, country
-~~aeolian~1 2 b3 4 5 b6 b7\n\nmood: dark, melancholic, natural, introspective, emotional\ngenres: rock, pop, metal, folk, indie
-~~dorian~1 2 b3 4 5 6 b7\n\nmood: moody, cool, soulful, hopeful, grooving\ngenres: jazz, funk, soul, modal rock, fusion
-~~mixolydian~1 2 3 4 5 6 b7\n\nmood: bluesy, open, earthy, relaxed, anthemic\ngenres: rock, blues, funk, folk, jam bands
-~~lydian~1 2 3 #4 5 6 7\n\nmood: bright, dreamy, floating, expansive, magical\ngenres: film, fusion, progressive rock, ambient, jazz
-~~phrygian~1 b2 b3 4 5 b6 b7\n\nmood: dark, tense, exotic, brooding, urgent\ngenres: metal, flamenco, soundtrack, dark folk, prog
-~~locrian~1 b2 b3 4 b5 b6 b7\n\nmood: unstable, eerie, dissonant, anxious, unresolved\ngenres: metal, avant-garde, experimental, fusion, soundtrack
-~~harmonic minor~1 2 b3 4 5 b6 7\n\nmood: dramatic, exotic, tense, regal, intense\ngenres: classical, neoclassical metal, film, jazz, world fusion
-~~melodic minor~1 2 b3 4 5 6 7\n\nmood: sophisticated, sleek, tense, modern, bittersweet\ngenres: jazz, fusion, film, progressive rock, contemporary classical
-~~super locrian~1 b2 #2 3 b5 #5 b7\n\nmood: altered, edgy, dissonant, unstable, aggressive\ngenres: jazz, fusion, modern classical, experimental, soundtrack
-~~neapolitan min~1 b2 b3 4 5 b6 7\n\nmood: dark, noble, dramatic, mysterious, old-world\ngenres: classical, film, neoclassical, gothic, metal
-~~neapolitan maj~1 b2 b3 4 5 6 7\n\nmood: bright but tense, ceremonial, mysterious, stately, exotic\ngenres: classical, film, prog, neoclassical, soundtrack
-~~enigmatic minor~1 b2 b3 #4 5 #6 7\n\nmood: cryptic, haunting, unstable, cerebral, suspenseful\ngenres: film, avant-garde, progressive rock, experimental, modern classical
-~~enigmatic~1 b2 3 #4 #5 #6 7\n\nmood: mysterious, surreal, floating, ornate, enigmatic\ngenres: film, classical, avant-garde, ambient, soundtrack
-~~composite~1 b2 3 #4 5 b6 7\n\nmood: uncanny, angular, tense, futuristic, dramatic\ngenres: fusion, experimental, soundtrack, prog, modern classical
-~~bhairav~1 b2 3 4 5 b6 7\n\nmood: austere, devotional, grave, majestic, meditative\ngenres: Indian classical, world, soundtrack, drone, fusion
-~~hungarian min~1 2 b3 #4 5 b6 7\n\nmood: fiery, dramatic, exotic, dark, virtuosic\ngenres: gypsy jazz, metal, classical, soundtrack, prog
-~~minor gypsy~1 b2 3 4 5 b6 b7\n\nmood: exotic, spicy, tense, earthy, dramatic\ngenres: flamenco, Balkan, folk, jazz, soundtrack
-~~persian~1 b2 3 4 b5 b6 7\n\nmood: exotic, dark, sharp, tense, regal\ngenres: Middle Eastern-inspired, metal, soundtrack, fusion, world
-~~asc minor~1 2 b3 4 5 6 7\n\nmood: lyrical, modern, upward, polished, bittersweet\ngenres: jazz, fusion, film, progressive rock, contemporary classical
-~~diminished~1 b2 #2 3 #4 5 6 b7\n\nmood: symmetrical, tense, restless, angular, suspenseful\ngenres: jazz, metal, fusion, soundtrack, experimental
-~~whole-half~1 2 b3 4 b5 b6 6 7\n\nmood: symmetrical, eerie, slick, tense, chromatic\ngenres: jazz, fusion, soundtrack, metal, experimental
-~~whole tone~1 2 3 #4 #5 #6\n\nmood: dreamy, floating, ambiguous, impressionistic, surreal\ngenres: impressionism, jazz, film, ambient, fusion
-~~minor blues~1 b3 4 b5 5 b7\n\nmood: bluesy, raw, soulful, gritty, expressive\ngenres: blues, rock, jazz, funk, soul
-~~minor penta~1 b3 4 5 b7\n\nmood: bluesy, soulful, earthy, tense but open\ngenres: blues, rock, R&B, soul, funk, gospel
-~~major penta~1 2 3 5 6\n\nmood: bright, open, uplifting, simple, melodic\ngenres: folk, country, pop, gospel, rock
-~~dominant sus~1 2 4 5 6 b7\n\nmood: open, suspended, earthy, funky, unresolved\ngenres: funk, jazz, gospel, rock, fusion
-~~bebop locrian~1 2 b3 4 b5 b6 b7 7\n\nmood: slippery, tense, jazzy, chromatic, agile\ngenres: bebop, jazz, fusion, modern swing, improvisation
-~~bebop dom~1 2 3 4 5 6 b7 7\n\nmood: lively, bluesy, jazzy, driving, playful\ngenres: bebop, jazz, swing, blues, funk
-~~bebop major~1 2 3 4 5 b6 6 7\n\nmood: bright, urbane, jazzy, nimble, sophisticated\ngenres: bebop, jazz, swing, big band, musical theater
-~~hirajoshi~1 2 b3 5 b6\n\nmood: sparse, wistful, delicate, introspective, haunting\ngenres: Japanese folk, soundtrack, ambient, post-rock, world
-~~in-sen~1 b2 4 5 b7\n\nmood: dark, sparse, meditative, mysterious, tense\ngenres: Japanese traditional, ambient, soundtrack, experimental, world
-~~iwato~1 b2 4 b5 b7\n\nmood: austere, eerie, hollow, minimal, suspenseful\ngenres: Japanese traditional, soundtrack, ambient, horror, experimental
-~~kumoi~1 2 b3 5 6\n\nmood: gentle, wistful, airy, reflective, pastoral\ngenres: Japanese folk, ambient, soundtrack, new age, world
-~~pelog~1 b2 b3 3 5 b6\n\nmood: earthy, ceremonial, unusual, colorful, hypnotic\ngenres: gamelan, world, experimental, soundtrack, ambient
-~~spanish~1 b2 b3 3 4 #4 b6 b7\n\nmood: fiery, dramatic, passionate, tense, exotic\ngenres: flamenco, Latin, metal, jazz, soundtrack
-~~chromatic~1 b2 2 b3 3 4 b5 5 #5 6 b7 7\n\nmood: tense, fluid, disorienting, colorful, unrestricted\ngenres: jazz, experimental, modern classical, film, avant-garde
+~~ionian~1 2 3 4 5 6 7
+~~aeolian~1 2 b3 4 5 b6 b7
+~~dorian~1 2 b3 4 5 6 b7
+~~mixolydian~1 2 3 4 5 6 b7
+~~lydian~1 2 3 #4 5 6 7
+~~phrygian~1 b2 b3 4 5 b6 b7
+~~locrian~1 b2 b3 4 b5 b6 b7
+~~harmonic minor~1 2 b3 4 5 b6 7
+~~melodic minor~1 2 b3 4 5 6 7
+~~super locrian~1 b2 #2 3 b5 #5 b7
+~~neapolitan min~1 b2 b3 4 5 b6 7
+~~neapolitan maj~1 b2 b3 4 5 6 7
+~~enigmatic minor~1 b2 b3 #4 5 #6 7
+~~enigmatic~1 b2 3 #4 #5 #6 7
+~~composite~1 b2 3 #4 5 b6 7
+~~bhairav~1 b2 3 4 5 b6 7
+~~hungarian min~1 2 b3 #4 5 b6 7
+~~minor gypsy~1 b2 3 4 5 b6 b7
+~~persian~1 b2 3 4 b5 b6 7
+~~asc minor~1 2 b3 4 5 6 7
+~~diminished~1 b2 #2 3 #4 5 6 b7
+~~whole-half~1 2 b3 4 b5 b6 6 7
+~~whole tone~1 2 3 #4 #5 #6
+~~minor blues~1 b3 4 b5 5 b7
+~~minor penta~1 b3 4 5 b7
+~~major penta~1 2 3 5 6
+~~dominant sus~1 2 4 5 6 b7
+~~bebop locrian~1 2 b3 4 b5 b6 b7 7
+~~bebop dom~1 2 3 4 5 6 b7 7
+~~bebop major~1 2 3 4 5 b6 6 7
+~~hirajoshi~1 2 b3 5 b6
+~~in-sen~1 b2 4 5 b7
+~~iwato~1 b2 4 b5
+~~kumoi~1 2 b3 5 6
+~~pelog~1 b2 b3 3 5 b6
+~~spanish~1 b2 b3 3 4 #4 b6 b7
+~~chromatic~1 b2 2 b3 3 4 b5 5 #5 6 b7 7
 ~degree~
 ~intonation~which method to use to tune the scale
 ~PPO~pitches per octave
