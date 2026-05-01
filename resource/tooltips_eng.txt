@@ -1998,13 +1998,13 @@ splitter~splits a stereo signal into two mono signals, or duplicates a mono sign
 scale~controls the global scale used by various modules
 ~root~root note of the scale
 ~scale~which set of notes to use
-~~ionian~1 2 3 4 5 6 7
-~~aeolian~1 2 b3 4 5 b6 b7
-~~dorian~1 2 b3 4 5 6 b7
-~~mixolydian~1 2 3 4 5 6 b7
-~~lydian~1 2 3 #4 5 6 7
-~~phrygian~1 b2 b3 4 5 b6 b7
-~~locrian~1 b2 b3 4 b5 b6 b7
+~~ionian~1 2 3 4 5 6 7 (major)
+~~aeolian~1 2 b3 4 5 b6 b7 (minor)
+~~dorian~1 2 b3 4 5 6 b7 (minor)
+~~mixolydian~1 2 3 4 5 6 b7 (major)
+~~lydian~1 2 3 #4 5 6 7 (major)
+~~phrygian~1 b2 b3 4 5 b6 b7 (minor)
+~~locrian~1 b2 b3 4 b5 b6 b7 (minor)
 ~~harmonic minor~1 2 b3 4 5 b6 7
 ~~melodic minor~1 2 b3 4 5 6 7
 ~~super locrian~1 b2 #2 3 b5 #5 b7
