@@ -1126,31 +1126,22 @@ void SongBuilder::ControlTarget::CreateUIControls(SongBuilder* owner)
       DropdownListElement label;
       label.mValue = i;
       label.mLabel = owner->mColors[i].name;
-      ofColor col = owner->mColors[i].color;
-      std::string args;
-      args.push_back(static_cast<char>(col.r));
-      args.push_back(static_cast<char>(col.g));
-      args.push_back(static_cast<char>(col.b));
-      args.push_back(static_cast<char>(col.a));
-      label.mCustomRenderArgs = args;
+      label.mArgs = &owner->mColors[i].color;
       label.mCustomRenderer = DrawColourCircle;
       mColorSelector->AddLabel(label);
    }
    mColorSelector->SetDrawTriangle(false);
 }
 
-void SongBuilder::DrawColourCircle(ofRectangle renderRect, bool isHovering, bool isDrawingOnPopup, const std::string& args)
+void SongBuilder::DrawColourCircle(ofRectangle renderRect, bool isHovering, bool isDrawingOnPopup, const DropdownListElement& element)
 {
    if (!isDrawingOnPopup)
       return;
    ofPushStyle();
 
-   int r = static_cast<unsigned char>(args[0]);
-   int g = static_cast<unsigned char>(args[1]);
-   int b = static_cast<unsigned char>(args[2]);
-   int a = static_cast<unsigned char>(args[3]);
    float hHalf = renderRect.height / 2.0f;
-   ofSetColor(ofColor(r, g, b, a));
+   auto col = static_cast<ofColor*>(element.mArgs);
+   ofSetColor(*col);
    ofCircle(renderRect.x + renderRect.width - hHalf, renderRect.y + hHalf, 4.5f);
    ofPopStyle();
 }

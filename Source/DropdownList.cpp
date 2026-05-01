@@ -220,7 +220,7 @@ void DropdownList::Render()
       DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12);
       if (dropdownLabel.mCustomRenderer)
       {
-         dropdownLabel.mCustomRenderer(ofRectangle(mX, mY, mWidth, mHeight), false, false, dropdownLabel.mCustomRenderArgs);
+         dropdownLabel.mCustomRenderer(ofRectangle(mX, mY, mWidth, mHeight), false, false, dropdownLabel);
       }
       ofPopMatrix();
       if (mDrawTriangle)
@@ -340,7 +340,7 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
 
       if (mElements[i].mCustomRenderer)
       {
-         mElements[i].mCustomRenderer(labelRect, isHovering, true, mElements[i].mCustomRenderArgs);
+         mElements[i].mCustomRenderer(labelRect, isHovering, true, mElements[i]);
       }
    }
    ofSetColor(255, 255, 255);
