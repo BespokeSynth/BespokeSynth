@@ -426,7 +426,7 @@ std::string HelpDisplay::GetTooltipFromAddress(const std::string& address)
    //Tokenize
    auto strings = ofSplitString(address, "~");
    //TODO, best to cache this as it's probably not super cheap.
-   const int tokens = strings.size();
+   const int tokens = static_cast<int>(strings.size());
 
    if (tokens == 1) //Asking for a module tooltip
       return GetModuleTooltipFromName(strings[0]);
