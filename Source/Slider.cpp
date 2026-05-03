@@ -304,7 +304,23 @@ void FloatSlider::OnClicked(float x, float y, bool right)
 {
    if (right)
    {
-      DisplayLFOControl();
+      if (GetCableTargetable())
+      {
+         if (mCableTargetable == 1)
+            DisplayLFOControl();
+         else if (mCableTargetable == 0)
+         {
+            double rTime = gTime / 1000.0;
+            if (mHoverWarningFlashTime < rTime)
+            {
+               TriggerHoverWarning(ofColor(255, 115, 0, 255), 2);
+            }
+            else
+            {
+               DisplayLFOControl();
+            }
+         } //No warning whatsoever is displayed if hard blocked.
+      }
       return;
    }
 

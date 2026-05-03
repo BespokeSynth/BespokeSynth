@@ -104,15 +104,21 @@ void ModuleSaveDataPanel::ReloadSaveData()
 
    mNameEntry = new TextEntry(this, "", x, y, 27, mSaveModule->NameMutable());
    mNameEntry->SetNoHover(true);
+   mNameEntry->SetCableTargetableBlockedHard();
+
    mSaveDataControls.push_back(mNameEntry);
    y += kItemSpacing;
 
    mPresetFileSelector = new DropdownList(this, "preset", x, y, &mPresetFileIndex, 150);
    mPresetFileSelector->SetNoHover(true);
+   mPresetFileSelector->SetCableTargetableBlockedHard();
    mPresetFileSelector->SetUnknownItemString("[none]");
+
    mSaveDataControls.push_back(mPresetFileSelector);
+
    mSavePresetAsButton = new ClickButton(this, "save as", mPresetFileSelector, kAnchor_Right);
    mSavePresetAsButton->SetNoHover(true);
+   mSavePresetAsButton->SetCableTargetableBlockedHard();
    mSaveDataControls.push_back(mSavePresetAsButton);
    y += kItemSpacing;
 
@@ -176,7 +182,10 @@ void ModuleSaveDataPanel::ReloadSaveData()
       }
 
       if (control != nullptr)
+      {
          control->SetNoHover(true);
+         control->SetCableTargetableBlockedHard();
+      }
       mSaveDataControls.push_back(control);
       y += kItemSpacing;
    }
@@ -184,11 +193,13 @@ void ModuleSaveDataPanel::ReloadSaveData()
    y += 6;
    mApplyButton = new ClickButton(this, "apply", x, y);
    mApplyButton->SetNoHover(true);
+   mApplyButton->SetCableTargetableBlockedHard();
    mSaveDataControls.push_back(mApplyButton);
    if (mSaveModule->CanBeDeleted())
    {
       mDeleteButton = new ClickButton(this, "delete module", x + 50, y);
       mDeleteButton->SetNoHover(true);
+      mDeleteButton->SetCableTargetableBlockedHard();
       mSaveDataControls.push_back(mDeleteButton);
    }
    y += kItemSpacing;
@@ -197,6 +208,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
    {
       mDrawDebugCheckbox = new Checkbox(this, "draw debug", x, y, &mSaveModule->mDrawDebug);
       mDrawDebugCheckbox->SetNoHover(true);
+      mDrawDebugCheckbox->SetCableTargetableBlockedHard();
       mSaveDataControls.push_back(mDrawDebugCheckbox);
       y += kItemSpacing;
    }
@@ -206,6 +218,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
    {
       mResetSequencerButton = new ClickButton(this, "resume self-advance mode", x, y);
       mResetSequencerButton->SetNoHover(true);
+      mResetSequencerButton->SetCableTargetableBlockedHard();
       mSaveDataControls.push_back(mResetSequencerButton);
       y += kItemSpacing;
    }

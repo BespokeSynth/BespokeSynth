@@ -2034,6 +2034,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~autosave~should autosave be enabled on startup
 ~show_tooltips_on_load~should tooltips be enabled on startup
 ~show_minimap~should the minimap be displayed (requires restart)
+~unsafe_cable_connections~allow cable connections on several controls that are not meant to be patched.\n\nunsafe controls are highlighted in red when patching.\n\nWARNING: may cause crashes if misused.
 ~show_welcome_screen~should we show the welcome screen when you first open bespoke?
 ~immediate_paste~when enabled, pasting values on UI controls will apply immediately instead of requiring you to press enter
 ~record_buffer_length_minutes~length of always-on recording buffer for "write audio" button in the title bar (requires restart)
