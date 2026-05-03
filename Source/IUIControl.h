@@ -87,7 +87,7 @@ public:
    //Enable/disable cable patching on compatible cables
    //Can be user overridden by ticking unsafe_cable_patching
    void SetCableTargetable(bool targetable) { mCableTargetable = static_cast<int>(targetable); }
-   void SetCableTargetableBlockedHard() { mCableTargetable = -1; } //Disallows cable patching, even unsafe.
+   void SetCableTargetableBlockHard() { mCableTargetable = -1; } //Disallows cable patching, even unsafe.
    bool GetCableTargetable() const;
 
    void SetNoHover(bool noHover) { mNoHover = noHover; }
