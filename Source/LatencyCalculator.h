@@ -111,7 +111,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override
    {
-      w = 400;
+      w = 450;
       h = 35;
    }
 
