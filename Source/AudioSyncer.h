@@ -75,10 +75,12 @@ private:
    Checkbox* mPassthroughCheckbox{ nullptr };
    bool mPassthrough{ false };
    FloatSlider* mDisplayLengthMsSlider{ nullptr };
-   float mDisplayLengthMs{ 10000 };
+   float mDisplayLengthMs{ 3000 };
    FloatSlider* mLatencyMsSlider{ nullptr };
    float mLatencyMs{ 0 };
    RollingBuffer mDelayBuffer;
    bool mMono{ true };
    BiquadFilter mBiquadFilter;
+   bool mStaticWaveform{ true };
+   Checkbox* mStaticWaveformCheckbox{ nullptr };
 };
