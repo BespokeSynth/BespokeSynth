@@ -33,15 +33,16 @@
 #include "ModulationChain.h"
 #include "Transport.h"
 
-const float mBufferX = 5;
-const float mBufferY = 60;
-const float mBufferW = 800;
-const float mBufferH = 200;
+const float kBufferX = 5;
+const float kBufferY = 60;
+const float kBufferW = 800;
+const float kBufferH = 200;
+const float kBufferLengthMs = 5000;
 
 AudioSyncer::AudioSyncer()
 : IAudioProcessor(gBufferSize)
 , mWriteBuffer(gBufferSize)
-, mDelayBuffer(5 * gSampleRate)
+, mDelayBuffer(kBufferLengthMs * gSampleRateMs)
 {
    mBiquadFilter.SetFilterType(kFilterType_Highpass);
    mBiquadFilter.SetFilterParams(2000, sqrt(2.0f) / 2);
@@ -53,8 +54,9 @@ void AudioSyncer::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    mPassthroughCheckbox = new Checkbox(this, "passthrough", 5, 5, &mPassthrough);
-   mDisplayLengthMsSlider = new FloatSlider(this, "display length", mPassthroughCheckbox, kAnchor_Below, 120, 15, &mDisplayLengthMs, .1f, mDelayBuffer.Size() / gSampleRateMs);
-   mLatencyMsSlider = new FloatSlider(this, "latencyMs", mDisplayLengthMsSlider, kAnchor_Below, 120, 15, &mLatencyMs, 0, 1000);
+   mStaticWaveformCheckbox = new Checkbox(this, "static waveform", mPassthroughCheckbox, kAnchor_Below, &mStaticWaveform);
+   mDisplayLengthMsSlider = new FloatSlider(this, "display length", mStaticWaveformCheckbox, kAnchor_Right, 120, 15, &mDisplayLengthMs, .1f, mDelayBuffer.Size() / gSampleRateMs);
+   mLatencyMsSlider = new FloatSlider(this, "latencyMs", mStaticWaveformCheckbox, kAnchor_Below, 120, 15, &mLatencyMs, 0, 250);
    mDisplayLengthMs = mDisplayLengthMsSlider->GetMax();
 }
 
@@ -98,21 +100,39 @@ void AudioSyncer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   mDisplayLengthMsSlider->SetShowing(!mStaticWaveform);
+
    mPassthroughCheckbox->Draw();
    mDisplayLengthMsSlider->Draw();
    mLatencyMsSlider->Draw();
+   mStaticWaveformCheckbox->Draw();
+
+   int displaySamples = mDisplayLengthMs * gSampleRateMs;
+   if (mStaticWaveform)
+   {
+      displaySamples = -1; //makes rolling buffer draw statically
+      mDisplayLengthMs = kBufferLengthMs;
+   }
 
    if (mMono)
    {
-      mDelayBuffer.Draw(mBufferX, mBufferY, mBufferW, mBufferH, mDisplayLengthMs * gSampleRateMs, 0);
+      mDelayBuffer.Draw(kBufferX, kBufferY, kBufferW, kBufferH, displaySamples, 0);
    }
    else
    {
       for (int ch = 0; ch < mDelayBuffer.NumChannels(); ++ch)
-         mDelayBuffer.Draw(mBufferX, mBufferY + mBufferH / mDelayBuffer.NumChannels() * ch, mBufferW, mBufferH / mDelayBuffer.NumChannels(), mDisplayLengthMs * gSampleRateMs, ch);
+         mDelayBuffer.Draw(kBufferX, kBufferY + kBufferH / mDelayBuffer.NumChannels() * ch, kBufferW, kBufferH / mDelayBuffer.NumChannels(), displaySamples, ch);
    }
 
    ofPushStyle();
+
+   float nowPosX = 0;
+   if (mStaticWaveform)
+   {
+      ofSetColor(0, 255, 0);
+      nowPosX = float(mDelayBuffer.GetRawBufferOffset(0)) / mDelayBuffer.Size() * kBufferW + kBufferX;
+      ofLine(nowPosX, kBufferY, nowPosX, kBufferY + kBufferH);
+   }
 
    float msPerBeat = TheTransport->MsPerBar() / TheTransport->GetTimeSigTop();
    int numDisplayBeats = int(mDisplayLengthMs / msPerBeat) + 1;
@@ -122,15 +142,22 @@ void AudioSyncer::DrawModule()
    for (int i = 0; i < numDisplayBeats; ++i)
    {
       float msSinceBeat = (i + beatProgress) * msPerBeat - mLatencyMs;
-      float x = mBufferX + mBufferW - (msSinceBeat / mDisplayLengthMs) * mBufferW;
+      float x = kBufferX + kBufferW - (msSinceBeat / mDisplayLengthMs) * kBufferW;
+
+      if (mStaticWaveform)
+         x = FloatWrap((x - kBufferX) + (nowPosX - kBufferX), kBufferW) + kBufferX;
+
+      float alpha = 70;
+      if (msSinceBeat > mDisplayLengthMs * .75f)
+         alpha *= ofMap(msSinceBeat, mDisplayLengthMs * .75f, mDisplayLengthMs * .9f, 1, 0, true);
 
       if (displayBeat == 0)
-         ofSetColor(255, 255, 0, 70);
+         ofSetColor(255, 255, 0, alpha);
       else
-         ofSetColor(255, 180, 0, 70);
+         ofSetColor(255, 180, 0, alpha);
 
-      ofLine(x, mBufferY, x, mBufferY + mBufferH / 3);
-      ofLine(x, mBufferY + mBufferH * 2 / 3, x, mBufferY + mBufferH);
+      ofLine(x, kBufferY, x, kBufferY + kBufferH / 3);
+      ofLine(x, kBufferY + kBufferH * 2 / 3, x, kBufferY + kBufferH);
 
       --displayBeat;
       if (displayBeat < 0)
@@ -145,7 +172,7 @@ void AudioSyncer::DrawModule()
       else
          ofSetColor(255, 180, 0, beatSquare == beat ? 255 : 40);
 
-      ofRect(150 + beatSquare * 30, 10, 25, 25);
+      ofRect(250 + beatSquare * 30, 10, 25, 25);
    }
 
    ofPopStyle();
@@ -168,8 +195,8 @@ bool AudioSyncer::MouseMoved(float x, float y)
 
 void AudioSyncer::GetModuleDimensions(float& width, float& height)
 {
-   width = mBufferW + 10;
-   height = mBufferY + mBufferH + 5;
+   width = kBufferW + 10;
+   height = kBufferY + kBufferH + 5;
 }
 
 void AudioSyncer::LoadLayout(const ofxJSONElement& moduleInfo)
