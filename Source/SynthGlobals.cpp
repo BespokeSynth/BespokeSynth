@@ -138,7 +138,7 @@ std::string GetBuildInfoString()
    juce::JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + std::string(__DATE__) + " " + std::string(__TIME__) + ")";
 }
 
-void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/)
+void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/, bool drawBackground /*=true*/)
 {
    ofPushMatrix();
    if (buffer != nullptr)
@@ -146,14 +146,14 @@ void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float sta
       int numChannels = buffer->NumActiveChannels();
       for (int i = 0; i < numChannels; ++i)
       {
-         DrawAudioBuffer(width, height / numChannels, buffer->GetChannel(i), start, MIN(end, buffer->BufferSize()), pos, vol, color, wraparoundFrom, wraparoundTo, buffer->BufferSize());
+         DrawAudioBuffer(width, height / numChannels, buffer->GetChannel(i), start, MIN(end, buffer->BufferSize()), pos, vol, color, wraparoundFrom, wraparoundTo, buffer->BufferSize(), drawBackground);
          ofTranslate(0, height / numChannels);
       }
    }
    ofPopMatrix();
 }
 
-void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/, int bufferSize /*=-1*/)
+void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/, int bufferSize /*=-1*/, bool drawBackground /*=true*/)
 {
    static std::array<float, 10000> sAudioBufferMinValues;
    static std::array<float, 10000> sAudioBufferMaxValues;
@@ -164,14 +164,17 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
 
    ofSetLineWidth(1);
    ofFill();
-   ofSetColor(255, 255, 255, 50);
-   if (width > 0)
-      ofRect(0, 0, width, height);
-   else
-      ofRect(width, 0, -width, height);
+   if (drawBackground)
+   {
+      ofSetColor(255, 255, 255, 50);
+      if (width > 0)
+         ofRect(0, 0, width, height);
+      else
+         ofRect(width, 0, -width, height);
 
-   ofSetColor(color, 17);
-   ofLine(0, height / 2, width, height / 2);
+      ofSetColor(color, 17);
+      ofLine(0, height / 2, width, height / 2);
+   }
 
    float length = end - 1 - start;
    if (length < 0)

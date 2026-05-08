@@ -104,7 +104,7 @@ void RollingBuffer::ClearBuffer()
       mOffsetToNow[i] = 0;
 }
 
-void RollingBuffer::Draw(int x, int y, int width, int height, int length /*= -1*/, int channel /*= -1*/, int delayOffset /*= 0*/)
+void RollingBuffer::Draw(int x, int y, int width, int height, int length /*= -1*/, int channel /*= -1*/, int delayOffset /*= 0*/, ofColor color /*=ofColor::black*/, bool drawBackground /*=true*/)
 {
    ofPushStyle();
    ofPushMatrix();
@@ -114,9 +114,9 @@ void RollingBuffer::Draw(int x, int y, int width, int height, int length /*= -1*
    if (length == -1) //draw full rolling buffer
    {
       if (channel == -1)
-         DrawAudioBuffer(width, height, &mBuffer, 0, Size(), -1);
+         DrawAudioBuffer(width, height, &mBuffer, 0, Size(), -1, 1, color, -1, 0, drawBackground);
       else
-         DrawAudioBuffer(width, height, mBuffer.GetChannel(channel), 0, Size(), -1);
+         DrawAudioBuffer(width, height, mBuffer.GetChannel(channel), 0, Size(), -1, 1, color, -1, 0, -1, drawBackground);
    }
    else //draw segment
    {
@@ -133,9 +133,9 @@ void RollingBuffer::Draw(int x, int y, int width, int height, int length /*= -1*
          endSample -= Size(); //draw wraparound
 
       if (channel == -1)
-         DrawAudioBuffer(width, height, &mBuffer, startSample, endSample, -1, 1, ofColor::black, Size());
+         DrawAudioBuffer(width, height, &mBuffer, startSample, endSample, -1, 1, color, Size(), 0, drawBackground);
       else
-         DrawAudioBuffer(width, height, mBuffer.GetChannel(channel), startSample, endSample, -1, 1, ofColor::black, Size());
+         DrawAudioBuffer(width, height, mBuffer.GetChannel(channel), startSample, endSample, -1, 1, color, Size(), 0, -1, drawBackground);
    }
 
    ofPopMatrix();
