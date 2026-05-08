@@ -40,7 +40,7 @@ class AudioSyncer : public IAudioProcessor, public IDrawableModule, public IFloa
 {
 public:
    AudioSyncer();
-   ~AudioSyncer();
+   virtual ~AudioSyncer();
    static IDrawableModule* Create() { return new AudioSyncer(); }
    static bool AcceptsAudio() { return true; }
    static bool AcceptsNotes() { return false; }
@@ -63,7 +63,7 @@ public:
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 0; }
+   int GetModuleSaveStateRev() const override { return 1; }
 
 private:
    //IDrawableModule
@@ -71,16 +71,21 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
 
-   ChannelBuffer mWriteBuffer;
+   struct BandBuffer
+   {
+      BandBuffer();
+      RollingBuffer mBuffer;
+      std::vector<BiquadFilter*> mFilters;
+      ofColor mColor;
+   };
+
+   std::vector<BandBuffer*> mBandBuffers;
    Checkbox* mPassthroughCheckbox{ nullptr };
    bool mPassthrough{ false };
    FloatSlider* mDisplayLengthMsSlider{ nullptr };
    float mDisplayLengthMs{ 3000 };
    FloatSlider* mLatencyMsSlider{ nullptr };
    float mLatencyMs{ 0 };
-   RollingBuffer mDelayBuffer;
-   bool mMono{ true };
-   BiquadFilter mBiquadFilter;
    bool mStaticWaveform{ true };
    Checkbox* mStaticWaveformCheckbox{ nullptr };
 };
