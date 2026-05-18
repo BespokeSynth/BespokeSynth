@@ -39,9 +39,7 @@ ModulatorBinaryValue::ModulatorBinaryValue()
       mBits[i].SetIndex(NUM_BITS - i - 1);
    }
    for (int i = 0; i < 1 << NUM_BITS; i++)
-   {
       mPermutations[i].value = i;
-   }
    std::sort(mPermutations.begin(), mPermutations.end());
 }
 
