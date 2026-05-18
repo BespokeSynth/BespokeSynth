@@ -98,7 +98,8 @@ private:
          if (!value)
             return 0;
          int ones = 0;
-         for (int i = 0; i < log(value) / log(2) + 1; i++) {
+         for (int i = 0; i < log(value) / log(2) + 1; i++)
+         {
             if (value & (1 << i))
                ones++;
          }
