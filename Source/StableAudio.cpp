@@ -30,6 +30,7 @@
 #include "Profiler.h"
 #include "Sample.h"
 #include "SynthGlobals.h"
+#include "Transport.h"
 #include "UIControlMacros.h"
 
 #if BESPOKE_STABLE_AUDIO_ENABLED
@@ -49,6 +50,7 @@ extern "C" {
 #include <array>
 #include <chrono>
 #include <climits>
+#include <cmath>
 #include <cstdlib>
 #include <random>
 #include <regex>
@@ -96,11 +98,11 @@ void StableAudio::CreateUIControls()
    mGeneratedWavDropdown->SetUnknownItemString("no generated wavs");
    RefreshGeneratedWavList();
    UIBLOCK_SHIFTRIGHT();
-   BUTTON(mLoadWavButton, "load");
+   CHECKBOX(mAutonextCheckbox, "autonext", &mAutonext);
    UIBLOCK_SHIFTRIGHT();
-   BUTTON(mDeleteWavButton, "delete");
+   BUTTON(mDeleteWavButton, "del");
    UIBLOCK_SHIFTRIGHT();
-   BUTTON(mDeleteAllWavsButton, "delete all");
+   BUTTON(mDeleteAllWavsButton, "del-all");
    UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mUseMetadataWavLabelsCheckbox, "details", &mUseMetadataWavLabels);
    UIBLOCK_NEWLINE();
@@ -114,7 +116,7 @@ void StableAudio::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mMoreIdeasButton, "more ideas...");
    UIBLOCK_SHIFTRIGHT();
-   CHECKBOX(mAutoplayCheckbox, "autoplay", &mAutoplay);
+   CHECKBOX(mAutoplayCheckbox, "auto gen", &mAutoplay);
    UIBLOCK_NEWLINE();
    DROPDOWN(mModelDropdown, "model", &mModelSelection, 120);
    mModelDropdown->DrawLabel(true);
@@ -168,6 +170,7 @@ void StableAudio::Init()
 void StableAudio::Poll()
 {
    IDrawableModule::Poll();
+   RefreshGeneratedWavListIfInstanceChanged();
 
    if (mGenerationInProgress && mGenerationFuture.valid() &&
        mGenerationFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
@@ -209,6 +212,8 @@ void StableAudio::Poll()
    {
       AutoplayNextPrompt();
    }
+
+   AdvanceAutonextIfNeeded();
 }
 
 void StableAudio::Process(double time)
@@ -234,9 +239,17 @@ void StableAudio::Process(double time)
 
       if (mPlay)
       {
-         mSample->SetLooping(mLoop);
+         const bool useCrossfadeLoop = ShouldUseCrossfadeLoop();
+         if (useCrossfadeLoop && mSample->GetPlayPosition() >= mSample->LengthInSamples())
+            mSample->SetPlayPosition(std::fmod(mSample->GetPlayPosition(), (double)mSample->LengthInSamples()));
+
+         const double startPlayPosition = mSample->GetPlayPosition();
+         mSample->SetLooping(mLoop && !mAutonext && !useCrossfadeLoop);
          if (mSample->ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
          {
+            if (useCrossfadeLoop)
+               ApplyLoopCrossfade(startPlayPosition, bufferSize);
+
             if (mPreviousSample != nullptr)
             {
                const double crossfadeMs = std::clamp(mCrossfadeSeconds, .25f, GetMaxCrossfadeSeconds()) * 1000.0;
@@ -320,9 +333,6 @@ void StableAudio::ButtonClicked(ClickButton* button, double time)
    if (button == mGenerateButton)
       StartGeneration();
 
-   if (button == mLoadWavButton)
-      LoadSelectedGeneratedWav();
-
    if (button == mDeleteWavButton)
       DeleteSelectedGeneratedWav();
    if (button == mDeleteAllWavsButton)
@@ -360,6 +370,8 @@ void StableAudio::StartGeneration()
       mStatusString = "enter a prompt first";
       return;
    }
+
+   ApplyPromptDuration();
 
    std::string outputPath = BuildOutputPath();
    juce::File(outputPath).getParentDirectory().createDirectory();
@@ -456,7 +468,9 @@ void StableAudio::LoadGeneratedSample(const std::string& path)
          mSample->SetPlayPosition(0);
          mCurrentSamplePath = path;
          mCurrentSamplePrompt = ReadGeneratedWavMetadataPrompt(path);
-         if (mCurrentSamplePrompt.empty())
+         if (!mCurrentSamplePrompt.empty())
+            SetPromptText(mCurrentSamplePrompt);
+         else if (mCurrentSamplePrompt.empty())
             mCurrentSamplePrompt = mPrompt;
          mPlay = true;
          UpdatePlaybackControls();
@@ -509,10 +523,45 @@ std::string StableAudio::GetGeneratedAudioDirectory() const
    return ofToDataPath("stableaudio/" + instanceName.toStdString());
 }
 
+void StableAudio::RefreshGeneratedWavListIfInstanceChanged()
+{
+   if (mGeneratedWavDropdown == nullptr)
+      return;
+
+   const std::string generatedAudioDirectory = GetGeneratedAudioDirectory();
+   if (generatedAudioDirectory == mGeneratedAudioDirectory)
+      return;
+
+   mGeneratedAudioDirectory = generatedAudioDirectory;
+
+   const bool currentSampleBelongsToInstance = !mCurrentSamplePath.empty() &&
+                                               juce::File(mCurrentSamplePath).getParentDirectory() == juce::File(mGeneratedAudioDirectory);
+   if (!currentSampleBelongsToInstance)
+   {
+      std::lock_guard<std::mutex> sampleLock(mSampleMutex);
+      delete mSample;
+      delete mPreviousSample;
+      mSample = nullptr;
+      mPreviousSample = nullptr;
+      mCurrentSamplePath.clear();
+      mCurrentSamplePrompt.clear();
+      mPlay = false;
+      mCrossfadeStartTime = -1;
+      mPendingTransportSyncTime = -1;
+      mPendingTransportSyncPrompt.clear();
+      UpdatePlaybackControls();
+   }
+
+   RefreshGeneratedWavList();
+   RefreshPromptChoices();
+}
+
 void StableAudio::RefreshGeneratedWavList()
 {
    if (mGeneratedWavDropdown == nullptr)
       return;
+
+   mGeneratedAudioDirectory = GetGeneratedAudioDirectory();
 
    struct WavFileEntry
    {
@@ -556,6 +605,64 @@ void StableAudio::RefreshGeneratedWavList()
       mGeneratedWavIndex = -1;
    else if (mGeneratedWavIndex < 0 || mGeneratedWavIndex >= (int)mGeneratedWavPaths.size())
       mGeneratedWavIndex = 0;
+
+   AutoloadSelectedGeneratedWavIfNeeded();
+}
+
+void StableAudio::AutoloadSelectedGeneratedWavIfNeeded()
+{
+   if (mGeneratedWavIndex < 0 || mGeneratedWavIndex >= (int)mGeneratedWavPaths.size())
+      return;
+
+   bool hasSample = false;
+   {
+      std::lock_guard<std::mutex> sampleLock(mSampleMutex);
+      hasSample = mSample != nullptr;
+   }
+
+   if (!hasSample && mCurrentSamplePath.empty())
+      LoadSelectedGeneratedWav();
+}
+
+void StableAudio::AdvanceAutonextIfNeeded()
+{
+   if (!mAutonext || mGeneratedWavPaths.empty() || mGenerationInProgress)
+      return;
+
+   std::string currentSamplePath;
+   double remainingSeconds = 0;
+   bool shouldAdvance = false;
+   {
+      std::lock_guard<std::mutex> sampleLock(mSampleMutex);
+      if (mSample == nullptr || !mPlay || mSample->LengthInSamples() <= 0 || mSample->GetSampleRateRatio() <= 0)
+         return;
+
+      currentSamplePath = mCurrentSamplePath;
+      remainingSeconds = (mSample->LengthInSamples() - mSample->GetPlayPosition()) / (gSampleRate * mSample->GetSampleRateRatio());
+      const double advanceSeconds = mTransitionMode == kTransition_Crossfade ? std::clamp((double)mCrossfadeSeconds, .25, (double)GetMaxCrossfadeSeconds()) : .05;
+      shouldAdvance = remainingSeconds <= advanceSeconds;
+   }
+
+   if (!shouldAdvance || currentSamplePath.empty())
+      return;
+
+   for (size_t i = 0; i < mGeneratedWavPaths.size(); ++i)
+   {
+      if (mGeneratedWavPaths[i] == currentSamplePath)
+      {
+         mGeneratedWavIndex = ((int)i + 1) % (int)mGeneratedWavPaths.size();
+         AdvanceToNextGeneratedWav();
+         return;
+      }
+   }
+}
+
+void StableAudio::AdvanceToNextGeneratedWav()
+{
+   if (mGeneratedWavIndex < 0 || mGeneratedWavIndex >= (int)mGeneratedWavPaths.size())
+      return;
+
+   LoadSelectedGeneratedWav();
 }
 
 void StableAudio::LoadSelectedGeneratedWav()
@@ -603,6 +710,7 @@ void StableAudio::DeleteSelectedGeneratedWav()
    metadataFile.deleteFile();
 
    RefreshGeneratedWavList();
+   RefreshPromptChoices();
 
    if (deletedWav && !mGeneratedWavPaths.empty())
    {
@@ -656,6 +764,7 @@ void StableAudio::DeleteAllGeneratedWavs()
    }
 
    RefreshGeneratedWavList();
+   RefreshPromptChoices();
    mStatusString = "deleted " + ofToString(deletedCount) + " generated wavs";
 }
 
@@ -681,13 +790,6 @@ void StableAudio::RefreshPromptChoices()
    mPromptDropdown->SetUnknownItemString("choose prompt");
    mPromptChoice = -1;
 
-   AddPromptChoice("lo-fi hip hop beat, warm tape saturation, 90 BPM");
-   AddPromptChoice("driving synthwave bassline, analog drums, 124 BPM");
-   AddPromptChoice("ambient guitar swells, soft piano, spacious reverb");
-   AddPromptChoice("cinematic whoosh impact, metallic tail");
-   AddPromptChoice("rain on glass, distant thunder, cozy room tone");
-   AddPromptChoice("punchy kick drum fill");
-
    juce::File directory(GetGeneratedAudioDirectory());
    for (const auto& entry : juce::RangedDirectoryIterator(directory, false, "*.meta", juce::File::findFiles))
    {
@@ -703,6 +805,9 @@ void StableAudio::RefreshPromptChoices()
       }
    }
 
+   if (ShouldUseDefaultPrompt())
+      AddPromptChoice("rain on glass, distant thunder, cozy room tone");
+
    for (int i = 0; i < (int)mPromptChoices.size(); ++i)
    {
       if (mPromptChoices[i] == selectedPrompt)
@@ -711,6 +816,11 @@ void StableAudio::RefreshPromptChoices()
          break;
       }
    }
+
+   if (mPrompt.empty() && ShouldUseDefaultPrompt())
+      SetPromptText("rain on glass, distant thunder, cozy room tone");
+   else if (!ShouldUseDefaultPrompt() && mPrompt == "rain on glass, distant thunder, cozy room tone" && mCurrentSamplePath.empty() && mGeneratedWavPaths.empty())
+      SetPromptText("");
 }
 
 void StableAudio::GenerateMorePromptIdeas()
@@ -841,20 +951,49 @@ std::string StableAudio::MakeGeneratedPromptIdea()
       "sci-fi UI bed",
       "relaxing focus loop"
    };
-   static const std::array<int, 6> bpms{ 70, 90, 110, 124, 128, 140 };
    static const std::array<int, 3> durations{ 30, 45, 60 };
 
-   std::uniform_int_distribution<int> bpmDist(0, (int)bpms.size() - 1);
    std::uniform_int_distribution<int> durationDist(0, (int)durations.size() - 1);
 
-   return std::string(pick(genres)) + ", " +
-          std::to_string(bpms[bpmDist(rng)]) + " BPM, " +
-          pick(instruments) + ", " +
-          pick(moods) + " mood, " +
-          pick(productionStyles) + ", " +
-          pick(structures) + ", " +
-          pick(uses) + ", seamless loop, " +
-          std::to_string(durations[durationDist(rng)]) + " seconds";
+   juce::String basePrompt(mPrompt);
+   basePrompt = basePrompt.trim().trimCharactersAtEnd(",");
+
+   std::string idea = std::string(pick(genres)) + ", ";
+   if (!PromptContainsTransportData(basePrompt.toStdString()))
+      idea += GetTransportPromptFragment() + ", ";
+   idea += std::string(pick(instruments)) + ", " +
+           pick(moods) + " mood, " +
+           pick(productionStyles) + ", " +
+           pick(structures) + ", " +
+           pick(uses) + ", seamless loop, " +
+           std::to_string(durations[durationDist(rng)]) + " seconds";
+
+   if (basePrompt.isEmpty())
+      return idea;
+   return basePrompt.toStdString() + ", " + idea;
+}
+
+std::string StableAudio::GetTransportPromptFragment() const
+{
+   if (TheTransport == nullptr)
+      return "tempo 120 BPM, swing 50%, timesigtop 4, timesigbottom 4, swinginterval 8n";
+
+   return "tempo " + ofToString(TheTransport->GetTempo(), 1) + " BPM, " +
+          "swing " + ofToString(TheTransport->GetSwing() * 100, 0) + "%, " +
+          "timesigtop " + ofToString(TheTransport->GetTimeSigTop()) + ", " +
+          "timesigbottom " + ofToString(TheTransport->GetTimeSigBottom()) + ", " +
+          "swinginterval " + ofToString(TheTransport->GetSwingInterval()) + "n";
+}
+
+bool StableAudio::PromptContainsTransportData(const std::string& prompt) const
+{
+   const std::regex transportPattern(R"(\b(?:tempo|bpm|swing|timesigtop|timesigbottom|swinginterval)\b)", std::regex_constants::icase);
+   return std::regex_search(prompt, transportPattern);
+}
+
+bool StableAudio::ShouldUseDefaultPrompt() const
+{
+   return std::string(Name()) == "stableaudio" && mGeneratedWavPaths.empty();
 }
 
 void StableAudio::AddPromptChoice(const std::string& prompt)
@@ -890,6 +1029,118 @@ void StableAudio::SetPromptText(const std::string& prompt)
    {
       mPromptEntry->SetText(mPrompt);
       mPromptEntry->UpdateDisplayString();
+   }
+}
+
+bool StableAudio::TryGetPromptDurationSeconds(const std::string& prompt, float& seconds) const
+{
+   seconds = 0;
+   std::vector<std::pair<size_t, size_t>> matchedRanges;
+   bool foundDuration = false;
+
+   const auto overlapsMatchedRange = [&matchedRanges](size_t start, size_t end)
+   {
+      for (const auto& range : matchedRanges)
+      {
+         if (start < range.second && end > range.first)
+            return true;
+      }
+      return false;
+   };
+
+   const auto addMatch = [&seconds, &matchedRanges, &foundDuration](const std::smatch& match, float multiplier)
+   {
+      seconds += (float)std::atof(match[1].str().c_str()) * multiplier;
+      matchedRanges.push_back({ (size_t)match.position(0), (size_t)(match.position(0) + match.length(0)) });
+      foundDuration = true;
+   };
+
+   const std::regex secondsPattern(R"((\d+(?:\.\d+)?)\s*(?:seconds?|secs?|s)\b)", std::regex_constants::icase);
+   for (std::sregex_iterator it(prompt.begin(), prompt.end(), secondsPattern), end; it != end; ++it)
+      addMatch(*it, 1);
+
+   const std::regex minutesPattern(R"((\d+(?:\.\d+)?)\s*(?:minutes?|mins?|m)\b)", std::regex_constants::icase);
+   for (std::sregex_iterator it(prompt.begin(), prompt.end(), minutesPattern), end; it != end; ++it)
+      addMatch(*it, 60);
+
+   const std::regex durationPattern(R"(\bduration\s*(?:of|:|=)?\s*(\d+(?:\.\d+)?)\b)", std::regex_constants::icase);
+   for (std::sregex_iterator it(prompt.begin(), prompt.end(), durationPattern), end; it != end; ++it)
+   {
+      const size_t start = (size_t)it->position(0);
+      const size_t matchEnd = (size_t)(it->position(0) + it->length(0));
+      if (!overlapsMatchedRange(start, matchEnd))
+         addMatch(*it, 1);
+   }
+
+   if (!foundDuration)
+      return false;
+
+   seconds = std::clamp(seconds, 1.0f, GetSelectedModelMaxSeconds());
+   return true;
+}
+
+void StableAudio::ApplyPromptDuration()
+{
+   float promptSeconds = 0;
+   if (!TryGetPromptDurationSeconds(mPrompt, promptSeconds))
+      return;
+
+   mSeconds = promptSeconds;
+   if (mSecondsSlider != nullptr)
+      mSecondsSlider->SetValue(mSeconds, gTime, true);
+   UpdateCrossfadeSlider();
+}
+
+bool StableAudio::ShouldUseCrossfadeLoop() const
+{
+   return mLoop &&
+          !mAutonext &&
+          mTransitionMode == kTransition_Crossfade &&
+          mSample != nullptr &&
+          mSample->LengthInSamples() > 1 &&
+          mSample->GetSampleRateRatio() > 0;
+}
+
+void StableAudio::ApplyLoopCrossfade(double startPlayPosition, int bufferSize)
+{
+   if (mSample == nullptr)
+      return;
+
+   const double sampleLength = mSample->LengthInSamples();
+   const double sampleRateRatio = mSample->GetSampleRateRatio();
+   if (sampleLength <= 1 || sampleRateRatio <= 0)
+      return;
+
+   const double crossfadeSamples = std::clamp((double)mCrossfadeSeconds * gSampleRate * sampleRateRatio, 1.0, sampleLength * .5);
+   const double fadeStart = sampleLength - crossfadeSamples;
+
+   for (int i = 0; i < bufferSize; ++i)
+   {
+      const double playPosition = startPlayPosition + i * sampleRateRatio;
+      if (playPosition < fadeStart)
+         continue;
+
+      double wrappedPosition = playPosition - fadeStart;
+      while (wrappedPosition >= sampleLength)
+         wrappedPosition -= sampleLength;
+
+      const float fadeIn = playPosition >= sampleLength ? 1 : ofClamp(float((playPosition - fadeStart) / crossfadeSamples), 0, 1);
+      const float fadeOut = 1 - fadeIn;
+      for (int ch = 0; ch < gWorkChannelBuffer.NumActiveChannels(); ++ch)
+      {
+         const int dataChannel = MIN(ch, mSample->Data()->NumActiveChannels() - 1);
+         const float wrappedSample = GetInterpolatedSample(wrappedPosition, mSample->Data()->GetChannel(dataChannel), mSample->LengthInSamples());
+         gWorkChannelBuffer.GetChannel(ch)[i] = gWorkChannelBuffer.GetChannel(ch)[i] * fadeOut + wrappedSample * fadeIn;
+      }
+   }
+
+   const double finalPlayPosition = startPlayPosition + bufferSize * sampleRateRatio;
+   if (finalPlayPosition >= sampleLength)
+   {
+      double nextPlayPosition = finalPlayPosition - fadeStart;
+      while (nextPlayPosition >= sampleLength)
+         nextPlayPosition -= sampleLength;
+      mSample->SetPlayPosition(nextPlayPosition);
    }
 }
 
@@ -1201,15 +1452,27 @@ void StableAudio::DrawModule()
    }
    mModelDropdown->Draw();
    mGenerateButton->Draw();
+   const bool hasAudioTarget = GetTarget() != nullptr;
    if (mPlayButton->IsShowing())
+   {
+      IUIControl::sCurrentOverrideColor = !hasAudioTarget ? ofColor(190, 45, 45) : mPlay ? ofColor(45, 180, 80)
+                                                                                         : ofColor(70, 90, 75);
+      IUIControl::sUseOverrideColor = true;
       mPlayButton->Draw();
+      IUIControl::sUseOverrideColor = false;
+   }
    if (mStopButton->IsShowing())
+   {
+      IUIControl::sCurrentOverrideColor = mPlay ? ofColor(95, 75, 70) : ofColor(190, 90, 45);
+      IUIControl::sUseOverrideColor = true;
       mStopButton->Draw();
+      IUIControl::sUseOverrideColor = false;
+   }
    mLoopCheckbox->Draw();
    mVolumeSlider->Draw();
    mSyncTransportCheckbox->Draw();
    mGeneratedWavDropdown->Draw();
-   mLoadWavButton->Draw();
+   mAutonextCheckbox->Draw();
    mDeleteWavButton->Draw();
    mDeleteAllWavsButton->Draw();
    mUseMetadataWavLabelsCheckbox->Draw();
@@ -1268,6 +1531,7 @@ void StableAudio::SaveState(FileStreamOut& out)
    out << mTransitionMode;
    out << mCrossfadeSeconds;
    out << mSyncTransport;
+   out << mAutonext;
 }
 
 void StableAudio::LoadState(FileStreamIn& in, int rev)
@@ -1311,6 +1575,8 @@ void StableAudio::LoadState(FileStreamIn& in, int rev)
       in >> mCrossfadeSeconds;
    if (rev >= 5)
       in >> mSyncTransport;
+   if (rev >= 6)
+      in >> mAutonext;
    UpdateCrossfadeSlider();
 
    RefreshGeneratedWavList();
@@ -1323,7 +1589,6 @@ std::vector<IUIControl*> StableAudio::ControlsToIgnoreInSaveState() const
    std::vector<IUIControl*> ignore;
    ignore.push_back(mGenerateButton);
    ignore.push_back(mMoreIdeasButton);
-   ignore.push_back(mLoadWavButton);
    ignore.push_back(mDeleteWavButton);
    ignore.push_back(mDeleteAllWavsButton);
    ignore.push_back(mPlayButton);

@@ -120,6 +120,7 @@ public:
    int GetTimeSigBottom() const { return mTimeSigBottom; }
    void SetSwing(float swing) { mSwing = swing; }
    float GetSwing() const { return mSwing; }
+   int GetSwingInterval() const { return mSwingInterval; }
    double MsPerBar() const { return 60.0 / mTempo * 1000 * mTimeSigTop * 4.0 / mTimeSigBottom; }
    void Advance(double ms);
    TransportListenerInfo* AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead);

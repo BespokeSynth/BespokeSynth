@@ -75,7 +75,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 5; }
+   int GetModuleSaveStateRev() const override { return 6; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
 private:
@@ -97,7 +97,11 @@ private:
    void FreeModel();
    std::string BuildOutputPath() const;
    std::string GetGeneratedAudioDirectory() const;
+   void RefreshGeneratedWavListIfInstanceChanged();
    void RefreshGeneratedWavList();
+   void AutoloadSelectedGeneratedWavIfNeeded();
+   void AdvanceAutonextIfNeeded();
+   void AdvanceToNextGeneratedWav();
    void LoadSelectedGeneratedWav();
    void DeleteSelectedGeneratedWav();
    void DeleteAllGeneratedWavs();
@@ -105,11 +109,18 @@ private:
    void RefreshPromptChoices();
    void GenerateMorePromptIdeas();
    std::string MakeGeneratedPromptIdea();
+   std::string GetTransportPromptFragment() const;
+   bool PromptContainsTransportData(const std::string& prompt) const;
+   bool ShouldUseDefaultPrompt() const;
    void AutoplayNextPrompt();
    void ScheduleNextAutoplay();
    void AddPromptChoice(const std::string& prompt);
    void ApplyPromptChoice();
    void SetPromptText(const std::string& prompt);
+   bool TryGetPromptDurationSeconds(const std::string& prompt, float& seconds) const;
+   void ApplyPromptDuration();
+   bool ShouldUseCrossfadeLoop() const;
+   void ApplyLoopCrossfade(double startPlayPosition, int bufferSize);
    bool TryGetPromptBpm(const std::string& prompt, float& bpm) const;
    void SyncTransportToPromptBpm();
    void SyncTransportToPromptBpm(const std::string& prompt);
@@ -141,6 +152,7 @@ private:
    int mLoadedSeed{ 0 };
    std::vector<std::string> mGeneratedWavPaths;
    std::vector<std::string> mPromptChoices;
+   std::string mGeneratedAudioDirectory;
    std::string mCurrentSamplePath;
    std::string mCurrentSamplePrompt;
 
@@ -167,7 +179,7 @@ private:
 
    std::string mModelDir;
    int mModelSelection{ kModel_SmallMusic };
-   std::string mPrompt{ "rain on glass, distant thunder, cozy room tone" };
+   std::string mPrompt;
    std::string mDitPath;
    std::string mDecoderPath;
    std::string mTextEncoderPath;
@@ -180,6 +192,7 @@ private:
    bool mPlay{ false };
    bool mLoop{ true };
    bool mAutoplay{ false };
+   bool mAutonext{ false };
    bool mSyncTransport{ true };
    int mGeneratedWavIndex{ -1 };
    int mPromptChoice{ -1 };
@@ -202,7 +215,7 @@ private:
    FloatSlider* mVolumeSlider{ nullptr };
    Checkbox* mSyncTransportCheckbox{ nullptr };
    ClickButton* mGenerateButton{ nullptr };
-   ClickButton* mLoadWavButton{ nullptr };
+   Checkbox* mAutonextCheckbox{ nullptr };
    ClickButton* mDeleteWavButton{ nullptr };
    ClickButton* mDeleteAllWavsButton{ nullptr };
    Checkbox* mUseMetadataWavLabelsCheckbox{ nullptr };
