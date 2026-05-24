@@ -43,12 +43,15 @@ extern "C" {
 #endif
 
 #include "juce_core/juce_core.h"
+#include "juce_gui_basics/juce_gui_basics.h"
 
 #include <algorithm>
 #include <array>
 #include <chrono>
 #include <climits>
+#include <cstdlib>
 #include <random>
+#include <regex>
 #include <vector>
 
 StableAudio::StableAudio()
@@ -97,6 +100,8 @@ void StableAudio::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mDeleteWavButton, "delete");
    UIBLOCK_SHIFTRIGHT();
+   BUTTON(mDeleteAllWavsButton, "delete all");
+   UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mUseMetadataWavLabelsCheckbox, "details", &mUseMetadataWavLabels);
    UIBLOCK_NEWLINE();
    TEXTENTRY(mPromptEntry, "prompt", 64, &mPrompt);
@@ -124,6 +129,8 @@ void StableAudio::CreateUIControls()
    CHECKBOX(mLoopCheckbox, "loop", &mLoop);
    UIBLOCK_SHIFTRIGHT();
    FLOATSLIDER(mVolumeSlider, "volume", &mVolume, 0, 2);
+   UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mSyncTransportCheckbox, "sync tempo", &mSyncTransport);
    UIBLOCK_NEWLINE();
 
    FLOATSLIDER_DIGITS(mSecondsSlider, "duration", &mSeconds, 1, GetSelectedModelMaxSeconds(), 2);
@@ -182,6 +189,13 @@ void StableAudio::Poll()
          mStatusString = result.error;
          TheSynth->LogEvent("stableaudio: " + result.error, kLogEventType_Error);
       }
+   }
+
+   if (mSyncTransport && mPendingTransportSyncTime > 0 && gTime >= mPendingTransportSyncTime)
+   {
+      SyncTransportToPromptBpm(mPendingTransportSyncPrompt);
+      mPendingTransportSyncTime = -1;
+      mPendingTransportSyncPrompt.clear();
    }
 
    bool hasSample = false;
@@ -289,12 +303,16 @@ void StableAudio::OnPulse(double time, float velocity, int flags)
 
 void StableAudio::Trigger(double time, float velocity)
 {
-   std::lock_guard<std::mutex> sampleLock(mSampleMutex);
-   if (!mEnabled || mSample == nullptr)
-      return;
+   {
+      std::lock_guard<std::mutex> sampleLock(mSampleMutex);
+      if (!mEnabled || mSample == nullptr)
+         return;
 
-   mSample->SetPlayPosition(0);
-   mPlay = true;
+      mSample->SetPlayPosition(0);
+      mPlay = true;
+   }
+
+   SyncTransportToPromptBpm();
 }
 
 void StableAudio::ButtonClicked(ClickButton* button, double time)
@@ -307,6 +325,8 @@ void StableAudio::ButtonClicked(ClickButton* button, double time)
 
    if (button == mDeleteWavButton)
       DeleteSelectedGeneratedWav();
+   if (button == mDeleteAllWavsButton)
+      DeleteAllGeneratedWavs();
 
    if (button == mMoreIdeasButton)
       GenerateMorePromptIdeas();
@@ -320,6 +340,8 @@ void StableAudio::ButtonClicked(ClickButton* button, double time)
       delete mPreviousSample;
       mPreviousSample = nullptr;
       mCrossfadeStartTime = -1;
+      mPendingTransportSyncTime = -1;
+      mPendingTransportSyncPrompt.clear();
       if (mSample != nullptr)
       {
          mPlay = false;
@@ -412,26 +434,45 @@ void StableAudio::LoadGeneratedSample(const std::string& path)
    Sample* sample = new Sample();
    if (sample->Read(path.c_str()))
    {
-      std::lock_guard<std::mutex> sampleLock(mSampleMutex);
-      delete mPreviousSample;
-      mPreviousSample = nullptr;
-      mCrossfadeStartTime = -1;
-
-      if (mSample != nullptr && mPlay && mTransitionMode == kTransition_Crossfade)
+      bool startedCrossfade = false;
       {
-         mPreviousSample = mSample;
-         mCrossfadeStartTime = gTime;
+         std::lock_guard<std::mutex> sampleLock(mSampleMutex);
+         delete mPreviousSample;
+         mPreviousSample = nullptr;
+         mCrossfadeStartTime = -1;
+
+         if (mSample != nullptr && mPlay && mTransitionMode == kTransition_Crossfade)
+         {
+            mPreviousSample = mSample;
+            mCrossfadeStartTime = gTime;
+            startedCrossfade = true;
+         }
+         else
+         {
+            delete mSample;
+         }
+
+         mSample = sample;
+         mSample->SetPlayPosition(0);
+         mCurrentSamplePath = path;
+         mCurrentSamplePrompt = ReadGeneratedWavMetadataPrompt(path);
+         if (mCurrentSamplePrompt.empty())
+            mCurrentSamplePrompt = mPrompt;
+         mPlay = true;
+         UpdatePlaybackControls();
+      }
+
+      if (startedCrossfade && mSyncTransport)
+      {
+         mPendingTransportSyncPrompt = mCurrentSamplePrompt;
+         mPendingTransportSyncTime = gTime + std::clamp(mCrossfadeSeconds, .25f, GetMaxCrossfadeSeconds()) * 500.0;
       }
       else
       {
-         delete mSample;
+         mPendingTransportSyncTime = -1;
+         mPendingTransportSyncPrompt.clear();
+         SyncTransportToPromptBpm();
       }
-
-      mSample = sample;
-      mSample->SetPlayPosition(0);
-      mCurrentSamplePath = path;
-      mPlay = true;
-      UpdatePlaybackControls();
    }
    else
    {
@@ -461,7 +502,11 @@ std::string StableAudio::BuildOutputPath() const
 
 std::string StableAudio::GetGeneratedAudioDirectory() const
 {
-   return ofToDataPath("stableaudio");
+   juce::String instanceName = juce::File::createLegalFileName(Name());
+   if (instanceName.isEmpty())
+      instanceName = "stableaudio";
+
+   return ofToDataPath("stableaudio/" + instanceName.toStdString());
 }
 
 void StableAudio::RefreshGeneratedWavList()
@@ -546,8 +591,11 @@ void StableAudio::DeleteSelectedGeneratedWav()
       mSample = nullptr;
       mPreviousSample = nullptr;
       mCurrentSamplePath.clear();
+      mCurrentSamplePrompt.clear();
       mPlay = false;
       mCrossfadeStartTime = -1;
+      mPendingTransportSyncTime = -1;
+      mPendingTransportSyncPrompt.clear();
       UpdatePlaybackControls();
    }
 
@@ -566,6 +614,49 @@ void StableAudio::DeleteSelectedGeneratedWav()
    {
       mStatusString = deletedWav ? "deleted " + wavFile.getFileName().toStdString() : "couldn't delete selected wav";
    }
+}
+
+void StableAudio::DeleteAllGeneratedWavs()
+{
+   if (mGeneratedWavPaths.empty())
+   {
+      mStatusString = "no generated wavs to delete";
+      return;
+   }
+
+   const bool confirm = juce::NativeMessageBox::showOkCancelBox(juce::MessageBoxIconType::WarningIcon,
+                                                                "Delete generated StableAudio WAVs?",
+                                                                "Delete all generated WAVs for " + juce::String(Name()) + "? This cannot be undone.");
+   if (!confirm)
+      return;
+
+   {
+      std::lock_guard<std::mutex> sampleLock(mSampleMutex);
+      delete mSample;
+      delete mPreviousSample;
+      mSample = nullptr;
+      mPreviousSample = nullptr;
+      mCurrentSamplePath.clear();
+      mCurrentSamplePrompt.clear();
+      mPlay = false;
+      mCrossfadeStartTime = -1;
+      mPendingTransportSyncTime = -1;
+      mPendingTransportSyncPrompt.clear();
+      UpdatePlaybackControls();
+   }
+
+   int deletedCount = 0;
+   for (const std::string& path : mGeneratedWavPaths)
+   {
+      juce::File wavFile(path);
+      juce::File metadataFile = wavFile.withFileExtension(".meta");
+      if (wavFile.deleteFile())
+         ++deletedCount;
+      metadataFile.deleteFile();
+   }
+
+   RefreshGeneratedWavList();
+   mStatusString = "deleted " + ofToString(deletedCount) + " generated wavs";
 }
 
 void StableAudio::UpdatePlaybackControls()
@@ -802,6 +893,37 @@ void StableAudio::SetPromptText(const std::string& prompt)
    }
 }
 
+bool StableAudio::TryGetPromptBpm(const std::string& prompt, float& bpm) const
+{
+   std::smatch match;
+   const std::regex numberBeforeBpm(R"((\d+(?:\.\d+)?)\s*bpm\b)", std::regex_constants::icase);
+   const std::regex numberAfterBpm(R"(\bbpm\s*(\d+(?:\.\d+)?))", std::regex_constants::icase);
+
+   if (!std::regex_search(prompt, match, numberBeforeBpm) &&
+       !std::regex_search(prompt, match, numberAfterBpm))
+   {
+      return false;
+   }
+
+   bpm = std::clamp((float)std::atof(match[1].str().c_str()), 20.0f, 225.0f);
+   return bpm > 0;
+}
+
+void StableAudio::SyncTransportToPromptBpm()
+{
+   SyncTransportToPromptBpm(!mCurrentSamplePrompt.empty() ? mCurrentSamplePrompt : mPrompt);
+}
+
+void StableAudio::SyncTransportToPromptBpm(const std::string& prompt)
+{
+   if (!mSyncTransport)
+      return;
+
+   float bpm = 0;
+   if (TryGetPromptBpm(prompt, bpm))
+      TheTransport->SetTempo(bpm);
+}
+
 std::string StableAudio::GetGeneratedWavLabel(const std::string& path) const
 {
    if (mUseMetadataWavLabels)
@@ -840,6 +962,24 @@ std::string StableAudio::ReadGeneratedWavMetadataLabel(const std::string& path) 
    return (model + " - " + prompt + " - " + seconds).toStdString();
 }
 
+std::string StableAudio::ReadGeneratedWavMetadataPrompt(const std::string& path) const
+{
+   juce::File metadataFile = juce::File(path).withFileExtension(".meta");
+   if (!metadataFile.existsAsFile())
+      return "";
+
+   juce::StringArray lines;
+   metadataFile.readLines(lines);
+
+   for (auto line : lines)
+   {
+      if (line.startsWith("prompt="))
+         return line.fromFirstOccurrenceOf("=", false, false).toStdString();
+   }
+
+   return "";
+}
+
 void StableAudio::WriteGeneratedWavMetadata(const GenerationResult& result) const
 {
    juce::String prompt(result.prompt);
@@ -868,6 +1008,9 @@ void StableAudio::CheckboxUpdated(Checkbox* checkbox, double time)
       else
          mAutoplayNextGenerationTime = -1;
    }
+
+   if (checkbox == mSyncTransportCheckbox && mSyncTransport)
+      SyncTransportToPromptBpm();
 }
 
 void StableAudio::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
@@ -898,6 +1041,8 @@ void StableAudio::DropdownUpdated(DropdownList* list, int oldVal, double time)
       delete mPreviousSample;
       mPreviousSample = nullptr;
       mCrossfadeStartTime = -1;
+      mPendingTransportSyncTime = -1;
+      mPendingTransportSyncPrompt.clear();
    }
    if (list == mTransitionDropdown && mCrossfadeSlider != nullptr)
       UpdateCrossfadeSlider();
@@ -1062,9 +1207,11 @@ void StableAudio::DrawModule()
       mStopButton->Draw();
    mLoopCheckbox->Draw();
    mVolumeSlider->Draw();
+   mSyncTransportCheckbox->Draw();
    mGeneratedWavDropdown->Draw();
    mLoadWavButton->Draw();
    mDeleteWavButton->Draw();
+   mDeleteAllWavsButton->Draw();
    mUseMetadataWavLabelsCheckbox->Draw();
    mSecondsSlider->Draw();
    mStepsSlider->Draw();
@@ -1120,6 +1267,7 @@ void StableAudio::SaveState(FileStreamOut& out)
    out << mModelSelection;
    out << mTransitionMode;
    out << mCrossfadeSeconds;
+   out << mSyncTransport;
 }
 
 void StableAudio::LoadState(FileStreamIn& in, int rev)
@@ -1161,6 +1309,8 @@ void StableAudio::LoadState(FileStreamIn& in, int rev)
       in >> mTransitionMode;
    if (rev >= 4)
       in >> mCrossfadeSeconds;
+   if (rev >= 5)
+      in >> mSyncTransport;
    UpdateCrossfadeSlider();
 
    RefreshGeneratedWavList();
@@ -1175,6 +1325,7 @@ std::vector<IUIControl*> StableAudio::ControlsToIgnoreInSaveState() const
    ignore.push_back(mMoreIdeasButton);
    ignore.push_back(mLoadWavButton);
    ignore.push_back(mDeleteWavButton);
+   ignore.push_back(mDeleteAllWavsButton);
    ignore.push_back(mPlayButton);
    ignore.push_back(mStopButton);
    return ignore;

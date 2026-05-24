@@ -75,7 +75,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 4; }
+   int GetModuleSaveStateRev() const override { return 5; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
 private:
@@ -100,6 +100,7 @@ private:
    void RefreshGeneratedWavList();
    void LoadSelectedGeneratedWav();
    void DeleteSelectedGeneratedWav();
+   void DeleteAllGeneratedWavs();
    void UpdatePlaybackControls();
    void RefreshPromptChoices();
    void GenerateMorePromptIdeas();
@@ -109,8 +110,12 @@ private:
    void AddPromptChoice(const std::string& prompt);
    void ApplyPromptChoice();
    void SetPromptText(const std::string& prompt);
+   bool TryGetPromptBpm(const std::string& prompt, float& bpm) const;
+   void SyncTransportToPromptBpm();
+   void SyncTransportToPromptBpm(const std::string& prompt);
    std::string GetGeneratedWavLabel(const std::string& path) const;
    std::string ReadGeneratedWavMetadataLabel(const std::string& path) const;
+   std::string ReadGeneratedWavMetadataPrompt(const std::string& path) const;
    void WriteGeneratedWavMetadata(const GenerationResult& result) const;
    void AddAvailableModelLabels();
    void ApplyModelSelection();
@@ -137,12 +142,15 @@ private:
    std::vector<std::string> mGeneratedWavPaths;
    std::vector<std::string> mPromptChoices;
    std::string mCurrentSamplePath;
+   std::string mCurrentSamplePrompt;
 
    std::future<GenerationResult> mGenerationFuture;
    bool mGenerationInProgress{ false };
    std::string mStatusString;
    double mAutoplayNextGenerationTime{ -1 };
    double mCrossfadeStartTime{ -1 };
+   double mPendingTransportSyncTime{ -1 };
+   std::string mPendingTransportSyncPrompt;
 
    enum ModelSelection
    {
@@ -172,6 +180,7 @@ private:
    bool mPlay{ false };
    bool mLoop{ true };
    bool mAutoplay{ false };
+   bool mSyncTransport{ true };
    int mGeneratedWavIndex{ -1 };
    int mPromptChoice{ -1 };
    bool mUseMetadataWavLabels{ true };
@@ -191,9 +200,11 @@ private:
    DropdownList* mTransitionDropdown{ nullptr };
    FloatSlider* mCrossfadeSlider{ nullptr };
    FloatSlider* mVolumeSlider{ nullptr };
+   Checkbox* mSyncTransportCheckbox{ nullptr };
    ClickButton* mGenerateButton{ nullptr };
    ClickButton* mLoadWavButton{ nullptr };
    ClickButton* mDeleteWavButton{ nullptr };
+   ClickButton* mDeleteAllWavsButton{ nullptr };
    Checkbox* mUseMetadataWavLabelsCheckbox{ nullptr };
    ClickButton* mPlayButton{ nullptr };
    ClickButton* mStopButton{ nullptr };
