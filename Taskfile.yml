@@ -114,7 +114,7 @@ tasks:
     desc: Configure for MSVC (Windows)
     platforms: [windows]
     cmds:
-      - mkdir -Force "{{.BUILD_DIR}}" 2>$null || true
+      - powershell -NoProfile -ExecutionPolicy Bypass -Command "New-Item -ItemType Directory -Force -Path '{{.BUILD_DIR}}' | Out-Null"
       - >
         cmake -S . -B "{{.BUILD_DIR}}"
         -G "{{.VS_GEN}}" -A "{{.VS_ARCH}}"
@@ -169,6 +169,8 @@ tasks:
   run:
     desc: Run BespokeSynth (platform-aware)
     cmds:
+      - task: configure
+      - task: build
       - task: run:windows
       - task: run:posix
     silent: true
@@ -176,8 +178,7 @@ tasks:
   run:windows:
     platforms: [windows]
     cmds:
-      - |
-        .\\ignore\\build\\Source\\BespokeSynth_artefacts\\Release\\BespokeSynth.exe
+      - powershell -NoProfile -ExecutionPolicy Bypass -Command "& (Join-Path (Get-Location) '{{.BUILD_DIR}}\Source\BespokeSynth_artefacts\{{.CONFIG}}\BespokeSynth.exe')"
 
   run:posix:
     platforms: [linux, darwin]

@@ -1,5 +1,6 @@
 include(cmake/lib.cmake)
 include(cmake/versiontools.cmake)
+include(ExternalProject)
 if(BESPOKE_SYSTEM_ABLETONLINK)
     find_package(AbletonLink NAMES AbletonLink ableton-link link REQUIRED)
 else()
@@ -694,6 +695,8 @@ target_sources(BespokeSynth PRIVATE
     SpectralDisplay.h
     Splitter.cpp
     Splitter.h
+    StableAudio.cpp
+    StableAudio.h
     StepSequencer.cpp
     StepSequencer.h
     StereoRotation.cpp
@@ -814,6 +817,95 @@ target_include_directories(BespokeSynth PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${Python_INCLUDE_DIRS}
     )
+
+set(BESPOKE_STABLE_AUDIO_DEFAULT_ROOT "")
+if(EXISTS "R:/w/stableaudio-rs/Cargo.toml")
+    set(BESPOKE_STABLE_AUDIO_DEFAULT_ROOT "R:/w/stableaudio-rs")
+endif()
+set(BESPOKE_STABLE_AUDIO_ROOT "${BESPOKE_STABLE_AUDIO_DEFAULT_ROOT}" CACHE PATH "Path to a local stableaudio-rs workspace; leave empty to fetch from git")
+set(BESPOKE_STABLE_AUDIO_GIT_REPOSITORY "https://github.com/davehorner/stableaudio-rs" CACHE STRING "stableaudio-rs git repository")
+set(BESPOKE_STABLE_AUDIO_GIT_TAG "main" CACHE STRING "stableaudio-rs git tag, branch, or commit")
+set(BESPOKE_STABLE_AUDIO_FEATURES "" CACHE STRING "Cargo features to enable for stable-audio-capi, for example vulkan or metal")
+set(BESPOKE_STABLE_AUDIO_SHORT_TARGET_DIR "${CMAKE_SOURCE_DIR}/ignore/stableaudio-rs")
+set(BESPOKE_STABLE_AUDIO_CARGO_TARGET_DIR "${BESPOKE_STABLE_AUDIO_SHORT_TARGET_DIR}" CACHE PATH "Cargo target directory for stableaudio-rs")
+if(BESPOKE_STABLE_AUDIO_CARGO_TARGET_DIR MATCHES "[/\\\\]stableaudio-rs-target$")
+    set(BESPOKE_STABLE_AUDIO_CARGO_TARGET_DIR "${BESPOKE_STABLE_AUDIO_SHORT_TARGET_DIR}" CACHE PATH "Cargo target directory for stableaudio-rs" FORCE)
+endif()
+
+if(BESPOKE_STABLE_AUDIO_GIT_REPOSITORY OR BESPOKE_STABLE_AUDIO_ROOT)
+    find_program(CARGO_EXECUTABLE cargo)
+    if(NOT CARGO_EXECUTABLE)
+        message(FATAL_ERROR "stableaudio-rs support requires cargo. Set BESPOKE_STABLE_AUDIO_GIT_REPOSITORY and BESPOKE_STABLE_AUDIO_ROOT empty to disable it.")
+    endif()
+
+    if(BESPOKE_STABLE_AUDIO_ROOT)
+        set(BESPOKE_STABLE_AUDIO_SOURCE_DIR "${BESPOKE_STABLE_AUDIO_ROOT}")
+        set(BESPOKE_STABLE_AUDIO_SOURCE_TARGET "")
+    else()
+        set(BESPOKE_STABLE_AUDIO_SOURCE_DIR "${CMAKE_BINARY_DIR}/_deps/stableaudio-rs-src")
+        ExternalProject_Add(stableaudio_rs_source
+            GIT_REPOSITORY "${BESPOKE_STABLE_AUDIO_GIT_REPOSITORY}"
+            GIT_TAG "${BESPOKE_STABLE_AUDIO_GIT_TAG}"
+            GIT_SHALLOW TRUE
+            SOURCE_DIR "${BESPOKE_STABLE_AUDIO_SOURCE_DIR}"
+            CONFIGURE_COMMAND ""
+            BUILD_COMMAND ""
+            INSTALL_COMMAND ""
+        )
+        set(BESPOKE_STABLE_AUDIO_SOURCE_TARGET stableaudio_rs_source)
+    endif()
+
+    set(BESPOKE_STABLE_AUDIO_CARGO_ARGS build -p stable-audio-capi --release)
+    if(BESPOKE_STABLE_AUDIO_FEATURES)
+        list(APPEND BESPOKE_STABLE_AUDIO_CARGO_ARGS --features "${BESPOKE_STABLE_AUDIO_FEATURES}")
+    endif()
+
+    if(WIN32)
+        set(BESPOKE_STABLE_AUDIO_IMPORT_LIBRARY "${BESPOKE_STABLE_AUDIO_CARGO_TARGET_DIR}/release/stable_audio_capi.dll.lib")
+        set(BESPOKE_STABLE_AUDIO_RUNTIME_LIBRARY "${BESPOKE_STABLE_AUDIO_CARGO_TARGET_DIR}/release/stable_audio_capi.dll")
+        set(BESPOKE_STABLE_AUDIO_LINK_LIBRARY "${BESPOKE_STABLE_AUDIO_IMPORT_LIBRARY}")
+    elseif(APPLE)
+        set(BESPOKE_STABLE_AUDIO_RUNTIME_LIBRARY "${BESPOKE_STABLE_AUDIO_CARGO_TARGET_DIR}/release/libstable_audio_capi.dylib")
+        set(BESPOKE_STABLE_AUDIO_LINK_LIBRARY "${BESPOKE_STABLE_AUDIO_RUNTIME_LIBRARY}")
+    else()
+        set(BESPOKE_STABLE_AUDIO_RUNTIME_LIBRARY "${BESPOKE_STABLE_AUDIO_CARGO_TARGET_DIR}/release/libstable_audio_capi.so")
+        set(BESPOKE_STABLE_AUDIO_LINK_LIBRARY "${BESPOKE_STABLE_AUDIO_RUNTIME_LIBRARY}")
+    endif()
+    set(BESPOKE_STABLE_AUDIO_OUTPUTS "${BESPOKE_STABLE_AUDIO_LINK_LIBRARY}" "${BESPOKE_STABLE_AUDIO_RUNTIME_LIBRARY}")
+    list(REMOVE_DUPLICATES BESPOKE_STABLE_AUDIO_OUTPUTS)
+
+    add_custom_command(
+        OUTPUT ${BESPOKE_STABLE_AUDIO_OUTPUTS}
+        COMMAND ${CMAKE_COMMAND} -E env "CARGO_TARGET_DIR=${BESPOKE_STABLE_AUDIO_CARGO_TARGET_DIR}" ${CARGO_EXECUTABLE} ${BESPOKE_STABLE_AUDIO_CARGO_ARGS}
+        WORKING_DIRECTORY "${BESPOKE_STABLE_AUDIO_SOURCE_DIR}"
+        VERBATIM
+    )
+    add_custom_target(stable_audio_capi_build DEPENDS ${BESPOKE_STABLE_AUDIO_OUTPUTS})
+    if(BESPOKE_STABLE_AUDIO_SOURCE_TARGET)
+        add_dependencies(stable_audio_capi_build ${BESPOKE_STABLE_AUDIO_SOURCE_TARGET})
+    endif()
+    add_dependencies(BespokeSynth stable_audio_capi_build)
+
+    target_compile_definitions(BespokeSynth PRIVATE BESPOKE_STABLE_AUDIO_ENABLED=1)
+    if(EXISTS "${BESPOKE_STABLE_AUDIO_SOURCE_DIR}/models/gguf-q8_0")
+        target_compile_definitions(BespokeSynth PRIVATE BESPOKE_STABLE_AUDIO_DEFAULT_MODEL_DIR="${BESPOKE_STABLE_AUDIO_SOURCE_DIR}/models/gguf-q8_0")
+    elseif(EXISTS "${BESPOKE_STABLE_AUDIO_SOURCE_DIR}/models/gguf")
+        target_compile_definitions(BespokeSynth PRIVATE BESPOKE_STABLE_AUDIO_DEFAULT_MODEL_DIR="${BESPOKE_STABLE_AUDIO_SOURCE_DIR}/models/gguf")
+    elseif(EXISTS "models/gguf-q8_0")
+        target_compile_definitions(BespokeSynth PRIVATE BESPOKE_STABLE_AUDIO_DEFAULT_MODEL_DIR="models/gguf-q8_0")
+    elseif(EXISTS "models/gguf")
+        target_compile_definitions(BespokeSynth PRIVATE BESPOKE_STABLE_AUDIO_DEFAULT_MODEL_DIR="models/gguf")
+    endif()
+    target_include_directories(BespokeSynth PRIVATE "${BESPOKE_STABLE_AUDIO_SOURCE_DIR}/crates/stable-audio-capi/include")
+    target_link_libraries(BespokeSynth PRIVATE "${BESPOKE_STABLE_AUDIO_LINK_LIBRARY}")
+
+    add_custom_command(TARGET BespokeSynth POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${BESPOKE_STABLE_AUDIO_RUNTIME_LIBRARY}" "$<TARGET_FILE_DIR:BespokeSynth>"
+        VERBATIM
+    )
+else()
+    target_compile_definitions(BespokeSynth PRIVATE BESPOKE_STABLE_AUDIO_ENABLED=0)
+endif()
 
 target_compile_definitions(BespokeSynth PRIVATE
     JUCE_MODAL_LOOPS_PERMITTED=1
