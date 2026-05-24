@@ -72,7 +72,7 @@ void PitchShifter::Process(float* buffer, int bufferSize)
    const double expct = 2. * M_PI * (double)stepSize / (double)mFFTBins;
    const double freqPerBin = gSampleRate / (double)mFFTBins;
 
-   mLatency = mFFTBins - stepSize;
+   mLatencyInSamples = mFFTBins - stepSize;
 
    mRollingInputBuffer.WriteChunk(buffer, bufferSize, 0);
 
@@ -316,7 +316,7 @@ void PitchShifter::Process(float* buffer, int bufferSize)
    if (gRover == false)
       gRover = inFifoLatency;
 
-   mLatency = inFifoLatency;
+   mLatencyInSamples = inFifoLatency;
 
    /* initialize our static arrays */
    if (gInit == false)

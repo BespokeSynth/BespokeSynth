@@ -290,7 +290,7 @@ void Looper::Process(double time)
       mPitchShift = 1 / speed;
    int latencyOffset = 0;
    if (mPitchShift != 1)
-      latencyOffset = mPitchShifter[0]->GetLatency();
+      latencyOffset = mPitchShifter[0]->GetLatencyInSamples();
 
    double processStartTime = time;
    for (int i = 0; i < bufferSize; ++i)

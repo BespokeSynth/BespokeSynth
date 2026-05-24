@@ -245,7 +245,11 @@ void PluginListWindow::closeButtonPressed()
 
 PluginScannerSubprocess::PluginScannerSubprocess()
 {
+#if JUCE_VERSION < ((8 << 16) + (0 << 8) + 11) // member-function replaced in 8.0.11
    formatManager.addDefaultFormats();
+#else
+   juce::addDefaultFormatsToManager(formatManager);
+#endif
 }
 
 void PluginScannerSubprocess::handleMessageFromCoordinator(const juce::MemoryBlock& mb)

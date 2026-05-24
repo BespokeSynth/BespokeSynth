@@ -54,6 +54,7 @@ public:
    void Process(double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
    bool IsEnabled() const override { return true; }

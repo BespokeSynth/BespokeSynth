@@ -9,11 +9,6 @@
 #include <cmath>
 #include <mutex>
 
-class NVGcontext;
-
-extern NVGcontext* gNanoVG;
-extern NVGcontext* gFontBoundsNanoVG;
-
 struct ofColor
 {
    ofColor()

@@ -99,6 +99,8 @@ namespace AbletonDevice
    const int kNumMainEncoders = 8;
    const int kNumPads = 64;
    const int kPitchBendIndex = 128 + 128;
+   const int kChannelPressureIndex = kPitchBendIndex + 1; //reserve next 16 indices for channels
+   const int kNumChannelPressureIndices = 16;
 
    //move
    const int kTrackButtonSection = 40 + 128;
@@ -467,10 +469,19 @@ namespace AbletonDevice
 }
 #include "leathers/pop"
 
+enum class LedPriority
+{
+   None = 4,
+   Low = 3,
+   Normal = 2,
+   High = 1
+};
+
 class IAbletonGridDevice
 {
 public:
-   virtual void SetLed(int index, int color, int flashColor = -1) = 0;
+   virtual ~IAbletonGridDevice() {}
+   virtual void SetLed(int index, int color, int flashColor = -1, LedPriority priority = LedPriority::Normal) = 0;
    virtual bool GetButtonState(int index) const = 0;
    virtual int GetGridControllerOption1Control() const = 0;
    virtual int GetGridControllerOption2Control() const = 0;
@@ -489,10 +500,17 @@ public:
 class IAbletonGridController
 {
 public:
+   enum class LCDDrawPass
+   {
+      HighPriority,
+      Normal,
+      Overlay
+   };
+
    virtual ~IAbletonGridController() {}
    virtual void OnAbletonGridConnect(IAbletonGridDevice* abletonGrid) {}
-   virtual bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) = 0;
+   virtual bool OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) { return false; }
+   virtual bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) { return false; }
    virtual void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) = 0;
-   virtual bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd) { return false; }
-   virtual bool HasHighPriorityAbletonMoveScreenUpdate(IAbletonGridDevice* abletonGrid) { return false; }
+   virtual bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass) { return false; }
 };

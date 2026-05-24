@@ -69,6 +69,14 @@ void UserPrefsEditor::CreateUIControls()
          UserPrefs.oversampling.GetIndex() = oversample;
    }
 
+   std::array<int, 3> bitDepths = { 16, 24, 32 };
+   for (auto& bitDepth : bitDepths)
+   {
+      UserPrefs.output_wav_bit_depth.GetDropdown()->AddLabel(ofToString(bitDepth), bitDepth);
+      if (UserPrefs.output_wav_bit_depth.Get() == bitDepth)
+         UserPrefs.output_wav_bit_depth.GetIndex() = bitDepth;
+   }
+
    UserPrefs.cable_drop_behavior.GetIndex() = 0;
    UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("show quickspawn", (int)CableDropBehavior::ShowQuickspawn);
    UserPrefs.cable_drop_behavior.GetDropdown()->AddLabel("do nothing", (int)CableDropBehavior::DoNothing);
@@ -114,6 +122,8 @@ void UserPrefsEditor::Show()
       mSaveButton->SetLabel("save and exit");
       mCancelButton->SetShowing(false);
    }
+
+   TheSynth->MoveToFront(this);
 }
 
 void UserPrefsEditor::CreatePrefsFileIfNonexistent()
@@ -479,6 +489,12 @@ void UserPrefsEditor::DropdownUpdated(DropdownList* list, int oldVal, double tim
    if (list == UserPrefs.audio_input_device.GetDropdown())
    {
       UpdateDropdowns({ UserPrefs.samplerate.GetDropdown(), UserPrefs.buffersize.GetDropdown() });
+   }
+
+   // Update the output_wav_bit_depth value when the dropdown selection changes
+   if (list == UserPrefs.output_wav_bit_depth.GetDropdown())
+   {
+      UserPrefs.output_wav_bit_depth.Get() = ofToInt(UserPrefs.output_wav_bit_depth.GetDropdown()->GetLabel(UserPrefs.output_wav_bit_depth.GetIndex()));
    }
 }
 

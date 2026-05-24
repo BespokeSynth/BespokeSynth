@@ -38,7 +38,7 @@ public:
    void WriteChunk(float* samples, int size, int channel);
    void Write(float sample, int channel);
    void ClearBuffer();
-   void Draw(int x, int y, int width, int height, int length = -1, int channel = -1, int delayOffset = 0);
+   void Draw(int x, int y, int width, int height, int length = -1, int channel = -1, int delayOffset = 0, ofColor color = ofColor::black, bool drawBackground = true);
    int Size() { return mBuffer.BufferSize(); }
    ChannelBuffer* GetRawBuffer() { return &mBuffer; }
    int GetRawBufferOffset(int channel) { return mOffsetToNow[channel]; }

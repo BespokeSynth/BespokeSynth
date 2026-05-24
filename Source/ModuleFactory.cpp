@@ -271,6 +271,7 @@
 #include "BassLineSequencer.h"
 #include "Acciaccatura.h"
 #include "ModulatorWander.h"
+#include "DopplerShift.h"
 #include "StereoRotation.h"
 #include "LatencyCalculator.h"
 #include "AbletonMoveControl.h"
@@ -278,6 +279,9 @@
 #include "ModulatorBinaryValue.h"
 #include "VelocityToDuration.h"
 #include "TapTempo.h"
+#include "ZeroCrossRate.h"
+#include "SessionOrganizer.h"
+#include "AudioSyncer.h"
 
 #include <juce_core/juce_core.h>
 
@@ -503,6 +507,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(BassLineSequencer, basslinesequencer, kModuleCategory_Instrument);
    REGISTER(Acciaccatura, acciaccatura, kModuleCategory_Note);
    REGISTER(ModulatorWander, wander, kModuleCategory_Modulator);
+   REGISTER(DopplerShift, dopplershift, kModuleCategory_Modulator);
    REGISTER(StereoRotation, stereorotation, kModuleCategory_Audio);
    REGISTER(LatencyCalculatorSender, latencycalculator, kModuleCategory_Synth);
    REGISTER(LatencyCalculatorReceiver, latencycalculatorreceiver, kModuleCategory_Audio);
@@ -511,6 +516,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(ModulatorBinaryValue, binaryvalue, kModuleCategory_Modulator);
    REGISTER(VelocityToDuration, velocitytoduration, kModuleCategory_Note);
    REGISTER(TapTempo, taptempo, kModuleCategory_Other);
+   REGISTER(ZeroCrossRate, zerocrossrate, kModuleCategory_Modulator);
+   REGISTER(SessionOrganizer, sessionorganizer, kModuleCategory_Other);
+   REGISTER(AudioSyncer, audiosyncer, kModuleCategory_Audio);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
@@ -802,6 +810,7 @@ void ModuleFactory::GetPrefabs(std::vector<ModuleFactory::Spawnable>& prefabs)
          prefabs.push_back(spawnable);
       }
    }
+   std::sort(prefabs.begin(), prefabs.end(), Spawnable::CompareAlphabetical);
 }
 
 //static

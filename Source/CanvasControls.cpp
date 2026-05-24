@@ -75,7 +75,10 @@ void CanvasControls::SetElement(CanvasElement* element)
    if (mSelectedElement)
    {
       for (auto* control : mSelectedElement->GetUIControls())
+      {
          control->SetShowing(false);
+         RemoveUIControl(control);
+      }
    }
 
    mSelectedElement = element;
@@ -87,6 +90,7 @@ void CanvasControls::SetElement(CanvasElement* element)
       {
          control->SetShowing(true);
          control->SetPosition(5 + (idx / 4) * 110, 20 + (idx % 4) * 18);
+         AddUIControl(control);
          ++idx;
       }
    }

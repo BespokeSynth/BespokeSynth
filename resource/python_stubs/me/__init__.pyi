@@ -15,19 +15,22 @@ from __future__ import annotations
    def note_msg(pitch, velocity, pan = 0, output_index = 0):
       pass
 
-   def set(path, value):
-      pass
-
-   def schedule_set(delay, path, value):
-      pass
-
    def get(path):
+      pass
+
+   def set(path, value):
       pass
 
    def get_text(path):
       pass
 
    def set_text(path, text):
+      pass
+
+   def schedule_set(delay, path, value):
+      pass
+
+   def get_path_prefix():
       pass
 
    def adjust(path, amount):

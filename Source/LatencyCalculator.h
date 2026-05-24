@@ -49,6 +49,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
    bool IsEnabled() const override { return true; }
@@ -110,7 +111,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override
    {
-      w = 400;
+      w = 450;
       h = 35;
    }
 

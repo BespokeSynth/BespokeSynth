@@ -39,7 +39,7 @@ public:
    void Process(float* buffer, int bufferSize);
    void SetRatio(float ratio) { mRatio = ratio; }
    void SetOversampling(int oversampling) { mOversampling = oversampling; }
-   int GetLatency() const { return mLatency; }
+   int GetLatencyInSamples() const { return mLatencyInSamples; }
 
 private:
    int mFFTBins;
@@ -60,7 +60,7 @@ private:
 
    float mRatio{ 1 };
    int mOversampling{ 4 };
-   float mLatency{ 0 };
+   float mLatencyInSamples{ 0 };
 
    float gInFIFO[MAX_FRAME_LENGTH]{};
    float gOutFIFO[MAX_FRAME_LENGTH]{};

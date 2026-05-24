@@ -659,7 +659,7 @@ PatchCablePos PatchCable::GetPatchCablePos()
    ofVec2f plug = end + endDirection * plugLength;
 
    PatchCablePos cable;
-   cable.start = start + startDirection * 4;
+   cable.start = start + startDirection * 5;
    cable.startDirection = startDirection;
    cable.end = end;
    cable.plug = plug;

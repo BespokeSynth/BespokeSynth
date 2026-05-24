@@ -39,6 +39,7 @@
 #include "ModuleSaveDataPanel.h"
 #include "GridController.h"
 #include "ControlSequencer.h"
+#include "IModuleDecorator.h"
 #include "PatchCableSource.h"
 #include "nanovg/nanovg.h"
 #include "IPulseReceiver.h"
@@ -78,6 +79,7 @@ void IDrawableModule::CreateUIControls()
    assert(mUIControlsCreated == false);
    mUIControlsCreated = true;
    mEnabledCheckbox = new Checkbox(this, "enabled", 3, -TitleBarHeight() - 2, &mEnabled);
+   mEnabledCheckbox->SetIsRandomizable(false);
 
    ConnectionType type = kConnectionType_Special;
    if (dynamic_cast<IAudioSource*>(this))
@@ -333,7 +335,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    const bool kDrawInnerFade = true;
-   if (kDrawInnerFade && !Push2Control::sDrawingPush2Display)
+   if (kDrawInnerFade && gNanoVG == gNanoVGRenderContexts[(int)NanoVGRenderContext::Main])
    {
       float fadeRoundness = 100;
       float fadeLength = w / 3;
@@ -403,6 +405,9 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofCircle(w, h, kPinRadius / 2);
       ofCircle(0, h, kPinRadius / 2);
    }
+
+   for (auto* decorator : mModuleDecorators)
+      decorator->DrawModuleDecoration(this);
 }
 
 void IDrawableModule::Render()
@@ -917,6 +922,23 @@ ofVec2f IDrawableModule::GetMinimumDimensions()
    return ofVec2f(GetMinimizedWidth() + 10, 10);
 }
 
+void IDrawableModule::AddModuleDecorator(IModuleDecorator* decorator)
+{
+   if (!ListContains(decorator, mModuleDecorators))
+      mModuleDecorators.push_back(decorator);
+}
+
+void IDrawableModule::RemoveModuleDecorator(IModuleDecorator* decorator)
+{
+   mModuleDecorators.remove(decorator);
+}
+
+void IDrawableModule::RandomizeModule()
+{
+   for (auto* control : GetUIControls())
+      control->Randomize();
+}
+
 void IDrawableModule::KeyPressed(int key, bool isRepeat)
 {
    for (auto source : mPatchCableSources)
@@ -1259,9 +1281,6 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    if (!CanModuleTypeSaveState())
       return;
 
-   if (Snapshots::sSerializingModuleStateForSnapshot)
-      return;
-
    out << GetModuleSaveStateRev();
 
    out << kBaseSaveStateRev;
@@ -1335,9 +1354,6 @@ int IDrawableModule::LoadModuleSaveStateRev(FileStreamIn& in)
 void IDrawableModule::LoadState(FileStreamIn& in, int rev)
 {
    if (!CanModuleTypeSaveState())
-      return;
-
-   if (Snapshots::sSerializingModuleStateForSnapshot)
       return;
 
    if (rev != -1 && ModularSynth::sLoadingFileSaveStateRev >= 423)

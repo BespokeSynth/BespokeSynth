@@ -275,6 +275,20 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
       if (!connection["14bit"].isNull())
          controlConnection->m14BitMode = connection["14bit"].asBool();
 
+      if (!connection["feedback_values"].isNull() && connection["feedback_values"].isArray())
+      {
+         std::string display;
+         for (int j = 0; j < (int)connection["feedback_values"].size(); ++j)
+         {
+            int val = connection["feedback_values"][j].asInt();
+            controlConnection->mFeedbackValues.push_back(val);
+            if (j > 0)
+               display += ",";
+            display += ofToString(val);
+         }
+         StringCopy(controlConnection->mFeedbackValuesInput, display.c_str(), MAX_TEXTENTRY_LENGTH);
+      }
+
       controlConnection->SetUIControl(path);
 
       //controlConnection->CreateUIControls(this, mConnections.size()); //do this on the first draw instead, to avoid a long init time when setting up a bunch of minimized controllers
@@ -436,7 +450,7 @@ void MidiController::OnMidiPressure(MidiPressure& pressure)
 
    mModulation.GetPressure(voiceIdx)->SetValue(pressure.mPressure / 127.0f);
 
-   mNoteOutput.SendPressure(pressure.mPitch, pressure.mPressure);
+   mNoteOutput.SendPressure(pressure.mChannel, pressure.mPressure);
 }
 
 void MidiController::OnMidiProgramChange(MidiProgramChange& program)
@@ -643,17 +657,9 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
             if (value > 0 || mUseNegativeEdge)
             {
                if (connection->mIncrementAmount != 0)
-               {
-                  const float midpoint = ceil(controlValueRange / 2) / controlValueRange;
-                  if (value > midpoint)
-                     uicontrol->Increment(connection->mIncrementAmount);
-                  else
-                     uicontrol->Increment(-connection->mIncrementAmount);
-               }
+                  uicontrol->Increment(connection->mIncrementAmount);
                else
-               {
                   uicontrol->SetValue(connection->mValue, NextBufferTime(false), K(forceUpdate));
-               }
                uicontrol->StartBeacon();
             }
          }
@@ -921,19 +927,37 @@ void MidiController::Poll()
             else if (connection->mType == kControlType_SetValue)
             {
                float realValue = uicontrol->GetValue();
-               bool valuesAreEqual = fabsf(realValue - connection->mValue) < .0001f;
                int outVal = 0;
-               if ((!uicontrol->IsBitmask() && valuesAreEqual) ||
-                   (uicontrol->IsBitmask() && ((int)realValue & (1 << (int)connection->mValue))))
+               if (connection->mIncrementAmount != 0)
                {
-                  if (connection->mBlink == false)
-                     outVal = connection->mMidiOnValue;
+                  if (!connection->mFeedbackValues.empty())
+                  {
+                     int idx = (int)roundf(realValue);
+                     if (idx >= 0 && idx < (int)connection->mFeedbackValues.size())
+                        outVal = connection->mFeedbackValues[idx];
+                     else if (idx >= (int)connection->mFeedbackValues.size())
+                        outVal = connection->mFeedbackValues.back();
+                  }
                   else
-                     outVal = mBlink ? connection->mMidiOnValue : connection->mMidiOffValue;
+                  {
+                     outVal = 0;
+                  }
                }
                else
                {
-                  outVal = connection->mMidiOffValue;
+                  bool valuesAreEqual = fabsf(realValue - connection->mValue) < .0001f;
+                  if ((!uicontrol->IsBitmask() && valuesAreEqual) ||
+                      (uicontrol->IsBitmask() && ((int)realValue & (1 << (int)connection->mValue))))
+                  {
+                     if (connection->mBlink == false)
+                        outVal = connection->mMidiOnValue;
+                     else
+                        outVal = mBlink ? connection->mMidiOnValue : connection->mMidiOffValue;
+                  }
+                  else
+                  {
+                     outVal = connection->mMidiOffValue;
+                  }
                }
                if (messageType == kMidiMessage_Note)
                   SendNote(mControllerPage, control, outVal, true, connection->mChannel);
@@ -2093,6 +2117,16 @@ void MidiController::TextEntryComplete(TextEntry* entry)
             }
          }
       }
+      if (entry == connection->mFeedbackValuesEntry)
+      {
+         connection->mFeedbackValues.clear();
+         std::vector<std::string> tokens = ofSplitString(connection->mFeedbackValuesInput, ",", true, true);
+         for (const auto& token : tokens)
+         {
+            if (!token.empty())
+               connection->mFeedbackValues.push_back(ofToInt(token));
+         }
+      }
    }
 
    if (entry == mOscInPortEntry)
@@ -2563,6 +2597,12 @@ void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
          mConnectionsJson[i]["feedbackcontrol"] = connection->mFeedbackControl;
       if (connection->m14BitMode)
          mConnectionsJson[i]["14bit"] = connection->m14BitMode;
+      if (!connection->mFeedbackValues.empty())
+      {
+         mConnectionsJson[i]["feedback_values"].resize(0);
+         for (int val : connection->mFeedbackValues)
+            mConnectionsJson[i]["feedback_values"].append(val);
+      }
 
       ++i;
    }
@@ -2703,8 +2743,10 @@ void UIControlConnection::CreateUIControls(int index)
    mBlinkCheckbox = new Checkbox(mUIOwner, "blink", mScaleOutputCheckbox, kAnchor_Right, &mBlink);
    mPagelessCheckbox = new Checkbox(mUIOwner, "pageless", mBlinkCheckbox, kAnchor_Right, &mPageless);
    m14BitModeCheckbox = new Checkbox(mUIOwner, "14bit", mPagelessCheckbox, kAnchor_Right, &m14BitMode);
-   mRemoveButton = new ClickButton(mUIOwner, " x ", mPagelessCheckbox, kAnchor_Right);
+   mRemoveButton = new ClickButton(mUIOwner, " x ", m14BitModeCheckbox, kAnchor_Right);
    mCopyButton = new ClickButton(mUIOwner, "copy", mRemoveButton, kAnchor_Right);
+   mFeedbackValuesEntry = new TextEntry(mUIOwner, "fbvals", -1, -1, 15, mFeedbackValuesInput);
+   mFeedbackValuesEntry->PositionTo(mFeedbackDropdown, kAnchor_Right);
    ++sControlID;
 
    mEditorControls.push_back(mMessageTypeDropdown);
@@ -2724,6 +2766,7 @@ void UIControlConnection::CreateUIControls(int index)
    mEditorControls.push_back(m14BitModeCheckbox);
    mEditorControls.push_back(mRemoveButton);
    mEditorControls.push_back(mCopyButton);
+   mEditorControls.push_back(mFeedbackValuesEntry);
 
    for (auto iter = mEditorControls.begin(); iter != mEditorControls.end(); ++iter)
    {
@@ -2796,7 +2839,8 @@ void UIControlConnection::Poll()
       else if (mUIControl != nullptr)
       {
          StringCopy(mUIControlPathInput, mUIControl->Path().c_str(), MAX_TEXTENTRY_LENGTH);
-         if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
+         if ((mPageless || mPage == mUIOwner->GetPage()) &&
+             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->SetTarget(mUIControl);
       }
       if (mUIControlPathEntry != nullptr)
@@ -2808,7 +2852,8 @@ void UIControlConnection::Poll()
          mUIControlPathEntry->SetInErrorMode(true);
       if (PatchCable::sActivePatchCable == nullptr)
       {
-         if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
+         if ((mPageless || mPage == mUIOwner->GetPage()) &&
+             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->ClearPatchCables();
       }
    }
@@ -2825,6 +2870,13 @@ void UIControlConnection::PreDraw()
    mValueEntry->SetShowing((mType == kControlType_SetValue || mType == kControlType_SetValueOnRelease) && mIncrementAmount == 0);
    m14BitModeCheckbox->SetShowing(mMessageType == kMidiMessage_Control && mControl >= 32);
    mIncrementalEntry->SetShowing(mType == kControlType_Slider || mType == kControlType_SetValue || mType == kControlType_SetValueOnRelease);
+
+   bool showIndividualFeedbackValues = (mType == kControlType_SetValue || mType == kControlType_SetValueOnRelease) && mIncrementAmount != 0;
+   mMidiOffEntry->SetShowing(!showIndividualFeedbackValues);
+   mMidiOnEntry->SetShowing(!showIndividualFeedbackValues);
+   mScaleOutputCheckbox->SetShowing(!showIndividualFeedbackValues);
+   mBlinkCheckbox->SetShowing(!showIndividualFeedbackValues);
+   mFeedbackValuesEntry->SetShowing(showIndividualFeedbackValues);
 }
 
 void UIControlConnection::DrawList(int index)
@@ -2838,6 +2890,7 @@ void UIControlConnection::DrawList(int index)
    mMidiOnEntry->DrawLabel(false);
    mIncrementalEntry->DrawLabel(false);
    mFeedbackDropdown->DrawLabel(false);
+   mFeedbackValuesEntry->DrawLabel(false);
 
    if (mControl < 32)
       m14BitModeCheckbox->SetShowing(false);
@@ -2848,6 +2901,8 @@ void UIControlConnection::DrawList(int index)
    for (auto iter = mEditorControls.begin(); iter != mEditorControls.end(); ++iter)
    {
       (*iter)->SetPosition(x, y);
+      if (*iter == mFeedbackValuesEntry)
+         mFeedbackValuesEntry->SetPosition(mMidiOffEntry->GetPosition(K(local)).x, mMidiOffEntry->GetPosition(K(local)).y);
       (*iter)->Draw();
 
       x += (*iter)->GetRect().width + 3;
@@ -2883,6 +2938,7 @@ void UIControlConnection::DrawLayout()
    mMidiOnEntry->DrawLabel(true);
    mIncrementalEntry->DrawLabel(true);
    mFeedbackDropdown->DrawLabel(true);
+   mFeedbackValuesEntry->DrawLabel(true);
 
    mMessageTypeDropdown->SetPosition(kLayoutControlsX + 5, kLayoutControlsY + 3);
    mControlEntry->PositionTo(mMessageTypeDropdown, kAnchor_Right_Padded);
@@ -2901,6 +2957,7 @@ void UIControlConnection::DrawLayout()
    m14BitModeCheckbox->PositionTo(mPagelessCheckbox, kAnchor_Right);
    mRemoveButton->PositionTo(mPagelessCheckbox, kAnchor_Below);
    mCopyButton->SetShowing(false);
+   mFeedbackValuesEntry->PositionTo(mControlTypeDropdown, kAnchor_Below);
 
    if (mControl < 32)
       m14BitModeCheckbox->SetShowing(false);

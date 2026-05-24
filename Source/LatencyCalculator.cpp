@@ -127,6 +127,11 @@ void LatencyCalculatorSender::LoadLayout(const ofxJSONElement& moduleInfo)
    SetUpFromSaveData();
 }
 
+void LatencyCalculatorSender::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   moduleInfo["receiver"] = mReceiver ? mReceiver->Path() : "";
+}
+
 void LatencyCalculatorSender::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
@@ -210,7 +215,8 @@ void LatencyCalculatorReceiver::DrawModule()
       {
          double duration = mTestEndTime - mTestStartTime;
          float durationBuffers = (float)mTestSamplesElapsed / gBufferSize;
-         DrawTextNormal("latency result: " + ofToString(duration, 2) + " ms (" + ofToString(mTestSamplesElapsed) + " samples, " + ofToString(durationBuffers, 2) + " buffers)", 3, 15);
+         float meters = duration / 1000.0f * 343;
+         DrawTextNormal("latency result: " + ofToString(duration, 2) + " ms (" + ofToString(mTestSamplesElapsed) + " samples, " + ofToString(durationBuffers, 2) + " buffers, ~" + ofToString(meters, 2) + " meters)", 3, 15);
          DrawTextNormal("buffer size: " + ofToString(gBufferSize) + "   sample rate: " + ofToString(gSampleRate), 3, 30);
          break;
       }

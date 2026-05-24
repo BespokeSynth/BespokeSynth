@@ -80,6 +80,7 @@ class IUIControl;
 class IDrawableModule;
 class RollingBuffer;
 class ChannelBuffer;
+struct NVGcontext;
 
 typedef std::map<std::string, int> EnumMap;
 
@@ -111,6 +112,17 @@ extern float gControlTactileFeedback;
 extern float gDrawScale;
 extern bool gShowDevModules;
 extern float gCornerRoundness;
+
+enum class NanoVGRenderContext
+{
+   Main,
+   FontBounds,
+   AbletonPush2Screen,
+   Screenshot,
+   Num
+};
+extern std::array<NVGcontext*, (int)NanoVGRenderContext::Num> gNanoVGRenderContexts;
+extern NVGcontext* gNanoVG;
 
 extern std::random_device gRandomDevice;
 
@@ -186,8 +198,8 @@ void LoadGlobalResources();
 
 void SetGlobalSampleRateAndBufferSize(int rate, int size);
 std::string GetBuildInfoString();
-void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol = 1, ofColor color = ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0);
-void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol = 1, ofColor color = ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0, int bufferSize = -1);
+void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol = 1, ofColor color = ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0, bool drawBackground = true);
+void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol = 1, ofColor color = ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0, int bufferSize = -1, bool drawBackground = true);
 void Add(float* buff1, const float* buff2, int bufferSize);
 void Subtract(float* buff1, const float* buff2, int bufferSize);
 void Mult(float* buff, float val, int bufferSize);
@@ -235,6 +247,7 @@ bool EvaluateExpression(std::string expression, float currentValue, float& outpu
 double NextBufferTime(bool includeLookahead);
 bool IsMainThread();
 bool IsAudioThread();
+bool IsRenderThread();
 
 inline static float RandomSample()
 {

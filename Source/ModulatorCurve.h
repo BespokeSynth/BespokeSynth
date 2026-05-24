@@ -46,6 +46,8 @@ public:
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
@@ -76,14 +78,16 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override
    {
-      w = 106;
-      h = 121;
+      w = mWidth;
+      h = mHeight;
    }
 
    void OnClicked(float x, float y, bool right) override;
 
    float mInput{ 0 };
    EnvelopeControl mEnvelopeControl{ ofVec2f(3, 19), ofVec2f(100, 100), nullptr };
+   static constexpr float kMinWidth = 106;
+   static constexpr float kMinHeight = 121;
    ::ADSR mAdsr;
 
    FloatSlider* mInputSlider{ nullptr };

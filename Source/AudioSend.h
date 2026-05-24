@@ -56,6 +56,8 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    int GetNumTargets() override { return 2; }
 
+   FloatSlider* GetAmountSlider() { return mAmountSlider; }
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;

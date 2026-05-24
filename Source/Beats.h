@@ -39,6 +39,7 @@
 #include "Ramp.h"
 #include "ChannelBuffer.h"
 #include "INoteReceiver.h"
+#include "PitchShifter.h"
 
 class Beats;
 
@@ -47,9 +48,12 @@ class Beats;
 struct BeatData
 {
    void LoadBeat(Sample* sample);
-   void RecalcPos(double time, bool doubleTime, int numBars);
+   void RecalcPos(double time, int offsetSamples);
 
-   Sample* mBeat{ nullptr };
+   Sample* mSample{ nullptr };
+   float mVolume{ 1.0f };
+   int mNumBars{ 1 };
+   float mPitchShift{ 1.0f };
 };
 
 class BeatColumn
@@ -62,34 +66,43 @@ public:
    void AddBeat(Sample* sample);
    void Process(double time, ChannelBuffer* buffer, int bufferSize);
    int GetNumSamples() { return (int)mSamples.size(); }
+   void ClearSamples();
    void SaveState(FileStreamOut& out);
-   void LoadState(FileStreamIn& in);
+   void LoadState(FileStreamIn& in, int rev);
 
    void RadioButtonUpdated(RadioButton* list, int oldVal, double time);
    void ButtonClicked(ClickButton* button, double time);
    void PlayNote(const NoteMessage& note);
 
 private:
+   void UpdateRadioButtonLabels();
+   void UpdateClipSliders();
+
    RadioButton* mSelector{ nullptr };
    int mSampleIndex{ -1 };
-   float mVolume{ 0 };
+   float mVolume{ 1 };
    FloatSlider* mVolumeSlider{ nullptr };
-   BeatData mBeatData;
    int mIndex{ 0 };
    float mFilter{ 0 };
    FloatSlider* mFilterSlider{ nullptr };
    std::array<BiquadFilter, 2> mLowpass;
    std::array<BiquadFilter, 2> mHighpass;
+   float mPitchShift{ 1 };
+   FloatSlider* mPitchShiftSlider{ nullptr };
    Beats* mOwner{ nullptr };
    Ramp mFilterRamp;
-   bool mDoubleTime{ false };
-   Checkbox* mDoubleTimeCheckbox{ nullptr };
-   int mNumBars{ 4 };
-   IntSlider* mNumBarsSlider{ nullptr };
-   std::vector<Sample*> mSamples;
+   std::vector<BeatData> mSamples;
    float mPan{ 0 };
    FloatSlider* mPanSlider{ nullptr };
    ClickButton* mDeleteButton{ nullptr };
+   FloatSlider* mClipVolumeSlider{ nullptr };
+   IntSlider* mClipNumBarsSlider{ nullptr };
+   FloatSlider* mClipPitchShiftSlider{ nullptr };
+   float mDummyClipVolume{ 0 };
+   int mDummyClipNumBars{ 1 };
+   float mDummyClipPitchShift{ 1 };
+
+   PitchShifter* mPitchShifter[ChannelBuffer::kMaxNumChannels];
 };
 
 class Beats : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITimeListener, public IButtonListener, public IRadioButtonListener, public INoteReceiver
@@ -106,6 +119,7 @@ public:
 
    void Init() override;
    int GetNumColumns() const { return (int)mBeatColumns.size(); }
+   void ClearSamples();
 
    //IAudioSource
    void Process(double time) override;
@@ -137,9 +151,12 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
+   int GetModuleSaveStateRev() const override { return 3; }
 
    bool IsEnabled() const override { return mEnabled; }
+
+   int mLegacyNumBars{ 1 }; // for loading older savestate data
 
 private:
    //IDrawableModule

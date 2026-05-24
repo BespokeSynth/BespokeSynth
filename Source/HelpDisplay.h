@@ -47,6 +47,10 @@ public:
 
    void Show() { mScrollOffsetY = 0; }
 
+   static void OpenTutorialVideoLink();
+   static void OpenDocsLink();
+   static void OpenDiscordLink();
+
    std::string GetUIControlTooltip(IUIControl* control);
    std::string GetModuleTooltip(IDrawableModule* module);
    std::string GetModuleTooltipFromName(std::string moduleTypeName);

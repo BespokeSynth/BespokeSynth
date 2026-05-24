@@ -83,6 +83,12 @@ void VocoderCarrierInput::LoadLayout(const ofxJSONElement& moduleInfo)
    SetUpFromSaveData();
 }
 
+void VocoderCarrierInput::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   IDrawableModule* vocoderModule = dynamic_cast<IDrawableModule*>(mVocoder);
+   moduleInfo["vocoder"] = vocoderModule ? vocoderModule->Path() : "";
+}
+
 void VocoderCarrierInput::SetUpFromSaveData()
 {
    IDrawableModule* vocoder = TheSynth->FindModule(mModuleSaveData.GetString("vocoder"), false);

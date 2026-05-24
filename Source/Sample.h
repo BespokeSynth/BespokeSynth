@@ -66,6 +66,7 @@ public:
    double GetPlayPosition() const { return mOffset; }
    void SetPlayPosition(double sample) { mOffset = sample; }
    float GetSampleRateRatio() const { return mSampleRateRatio; }
+   float GetOriginalSampleRate() const { return mOriginalSampleRate; }
    void Reset() { mOffset = mNumSamples; }
    void SetStopPoint(int stopPoint) { mStopPoint = stopPoint; }
    void ClearStopPoint() { mStopPoint = -1; }

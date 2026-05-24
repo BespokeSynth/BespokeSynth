@@ -34,6 +34,10 @@
 IUIControl* IUIControl::sLastHoveredUIControl = nullptr;
 //static
 bool IUIControl::sLastUIHoverWasSetManually = false;
+//static
+ofColor IUIControl::sCurrentOverrideColor = ofColor(0, 0, 0);
+//static
+bool IUIControl::sUseOverrideColor = false;
 
 IUIControl::~IUIControl()
 {
@@ -100,7 +104,18 @@ void IUIControl::DrawHover(float x, float y, float w, float h)
    if (Push2Control::sDrawingPush2Display)
       return;
 
-   if (gHoveredUIControl == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr && TheSynth->GetGroupSelectedModules().empty())
+   if (IsRandomizeControl())
+   {
+      ofPushStyle();
+      ofNoFill();
+      ofSetLineWidth(2);
+      ofColor randomizeColor;
+      randomizeColor.setHsb(FloatWrap(gTime / 500, 1) * 255, 150, 255);
+      ofSetColor(randomizeColor);
+      ofRect(x, y, w, h, 4);
+      ofPopStyle();
+   }
+   else if (gHoveredUIControl == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr && TheSynth->GetGroupSelectedModules().empty())
    {
       ofPushStyle();
       ofNoFill();
@@ -187,15 +202,27 @@ void IUIControl::PositionTo(IUIControl* anchor, AnchorDirection direction)
       mX = rect.x + rect.width + 10;
       mY = rect.y;
    }
+   else if (direction == kAnchor_Below_Padded)
+   {
+      mX = rect.x;
+      mY = rect.y + rect.height + 8;
+   }
 }
 
 void IUIControl::GetColors(ofColor& color, ofColor& textColor)
 {
-   IDrawableModule* module = dynamic_cast<IDrawableModule*>(GetParent());
-   if (module)
-      color = IDrawableModule::GetColor(module->GetModuleCategory());
+   if (sUseOverrideColor)
+   {
+      color = sCurrentOverrideColor;
+   }
    else
-      color = ofColor::white;
+   {
+      IDrawableModule* module = dynamic_cast<IDrawableModule*>(GetParent());
+      if (module)
+         color = IDrawableModule::GetColor(module->GetModuleCategory());
+      else
+         color = ofColor::white;
+   }
    float h, s, b;
    color.getHsb(h, s, b);
    color.setHsb(h, s * .4f, ofLerp(b, 0, .6f));
@@ -211,12 +238,42 @@ void IUIControl::GetColors(ofColor& color, ofColor& textColor)
    }
 }
 
+void IUIControl::Randomize()
+{
+   if (IsRandomizable())
+      SetFromMidiCC(ofRandom(1), NextBufferTime(false), true);
+}
+
+bool IUIControl::IsRandomizeControl()
+{
+   if (IsRandomizable() && TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::Randomize))
+   {
+      if (gHoveredUIControl == this)
+         return true;
+
+      if (IDrawableModule* randomizeModule = TheSynth->GetHoveredRandomizeModule())
+      {
+         if (GetModuleParent() == randomizeModule)
+            return true;
+      }
+   }
+   return false;
+}
+
 void IUIControl::RemoveFromOwner()
 {
    IDrawableModule* owner = dynamic_cast<IDrawableModule*>(GetParent());
    assert(owner);
    if (owner)
       owner->RemoveUIControl(this);
+}
+
+//static
+bool IUIControl::IsInactiveValue(std::string valueLabel)
+{
+   if (valueLabel == "0" || valueLabel == "none" || valueLabel == "off" || valueLabel == "")
+      return true;
+   return false;
 }
 
 //static

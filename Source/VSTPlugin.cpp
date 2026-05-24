@@ -361,9 +361,11 @@ void VSTPlugin::CreateUIControls()
    mPanicButton = new ClickButton(this, "panic", mOpenEditorButton, kAnchor_Right_Padded);
    mRemoveExtraOutputButton = new ClickButton(this, "  -  ", 83, 38);
    mAddExtraOutputButton = new ClickButton(this, " + ", mRemoveExtraOutputButton, kAnchor_Right);
+   mResetPresetButton = new ClickButton(this, "reset", -1, -1);
 
    mPresetFileSelector->DrawLabel(true);
    mSavePresetFileButton->PositionTo(mPresetFileSelector, kAnchor_Right);
+   mResetPresetButton->PositionTo(mSavePresetFileButton, kAnchor_Below);
 
    mMidiOutCable = new AdditionalNoteCable();
    mMidiOutCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
@@ -658,9 +660,6 @@ void VSTPlugin::Poll()
       }
    }
 
-   for (auto& parameterSlider : mParameterSliders)
-      parameterSlider.mValue = parameterSlider.mParameter->getValue();
-
    if (mChangeGestureParameterIndex != -1)
    {
       if (mChangeGestureParameterIndex < (int)mParameterSliders.size() && !mParameterSliders[mChangeGestureParameterIndex].mInSelectorList)
@@ -685,13 +684,21 @@ void VSTPlugin::Poll()
    if (mPresetFileUpdateQueued)
    {
       mPresetFileUpdateQueued = false;
+      mPresetFileLoadCountdown = 2; //load twice: some plugins need a second setStateInformation call for JUCE's parameter cache to fully sync
+   }
+
+   if (mPresetFileLoadCountdown > 0)
+   {
+      --mPresetFileLoadCountdown;
       if (mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
       {
-         File resourceFile = File(mPresetFilePaths[mPresetFileIndex]);
+         mLastLoadedPresetFilePath = mPresetFilePaths[mPresetFileIndex];
+         File resourceFile = File(mLastLoadedPresetFilePath);
 
          if (!resourceFile.existsAsFile())
          {
             DBG("File doesn't exist ...");
+            mPresetFileLoadCountdown = 0;
             return;
          }
 
@@ -700,6 +707,7 @@ void VSTPlugin::Poll()
          if (!input->openedOk())
          {
             DBG("Failed to open file");
+            mPresetFileLoadCountdown = 0;
             return;
          }
 
@@ -740,6 +748,9 @@ void VSTPlugin::Poll()
          }
       }
    }
+
+   for (auto& parameterSlider : mParameterSliders)
+      parameterSlider.mValue = parameterSlider.mParameter->getValue();
 }
 void VSTPlugin::audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details)
 {
@@ -1122,6 +1133,7 @@ void VSTPlugin::DrawModule()
    mPanicButton->Draw();
    mRemoveExtraOutputButton->Draw();
    mAddExtraOutputButton->Draw();
+   mResetPresetButton->Draw();
    mShowParameterDropdown->Draw();
 
    ofPushStyle();
@@ -1249,6 +1261,14 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
       return;
    }
 
+   if (button == mResetPresetButton && mPlugin != nullptr)
+   {
+      RefreshPresetFiles();
+      if (mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
+         mPresetFileUpdateQueued = true;
+      return;
+   }
+
    if (button == mSavePresetFileButton && mPlugin != nullptr)
    {
       juce::File(ofToDataPath("vst/presets/" + GetPluginId())).createDirectory();
@@ -1352,8 +1372,12 @@ void VSTPlugin::RefreshPresetFiles()
    fileList.sort();
    for (const auto& file : fileList)
    {
-      mPresetFileSelector->AddLabel(file.getFileName().toStdString(), (int)mPresetFilePaths.size());
-      mPresetFilePaths.push_back(file.getFullPathName().toStdString());
+      int index = (int)mPresetFilePaths.size();
+      mPresetFileSelector->AddLabel(file.getFileNameWithoutExtension().toStdString(), index);
+      std::string filePath = file.getFullPathName().toStdString();
+      mPresetFilePaths.push_back(filePath);
+      if (filePath == mLastLoadedPresetFilePath)
+         mPresetFileIndex = index;
    }
 }
 
@@ -1460,6 +1484,8 @@ void VSTPlugin::SaveState(FileStreamOut& out)
    }
 
    IDrawableModule::SaveState(out);
+
+   out << mLastLoadedPresetFilePath;
 }
 
 void VSTPlugin::LoadState(FileStreamIn& in, int rev)
@@ -1487,7 +1513,11 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
    if (rev < 3)
       LoadVSTFromSaveData(in, rev);
 
+   if (rev >= 4)
+      in >> mLastLoadedPresetFilePath;
+
    RecreateUIOutputCables();
+   RefreshPresetFiles();
 }
 
 void VSTPlugin::LoadVSTFromSaveData(FileStreamIn& in, int rev)

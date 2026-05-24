@@ -247,27 +247,53 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
    {
       if (bOn)
       {
+         // Build new chord pitch set
+         bool newChordPitches[128] = {};
+         for (int i = 0; i < (int)mChords[x].size(); ++i)
+            newChordPitches[TheScale->MakeDiatonic(pitch + mChords[x][i])] = true;
+
+         // Note-off only for pitches in OLD chord but NOT in new chord.
+         // Shared pitches continue sustaining — avoids timing issues where
+         // note-off/note-on for the same pitch don't retrigger properly.
+         for (int i = 0; i < 128; ++i)
+         {
+            if (mActiveChordPitches[i] && !newChordPitches[i])
+               PlayKeyboardNote(time, i, 0);
+         }
+
+         // Note-on only for pitches in NEW chord but NOT in old chord
+         for (int i = 0; i < 128; ++i)
+         {
+            if (newChordPitches[i] && !mActiveChordPitches[i])
+               PlayKeyboardNote(time, i, 127 * velocity);
+         }
+
+         // Update tracking
+         for (int i = 0; i < 128; ++i)
+            mActiveChordPitches[i] = newChordPitches[i];
+         mActiveChordX = x;
+         mActiveChordY = y;
          for (int i = 0; i < 128; ++i)
             mCurrentNotes[i] = 0;
          PressedNoteFor(x, y, (int)127 * velocity);
-         mNoteOutput.Flush(time);
-         for (int i = 0; i < mChords[x].size(); ++i)
-            PlayKeyboardNote(time, TheScale->MakeDiatonic(pitch + mChords[x][i]), 127 * velocity);
       }
       else
       {
-         int currentPitch = -1;
-         for (int i = 0; i < 128; ++i)
-         {
-            if (mCurrentNotes[i] > 0)
-               currentPitch = i;
-         }
-
-         if (GridToPitch(x, y) == currentPitch)
+         // Only release if this is the button that activated the current chord.
+         // GridToPitch() only uses Y in chord mode, so buttons on the same row
+         // share the same root pitch — we must check the exact (x,y) position.
+         if (x == mActiveChordX && y == mActiveChordY)
          {
             for (int i = 0; i < 128; ++i)
+            {
+               if (mActiveChordPitches[i])
+                  PlayKeyboardNote(time, i, 0);
+            }
+            mActiveChordPitches.fill(false);
+            mActiveChordX = -1;
+            mActiveChordY = -1;
+            for (int i = 0; i < 128; ++i)
                mCurrentNotes[i] = 0;
-            mNoteOutput.Flush(time);
          }
       }
    }
@@ -312,7 +338,7 @@ void LaunchpadKeyboard::PlayKeyboardNote(double time, int pitch, int velocity)
    {
       if (velocity == 0)
          time += .001f; //TODO(Ryan) gross hack. need to handle the case better of receiving a note-on followed by a note-off for one pitch at the exact same time. right now it causes stuck notes.
-      PlayNoteOutput(NoteMessage(time, pitch, velocity));
+      PlayNoteOutput(NoteMessage(time, pitch, velocity, -1, ModulationParameters(mModulation.GetPitchBend(0), mModulation.GetModWheel(0), mModulation.GetPressure(0), 0)));
    }
 
    if (mDrawDebug)
@@ -372,8 +398,16 @@ void LaunchpadKeyboard::OnTimeEvent(double time)
 {
 }
 
-bool LaunchpadKeyboard::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
+bool LaunchpadKeyboard::OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
+   if (controlIndex >= AbletonDevice::kChannelPressureIndex && controlIndex < AbletonDevice::kChannelPressureIndex + AbletonDevice::kNumChannelPressureIndices)
+   {
+      int channel = 0; //controlIndex - AbletonDevice::kChannelPressureIndex;
+      mModulation.GetPressure(channel)->SetValue(midiValue / 127.0f);
+      mNoteOutput.SendPressure(channel, midiValue / 127.0f);
+      return true;
+   }
+
    int rangeStart = abletonGrid->GetGridStartIndex();
    int rangeEnd = abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads();
    mCols = abletonGrid->GetGridNumCols(); //TODO(Ryan) need proper way to update grid size based upon context of relevant grid
@@ -922,6 +956,18 @@ void LaunchpadKeyboard::Exit()
 
 void LaunchpadKeyboard::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
+   if (list == mLayoutDropdown)
+   {
+      // Release any held chord notes when switching layout modes
+      for (int i = 0; i < 128; ++i)
+      {
+         if (mActiveChordPitches[i])
+            PlayKeyboardNote(NextBufferTime(false), i, 0);
+      }
+      mActiveChordPitches.fill(false);
+      mActiveChordX = -1;
+      mActiveChordY = -1;
+   }
    UpdateLights();
 }
 
@@ -933,6 +979,11 @@ void LaunchpadKeyboard::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadEnum<LaunchpadLayout>("layout", moduleInfo, (int)LaunchpadLayout::kChromatic, mLayoutDropdown);
 
    SetUpFromSaveData();
+}
+
+void LaunchpadKeyboard::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   moduleInfo["chorder"] = mChorder ? mChorder->Path() : "";
 }
 
 void LaunchpadKeyboard::SetUpFromSaveData()

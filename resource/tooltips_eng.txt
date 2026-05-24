@@ -662,6 +662,7 @@ midicontroller~get midi input from external devices. to get a nice display in th
 ~feedback~which cc or note should we send the feedback to?
 ~pageless~should this connection work across all pages of the midicontroller?
 ~14bit~is this a 14-bit midi control, with this control as the LSB and the control 32 less than this as the MSB?
+~fbvals~comma-separated midi values for feedback per control value (e.g. "53,21,9,0"). only used with "set"/"release" connections that have a nonzero increment amount. the control's current value is used as an index to look up the midi feedback value to send. useful for lighting controller LEDs with different colors per value.
 ~ x ~delete this connection
 ~copy~duplicate this connection
 ~layout~which layout file should we use for this controller? these can be created in your Documents/BespokeSynth/controllers folder.
@@ -1936,6 +1937,7 @@ plugin~a hosted plugin instance, such as a VST
 ~load parameter~This shows the number of parameters exposed by the plugin. If you click here, up to a 100 parameters are attempted to be added to the parameter dropdown list. If you hold `shift` while clicking, the parameter sliders will be added as well. If you hold `control` the parameter list will be reset and recreated as if the plugin was spawned new.
 ~preset~choose from saved plugin presets
 ~save as~save the current plugin settings as a preset to load again later
+~reset~reload the currently selected preset from disk, resetting all parameters to their original saved values
 ~panic~send "all notes off" and "all sounds off" to this plugin in order to silence it immediately
 ~ + ~Manually add a new Stereo output from the plugin
 ~  -  ~Remove the last manually added Stereo output from the plugin
@@ -2016,6 +2018,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~samplerate~what sample rate to use with your audio device (requires restart)
 ~buffersize~what buffer size to use with your audio device. lower values use require more CPU power, higher values add more latency. (requires restart)
 ~oversampling~global oversampling multiplier. uses additional CPU for higher-resolution audio processing. (requires restart)
+~output_wav_bit_depth~bit depth to use when exporting audio to WAV files
 ~width~width of bespoke's window on startup
 ~height~height of bespoke's window on startup
 ~set_manual_window_position~should we force bespoke to a specific position on startup
@@ -2031,6 +2034,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~autosave~should autosave be enabled on startup
 ~show_tooltips_on_load~should tooltips be enabled on startup
 ~show_minimap~should the minimap be displayed (requires restart)
+~show_welcome_screen~should we show the welcome screen when you first open bespoke?
 ~immediate_paste~when enabled, pasting values on UI controls will apply immediately instead of requiring you to press enter
 ~record_buffer_length_minutes~length of always-on recording buffer for "write audio" button in the title bar (requires restart)
 ~vst_always_on_top~should plugin windows always stay on top of bespoke when opened
@@ -2165,6 +2169,11 @@ acciaccatura~adds a quick grace note before playing the input pitch
 ~hold ms~how long to hold offset pitch before transitioning to input pitch
 ~glide ms~how long to spend bending between offset pitch and input pitch after hold ms
 
+dopplershift~output pitch shift value based on speeds of receiver and source
+~receiver speed~speed of receiver towards the source in m/s
+~source speed~speed of source towards the receiver in m/s
+~reverse~reverse moving direction of both receiver and source
+
 stereorotation~rotates the phase of input audio
 ~phase~phase offset
 
@@ -2181,3 +2190,5 @@ binaryvalue~convert modulated value to binary and send each bit to separate modu
 
 velocitytoduration~use a note's velocity to set its duration
 ~max duration~duration (in measures) corresponding to the maximum velocity value
+
+zerocrossrate~measure the zero-cross rate of input audio

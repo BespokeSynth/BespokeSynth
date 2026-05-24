@@ -31,13 +31,14 @@
 #include "IAudioPoller.h"
 #include "Slider.h"
 #include "ClickButton.h"
+#include "DropdownList.h"
 
 namespace ableton
 {
    class Link;
 }
 
-class AbletonLink : public IDrawableModule, public IAudioPoller, public IFloatSliderListener, public IButtonListener
+class AbletonLink : public IDrawableModule, public IAudioPoller, public IFloatSliderListener, public IButtonListener, public IDropdownListener
 {
 public:
    AbletonLink();
@@ -58,19 +59,32 @@ public:
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    bool IsEnabled() const override { return mEnabled; }
 
 private:
    //IDrawableModule
    void DrawModule() override;
 
+   enum class SyncMode
+   {
+      Off,
+      SendAndReceive,
+      SendOnly,
+      ReceiveOnly
+   };
+
    float mOffsetMs{ 0 };
    FloatSlider* mOffsetMsSlider{ nullptr };
-   ClickButton* mResetButton{ nullptr };
+   ClickButton* mShiftBeatBackwardButton{ nullptr };
+   ClickButton* mShiftBeatForwardButton{ nullptr };
+   SyncMode mSyncMode{ SyncMode::Off };
+   DropdownList* mSyncModeSelector{ nullptr };
 
    std::unique_ptr<ableton::Link> mLink;
    double mTempo{ 120 };
    std::size_t mNumPeers{ 0 };
    double mLastReceivedBeat{ 0 };
    double mSampleTime{ 0 };
+   int mBeatOffset{ 0 };
 };

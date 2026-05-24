@@ -57,9 +57,11 @@ public:
    void Poll() override;
    bool IsResizable() const override { return true; /*mDisplayMode == DisplayMode::Grid;*/ }
    void Resize(float w, float h) override;
+   void DumpDebugData(std::string input, juce::FileOutputStream& out) override;
 
    bool HasSnapshot(int index) const;
    int GetCurrentSnapshot() const { return mCurrentSnapshot; }
+   int* GetCurrentSnapshotVar() { return &mCurrentSnapshot; }
    bool IsTargetingModule(IDrawableModule* module) const;
    void AddSnapshotTarget(IDrawableModule* target);
    void SetSnapshot(int idx, double time);
@@ -67,6 +69,7 @@ public:
    void DeleteSnapshot(int idx);
    int GetSize() { return (int)mSnapshotCollection.size(); }
    void SetLabel(int idx, const std::string& label);
+   std::string GetLabel(int idx) const;
 
    void OnTransportAdvanced(float amount) override;
 
@@ -94,12 +97,11 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
-   int GetModuleSaveStateRev() const override { return 5; }
+   int GetModuleSaveStateRev() const override { return 6; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    void UpdateOldControlName(std::string& oldName) override;
 
    static std::vector<IUIControl*> sSnapshotHighlightControls;
-   static bool sSerializingModuleStateForSnapshot;
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -111,7 +113,6 @@ private:
    void SetGridSize(float w, float h);
    bool IsConnectedToPath(std::string path) const;
    void RandomizeTargets();
-   void RandomizeControl(IUIControl* control);
    void UpdateListGrid();
    void ResizeSnapshotCollection(int size);
 
@@ -154,7 +155,8 @@ private:
 
    struct SnapshotModuleData
    {
-      SnapshotModuleData(IDrawableModule* module);
+      SnapshotModuleData(IDrawableModule* module, int snapshotIndex);
+      SnapshotModuleData() {}
       std::string mModulePath;
       std::string mData;
    };
@@ -207,4 +209,5 @@ private:
    int mGridControlOffsetY{ 0 };
    IntSlider* mGridControlOffsetXSlider{ nullptr };
    IntSlider* mGridControlOffsetYSlider{ nullptr };
+   bool mOnlyListFilledSnapshots{ false };
 };

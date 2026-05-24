@@ -31,7 +31,6 @@
 #include "juce_core/juce_core.h"
 
 std::vector<IUIControl*> Snapshots::sSnapshotHighlightControls;
-bool Snapshots::sSerializingModuleStateForSnapshot = false;
 
 namespace
 {
@@ -87,9 +86,6 @@ void Snapshots::CreateUIControls()
       //mUIControlCable->SetPatchCableDrawMode(kPatchCableDrawMode_HoverOnly);
       AddPatchCableSource(mUIControlCable);
    }
-
-   for (int i = 0; i < 32; ++i)
-      mCurrentSnapshotSelector->AddLabel((ofToString(i)).c_str(), i);
 }
 
 void Snapshots::Init()
@@ -423,6 +419,23 @@ void Snapshots::PlayNote(NoteMessage note)
    }
 }
 
+void Snapshots::DumpDebugData(std::string input, juce::FileOutputStream& out)
+{
+   out.writeText("num snapshots " + ofToString(mSnapshotCollection.size()) + "\n", true, true, nullptr);
+   for (int i = 0; i < mSnapshotCollection.size(); ++i)
+   {
+      out.writeText("snapshot " + ofToString(i) + ":\n", true, true, nullptr);
+      out.writeText("  num items: " + ofToString(mSnapshotCollection[i].mSnapshots.size()) + "\n", true, true, nullptr);
+      int j = 0;
+      for (auto& item : mSnapshotCollection[i].mSnapshots)
+      {
+         out.writeText("      item " + ofToString(j) + ": " + item.mControlPath + "\n", true, true, nullptr);
+         ++j;
+      }
+      out.writeText("  num SnapshotModuleDatas: " + ofToString(mSnapshotCollection[i].mModuleData.size()) + "\n", true, true, nullptr);
+   }
+}
+
 void Snapshots::SetSnapshot(int idx, double time)
 {
    if (!mAllowSetOnAudioThread && IsAudioThread())
@@ -524,11 +537,7 @@ void Snapshots::SetSnapshot(int idx, double time)
          juce::MemoryBlock outputStream;
          outputStream.fromBase64Encoding(moduleData.mData);
          FileStreamIn in(outputStream);
-         int dataRev;
-         in >> dataRev;
-         sSerializingModuleStateForSnapshot = true;
-         module->LoadState(in, dataRev);
-         sSerializingModuleStateForSnapshot = false;
+         module->LoadSnapshotData(in, idx);
       }
    }
 
@@ -544,21 +553,12 @@ void Snapshots::SetSnapshot(int idx, double time)
 void Snapshots::RandomizeTargets()
 {
    for (int i = 0; i < mSnapshotControls.size(); ++i)
-      RandomizeControl(mSnapshotControls[i]);
+      mSnapshotControls[i]->Randomize();
    for (int i = 0; i < mSnapshotModules.size(); ++i)
    {
-      for (auto* control : mSnapshotModules[i]->GetUIControls())
-         RandomizeControl(control);
+      if (mSnapshotModules[i] != nullptr && !mSnapshotModules[i]->IsDeleted())
+         mSnapshotModules[i]->RandomizeModule();
    }
-}
-
-void Snapshots::RandomizeControl(IUIControl* control)
-{
-   if (strcmp(control->Name(), "enabled") == 0) //don't randomize enabled/disable checkbox, too annoying
-      return;
-   if (dynamic_cast<ClickButton*>(control) != nullptr)
-      return;
-   control->SetFromMidiCC(ofRandom(1), NextBufferTime(false), true);
 }
 
 void Snapshots::OnTransportAdvanced(float amount)
@@ -654,13 +654,16 @@ void Snapshots::StoreSnapshot(int idx, bool setAsCurrent)
       for (auto* grid : mSnapshotModules[i]->GetUIGrids())
          coll.mSnapshots.push_back(Snapshot(grid, this));
       if (mSnapshotModules[i]->ShouldSerializeForSnapshot())
-         coll.mModuleData.push_back(SnapshotModuleData(mSnapshotModules[i]));
+         coll.mModuleData.push_back(SnapshotModuleData(mSnapshotModules[i], idx));
    }
 
    mSnapshotLabel = coll.mLabel;
 
    if (setAsCurrent)
       mCurrentSnapshot = idx;
+
+   if (!mCurrentSnapshotSelector->HasLabel(idx))
+      mCurrentSnapshotSelector->AddLabel(mSnapshotLabel.c_str(), idx);
 
    UpdateGridValues();
 }
@@ -672,7 +675,10 @@ void Snapshots::DeleteSnapshot(int idx)
       SnapshotCollection& coll = mSnapshotCollection[idx];
       coll.mSnapshots.clear();
       coll.mLabel = ofToString(idx);
-      mCurrentSnapshotSelector->SetLabel(coll.mLabel, idx);
+      if (mOnlyListFilledSnapshots)
+         mCurrentSnapshotSelector->RemoveLabel(idx);
+      else
+         mCurrentSnapshotSelector->SetLabel(coll.mLabel, idx);
 
       UpdateGridValues();
    }
@@ -685,6 +691,13 @@ void Snapshots::SetLabel(int idx, const std::string& label)
       mSnapshotCollection[idx].mLabel = label;
       mCurrentSnapshotSelector->SetLabel(label, idx);
    }
+}
+
+std::string Snapshots::GetLabel(int idx) const
+{
+   if (idx >= 0 && idx < mSnapshotCollection.size())
+      return mSnapshotCollection[idx].mLabel;
+   return "";
 }
 
 void Snapshots::UpdateGridControllerLights(bool force)
@@ -953,6 +966,8 @@ void Snapshots::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadInt("num_list_snapshots", moduleInfo, 8, 0, 64, K(isTextField));
    mModuleSaveData.LoadBool("allow_set_on_audio_thread", moduleInfo, true);
    mModuleSaveData.LoadBool("auto_store_on_switch", moduleInfo, false);
+   mModuleSaveData.LoadBool("autofill", moduleInfo, false);
+   mModuleSaveData.LoadBool("only_list_filled_snapshots", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -962,6 +977,35 @@ void Snapshots::SetUpFromSaveData()
    mAllowSetOnAudioThread = mModuleSaveData.GetBool("allow_set_on_audio_thread");
    mDisplayMode = mModuleSaveData.GetEnum<DisplayMode>("display_mode");
    mAutoStoreOnSwitch = mModuleSaveData.GetBool("auto_store_on_switch");
+   mOnlyListFilledSnapshots = mModuleSaveData.GetBool("only_list_filled_snapshots");
+
+   if (mModuleSaveData.GetBool("autofill") && !mSnapshotControls.empty())
+   {
+      for (int i = 0; i < mSnapshotCollection.size(); ++i)
+         DeleteSnapshot(i);
+
+      auto* control = mSnapshotControls[0];
+      for (int i = 0; i < control->GetNumValues(); ++i)
+      {
+         StoreSnapshot(i, false);
+         mSnapshotCollection[i].mLabel = control->GetDisplayValue(i - 1);
+         mSnapshotCollection[i].mSnapshots.begin()->mValue = i - 1;
+      }
+   }
+
+   mCurrentSnapshotSelector->Clear();
+   for (int i = 0; i < 32 || i < mSnapshotCollection.size(); ++i)
+   {
+      if (!mOnlyListFilledSnapshots || HasSnapshot(i))
+      {
+         std::string label;
+         if (HasSnapshot(i))
+            label = GetLabel(i);
+         else
+            label = ofToString(i);
+         mCurrentSnapshotSelector->AddLabel(label.c_str(), i);
+      }
+   }
 
    Resize(mWidth, mHeight);
 }
@@ -1009,6 +1053,14 @@ void Snapshots::SaveState(FileStreamOut& out)
             out << snapshot.mGridContents[i];
          out << snapshot.mString;
       }
+
+      out << (int)coll.mModuleData.size();
+      for (auto& moduleData : coll.mModuleData)
+      {
+         out << moduleData.mModulePath;
+         out << moduleData.mData;
+      }
+
       out << coll.mLabel;
    }
 
@@ -1073,6 +1125,19 @@ void Snapshots::LoadState(FileStreamIn& in, int rev)
             in >> snapshotData.mGridContents[k];
          in >> snapshotData.mString;
       }
+
+      if (rev >= 6)
+      {
+         int numModuleDatas;
+         in >> numModuleDatas;
+         mSnapshotCollection[i].mModuleData.resize(numModuleDatas);
+         for (auto& moduleData : mSnapshotCollection[i].mModuleData)
+         {
+            in >> moduleData.mModulePath;
+            in >> moduleData.mData;
+         }
+      }
+
       in >> mSnapshotCollection[i].mLabel;
       if (rev < 2 && mSnapshotCollection[i].mLabel.empty())
          mSnapshotCollection[i].mLabel = ofToString(i);
@@ -1243,15 +1308,13 @@ Snapshots::Snapshot::Snapshot(IUIControl* control, Snapshots* snapshots)
    }
 }
 
-Snapshots::SnapshotModuleData::SnapshotModuleData(IDrawableModule* module)
+Snapshots::SnapshotModuleData::SnapshotModuleData(IDrawableModule* module, int snapshotIndex)
 {
    mModulePath = module->Path();
    juce::MemoryBlock tempBlock;
    {
       FileStreamOut out(tempBlock);
-      sSerializingModuleStateForSnapshot = true;
-      module->SaveState(out);
-      sSerializingModuleStateForSnapshot = false;
+      module->SaveSnapshotData(out, snapshotIndex);
    }
    mData = tempBlock.toBase64Encoding().toStdString();
 }

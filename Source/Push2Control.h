@@ -33,6 +33,7 @@
 #include "TitleBar.h"
 #include "DropdownList.h"
 #include "AbletonDeviceShared.h"
+#include "LockFreeQueue.h"
 
 class NVGcontext;
 class NVGLUframebuffer;
@@ -56,7 +57,7 @@ public:
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
 
-   void SetLed(int index, int color, int flashColor = -1) override;
+   void SetLed(int index, int color, int flashColor = -1, LedPriority priority = LedPriority::Normal) override;
    bool GetButtonState(int index) const override;
    void SetDisplayModule(IDrawableModule* module, bool addToHistory = true) override;
    void DisplayScreenMessage(std::string message, float durationMs = 500) override { ofLog() << "todo: handle push 2 screen message"; }
@@ -70,6 +71,7 @@ public:
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
+   void OnMidiPressure(MidiPressure& pressure) override;
 
    MidiDevice* GetDevice() override { return &mDevice; }
 
@@ -86,7 +88,6 @@ public:
    int GetGridControllerOption2Control() const override;
 
    static bool sDrawingPush2Display;
-   static NVGcontext* sVG;
    static NVGLUframebuffer* sFB;
    static void CreateStaticFramebuffer(); //windows was having trouble creating a nanovg context and fbo on the fly
    static IUIControl* sBindToUIControl;
@@ -137,13 +138,15 @@ private:
    void UpdateRoutingModules();
    void SetGridControlInterface(IAbletonGridController* controller, IDrawableModule* module);
 
+   void OnMidiNote_Consume(MidiNote& note);
+   void OnMidiControl_Consume(MidiControl& control);
+   void OnMidiPitchBend_Consume(MidiPitchBend& pitchBend);
+   void OnMidiPressure_Consume(MidiPressure& pressure);
+
    unsigned char* mPixels{ nullptr };
    const int kPixelRatio = 1;
 
    const float kColumnSpacing = 121;
-
-   int mFontHandle{ 0 };
-   int mFontHandleBold{ 0 };
 
    IDrawableModule* mDisplayModule{ nullptr };
    Snapshots* mDisplayModuleSnapshots{ nullptr };
@@ -230,4 +233,9 @@ private:
    int mPendingSpawnPitch{ -1 };
    int mSelectedGridSpawnListIndex{ -1 };
    std::string mPushBridgeInitErrMsg;
+
+   LockFreeQueue<MidiNote> mQueuedNoteMessages{};
+   LockFreeQueue<MidiControl> mQueuedControlMessages{};
+   LockFreeQueue<MidiPitchBend> mQueuedPitchBendMessages{};
+   LockFreeQueue<MidiPressure> mQueuedPressureMessages{};
 };

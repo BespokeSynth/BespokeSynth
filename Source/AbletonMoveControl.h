@@ -35,11 +35,14 @@
 #include "AbletonMoveLCD.h"
 #include "AbletonDeviceShared.h"
 #include "pybind11/attr.h"
+#include "LockFreeQueue.h"
+#include "SessionOrganizer.h"
 
 class IUIControl;
 class Snapshots;
 class ControlRecorder;
 class TrackOrganizer;
+class SessionOrganizer;
 
 class AbletonMoveControl : public IDrawableModule, public MidiDeviceListener, public IDropdownListener, public IAbletonGridDevice
 {
@@ -56,7 +59,7 @@ public:
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
 
-   void SetLed(int index, int color, int flashColor = -1) override;
+   void SetLed(int index, int color, int flashColor = -1, LedPriority priority = LedPriority::Normal) override;
    void SetLedFlashColor(int index, int flashColor = -1);
    bool GetButtonState(int index) const override;
    void SetDisplayModule(IDrawableModule* module, bool addToHistory = true) override;
@@ -72,8 +75,12 @@ public:
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
+   void OnMidiPressure(MidiPressure& pressure) override;
 
    MidiDevice* GetDevice() override { return &mDevice; }
+
+   //IPatchable
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
@@ -82,7 +89,7 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 3; }
 
    int GetGridControllerOption1Control() const override;
    int GetGridControllerOption2Control() const override;
@@ -105,7 +112,7 @@ private:
 
    bool Initialize();
    void DrawToFramebuffer();
-   void RenderPush2Display();
+   void RenderMoveDisplay();
    void UpdateLeds();
    void SendLeds(bool force);
 
@@ -120,7 +127,7 @@ private:
    bool AdjustGlobalModuleIndex(int amount);
    IDrawableModule* GetCurrentGlobalModule() const;
    IAbletonGridController* GetCurrentGlobalGridInterface() const;
-   void AdjustControlWithEncoder(IUIControl* control, float midiInputValue);
+   void AdjustControlWithEncoder(IUIControl* control, float midiInputValue, bool ignoreShift = false);
    int GetDisplayKnobIndex();
    bool ShouldDisplayMixer();
    bool ShouldDisplaySnapshotView();
@@ -128,6 +135,17 @@ private:
    void SetModuleViewOffset(float offset);
    void DetermineTrackControlLayout();
    bool WasPeekHold(int controlIndex) const { return gTime - mControlState[controlIndex].mLastChangeTime > 300; }
+   void ZoomToTrack(TrackOrganizer* track);
+   void ZoomToModule(IDrawableModule* module);
+   void OnTrackRowExited(int newRow, int oldRow);
+   void ShowSoundSelector();
+   void StartControlRecorder(int controlIndex);
+   void DrawKnobDisplay(int controlIndex);
+
+   void OnMidiNote_Consume(MidiNote& note);
+   void OnMidiControl_Consume(MidiControl& control);
+   void OnMidiPitchBend_Consume(MidiPitchBend& pitchBend);
+   void OnMidiPressure_Consume(MidiPressure& pressure);
 
    const int kTrackRowGlobal = -1;
    const int kTrackRowMixer = -2;
@@ -138,23 +156,29 @@ private:
    double mScreenOverrideTimeout{ 0.0 };
    std::string mTemporaryScreenMessage{};
    double mTemporaryScreenMessageTimeout{ 0.0 };
+   bool mShowSoundSelector{ false };
+   int mSoundSelectorIndex{ 0 };
 
    IDrawableModule* mDisplayModule{ nullptr };
    std::string mDisplayModuleContext{};
+   ControlRecorder* mCurrentControlRecorder{ nullptr };
    std::vector<IUIControl*> mControls;
    bool mDisplayModuleIsShowingOverrideControls{ false };
 
-   std::array<PatchCableSource*, 8> mTrackCables{ nullptr };
+   SessionOrganizer* mSessionOrganizer{ nullptr };
+   PatchCableSource* mSessionOrganizerCable;
    int mTrackRowOffset{ 0 };
    int mSelectedTrackRow{ kTrackRowMixer };
    int mPreviousSelectedTrackRow{ -1 };
    double mDisplayModuleSelectTimeout{ 0.0 };
+   int mSnapshotOffset{ 0 };
 
    static constexpr int kNumPages{ 5 };
    std::array<PatchCableSource*, kNumPages> mGlobalControlModuleCables{};
    std::array<PatchCableSource*, kNumPages> mGlobalGridInterfaceCables{};
    int mGlobalModuleIndex{ 0 };
    float mGlobalModuleViewOffset{ 0.0f };
+   float mModalModuleViewOffset{ 0.0f };
 
    struct TrackLayoutEntry
    {
@@ -182,6 +206,7 @@ private:
 
    bool mShiftHeld{ false };
    int mMostRecentlyTouchedKnobIndex{ -1 };
+   std::array<double, AbletonDevice::kNumMainEncoders> mLastTouchedKnobTime{};
    int mLastAdjustedKnobIndex{ -1 };
    double mLastAdjustedKnobTime{ -1 };
    double mLastResetTime{ -1 };
@@ -189,6 +214,10 @@ private:
    double mLastGainAdjustTrackTime{ -1 };
    float mTrackRowOffsetSmoothed{ 0 };
    bool mShowLCDOnScreen{ false };
+   bool mAutoZoomToTrack{ false };
+   bool mPageWithinModules{ false };
+   bool mBottomRowMode{ false };
+   bool mRequireTouchForKnobAdjustment{ false };
 
    IAbletonGridController* mGridControlInterface{ nullptr };
 
@@ -215,6 +244,7 @@ private:
    {
       LedState mQueuedLedState{};
       LedState mLedState{};
+      LedPriority mLedPriority{ LedPriority::None };
       int mButtonState{ 0 };
       double mLastChangeTime{ 0.0 };
    };
@@ -224,4 +254,9 @@ private:
    MidiDevice mDevice;
 
    std::string mPushBridgeInitErrMsg;
+
+   LockFreeQueue<MidiNote> mQueuedNoteMessages{};
+   LockFreeQueue<MidiControl> mQueuedControlMessages{};
+   LockFreeQueue<MidiPitchBend> mQueuedPitchBendMessages{};
+   LockFreeQueue<MidiPressure> mQueuedPressureMessages{};
 };

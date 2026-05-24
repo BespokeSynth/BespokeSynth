@@ -108,6 +108,7 @@ public:
    void RemoveLabel(int value);
    void SetLabel(std::string label, int value);
    std::string GetLabel(int val) const;
+   bool HasLabel(int val) const;
    void SetDisplayStyle(DropdownDisplayStyle style) { mDisplayStyle = style; }
    void Render() override;
    bool MouseMoved(float x, float y) override;
@@ -154,6 +155,7 @@ public:
    void Increment(float amount) override;
    void Poll() override;
    bool CanBeTargetedBy(PatchCableSource* source) const override;
+   bool ShouldDisplayAsInactive() const override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
 

@@ -64,6 +64,8 @@ target_sources(BespokeSynth PRIVATE
     AudioSend.h
     AudioSplitter.cpp
     AudioSplitter.h
+    AudioSyncer.cpp
+    AudioSyncer.h
     AudioToCV.cpp
     AudioToCV.h
     AudioToPulse.cpp
@@ -158,6 +160,8 @@ target_sources(BespokeSynth PRIVATE
     DelayEffect.h
     DistortionEffect.cpp
     DistortionEffect.h
+    DopplerShift.cpp
+    DopplerShift.h
     DotGrid.cpp
     DotGrid.h
     DotSequencer.cpp
@@ -247,6 +251,7 @@ target_sources(BespokeSynth PRIVATE
     IAudioSource.h
     IClickable.cpp
     IClickable.h
+    IControlVisualizer.h
     IDrawableModule.cpp
     IDrawableModule.h
     IDrivableSequencer.h
@@ -254,6 +259,7 @@ target_sources(BespokeSynth PRIVATE
     IMidiVoice.h
     IModulator.cpp
     IModulator.h
+    IModuleDecorator.h
     INonstandardController.h
     INoteReceiver.cpp
     INoteReceiver.h
@@ -508,6 +514,8 @@ target_sources(BespokeSynth PRIVATE
     PSMoveMgr.h
     PanicButton.cpp
     PanicButton.h
+    FileUtils.cpp
+    FileUtils.h
     Panner.cpp
     Panner.h
     PatchCable.cpp
@@ -657,12 +665,15 @@ target_sources(BespokeSynth PRIVATE
     ScriptStatus.h
     SeaOfGrain.cpp
     SeaOfGrain.h
+    SessionOrganizer.cpp
+    SessionOrganizer.h
     Selector.cpp
     Selector.h
     SignalClamp.cpp
     SignalClamp.h
     SignalGenerator.cpp
     SignalGenerator.h
+    SimplexFont.h
     SingleOscillator.cpp
     SingleOscillator.h
     SingleOscillatorVoice.cpp
@@ -776,9 +787,13 @@ target_sources(BespokeSynth PRIVATE
     WaveformViewer.h
     Waveshaper.cpp
     Waveshaper.h
+    WelcomeScreen.cpp
+    WelcomeScreen.h
     WhiteKeys.cpp
     WhiteKeys.h
     WindowCloseListener.h
+    ZeroCrossRate.cpp
+    ZeroCrossRate.h
     ofxJSONElement.cpp
     ofxJSONElement.h
     )
@@ -906,6 +921,7 @@ endif ()
 
 target_link_libraries(BespokeSynth PRIVATE
     exprtk::exprtk
+    bespoke::abletonmove
     bespoke::freeverb
     $<IF:$<STREQUAL:${BESPOKE_SYSTEM_JSONCPP},OFF>,bespoke::json,jsoncpp>
     bespoke::leathers
