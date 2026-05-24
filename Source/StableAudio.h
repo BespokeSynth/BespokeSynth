@@ -35,6 +35,7 @@
 #include "TextEntry.h"
 
 #include <future>
+#include <mutex>
 #include <string>
 
 class Sample;
@@ -74,7 +75,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 2; }
+   int GetModuleSaveStateRev() const override { return 4; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
 private:
@@ -101,6 +102,10 @@ private:
    void DeleteSelectedGeneratedWav();
    void UpdatePlaybackControls();
    void RefreshPromptChoices();
+   void GenerateMorePromptIdeas();
+   std::string MakeGeneratedPromptIdea();
+   void AutoplayNextPrompt();
+   void ScheduleNextAutoplay();
    void AddPromptChoice(const std::string& prompt);
    void ApplyPromptChoice();
    void SetPromptText(const std::string& prompt);
@@ -112,10 +117,17 @@ private:
    void RefreshModelPathEntries();
    bool ModelFilesExist(const std::string& ditFilename, const std::string& decoderFilename) const;
    float GetSelectedModelMaxSeconds() const;
+   float GetMaxCrossfadeSeconds() const;
+   void UpdateCrossfadeSlider();
    const char* GetSelectedModelLabel() const;
    const char* GetSelectedModelDescription() const;
 
+   // Guard sample pointer swaps and playback reads. Generated WAVs load on the UI thread,
+   // while Process() consumes these Sample objects on the audio thread.
    Sample* mSample{ nullptr };
+   Sample* mPreviousSample{ nullptr };
+   std::mutex mSampleMutex;
+   ChannelBuffer mCrossfadeBuffer{ gBufferSize };
    StableAudioModel* mModel{ nullptr };
    std::string mLoadedDitPath;
    std::string mLoadedDecoderPath;
@@ -129,12 +141,20 @@ private:
    std::future<GenerationResult> mGenerationFuture;
    bool mGenerationInProgress{ false };
    std::string mStatusString;
+   double mAutoplayNextGenerationTime{ -1 };
+   double mCrossfadeStartTime{ -1 };
 
    enum ModelSelection
    {
       kModel_SmallMusic,
       kModel_SmallSfx,
       kModel_Medium
+   };
+
+   enum TransitionMode
+   {
+      kTransition_Normal,
+      kTransition_Crossfade
    };
 
    std::string mModelDir;
@@ -146,15 +166,20 @@ private:
    float mSeconds{ 8 };
    int mSteps{ 8 };
    int mSeed{ 0 };
+   int mTransitionMode{ kTransition_Crossfade };
+   float mCrossfadeSeconds{ 2 };
    float mVolume{ 1 };
    bool mPlay{ false };
    bool mLoop{ true };
+   bool mAutoplay{ false };
    int mGeneratedWavIndex{ -1 };
    int mPromptChoice{ -1 };
    bool mUseMetadataWavLabels{ true };
 
    TextEntry* mPromptEntry{ nullptr };
    DropdownList* mPromptDropdown{ nullptr };
+   ClickButton* mMoreIdeasButton{ nullptr };
+   Checkbox* mAutoplayCheckbox{ nullptr };
    DropdownList* mModelDropdown{ nullptr };
    DropdownList* mGeneratedWavDropdown{ nullptr };
    TextEntry* mDitPathEntry{ nullptr };
@@ -163,6 +188,8 @@ private:
    FloatSlider* mSecondsSlider{ nullptr };
    IntSlider* mStepsSlider{ nullptr };
    IntSlider* mSeedSlider{ nullptr };
+   DropdownList* mTransitionDropdown{ nullptr };
+   FloatSlider* mCrossfadeSlider{ nullptr };
    FloatSlider* mVolumeSlider{ nullptr };
    ClickButton* mGenerateButton{ nullptr };
    ClickButton* mLoadWavButton{ nullptr };
