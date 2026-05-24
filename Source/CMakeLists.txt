@@ -826,9 +826,10 @@ set(BESPOKE_STABLE_AUDIO_ROOT "${BESPOKE_STABLE_AUDIO_DEFAULT_ROOT}" CACHE PATH 
 set(BESPOKE_STABLE_AUDIO_GIT_REPOSITORY "https://github.com/davehorner/stableaudio-rs" CACHE STRING "stableaudio-rs git repository")
 set(BESPOKE_STABLE_AUDIO_GIT_TAG "main" CACHE STRING "stableaudio-rs git tag, branch, or commit")
 set(BESPOKE_STABLE_AUDIO_FEATURES "" CACHE STRING "Cargo features to enable for stable-audio-capi, for example vulkan or metal")
-set(BESPOKE_STABLE_AUDIO_SHORT_TARGET_DIR "${CMAKE_SOURCE_DIR}/ignore/stableaudio-rs")
+set(BESPOKE_STABLE_AUDIO_SHORT_SOURCE_DIR "${CMAKE_SOURCE_DIR}/ignore/sas")
+set(BESPOKE_STABLE_AUDIO_SHORT_TARGET_DIR "${CMAKE_SOURCE_DIR}/ignore/sa")
 set(BESPOKE_STABLE_AUDIO_CARGO_TARGET_DIR "${BESPOKE_STABLE_AUDIO_SHORT_TARGET_DIR}" CACHE PATH "Cargo target directory for stableaudio-rs")
-if(BESPOKE_STABLE_AUDIO_CARGO_TARGET_DIR MATCHES "[/\\\\]stableaudio-rs-target$")
+if(BESPOKE_STABLE_AUDIO_CARGO_TARGET_DIR MATCHES "[/\\\\](stableaudio-rs|stableaudio-rs-target)$")
     set(BESPOKE_STABLE_AUDIO_CARGO_TARGET_DIR "${BESPOKE_STABLE_AUDIO_SHORT_TARGET_DIR}" CACHE PATH "Cargo target directory for stableaudio-rs" FORCE)
 endif()
 
@@ -842,7 +843,7 @@ if(BESPOKE_STABLE_AUDIO_GIT_REPOSITORY OR BESPOKE_STABLE_AUDIO_ROOT)
         set(BESPOKE_STABLE_AUDIO_SOURCE_DIR "${BESPOKE_STABLE_AUDIO_ROOT}")
         set(BESPOKE_STABLE_AUDIO_SOURCE_TARGET "")
     else()
-        set(BESPOKE_STABLE_AUDIO_SOURCE_DIR "${CMAKE_BINARY_DIR}/_deps/stableaudio-rs-src")
+        set(BESPOKE_STABLE_AUDIO_SOURCE_DIR "${BESPOKE_STABLE_AUDIO_SHORT_SOURCE_DIR}")
         ExternalProject_Add(stableaudio_rs_source
             GIT_REPOSITORY "${BESPOKE_STABLE_AUDIO_GIT_REPOSITORY}"
             GIT_TAG "${BESPOKE_STABLE_AUDIO_GIT_TAG}"
