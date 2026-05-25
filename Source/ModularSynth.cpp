@@ -2454,9 +2454,9 @@ void ModularSynth::AudioIn(const float* const* input, int bufferSize, int nChann
    int oversampling = UserPrefs.oversampling.Get();
 
    assert(bufferSize * oversampling == mIOBufferSize);
-   assert(nChannels == (int)mInputBuffers.size());
 
-   for (int i = 0; i < nChannels; ++i)
+   int channelsToProcess = MIN(nChannels, (int)mInputBuffers.size());
+   for (int i = 0; i < channelsToProcess; ++i)
    {
       if (oversampling == 1)
       {

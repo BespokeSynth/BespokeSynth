@@ -271,21 +271,8 @@ public:
          {
             ofLog() << "output: " << loadedSetup.outputDeviceName << "   input: " << loadedSetup.inputDeviceName;
 
-            int numInputChannels = 0;
-            int64 inputMask = loadedSetup.inputChannels.toInteger();
-            while (inputMask != 0)
-            {
-               ++numInputChannels;
-               inputMask >>= 1;
-            }
-
-            int numOutputChannels = 0;
-            int64 outputMask = loadedSetup.outputChannels.toInteger();
-            while (outputMask != 0)
-            {
-               ++numOutputChannels;
-               outputMask >>= 1;
-            }
+            int numInputChannels = loadedSetup.inputChannels.countNumberOfSetBits();
+            int numOutputChannels = loadedSetup.outputChannels.countNumberOfSetBits();
 
             mSynth.InitIOBuffers(numInputChannels, numOutputChannels);
 
