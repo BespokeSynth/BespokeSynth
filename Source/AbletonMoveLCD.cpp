@@ -147,56 +147,41 @@ void AbletonMoveLCD::DrawLCDText(const char* text, int x, int y, int style, int 
    draw_ssfn_text(text, x, y, style, fontSize);
 }
 
-void AbletonMoveLCD::DrawRect(int x, int y, int width, int height, bool filled)
+void AbletonMoveLCD::DrawRect(int x, int y, int width, int height, LCDDrawMode drawMode)
 {
    for (int penX = x; penX < x + width && penX >= 0 && penX < kMoveDisplayWidth; ++penX)
    {
       for (int penY = y; penY < y + height && penY >= 0 && penY < kMoveDisplayHeight; ++penY)
       {
-         if (filled || penX == x || penY == y || penX == x + width - 1 || penY == y + height - 1)
-            mPixels[(penX + penY * kMoveDisplayWidth) * 4] = 255;
+         if (IsFill(drawMode) || penX == x || penY == y || penX == x + width - 1 || penY == y + height - 1)
+            DrawPixel(penX, penY, drawMode);
       }
    }
 }
 
-void AbletonMoveLCD::DrawArrow(int pointX, int pointY, int arrowSize, bool left, bool fill)
+void AbletonMoveLCD::DrawArrow(int pointX, int pointY, int arrowSize, bool left, LCDDrawMode drawMode)
 {
    for (int arrowX = 0; arrowX < arrowSize; ++arrowX)
    {
       for (int arrowY = 0; arrowY < arrowSize; ++arrowY)
       {
-         if (arrowX == arrowY || (fill && arrowY < arrowX) || arrowX == arrowSize - 1)
+         if (arrowX == arrowY || (IsFill(drawMode) && arrowY < arrowX) || arrowX == arrowSize - 1)
          {
-            DrawPixel(pointX + arrowX * (left ? 1 : -1), pointY - arrowY);
-            DrawPixel(pointX + arrowX * (left ? 1 : -1), pointY + arrowY);
+            DrawPixel(pointX + arrowX * (left ? 1 : -1), pointY - arrowY, drawMode);
+            DrawPixel(pointX + arrowX * (left ? 1 : -1), pointY + arrowY, drawMode);
          }
       }
    }
 }
 
-void AbletonMoveLCD::ClearRect(int x, int y, int width, int height)
-{
-   for (int penX = x; penX < x + width && penX >= 0 && penX < kMoveDisplayWidth; ++penX)
-   {
-      for (int penY = y; penY < y + height && penY >= 0 && penY < kMoveDisplayHeight; ++penY)
-      {
-         mPixels[(penX + penY * kMoveDisplayWidth) * 4] = 0;
-      }
-   }
-}
-
-void AbletonMoveLCD::DrawPixel(int x, int y)
-{
-   if (x >= 0 && y >= 0 && x < kMoveDisplayWidth && y < kMoveDisplayHeight)
-      mPixels[(x + y * kMoveDisplayWidth) * 4] = 255;
-}
-
-void AbletonMoveLCD::TogglePixel(int x, int y)
+void AbletonMoveLCD::DrawPixel(int x, int y, LCDDrawMode drawMode)
 {
    if (x >= 0 && y >= 0 && x < kMoveDisplayWidth && y < kMoveDisplayHeight)
    {
-      if (mPixels[(x + y * kMoveDisplayWidth) * 4] > 0)
+      if (IsClear(drawMode))
          mPixels[(x + y * kMoveDisplayWidth) * 4] = 0;
+      else if (IsToggle(drawMode))
+         mPixels[(x + y * kMoveDisplayWidth) * 4] = mPixels[(x + y * kMoveDisplayWidth) * 4] > 0 ? 0 : 255;
       else
          mPixels[(x + y * kMoveDisplayWidth) * 4] = 255;
    }
@@ -212,4 +197,79 @@ uint8_t AbletonMoveLCD::GetPixel(int x, int y) const
 int AbletonMoveLCD::GetNumDisplayPixels() const
 {
    return kMoveDisplayWidth * kMoveDisplayHeight * 4;
+}
+
+void AbletonMoveLCD::DrawAudioBuffer(int x, int y, float width, float height, const float* buffer, float start, float end, float pos)
+{
+   static std::array<float, 10000> sAudioBufferMinValues;
+   static std::array<float, 10000> sAudioBufferMaxValues;
+
+   float length = end - 1 - start;
+
+   if (length > 0)
+   {
+      const float kStepSize = 1;
+      float samplesPerStep = length / abs(width) * kStepSize;
+      start = start - (int(start) % MAX(1, int(samplesPerStep)));
+
+      if (buffer && length > 0)
+      {
+         float step = width > 0 ? kStepSize : -kStepSize;
+         samplesPerStep = length / width * step;
+
+         float highestMagnitude = 0;
+         for (float i = 0; abs(i) < abs(width); i += step)
+         {
+            float max = -999;
+            float min = 999;
+            int position = i / width * length + start;
+
+            int j;
+            int inc = 1 + samplesPerStep / 100;
+            for (j = 0; j < samplesPerStep; j += inc)
+            {
+               int sampleIdx = position + j;
+               max = std::max(max, buffer[sampleIdx]);
+               min = std::min(min, buffer[sampleIdx]);
+            }
+
+            if (max > highestMagnitude)
+               highestMagnitude = max;
+            if (min < -highestMagnitude)
+               highestMagnitude = -min;
+
+            if (i < (int)sAudioBufferMinValues.size())
+            {
+               sAudioBufferMaxValues[i] = max;
+               sAudioBufferMinValues[i] = min;
+            }
+         }
+
+         float rescale = 1.0f;
+         if (highestMagnitude != 0.0)
+            rescale = std::clamp(1.0f / highestMagnitude, 1.0f, 10.0f);
+         for (float i = 0; abs(i) < abs(width); i += step)
+         {
+            float max = sAudioBufferMaxValues[i];
+            float min = sAudioBufferMinValues[i];
+
+            min *= height / 2 * rescale;
+            max *= height / 2 * rescale;
+
+            if (fabsf(max - min) < .1f) //always draw something even if max == min
+            {
+               max += .05f;
+               min -= .05f;
+            }
+
+            DrawRect(i + x, height / 2 - max + y, 1, max - min, LCDDrawMode::Toggle);
+         }
+
+         if (pos != -1)
+         {
+            int position = ofMap(pos, start, end, 0, width, true);
+            DrawRect(position + x, y, 1, height, LCDDrawMode::Toggle);
+         }
+      }
+   }
 }

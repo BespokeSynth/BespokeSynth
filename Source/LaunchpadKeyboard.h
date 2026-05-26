@@ -82,6 +82,7 @@ public:
 
    //IAbletonGridController
    bool OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
@@ -89,9 +90,9 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
 
-   virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
-   virtual void SetUpFromSaveData() override;
+   void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   void SaveLayout(ofxJSONElement& moduleInfo) override;
+   void SetUpFromSaveData() override;
 
    bool IsEnabled() const override { return mEnabled; }
 

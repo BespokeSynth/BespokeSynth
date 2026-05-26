@@ -232,12 +232,12 @@ void FloatSliderLFOControl::DrawToAbletonMoveScreen(AbletonMoveLCD* screen)
       if (lastY <= newY)
       {
          for (int y = lastY; y <= newY; ++y)
-            screen->TogglePixel(x, y);
+            screen->DrawPixel(x, y, LCDDrawMode::Toggle);
       }
       else
       {
          for (int y = lastY; y >= newY; --y)
-            screen->TogglePixel(x, y);
+            screen->DrawPixel(x, y, LCDDrawMode::Toggle);
       }
 
       lastY = newY;
@@ -250,7 +250,7 @@ void FloatSliderLFOControl::DrawToAbletonMoveScreen(AbletonMoveLCD* screen)
       GetCurrentPhaseDrawPosition(xNormalized, yNormalized);
 
       screen->DrawRect(ofLerp(0, AbletonMoveLCD::kMoveDisplayWidth, xNormalized),
-                       ofLerp(10, AbletonMoveLCD::kMoveDisplayHeight - 10, yNormalized), 3, 3, false);
+                       ofLerp(10, AbletonMoveLCD::kMoveDisplayHeight - 10, yNormalized), 3, 3, LCDDrawMode::Outline);
    }
 }
 

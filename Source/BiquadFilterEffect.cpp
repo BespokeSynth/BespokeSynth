@@ -156,7 +156,7 @@ void BiquadFilterEffect::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUICo
          float response = mBiquad[0].GetMagnitudeResponseAt(freq);
          float screenEnvelopeY = (.5f - .666f * log10(response)) * AbletonMoveLCD::kMoveDisplayHeight;
          for (int screenY = screenEnvelopeY; screenY < AbletonMoveLCD::kMoveDisplayHeight; ++screenY)
-            screen->TogglePixel(x, screenY);
+            screen->DrawPixel(x, screenY, LCDDrawMode::Toggle);
       }
    }
 }
