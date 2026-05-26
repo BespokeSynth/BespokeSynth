@@ -365,7 +365,7 @@ std::string ChordDatabase::NoteNameScaleRelative(int pitch, bool useDegrees) con
    }
 }
 
-std::string ChordDatabase::GetChordName(std::vector<int> pitches) const
+std::string ChordDatabase::GetChordName(std::vector<int> pitches, int requiredRoot /*=-1*/) const
 {
    int numPitches = (int)pitches.size();
    if (numPitches < 3)
@@ -381,6 +381,8 @@ std::string ChordDatabase::GetChordName(std::vector<int> pitches) const
          if (shape.mElements.size() == numPitches)
          {
             int root = pitches[(numPitches - inversion) % numPitches] - (inversion > 0 ? 12 : 0);
+            if (requiredRoot != -1 && root % 12 != requiredRoot % 12)
+               continue;
             bool match = true;
             for (int i = 0; i < numPitches; ++i)
             {

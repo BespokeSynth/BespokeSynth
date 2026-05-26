@@ -282,6 +282,7 @@
 #include "ZeroCrossRate.h"
 #include "SessionOrganizer.h"
 #include "AudioSyncer.h"
+#include "ChordKeyboard.h"
 
 #include <juce_core/juce_core.h>
 
@@ -519,6 +520,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(ZeroCrossRate, zerocrossrate, kModuleCategory_Modulator);
    REGISTER(SessionOrganizer, sessionorganizer, kModuleCategory_Other);
    REGISTER(AudioSyncer, audiosyncer, kModuleCategory_Audio);
+   REGISTER(ChordKeyboard, chordkeyboard, kModuleCategory_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

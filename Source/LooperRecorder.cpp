@@ -700,6 +700,7 @@ bool LooperRecorder::IsRecording() const
 //IInputRecordable
 void LooperRecorder::ClearRecording()
 {
+   SetRecording(0, false);
    ClearRecording(0);
 }
 

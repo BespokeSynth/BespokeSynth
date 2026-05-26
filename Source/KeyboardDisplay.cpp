@@ -56,7 +56,19 @@ void KeyboardDisplay::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   DrawKeyboard(0, kKeyboardYOffset, mWidth, mHeight - kKeyboardYOffset);
+   UpdateDrawOptions();
+   DrawKeyboard(0, kKeyboardYOffset, mDrawOptions, &mLastOnTime, &mLastOffTime);
+}
+
+void KeyboardDisplay::UpdateDrawOptions()
+{
+   mDrawOptions.mWidth = mWidth;
+   mDrawOptions.mHeight = mHeight - kKeyboardYOffset;
+   mDrawOptions.mNumOctaves = mNumOctaves;
+   mDrawOptions.mRootOctave = mRootOctave;
+   mDrawOptions.mHideLabels = mHideLabels;
+   mDrawOptions.mShowScale = mShowScale;
+   mDrawOptions.mEnabled = IsEnabled();
 }
 
 void KeyboardDisplay::PlayNote(NoteMessage note)
@@ -84,17 +96,21 @@ void KeyboardDisplay::OnClicked(float x, float y, bool right)
    if (IsHoveringOverResizeHandle() || !IsEnabled())
       return;
 
+   int numKeys = TheScale->GetPitchesPerOctave() * mNumOctaves + 1;
+   int rootKey = TheScale->GetPitchesPerOctave() * mRootOctave;
+   UpdateDrawOptions();
+
    double time = NextBufferTime(false);
    for (int pass = 0; pass < 2; ++pass)
    {
-      for (int i = 0; i < NumKeys(); ++i)
+      for (int i = 0; i < numKeys; ++i)
       {
          bool isBlackKey;
-         if (GetKeyboardKeyRect(i + RootKey(), mWidth, mHeight - kKeyboardYOffset, isBlackKey).contains(x, y - kKeyboardYOffset))
+         if (GetKeyboardKeyRect(i + rootKey, isBlackKey, mDrawOptions).contains(x, y - kKeyboardYOffset))
          {
             if ((pass == 0 && isBlackKey) || (pass == 1 && !isBlackKey))
             {
-               int pitch = i + RootKey();
+               int pitch = i + rootKey;
 
                float minVelocityY;
                float maxVelocityY;
@@ -145,19 +161,10 @@ void KeyboardDisplay::MouseReleased()
    }
 }
 
-int KeyboardDisplay::RootKey() const
+//static
+void KeyboardDisplay::SetPitchColor(int pitch, const KeyboardDrawOptions& options)
 {
-   return TheScale->GetPitchesPerOctave() * mRootOctave;
-}
-
-int KeyboardDisplay::NumKeys() const
-{
-   return TheScale->GetPitchesPerOctave() * mNumOctaves + 1;
-}
-
-void KeyboardDisplay::SetPitchColor(int pitch)
-{
-   if (mShowScale)
+   if (options.mShowScale)
    {
       if (TheScale->IsRoot(pitch))
          ofSetColor(0, 200, 0);
@@ -171,7 +178,7 @@ void KeyboardDisplay::SetPitchColor(int pitch)
    else
    {
       int enableOffset = 0;
-      if (!IsEnabled())
+      if (!options.mEnabled)
          enableOffset = 80;
 
       pitch %= 12;
@@ -215,24 +222,28 @@ void KeyboardDisplay::RefreshOctaveCount()
    }
 }
 
-void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
+//static
+void KeyboardDisplay::DrawKeyboard(int x, int y, const KeyboardDrawOptions& options, std::array<double, 128>* lastOnTimes, std::array<double, 128>* lastOffTimes)
 {
+   int numKeys = TheScale->GetPitchesPerOctave() * options.mNumOctaves + 1;
+   int rootKey = TheScale->GetPitchesPerOctave() * options.mRootOctave;
+
    ofPushStyle();
    ofPushMatrix();
    ofTranslate(x, y);
 
    for (int pass = 0; pass < 2; ++pass)
    {
-      for (int i = 0; i < NumKeys(); ++i)
+      for (int i = 0; i < numKeys; ++i)
       {
-         if (i + RootKey() > 127)
+         if (i + rootKey > 127)
             break;
          bool isBlackKey;
-         ofRectangle key = GetKeyboardKeyRect(i + RootKey(), w, h, isBlackKey);
+         ofRectangle key = GetKeyboardKeyRect(i + rootKey, isBlackKey, options);
 
          if ((pass == 0 && !isBlackKey) || (pass == 1 && isBlackKey))
          {
-            SetPitchColor(i);
+            SetPitchColor(i, options);
             ofFill();
             ofRect(key);
             ofSetColor(0, 0, 0);
@@ -242,15 +253,15 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
       }
    }
 
-   float keySpace = (float)w / ((float)NumKeys() - mNumOctaves * 5);
+   float keySpace = (float)options.mWidth / ((float)numKeys - options.mNumOctaves * 5);
 
-   int oct = mRootOctave;
-   if (keySpace > 16 && h > 34 && !mHideLabels)
+   int oct = options.mRootOctave;
+   if (keySpace > 16 && options.mHeight > 34 && !options.mHideLabels)
    {
-      for (int i = 0; i < NumKeys(); i += 7)
+      for (int i = 0; i < numKeys; i += 7)
       {
          ofSetColor(108, 37, 62, 255);
-         DrawTextNormal(NoteName(oct * 12, false, true), keySpace * 0.5f - 6.5f + i * keySpace, h - 8, 12);
+         DrawTextNormal(NoteName(oct * 12, false, true), keySpace * 0.5f - 6.5f + i * keySpace, options.mHeight - 8, 12);
          oct++;
       }
    }
@@ -258,16 +269,21 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
    ofPushStyle();
    ofFill();
    ofSetLineWidth(2);
-   for (int pitch = RootKey(); pitch < MIN(RootKey() + NumKeys(), mLastOnTime.size()); ++pitch)
+   if (lastOnTimes != nullptr && lastOffTimes != nullptr)
    {
-      if (gTime >= mLastOnTime[pitch] && (gTime <= mLastOffTime[pitch] || mLastOffTime[pitch] < mLastOnTime[pitch]))
+      std::array<double, 128>& _lastOnTimes = *lastOnTimes;
+      std::array<double, 128>& _lastOffTimes = *lastOffTimes;
+      for (int pitch = rootKey; pitch < MIN(rootKey + numKeys, _lastOnTimes.size()); ++pitch)
       {
-         bool isBlackKey;
-         ofRectangle key = GetKeyboardKeyRect(pitch, w, h, isBlackKey);
-         key.height /= 3;
-         key.y += key.height * 2;
-         ofSetColor(255, 255, 255, ofLerp(255, 150, ofClamp((gTime - mLastOnTime[pitch]) / 150.0f, 0, 1)));
-         ofRect(key);
+         if (gTime >= _lastOnTimes[pitch] && (gTime <= _lastOffTimes[pitch] || _lastOffTimes[pitch] < _lastOnTimes[pitch]))
+         {
+            bool isBlackKey;
+            ofRectangle key = GetKeyboardKeyRect(pitch, isBlackKey, options);
+            key.height /= 3;
+            key.y += key.height * 2;
+            ofSetColor(255, 255, 255, ofLerp(255, 150, ofClamp((gTime - _lastOnTimes[pitch]) / 150.0f, 0, 1)));
+            ofRect(key);
+         }
       }
    }
    ofPopStyle();
@@ -276,12 +292,14 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
    ofPopStyle();
 }
 
-ofRectangle KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const
+//static
+ofRectangle KeyboardDisplay::GetKeyboardKeyRect(int pitch, bool& isBlackKey, const KeyboardDrawOptions& options)
 {
-   float extraKeyWidth = w / (mNumOctaves * 7 + 1);
-   float octaveWidth = (w - extraKeyWidth) / mNumOctaves;
+   float extraKeyWidth = options.mWidth / (options.mNumOctaves * 7 + 1);
+   float octaveWidth = (options.mWidth - extraKeyWidth) / options.mNumOctaves;
+   int rootKey = TheScale->GetPitchesPerOctave() * options.mRootOctave;
 
-   pitch -= RootKey();
+   pitch -= rootKey;
 
    float offset = pitch / TheScale->GetPitchesPerOctave() * (octaveWidth);
    pitch %= 12;
@@ -290,13 +308,13 @@ ofRectangle KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& i
    {
       int whiteKey = (pitch + 1) / 2;
       isBlackKey = false;
-      return ofRectangle(offset + whiteKey * octaveWidth / 7, 0, octaveWidth / 7, h);
+      return ofRectangle(offset + whiteKey * octaveWidth / 7, 0, octaveWidth / 7, options.mHeight);
    }
    else //black key
    {
       int blackKey = pitch / 2;
       isBlackKey = true;
-      return ofRectangle(offset + blackKey * octaveWidth / 7 + octaveWidth / 16 + octaveWidth / 7 * .1f, 0, octaveWidth / 7 * .8f, h / 2);
+      return ofRectangle(offset + blackKey * octaveWidth / 7 + octaveWidth / 16 + octaveWidth / 7 * .1f, 0, octaveWidth / 7 * .8f, options.mHeight * .6f);
    }
 }
 
