@@ -1202,6 +1202,7 @@ bool Looper::IsRecording() const
 
 void Looper::ClearRecording()
 {
+   SetRecording(false);
    Clear();
 }
 

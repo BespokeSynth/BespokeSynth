@@ -116,6 +116,8 @@ target_sources(BespokeSynth PRIVATE
     ChordDisplayer.h
     ChordHolder.cpp
     ChordHolder.h
+    ChordKeyboard.cpp
+    ChordKeyboard.h
     Chorder.cpp
     Chorder.h
     CircleSequencer.cpp
