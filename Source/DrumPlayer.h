@@ -43,12 +43,13 @@
 #include "RollingBuffer.h"
 #include "GridController.h"
 #include "Push2Control.h"
+#include "NoteCanvas.h"
 
 #define NUM_DRUM_HITS 16
 
 class SamplePlayer;
 
-class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener, public ITimeListener, public IAbletonGridController
+class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener, public ITimeListener, public IAbletonGridController, public IPitchContextInterface
 {
 public:
    DrumPlayer();
@@ -93,6 +94,10 @@ public:
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
    bool HasPush2OverrideControls() const override { return mPush2SelectedHitIdx != -1; }
    void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const override;
+   bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass) override;
+
+   //IPitchContextInterface
+   void SetPitchContext(int pitch) override { mPush2SelectedHitIdx = pitch; }
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
@@ -241,6 +246,7 @@ private:
       void GrabSample();
       void StartPlayhead(double time, float startOffsetPercent, float velocity);
       void StopLinked(double time);
+      float GetPlaySampleIndex(double time);
       float GetPlayProgress(double time);
 
       Sample mSample;

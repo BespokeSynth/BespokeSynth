@@ -291,7 +291,6 @@ void DrumPlayer::Process(double time)
    if (!mLoadingSamples)
    {
       mLoadSamplesAudioMutex.lock();
-      mLoadingSamples = true;
       for (int i = 0; i < NUM_DRUM_HITS; ++i)
       {
          int individualOutputIndex = GetIndividualOutputIndex(i);
@@ -323,7 +322,6 @@ void DrumPlayer::Process(double time)
             }
          }
       }
-      mLoadingSamples = false;
       mLoadSamplesAudioMutex.unlock();
    }
 
@@ -367,7 +365,7 @@ void DrumPlayer::DrumHit::StopLinked(double time)
    }
 }
 
-float DrumPlayer::DrumHit::GetPlayProgress(double time)
+float DrumPlayer::DrumHit::GetPlaySampleIndex(double time)
 {
    int playheadIdx = -1;
    double startTime = -1;
@@ -381,8 +379,13 @@ float DrumPlayer::DrumHit::GetPlayProgress(double time)
    }
 
    if (startTime != -1 && mSample.Data() != nullptr)
-      return mPlayheads[playheadIdx].mOffset / mSample.LengthInSamples();
-   return 1;
+      return mPlayheads[playheadIdx].mOffset;
+   return mSample.LengthInSamples();
+}
+
+float DrumPlayer::DrumHit::GetPlayProgress(double time)
+{
+   return GetPlaySampleIndex(time) / mSample.LengthInSamples();
 }
 
 bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBuffer* out, int bufferSize)
@@ -617,6 +620,36 @@ void DrumPlayer::GetPush2OverrideControls(std::vector<IUIControl*>& controls) co
       controls.push_back(mDrumHits[i].mHitCategoryDropdown);
       controls.push_back(mDrumHits[i].mStartOffsetSlider);
    }
+}
+
+bool DrumPlayer::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass)
+{
+   if (mPush2SelectedHitIdx < 0 || mPush2SelectedHitIdx >= (int)mDrumHits.size())
+      return false;
+
+   if (drawPass == LCDDrawPass::Overlay)
+   {
+      if (!mLoadingSamples)
+      {
+         mLoadSamplesDrawMutex.lock();
+
+         DrumHit& drumHit = mDrumHits[mPush2SelectedHitIdx];
+         Sample& sample = drumHit.mSample;
+         float displayLength = sample.LengthInSamples();
+         if (drumHit.mUseEnvelope)
+            displayLength = MIN((drumHit.mEnvelope.GetA() + drumHit.mEnvelope.GetR()) * gSampleRateMs, displayLength);
+         lcd->DrawAudioBuffer(0, 0, AbletonMoveLCD::kMoveDisplayWidth, AbletonMoveLCD::kMoveDisplayHeight, sample.Data()->GetChannel(0), drumHit.mStartOffset * displayLength, displayLength, drumHit.GetPlaySampleIndex(gTime));
+
+         lcd->DrawRect(1, 2, AbletonMoveLCD::kMoveDisplayWidth - 2, 13, LCDDrawMode::Clear);
+         lcd->DrawLCDText(drumHit.mSample.Name().c_str(), 4, 12, LCDFONT_STYLE_REGULAR);
+
+         mLoadSamplesDrawMutex.unlock();
+      }
+
+      return true;
+   }
+
+   return false;
 }
 
 void DrumPlayer::FilesDropped(std::vector<std::string> files, int x, int y)
@@ -908,7 +941,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
    if (!mOwner->mLoadingSamples)
    {
       mOwner->mLoadSamplesDrawMutex.lock();
-      DrawAudioBuffer(135, 100, mSample.Data(), mStartOffset * displayLength, displayLength, mSample.GetPlayPosition());
+      DrawAudioBuffer(135, 100, mSample.Data(), mStartOffset * displayLength, displayLength, GetPlaySampleIndex(gTime));
       mOwner->mLoadSamplesDrawMutex.unlock();
    }
    ofPopMatrix();

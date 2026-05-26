@@ -43,6 +43,16 @@
 #define LCDFONT_STYLE_ABS_SIZE 4096 /* scale absoulte height */
 #define LCDFONT_STYLE_NOSMOOTH 8192 /* no edge-smoothing for bitmaps */
 
+enum class LCDDrawMode
+{
+   Fill,
+   Toggle,
+   Clear,
+   Outline,
+   OutlineClear,
+   OutlineToggle,
+};
+
 class AbletonMoveLCD
 {
 public:
@@ -52,11 +62,10 @@ public:
    void Init();
    void Clear();
    void DrawLCDText(const char* text, int x, int y, int style = LCDFONT_STYLE_REGULAR, int fontSize = 12);
-   void DrawRect(int x, int y, int width, int height, bool filled);
-   void DrawArrow(int pointX, int pointY, int arrowSize, bool left, bool fill);
-   void ClearRect(int x, int y, int width, int height);
-   void DrawPixel(int x, int y);
-   void TogglePixel(int x, int y);
+   void DrawRect(int x, int y, int width, int height, LCDDrawMode drawMode);
+   void DrawArrow(int pointX, int pointY, int arrowSize, bool left, LCDDrawMode drawMode);
+   void DrawPixel(int x, int y, LCDDrawMode drawMode);
+   void DrawAudioBuffer(int x, int y, float width, float height, const float* buffer, float start, float end, float pos);
 
    uint8_t* GetPixels() const { return mPixels; }
    uint8_t GetPixel(int x, int y) const;
@@ -67,5 +76,9 @@ public:
    static constexpr int kTextLineSpacing = 8;
 
 private:
+   static bool IsFill(LCDDrawMode drawMode) { return drawMode == LCDDrawMode::Fill || drawMode == LCDDrawMode::Toggle || drawMode == LCDDrawMode::Clear; }
+   static bool IsClear(LCDDrawMode drawMode) { return drawMode == LCDDrawMode::Clear || drawMode == LCDDrawMode::OutlineClear; }
+   static bool IsToggle(LCDDrawMode drawMode) { return drawMode == LCDDrawMode::Toggle || drawMode == LCDDrawMode::OutlineToggle; }
+
    uint8_t* mPixels{ nullptr };
 };

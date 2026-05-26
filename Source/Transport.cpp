@@ -774,6 +774,17 @@ bool Transport::OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid
             if (x == 3) //shift forward 1 measure
                SetMeasureTime(GetMeasureTime(gTime) + 1.0f);
          }
+
+         if (x >= 5 && y <= 1)
+         {
+            float increment = 1;
+            for (int i = 5; i < x; ++i)
+               increment *= .1f;
+            if (y == 1)
+               increment *= -1;
+            mTempo += increment;
+            abletonGrid->DisplayScreenMessage("tempo: " + ofToString(mTempo, 2));
+         }
       }
 
       return true;
@@ -814,6 +825,10 @@ void Transport::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
             if (x == 2 || x == 3)
                pushColor = AbletonDevice::kColorOrange;
          }
+         if (x >= 5 && y == 0)
+            pushColor = AbletonDevice::kColorMintGreen;
+         if (x >= 5 && y == 1)
+            pushColor = AbletonDevice::kColorDarkRed;
 
          abletonGrid->SetLed(x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex(), pushColor);
       }

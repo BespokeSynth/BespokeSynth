@@ -141,6 +141,8 @@ private:
    void ShowSoundSelector();
    void StartControlRecorder(int controlIndex);
    void DrawKnobDisplay(int controlIndex);
+   bool IsRandomizeChordHeld() const;
+   IDrawableModule* GetCurrentControlModule() const;
 
    void OnMidiNote_Consume(MidiNote& note);
    void OnMidiControl_Consume(MidiControl& control);
