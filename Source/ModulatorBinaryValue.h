@@ -105,7 +105,7 @@ private:
          }
          return ones;
       }
-      bool operator<(const Permutation& other)
+      bool operator<(const Permutation& other) const
       {
          int ones_this = ones();
          int ones_other = other.ones();
