@@ -162,6 +162,8 @@ target_sources(BespokeSynth PRIVATE
     DelayEffect.h
     DistortionEffect.cpp
     DistortionEffect.h
+    DJFilterEffect.cpp
+    DJFilterEffect.h
     DopplerShift.cpp
     DopplerShift.h
     DotGrid.cpp

@@ -45,11 +45,13 @@
 #include "PitchShiftEffect.h"
 #include "ButterworthFilterEffect.h"
 #include "GainStageEffect.h"
+#include "DJFilterEffect.h"
 
 EffectFactory::EffectFactory()
 {
    Register("bitcrush", &(BitcrushEffect::Create));
    Register("delay", &(DelayEffect::Create));
+   Register("djfilter", &(DJFilterEffect::Create));
    Register("biquad", &(BiquadFilterEffect::Create));
    Register("distortion", &(DistortionEffect::Create));
    //Register("stutter", &(Stutter::Create));   stutter is now a standalone module as StutterControl
