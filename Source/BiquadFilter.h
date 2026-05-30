@@ -64,7 +64,7 @@ public:
    void CopyCoeffFrom(BiquadFilter& other);
    bool UsesGain() { return mType == kFilterType_Peak || mType == kFilterType_HighShelf || mType == kFilterType_LowShelf; }
    bool UsesQ() { return true; } // return mType == kFilterType_Lowpass || mType == kFilterType_Highpass || mType == kFilterType_Bandpass || mType == kFilterType_Notch || mType == kFilterType_Peak; }
-   float GetMagnitudeResponseAt(float f);
+   float GetMagnitudeResponseAt(float f) const;
 
    float Filter(float sample);
    void Filter(float* buffer, int bufferSize);

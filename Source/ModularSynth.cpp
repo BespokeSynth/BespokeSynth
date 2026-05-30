@@ -701,7 +701,7 @@ void ModularSynth::Draw()
    {
       ofSetColor(255, 255, 255, (1 - (gTime - mLastClapboardTime) / 100) * 255);
       ofFill();
-      ofRect(0, 0, ofGetWidth(), ofGetHeight());
+      ofRect(0, 0, ofGetWidth() / gDrawScale, ofGetHeight() / gDrawScale);
    }
 
    ofPopMatrix();
@@ -2406,7 +2406,7 @@ void ModularSynth::AudioOut(float* const* output, int bufferSize, int nChannels)
             for (int i = 0; i < bufferSize; ++i)
             {
                float sample = sin(GetPhaseInc(440) * i) * (1 - ((gTime - mLastClapboardTime) / 100));
-               output[ch][i] = sample;
+               mOutputBuffers[ch][i] = sample;
             }
          }
       }
