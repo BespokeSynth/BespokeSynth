@@ -710,6 +710,13 @@ void LooperRecorder::CancelRecording()
    CancelRecording(0);
 }
 
+//IInputRecordable
+void LooperRecorder::DoRetroactiveRecord(int numBars)
+{
+   SetNumBars(numBars);
+   Commit(GetNextCommitTarget());
+}
+
 int LooperRecorder::GetLooperIndex(const Looper* looper) const
 {
    for (int i = 0; i < (int)mLoopers.size(); ++i)

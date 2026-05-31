@@ -127,6 +127,14 @@
    UIBLOCK_SHIFTDOWN();                                             \
    UIBLOCK_UPDATEEXTENTS();
 
+#define RADIOBUTTON(radioButton, name, var, width, rows)       \
+   radioButton = new RadioButton(UICONTROL_BASICS(name), var); \
+   radioButton->SetForcedWidth(width);                         \
+   lastUIControl = radioButton;                                \
+   UIBLOCK_SHIFTDOWN();                                        \
+   UIBLOCK_SHIFTY((rows - 1) * 15);                            \
+   UIBLOCK_UPDATEEXTENTS();
+
 #define BUTTON(button, name)                         \
    button = new ClickButton(UICONTROL_BASICS(name)); \
    lastUIControl = button;                           \

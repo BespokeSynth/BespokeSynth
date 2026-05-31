@@ -986,14 +986,14 @@ void AbletonMoveControl::UpdateLeds()
          auto* recorder = activeTrackRow != nullptr ? activeTrackRow->GetRecorder() : nullptr;
          if (recorder)
          {
-            LooperRecorder* looperRecorder = dynamic_cast<LooperRecorder*>(recorder);
-            if (looperRecorder == nullptr)
+            IInputRecordable* retroactiveRecorder = recorder->IsInRetroactiveRecorderMode() ? recorder : nullptr;
+            if (retroactiveRecorder == nullptr)
             {
                Looper* looper = dynamic_cast<Looper*>(recorder);
                if (looper != nullptr)
-                  looperRecorder = looper->GetRecorder();
+                  retroactiveRecorder = looper->GetRecorder();
             }
-            if (looperRecorder != nullptr)
+            if (retroactiveRecorder != nullptr && recorder->IsInRetroactiveRecorderMode())
             {
                if (i < 5)
                {
@@ -1896,11 +1896,14 @@ void AbletonMoveControl::OnMidiNote_Consume(MidiNote& note)
                auto* recorder = activeTrackRow != nullptr ? activeTrackRow->GetRecorder() : nullptr;
                if (recorder)
                {
-                  LooperRecorder* looperRecorder = dynamic_cast<LooperRecorder*>(recorder);
+                  IInputRecordable* retroactiveRecorder = recorder->IsInRetroactiveRecorderMode() ? recorder : nullptr;
                   Looper* looper = dynamic_cast<Looper*>(recorder);
-                  if (looperRecorder == nullptr && looper != nullptr)
-                     looperRecorder = looper->GetRecorder();
-                  if (looperRecorder != nullptr)
+                  if (retroactiveRecorder == nullptr)
+                  {
+                     if (looper != nullptr)
+                        retroactiveRecorder = looper->GetRecorder();
+                  }
+                  if (retroactiveRecorder != nullptr && recorder->IsInRetroactiveRecorderMode())
                   {
                      int buttonIndex = note.mPitch - kStepButtonSection;
                      if (buttonIndex < 5)
@@ -1917,11 +1920,18 @@ void AbletonMoveControl::OnMidiNote_Consume(MidiNote& note)
                         else
                            numBars = 1;
 
-                        looperRecorder->SetNumBars(numBars);
                         if (looper)
-                           looperRecorder->Commit(looper);
+                        {
+                           if (LooperRecorder* looperRecorder = looper->GetRecorder())
+                           {
+                              looperRecorder->SetNumBars(numBars);
+                              looperRecorder->Commit(looper);
+                           }
+                        }
                         else
-                           looperRecorder->Commit(looperRecorder->GetNextCommitTarget());
+                        {
+                           retroactiveRecorder->DoRetroactiveRecord(numBars);
+                        }
                      }
                   }
                }
