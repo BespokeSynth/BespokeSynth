@@ -332,7 +332,7 @@ void SessionOrganizer::TrackColumn::Poll(SessionOrganizer* sessionOrganizer, int
          for (int i = 0; i < (int)cableSources.size(); ++i)
          {
             PatchCableSource* cableSource = cableSources[i];
-            cableSource->SetManualPosition(position.x + kColumnWidth / 2 - 10 + i * 20 + offset.x, position.y + kColumnHeight + offset.y);
+            cableSource->SetManualPosition(position.x + kColumnWidth / 2 - 10 + i * 20 + offset.x, position.y + kColumnHeight + offset.y + kPaddingBottom);
          }
 
          mSendSlider->SetDimensions(kColumnWidth - 10, 15);
@@ -355,7 +355,7 @@ void SessionOrganizer::TrackColumn::Poll(SessionOrganizer* sessionOrganizer, int
          else
          {
             ofVec2f offset = sessionOrganizer->GetPosition() - gain->GetPosition();
-            gain->GetPatchCableSource()->SetManualPosition(position.x + kColumnWidth / 2 + offset.x, position.y + kColumnHeight + offset.y);
+            gain->GetPatchCableSource()->SetManualPosition(position.x + kColumnWidth / 2 + offset.x, position.y + kColumnHeight + offset.y + kPaddingBottom);
          }
 
          mGainSlider->SetDimensions(kColumnWidth - 10, 15);

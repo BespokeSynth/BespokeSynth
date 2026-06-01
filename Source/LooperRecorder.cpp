@@ -700,6 +700,7 @@ bool LooperRecorder::IsRecording() const
 //IInputRecordable
 void LooperRecorder::ClearRecording()
 {
+   SetRecording(0, false);
    ClearRecording(0);
 }
 
@@ -707,6 +708,13 @@ void LooperRecorder::ClearRecording()
 void LooperRecorder::CancelRecording()
 {
    CancelRecording(0);
+}
+
+//IInputRecordable
+void LooperRecorder::DoRetroactiveRecord(int numBars)
+{
+   SetNumBars(numBars);
+   Commit(GetNextCommitTarget());
 }
 
 int LooperRecorder::GetLooperIndex(const Looper* looper) const

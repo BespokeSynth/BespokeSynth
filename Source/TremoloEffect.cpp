@@ -80,7 +80,7 @@ void TremoloEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 
    ComputeSliders(0);
 
-   if (mAmount > 0)
+   if (mAmount > 0 && mDuty < 1.0f)
    {
       for (int i = 0; i < bufferSize; ++i)
       {

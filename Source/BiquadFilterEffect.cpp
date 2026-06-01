@@ -156,7 +156,7 @@ void BiquadFilterEffect::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUICo
          float response = mBiquad[0].GetMagnitudeResponseAt(freq);
          float screenEnvelopeY = (.5f - .666f * log10(response)) * AbletonMoveLCD::kMoveDisplayHeight;
          for (int screenY = screenEnvelopeY; screenY < AbletonMoveLCD::kMoveDisplayHeight; ++screenY)
-            screen->TogglePixel(x, screenY);
+            screen->DrawPixel(x, screenY, LCDDrawMode::Toggle);
       }
    }
 }
@@ -195,6 +195,8 @@ void BiquadFilterEffect::ResetFilter()
    if (mBiquad[0].mType == kFilterType_Highpass)
       mBiquad[0].SetFilterParams(mFSlider->GetMin(), sqrt(2) / 2);
 
+   mBiquad[0].UpdateFilterCoeff();
+
    for (int ch = 1; ch < ChannelBuffer::kMaxNumChannels; ++ch)
       mBiquad[ch].CopyCoeffFrom(mBiquad[0]);
 
@@ -209,13 +211,9 @@ void BiquadFilterEffect::RadioButtonUpdated(RadioButton* list, int oldVal, doubl
 {
    if (list == mTypeSelector)
    {
-      if (mBiquad[0].mType == kFilterType_Lowpass)
-         mBiquad[0].SetFilterParams(mFSlider->GetMax(), sqrt(2) / 2);
-      if (mBiquad[0].mType == kFilterType_Highpass)
-         mBiquad[0].SetFilterParams(mFSlider->GetMin(), sqrt(2) / 2);
+      ResetFilter();
       mQSlider->SetShowing(mBiquad[0].UsesQ());
       mGSlider->SetShowing(mBiquad[0].UsesGain());
-      mCoefficientsHaveChanged = true;
    }
 }
 

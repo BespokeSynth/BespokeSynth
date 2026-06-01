@@ -422,6 +422,11 @@ bool LaunchpadKeyboard::OnAbletonGridControl_InputThread(IAbletonGridDevice* abl
       return true;
    }
 
+   return false;
+}
+
+bool LaunchpadKeyboard::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
+{
    if (controlIndex == AbletonDevice::kOctaveUpButton)
    {
       if (midiValue > 0)

@@ -197,7 +197,6 @@ void Rewriter::Go(double time)
       AudioSend* connectedSend = dynamic_cast<AudioSend*>(mConnectedLooper->GetTarget());
       if (connectedSend)
          connectedSend->SetSend(1, true);
-      TheSynth->ArrangeAudioSourceDependencies();
    }
 }
 

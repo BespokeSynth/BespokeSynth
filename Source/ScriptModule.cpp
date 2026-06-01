@@ -976,6 +976,9 @@ void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float 
 
 void ScriptModule::ButtonClicked(ClickButton* button, double time)
 {
+   if (!IsMainThread())
+      return;
+
    if (button == mPythonInstalledConfirmButton)
       InitializePythonIfNecessary();
 

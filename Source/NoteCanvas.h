@@ -43,6 +43,12 @@ class CanvasControls;
 class CanvasTimeline;
 class CanvasScrollbar;
 
+class IPitchContextInterface
+{
+public:
+   virtual void SetPitchContext(int pitch) = 0;
+};
+
 class NoteCanvas : public IDrawableModule, public INoteSource, public ICanvasListener, public IFloatSliderListener, public IAudioPoller, public IIntSliderListener, public INoteReceiver, public IButtonListener, public IDropdownListener, public ITextEntryListener, public IAbletonGridController, public IInputRecordable
 {
 public:
@@ -61,6 +67,8 @@ public:
    void Resize(float w, float h) override;
    void KeyPressed(int key, bool isRepeat) override;
    void DumpDebugData(std::string input, juce::FileOutputStream& out) override;
+   bool HasPush2OverrideControls() const override;
+   void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const override;
 
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
@@ -82,11 +90,16 @@ public:
    bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
    bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass) override;
+   bool IsInAbletonGridFocusMode() const override { return mEditCurrentPitchContext != -1 && mPitchContextInterface != nullptr; }
 
    //IInputRecordable
    void SetRecording(bool record) override;
    bool IsRecording() const override { return mRecord; }
-   void ClearRecording() override { Clear(NextBufferTime(false)); }
+   void ClearRecording() override
+   {
+      SetRecording(false);
+      Clear(NextBufferTime(false));
+   }
    void CancelRecording() override { SetRecording(false); }
    float GetRecordingLengthMeasures() const override { return mNumMeasures; }
 
@@ -154,6 +167,7 @@ private:
    bool mShowIntervals{ false };
    Checkbox* mShowIntervalsCheckbox{ nullptr };
    LaunchpadKeyboard* mGridKeyboardInterface{ nullptr };
+   IPitchContextInterface* mPitchContextInterface{ nullptr };
 
    int mEditMeasureOffset{ 0 };
    float mEditMeasureOffsetSlider{ 0.0f };
