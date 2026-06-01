@@ -49,7 +49,6 @@ void TapeLooper::CreateUIControls()
    FLOATSLIDER(mLoopBeatsAgoSlider, "loop beats ago", &mLoopBeatsAgo, 0, 4 * 16);
    FLOATSLIDER(mDownbeatOffsetBeatsSlider, "downbeat offset", &mDownbeatOffsetBeats, 0, 4 * 16);
    UIBLOCK_NEWCOLUMN();
-   CHECKBOX(mRecordCheckbox, "record", &mRecording);
    BUTTON(mLoop1BarButton, "loop 1 bar");
    BUTTON(mLoop2BarsButton, "loop 2 bars");
    BUTTON(mLoop4BarsButton, "loop 4 bars");
@@ -211,7 +210,6 @@ void TapeLooper::DrawModule()
    mLoopLengthBeatsSlider->Draw();
    mLoopBeatsAgoSlider->Draw();
    mDownbeatOffsetBeatsSlider->Draw();
-   mRecordCheckbox->Draw();
    mLoop1BarButton->Draw();
    mLoop2BarsButton->Draw();
    mLoop4BarsButton->Draw();
@@ -226,14 +224,12 @@ void TapeLooper::StartLoop(int numBars)
    mLoopBeatsAgo = 0;
    mDownbeatOffsetBeats = 0;
    mState = TapeLooperState::Loop;
-   mRecording = false;
 }
 
 void TapeLooper::SetRecording(bool record)
 {
    if (record)
    {
-      mRecording = true;
       mState = TapeLooperState::Capture;
       mStartRecordingMeasureTime = TheTransport->GetMeasureTime(gTime);
    }
@@ -247,7 +243,6 @@ void TapeLooper::SetRecording(bool record)
          else
             mState = TapeLooperState::Capture;
          mStartRecordingMeasureTime = -1;
-         mRecording = false;
       }
    }
 }
@@ -256,12 +251,6 @@ void TapeLooper::DoRetroactiveRecord(int numBars)
 {
    mLoopLengthBeats = numBars * TheTransport->GetTimeSigTop();
    mState = TapeLooperState::Loop;
-}
-
-void TapeLooper::CheckboxUpdated(Checkbox* checkbox, double time)
-{
-   if (checkbox == mRecordCheckbox)
-      SetRecording(mRecording);
 }
 
 void TapeLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)

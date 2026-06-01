@@ -60,16 +60,15 @@ public:
 
    //IInputRecordable
    void SetRecording(bool record) override;
-   bool IsRecording() const override { return mRecording; }
+   bool IsRecording() const override { return mState == TapeLooperState::Capture; }
    void ClearRecording() override { mState = TapeLooperState::Capture; }
    void CancelRecording() override { mState = TapeLooperState::Capture; }
    bool IsInRetroactiveRecorderMode() const override { return true; }
    void DoRetroactiveRecord(int numBars) override;
 
-   void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
-   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override { }
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override { }
    void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -98,8 +97,6 @@ private:
    float mLoopBeatsAgo{ 0.0f };
    FloatSlider* mDownbeatOffsetBeatsSlider{ nullptr };
    float mDownbeatOffsetBeats{ 0.0f };
-   Checkbox* mRecordCheckbox{ nullptr };
-   bool mRecording{ false };
    ClickButton* mLoop1BarButton{ nullptr };
    ClickButton* mLoop2BarsButton{ nullptr };
    ClickButton* mLoop4BarsButton{ nullptr };
