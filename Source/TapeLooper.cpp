@@ -82,7 +82,16 @@ void TapeLooper::Process(double time)
 
    ChannelBuffer* out = target->GetBuffer();
 
-   if (mState == TapeLooperState::Capture)
+   if (!mEnabled)
+   {
+      // passthrough
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+      }
+   }
+   else if (mState == TapeLooperState::Capture)
    {
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
