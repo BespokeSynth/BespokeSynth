@@ -107,6 +107,8 @@ private:
    ClickButton* mLoop16BarsButton{ nullptr };
    float mLatencyFixMs{ 0.0f };
    FloatSlider* mLatencyFixMsSlider{ nullptr };
+   bool mPassthrough{ true };
+   Checkbox* mPassthroughCheckbox{ nullptr };
 
    double mLastCaptureMeasureTime{ 0.0 };
    double mStartRecordingMeasureTime{ -1 };

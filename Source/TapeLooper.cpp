@@ -49,12 +49,15 @@ void TapeLooper::CreateUIControls()
    FLOATSLIDER(mLoopBeatsAgoSlider, "loop beats ago", &mLoopBeatsAgo, 0, 4 * 16);
    FLOATSLIDER(mDownbeatOffsetBeatsSlider, "downbeat offset", &mDownbeatOffsetBeats, 0, 4 * 16);
    UIBLOCK_NEWCOLUMN();
+   UIBLOCK_POPSLIDERWIDTH();
    CHECKBOX(mRecordCheckbox, "record", &mRecording);
+   CHECKBOX(mPassthroughCheckbox, "passthrough", &mPassthrough);
    BUTTON(mLoop1BarButton, "loop 1 bar");
    BUTTON(mLoop2BarsButton, "loop 2 bars");
    BUTTON(mLoop4BarsButton, "loop 4 bars");
    BUTTON(mLoop8BarsButton, "loop 8 bars");
    BUTTON(mLoop16BarsButton, "loop 16 bars");
+   UIBLOCK_NEWCOLUMN();
    FLOATSLIDER(mLatencyFixMsSlider, "latency fix ms", &mLatencyFixMs, 0, 200);
    ENDUIBLOCK0();
 
@@ -82,44 +85,55 @@ void TapeLooper::Process(double time)
 
    ChannelBuffer* out = target->GetBuffer();
 
-   if (mState == TapeLooperState::Capture)
+   bool passthrough = (mPassthrough || !mEnabled) && mState != TapeLooperState::Loop;
+   bool hasWrittenOutput = false;
+
+   if (mEnabled)
+   {
+      if (mState == TapeLooperState::Capture)
+      {
+         for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+            mRecordBuffer.WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
+      }
+      else if (mState == TapeLooperState::Loop)
+      {
+         double loopTime = time;
+         for (int i = 0; i < bufferSize; ++i)
+         {
+            int samplesAgo = GetPlaybackSamplesAgo(loopTime);
+            if (samplesAgo != mLastPlayedSamplesAgo - 1) //playhead jumped
+               mLoopWrapSmoother.StartSwitch();
+            if (samplesAgo == mLastPlayedSamplesAgo)
+               ofLog() << "tapelooper: huh? repeating a sample";
+            for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+            {
+               float sample = 0;
+               if (samplesAgo < mRecordBuffer.Size())
+                  sample = mLoopWrapSmoother.Process(ch, mRecordBuffer.GetSample(samplesAgo, ch));
+               out->GetChannel(ch)[i] += sample;
+               GetVizBuffer()->Write(sample, ch);
+            }
+            mLastPlayedSamplesAgo = samplesAgo;
+            loopTime += gInvSampleRateMs;
+         }
+         hasWrittenOutput = true;
+      }
+   }
+
+   if (passthrough)
    {
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
-         mRecordBuffer.WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
          Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }
+      hasWrittenOutput = true;
    }
-   else if (mState == TapeLooperState::Stop)
+
+   if (!hasWrittenOutput)
    {
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
-      {
-         Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
          GetVizBuffer()->WriteChunk(gZeroBuffer, GetBuffer()->BufferSize(), ch);
-      }
-   }
-   else if (mState == TapeLooperState::Loop)
-   {
-      double loopTime = time;
-      for (int i = 0; i < bufferSize; ++i)
-      {
-         int samplesAgo = GetPlaybackSamplesAgo(loopTime);
-         if (samplesAgo != mLastPlayedSamplesAgo - 1) //playhead jumped
-            mLoopWrapSmoother.StartSwitch();
-         if (samplesAgo == mLastPlayedSamplesAgo)
-            ofLog() << "tapelooper: huh? repeating a sample";
-         for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
-         {
-            float sample = 0;
-            if (samplesAgo < mRecordBuffer.Size())
-               sample = mLoopWrapSmoother.Process(ch, mRecordBuffer.GetSample(samplesAgo, ch));
-            out->GetChannel(ch)[i] += sample;
-            GetVizBuffer()->Write(sample, ch);
-         }
-         mLastPlayedSamplesAgo = samplesAgo;
-         loopTime += gInvSampleRateMs;
-      }
    }
 
    if (mState == TapeLooperState::Capture)
@@ -150,58 +164,61 @@ void TapeLooper::DrawModule()
    int displaySamples = MIN(mDisplayLengthSeconds * gSampleRate, mRecordBuffer.Size());
    mRecordBuffer.Draw(0, 0, bufferWidth, bufferHeight, displaySamples);
 
-   float lastRecordedMeasurePos = fmod(mLastCaptureMeasureTime, 1.0f);
-   float displayLengthMs = displaySamples / gSampleRateMs;
-   int beatsPerBar = TheTransport->GetTimeSigTop();
-   float msPerBeat = TheTransport->MsPerBar() / beatsPerBar;
-   int numDisplayBeats = int(displayLengthMs / msPerBeat) + 1;
-   int beat = int(lastRecordedMeasurePos * beatsPerBar);
-   float beatProgress = lastRecordedMeasurePos * beatsPerBar - beat;
-   int displayBeat = beat;
-   for (int i = 0; i < numDisplayBeats; ++i)
+   if (mEnabled)
    {
-      float msSinceBeat = (i + beatProgress) * msPerBeat;
-      float x = bufferWidth - (msSinceBeat / displayLengthMs) * bufferWidth;
+      float lastRecordedMeasurePos = fmod(mLastCaptureMeasureTime, 1.0f);
+      float displayLengthMs = displaySamples / gSampleRateMs;
+      int beatsPerBar = TheTransport->GetTimeSigTop();
+      float msPerBeat = TheTransport->MsPerBar() / beatsPerBar;
+      int numDisplayBeats = int(displayLengthMs / msPerBeat) + 1;
+      int beat = int(lastRecordedMeasurePos * beatsPerBar);
+      float beatProgress = lastRecordedMeasurePos * beatsPerBar - beat;
+      int displayBeat = beat;
+      for (int i = 0; i < numDisplayBeats; ++i)
+      {
+         float msSinceBeat = (i + beatProgress) * msPerBeat;
+         float x = bufferWidth - (msSinceBeat / displayLengthMs) * bufferWidth;
 
-      float alpha = 150;
-      if (msSinceBeat > displayLengthMs * .75f)
-         alpha *= ofMap(msSinceBeat, displayLengthMs * .75f, displayLengthMs * .9f, 1, 0, true);
+         float alpha = 150;
+         if (msSinceBeat > displayLengthMs * .75f)
+            alpha *= ofMap(msSinceBeat, displayLengthMs * .75f, displayLengthMs * .9f, 1, 0, true);
 
-      if (displayBeat == 0)
-         ofSetColor(255, 255, 0, alpha);
-      else
-         ofSetColor(255, 255, 255, alpha);
+         if (displayBeat == 0)
+            ofSetColor(255, 255, 0, alpha);
+         else
+            ofSetColor(255, 255, 255, alpha);
 
-      ofLine(x, 0, x, bufferHeight / 3);
-      ofLine(x, 0 + bufferHeight * 2 / 3, x, bufferHeight);
+         ofLine(x, 0, x, bufferHeight / 3);
+         ofLine(x, 0 + bufferHeight * 2 / 3, x, bufferHeight);
 
-      --displayBeat;
-      if (displayBeat < 0)
-         displayBeat += beatsPerBar;
-   }
+         --displayBeat;
+         if (displayBeat < 0)
+            displayBeat += beatsPerBar;
+      }
 
-   ofSetColor(255, 255, 255, 50);
-   ofFill();
+      ofSetColor(255, 255, 255, 50);
+      ofFill();
 
-   float loopNumMeasures = float(mLoopLengthBeats) / TheTransport->GetTimeSigTop();
-   float loopMeasuresAgo = float(mLoopBeatsAgo) / TheTransport->GetTimeSigTop();
-   float downbeatMeasureOffset = mDownbeatOffsetBeats / TheTransport->GetTimeSigTop() + fmod(1 - fmod(loopMeasuresAgo, 1.0f), 1.0f);
+      float loopNumMeasures = float(mLoopLengthBeats) / TheTransport->GetTimeSigTop();
+      float loopMeasuresAgo = float(mLoopBeatsAgo) / TheTransport->GetTimeSigTop();
+      float downbeatMeasureOffset = mDownbeatOffsetBeats / TheTransport->GetTimeSigTop() + fmod(1 - fmod(loopMeasuresAgo, 1.0f), 1.0f);
 
-   float msSinceLoopStart = (loopNumMeasures + loopMeasuresAgo) * TheTransport->MsPerBar();
-   float loopStartX = bufferWidth - (msSinceLoopStart / displayLengthMs) * bufferWidth;
-   float loopWidth = (TheTransport->MsPerBar() * loopNumMeasures / displayLengthMs) * bufferWidth;
-   ofRect(loopStartX, 0, loopWidth, bufferHeight);
+      float msSinceLoopStart = (loopNumMeasures + loopMeasuresAgo) * TheTransport->MsPerBar();
+      float loopStartX = bufferWidth - (msSinceLoopStart / displayLengthMs) * bufferWidth;
+      float loopWidth = (TheTransport->MsPerBar() * loopNumMeasures / displayLengthMs) * bufferWidth;
+      ofRect(loopStartX, 0, loopWidth, bufferHeight);
 
-   float downbeatPositionMs = FloatWrap(downbeatMeasureOffset - (loopNumMeasures - mLastCaptureMeasureTime), loopNumMeasures) * TheTransport->MsPerBar();
-   float downbeatPositionX = loopStartX + loopWidth - (downbeatPositionMs / displayLengthMs) * bufferWidth;
-   ofLine(downbeatPositionX, 0, downbeatPositionX, bufferHeight);
+      float downbeatPositionMs = FloatWrap(downbeatMeasureOffset - (loopNumMeasures - mLastCaptureMeasureTime), loopNumMeasures) * TheTransport->MsPerBar();
+      float downbeatPositionX = loopStartX + loopWidth - (downbeatPositionMs / displayLengthMs) * bufferWidth;
+      ofLine(downbeatPositionX, 0, downbeatPositionX, bufferHeight);
 
-   if (mState == TapeLooperState::Loop)
-   {
-      ofSetColor(0, 255, 0);
-      float msSincePlaybackPos = GetPlaybackSamplesAgo(gTime) / gSampleRateMs;
-      float playbackPosX = bufferWidth - (msSincePlaybackPos / displayLengthMs) * bufferWidth;
-      ofLine(playbackPosX, 0, playbackPosX, bufferHeight);
+      if (mState == TapeLooperState::Loop)
+      {
+         ofSetColor(0, 255, 0);
+         float msSincePlaybackPos = GetPlaybackSamplesAgo(gTime) / gSampleRateMs;
+         float playbackPosX = bufferWidth - (msSincePlaybackPos / displayLengthMs) * bufferWidth;
+         ofLine(playbackPosX, 0, playbackPosX, bufferHeight);
+      }
    }
 
    ofPopMatrix();
@@ -212,6 +229,7 @@ void TapeLooper::DrawModule()
    mLoopBeatsAgoSlider->Draw();
    mDownbeatOffsetBeatsSlider->Draw();
    mRecordCheckbox->Draw();
+   mPassthroughCheckbox->Draw();
    mLoop1BarButton->Draw();
    mLoop2BarsButton->Draw();
    mLoop4BarsButton->Draw();
@@ -231,15 +249,15 @@ void TapeLooper::StartLoop(int numBars)
 
 void TapeLooper::SetRecording(bool record)
 {
+   mRecording = record;
    if (record)
    {
-      mRecording = true;
       mState = TapeLooperState::Capture;
       mStartRecordingMeasureTime = TheTransport->GetMeasureTime(gTime);
    }
    else
    {
-      if (IsRecording())
+      if (mStartRecordingMeasureTime != -1)
       {
          float numBars = round(TheTransport->GetMeasureTime(gTime) - mStartRecordingMeasureTime);
          if (numBars > 0)
@@ -247,15 +265,13 @@ void TapeLooper::SetRecording(bool record)
          else
             mState = TapeLooperState::Capture;
          mStartRecordingMeasureTime = -1;
-         mRecording = false;
       }
    }
 }
 
 void TapeLooper::DoRetroactiveRecord(int numBars)
 {
-   mLoopLengthBeats = numBars * TheTransport->GetTimeSigTop();
-   mState = TapeLooperState::Loop;
+   StartLoop(numBars);
 }
 
 void TapeLooper::CheckboxUpdated(Checkbox* checkbox, double time)
