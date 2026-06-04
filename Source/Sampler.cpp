@@ -45,7 +45,11 @@ Sampler::Sampler()
    mVoiceParams.mSample = &mSample;
    mVoiceParams.mSamplePitch = 48;
 
-   mPolyMgr.Init(kVoiceType_Sampler, &mVoiceParams);
+   mPolyMgr.Init([](IDrawableModule* owner)
+                 {
+                    return std::unique_ptr<IMidiVoice>(new SampleVoice(owner));
+                 },
+                 &mVoiceParams);
 
    //mWriteBuffer.SetNumActiveChannels(2);
 }
