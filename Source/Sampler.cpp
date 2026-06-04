@@ -45,7 +45,11 @@ Sampler::Sampler()
    mVoiceParams.mSample = &mSample;
    mVoiceParams.mSamplePitch = 48;
 
-   mPolyMgr.Init(kVoiceType_Sampler, &mVoiceParams);
+   mPolyMgr.Init([](IDrawableModule* owner)
+                 {
+                    return std::unique_ptr<IMidiVoice>(new SampleVoice(owner));
+                 },
+                 &mVoiceParams);
 
    //mWriteBuffer.SetNumActiveChannels(2);
 }
@@ -205,7 +209,7 @@ void Sampler::DrawModule()
    if (mMostRecentVoiceIdx != -1)
    {
       auto& voiceInfo = mPolyMgr.GetVoiceInfo(mMostRecentVoiceIdx);
-      SampleVoice* voice = dynamic_cast<SampleVoice*>(voiceInfo.mVoice);
+      SampleVoice* voice = dynamic_cast<SampleVoice*>(voiceInfo.mVoice.get());
       pos = voice->GetSamplePosition();
    }
    DrawAudioBuffer(200, 50, mSample.Data(), 0, mSample.LengthInSamples(), pos);
