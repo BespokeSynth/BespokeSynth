@@ -26,6 +26,7 @@
 #pragma once
 
 #include <memory>
+#include <functional>
 #include "SynthGlobals.h"
 #include "ChannelBuffer.h"
 
