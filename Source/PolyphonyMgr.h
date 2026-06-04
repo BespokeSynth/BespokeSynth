@@ -42,7 +42,8 @@ enum VoiceType
    kVoiceType_Karplus,
    kVoiceType_FM,
    kVoiceType_SingleOscillator,
-   kVoiceType_Sampler
+   kVoiceType_Sampler,
+   kVoiceType_PadSynth
 };
 
 struct VoiceInfo
