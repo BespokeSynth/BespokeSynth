@@ -47,7 +47,7 @@ struct VoiceInfo
    float mActivity{ 0 };
 };
 
-using VoiceConstructor = std::unique_ptr<IMidiVoice> (*)(IDrawableModule* owner);
+using VoiceConstructor = std::function<std::unique_ptr<IMidiVoice>(IDrawableModule*)>;
 
 class PolyphonyMgr
 {
