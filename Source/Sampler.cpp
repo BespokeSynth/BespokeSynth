@@ -209,7 +209,7 @@ void Sampler::DrawModule()
    if (mMostRecentVoiceIdx != -1)
    {
       auto& voiceInfo = mPolyMgr.GetVoiceInfo(mMostRecentVoiceIdx);
-      SampleVoice* voice = dynamic_cast<SampleVoice*>(voiceInfo.mVoice);
+      SampleVoice* voice = dynamic_cast<SampleVoice*>(voiceInfo.mVoice.get());
       pos = voice->GetSamplePosition();
    }
    DrawAudioBuffer(200, 50, mSample.Data(), 0, mSample.LengthInSamples(), pos);
