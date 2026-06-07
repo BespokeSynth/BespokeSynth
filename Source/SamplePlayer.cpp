@@ -1279,6 +1279,12 @@ void SamplePlayer::oscBundleReceived(const OSCBundle& bundle)
 
 bool SamplePlayer::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
+   if (GetKeyModifiers() & kModifier_Alt)
+   {
+      scrollX = scrollY;
+      scrollY = 0;
+   }
+
    if (fabs(scrollX) > fabsf(scrollY))
       scrollY = 0;
    else
