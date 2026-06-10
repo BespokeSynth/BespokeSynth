@@ -71,5 +71,5 @@ private:
    FloatSlider* mStrumMsSlider{ nullptr };
 
    std::array<float, 128> mLastDelayMs{};
-   double mLastNotePlayTimeMs{ 0 };
+   double mLastNoteStrumTimeMs{ 0 };
 };
