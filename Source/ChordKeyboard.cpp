@@ -406,13 +406,14 @@ void ChordKeyboard::UpdateOutputNotes(double time)
          newOutputNotes[pitch] = true;
    }
 
+   int velocity = mLastInputVelocity;
+   if (mVelocityOverride != -1)
+      velocity = mVelocityOverride;
+
    for (int i = 0; i < 128; ++i)
    {
       if (newOutputNotes[i] && (!mOutputNotes[i] || forceNoteReplay))
       {
-         int velocity = mLastInputVelocity;
-         if (mVelocityOverride != -1)
-            velocity = mVelocityOverride;
          NoteMessage noteOn(time, i, velocity);
          PlayNoteOutput(noteOn);
          mLastNoteOnTime[i] = time;
@@ -434,7 +435,7 @@ void ChordKeyboard::UpdateOutputNotes(double time)
       }
       if (bassPitch != -1)
       {
-         NoteMessage noteOn(time, bassPitch, mLastInputVelocity);
+         NoteMessage noteOn(time, bassPitch, velocity);
          mBassCable->PlayNoteOutput(noteOn);
       }
    }

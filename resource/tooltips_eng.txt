@@ -1747,7 +1747,8 @@ notelatch~use note on messages to toggle notes on and off
 
 
 notehumanizer~add randomness to timing and velocity
-~time~amount of timing randomness, in milliseconds.
+~time ms~amount of timing randomness, in milliseconds
+~strum ms~amount of time to wait after the previous note was played, in milliseconds
 ~velocity~amount of velocity randomness
 
 

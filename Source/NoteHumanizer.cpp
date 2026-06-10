@@ -29,6 +29,7 @@
 #include "OpenFrameworksPort.h"
 #include "Scale.h"
 #include "ModularSynth.h"
+#include "UIControlMacros.h"
 
 NoteHumanizer::NoteHumanizer()
 {
@@ -42,10 +43,14 @@ void NoteHumanizer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mTimeSlider = new FloatSlider(this, "time", 4, 4, 100, 15, &mTime, 0, 500);
-   mVelocitySlider = new FloatSlider(this, "velocity", mTimeSlider, kAnchor_Below, 100, 15, &mVelocity, 0, 1);
+   UIBLOCK0();
+   FLOATSLIDER(mTimeMsSlider, "time ms", &mTimeMs, 0, 500);
+   FLOATSLIDER(mStrumMsSlider, "strum ms", &mStrumMs, 0, 500);
+   FLOATSLIDER(mVelocitySlider, "velocity", &mVelocity, 0, 1);
+   ENDUIBLOCK(mWidth, mHeight);
 
-   mTimeSlider->SetMode(FloatSlider::kSquare);
+   mTimeMsSlider->SetMode(FloatSlider::kSquare);
+   mStrumMsSlider->SetMode(FloatSlider::kSquare);
 }
 
 void NoteHumanizer::DrawModule()
@@ -53,7 +58,8 @@ void NoteHumanizer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   mTimeSlider->Draw();
+   mTimeMsSlider->Draw();
+   mStrumMsSlider->Draw();
    mVelocitySlider->Draw();
 }
 
@@ -71,11 +77,14 @@ void NoteHumanizer::PlayNote(NoteMessage note)
       return;
    }
 
-   float delayMs;
+   float delayMs = 0;
    int outputVelocity;
    if (note.velocity > 0)
    {
-      delayMs = ofRandom(0, mTime);
+      float msSinceLastNote = note.time - mLastNotePlayTimeMs;
+      if (msSinceLastNote < mStrumMs)
+         delayMs += mStrumMs - msSinceLastNote;
+      delayMs += ofRandom(0, mTimeMs);
       outputVelocity = ofClamp((note.velocity / 127.0f * ofRandom(1 - mVelocity, 1 + mVelocity)) * 127, 1, 127);
       mLastDelayMs[note.pitch] = delayMs;
    }
@@ -88,10 +97,21 @@ void NoteHumanizer::PlayNote(NoteMessage note)
    note.time += delayMs;
    note.velocity = outputVelocity;
    PlayNoteOutput(note);
+
+   if (note.velocity > 0)
+      mLastNotePlayTimeMs = note.time;
 }
 
 void NoteHumanizer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 {
+}
+
+void NoteHumanizer::UpdateOldControlName(std::string& oldName)
+{
+   IDrawableModule::UpdateOldControlName(oldName);
+
+   if (oldName == "time")
+      oldName = "time ms";
 }
 
 void NoteHumanizer::LoadLayout(const ofxJSONElement& moduleInfo)
