@@ -61,16 +61,15 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = 108;
-      height = 40;
-   }
+   void UpdateOldControlName(std::string& oldName) override;
 
-   float mTime{ 33 };
-   FloatSlider* mTimeSlider{ nullptr };
+   float mTimeMs{ 33 };
+   FloatSlider* mTimeMsSlider{ nullptr };
    float mVelocity{ .1 };
    FloatSlider* mVelocitySlider{ nullptr };
+   float mStrumMs{ 20 };
+   FloatSlider* mStrumMsSlider{ nullptr };
 
    std::array<float, 128> mLastDelayMs{};
+   double mLastNotePlayTimeMs{ 0 };
 };
