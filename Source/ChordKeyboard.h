@@ -144,6 +144,50 @@ private:
       bool mNine{ false };
       PlayOptions mPlayOptions{ PlayOptions::ChordAndBass };
 
+      void SetDim(bool dim)
+      {
+         mDim = dim;
+         if (mDim)
+         {
+            mMinor = false;
+            mMajor = false;
+            mSus = false;
+         }
+      }
+
+      void SetMinor(bool minor)
+      {
+         mMinor = minor;
+         if (mMinor)
+         {
+            mDim = false;
+            mMajor = false;
+            mSus = false;
+         }
+      }
+
+      void SetMajor(bool major)
+      {
+         mMajor = major;
+         if (mMajor)
+         {
+            mDim = false;
+            mMinor = false;
+            mSus = false;
+         }
+      }
+
+      void SetSus(bool sus)
+      {
+         mSus = sus;
+         if (mSus)
+         {
+            mDim = false;
+            mMinor = false;
+            mMajor = false;
+         }
+      }
+
       bool IsChordButtonPressed() const
       {
          return mDim || mMinor || mMajor || mSus;
@@ -177,6 +221,7 @@ private:
    static int AdjustForVoicing(int pitch, int voicing);
    const ChordSettings& GetChordSettings() const;
    std::string GetChordDisplayString() const;
+   void OnChordSettingsUpdated(double time);
 
    bool mScaleMode{ false };
    Checkbox* mScaleModeCheckbox{ nullptr };
@@ -208,6 +253,7 @@ private:
    int mBassOutputPitch{ -1 };
    bool mLatchChord{ false };
    double mLastKeyPressTime{ -1 };
+   double mLastChordPressTime{ -1 };
 
    AdditionalNoteCable* mBassCable{ nullptr };
 

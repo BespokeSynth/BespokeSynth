@@ -199,6 +199,28 @@ void ChordKeyboard::CheckboxUpdated(Checkbox* checkbox, double time)
    {
       mNoteOutput.Flush(time);
    }
+   if (checkbox == mDimCheckbox)
+   {
+      mChordSettings.SetDim(mChordSettings.mDim);
+      OnChordSettingsUpdated(time);
+   }
+   if (checkbox == mMinorCheckbox)
+   {
+      mChordSettings.SetMinor(mChordSettings.mMinor);
+      OnChordSettingsUpdated(time);
+   }
+   if (checkbox == mMajorCheckbox)
+   {
+      mChordSettings.SetMajor(mChordSettings.mMajor);
+      OnChordSettingsUpdated(time);
+   }
+   if (checkbox == mSusCheckbox)
+   {
+      mChordSettings.SetSus(mChordSettings.mSus);
+      OnChordSettingsUpdated(time);
+   }
+   if (checkbox == mSixCheckbox || checkbox == mMin7Checkbox || checkbox == mMajorCheckbox || checkbox == mNineCheckbox)
+      OnChordSettingsUpdated(time);
 }
 
 void ChordKeyboard::DropdownUpdated(DropdownList* dropdown, int oldVal, double time)
@@ -209,6 +231,12 @@ void ChordKeyboard::DropdownUpdated(DropdownList* dropdown, int oldVal, double t
       if (transportListenerInfo != nullptr)
          transportListenerInfo->mInterval = mQuantizeInterval;
    }
+}
+
+void ChordKeyboard::OnChordSettingsUpdated(double time)
+{
+   if (time < mLastKeyPressTime + 100) // changed chord very shortly after playing new pitch
+      memcpy(&mLastPlayedChordSettings, &mChordSettings, sizeof(mChordSettings));
 }
 
 std::list<int> ChordKeyboard::GetChordPitches(int forPitch)
@@ -481,25 +509,49 @@ bool ChordKeyboard::OnAbletonGridControl_InputThread(IAbletonGridDevice* ableton
             if (midiValue > 0)
             {
                if (gridX == 0)
-                  mChordSettings.mDim = !mChordSettings.mDim;
+               {
+                  mChordSettings.SetDim(!mChordSettings.mDim);
+                  OnChordSettingsUpdated(gTime);
+               }
                if (gridX == 1)
-                  mChordSettings.mMinor = !mChordSettings.mMinor;
+               {
+                  mChordSettings.SetMinor(!mChordSettings.mMinor);
+                  OnChordSettingsUpdated(gTime);
+               }
                if (gridX == 2)
-                  mChordSettings.mMajor = !mChordSettings.mMajor;
+               {
+                  mChordSettings.SetMajor(!mChordSettings.mMajor);
+                  OnChordSettingsUpdated(gTime);
+               }
                if (gridX == 3)
-                  mChordSettings.mSus = !mChordSettings.mSus;
+               {
+                  mChordSettings.SetSus(!mChordSettings.mSus);
+                  OnChordSettingsUpdated(gTime);
+               }
             }
          }
          else
          {
             if (gridX == 0)
-               mChordSettings.mDim = midiValue > 0;
+            {
+               mChordSettings.SetDim(midiValue > 0);
+               OnChordSettingsUpdated(gTime);
+            }
             if (gridX == 1)
-               mChordSettings.mMinor = midiValue > 0;
+            {
+               mChordSettings.SetMinor(midiValue > 0);
+               OnChordSettingsUpdated(gTime);
+            }
             if (gridX == 2)
-               mChordSettings.mMajor = midiValue > 0;
+            {
+               mChordSettings.SetMajor(midiValue > 0);
+               OnChordSettingsUpdated(gTime);
+            }
             if (gridX == 3)
-               mChordSettings.mSus = midiValue > 0;
+            {
+               mChordSettings.SetSus(midiValue > 0);
+               OnChordSettingsUpdated(gTime);
+            }
          }
 
          if (gridX == 4 && midiValue > 0)
@@ -518,25 +570,49 @@ bool ChordKeyboard::OnAbletonGridControl_InputThread(IAbletonGridDevice* ableton
             if (midiValue > 0)
             {
                if (gridX == 0)
+               {
                   mChordSettings.mSix = !mChordSettings.mSix;
+                  OnChordSettingsUpdated(gTime);
+               }
                if (gridX == 1)
+               {
                   mChordSettings.mMin7 = !mChordSettings.mMin7;
+                  OnChordSettingsUpdated(gTime);
+               }
                if (gridX == 2)
+               {
                   mChordSettings.mMaj7 = !mChordSettings.mMaj7;
+                  OnChordSettingsUpdated(gTime);
+               }
                if (gridX == 3)
+               {
                   mChordSettings.mNine = !mChordSettings.mNine;
+                  OnChordSettingsUpdated(gTime);
+               }
             }
          }
          else
          {
             if (gridX == 0)
+            {
                mChordSettings.mSix = midiValue > 0;
+               OnChordSettingsUpdated(gTime);
+            }
             if (gridX == 1)
+            {
                mChordSettings.mMin7 = midiValue > 0;
+               OnChordSettingsUpdated(gTime);
+            }
             if (gridX == 2)
+            {
                mChordSettings.mMaj7 = midiValue > 0;
+               OnChordSettingsUpdated(gTime);
+            }
             if (gridX == 3)
+            {
                mChordSettings.mNine = midiValue > 0;
+               OnChordSettingsUpdated(gTime);
+            }
          }
 
          if (gridX == 4 && midiValue > 0)
