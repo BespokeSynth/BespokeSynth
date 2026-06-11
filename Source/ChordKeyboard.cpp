@@ -442,7 +442,7 @@ void ChordKeyboard::UpdateOutputNotes(double time)
    {
       if (newOutputNotes[i] && (!mOutputNotes[i] || forceNoteReplay))
       {
-         NoteMessage noteOn(time, i, velocity);
+         NoteMessage noteOn(time, i, velocity, -1, ModulationParameters(mModulation.GetPitchBend(0), mModulation.GetModWheel(0), mModulation.GetPressure(0), 0));
          PlayNoteOutput(noteOn);
          mLastNoteOnTime[i] = time;
       }
@@ -463,7 +463,7 @@ void ChordKeyboard::UpdateOutputNotes(double time)
       }
       if (bassPitch != -1)
       {
-         NoteMessage noteOn(time, bassPitch, velocity);
+         NoteMessage noteOn(time, bassPitch, velocity, -1, ModulationParameters(mModulation.GetPitchBend(0), mModulation.GetModWheel(0), mModulation.GetPressure(0), 0));
          mBassCable->PlayNoteOutput(noteOn);
       }
    }
@@ -493,6 +493,14 @@ int ChordKeyboard::GridToPitch(int x, int y) const
 
 bool ChordKeyboard::OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
+   if (controlIndex >= AbletonDevice::kChannelPressureIndex && controlIndex < AbletonDevice::kChannelPressureIndex + AbletonDevice::kNumChannelPressureIndices)
+   {
+      int channel = 0; //controlIndex - AbletonDevice::kChannelPressureIndex;
+      mModulation.GetPressure(channel)->SetValue(midiValue / 127.0f);
+      mNoteOutput.SendPressure(channel, midiValue / 127.0f);
+      return true;
+   }
+
    int rangeStart = abletonGrid->GetGridStartIndex();
    int rangeEnd = abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads();
 
@@ -626,17 +634,19 @@ bool ChordKeyboard::OnAbletonGridControl_InputThread(IAbletonGridDevice* ableton
          int pitch = GridToPitch(gridX, gridY);
 
          if (pitch != -1)
-            PlayNote(NoteMessage(gTime, pitch, midiValue));
+            PlayNote(NoteMessage(gTime, pitch, midiValue, -1, ModulationParameters(mModulation.GetPitchBend(0), mModulation.GetModWheel(0), mModulation.GetPressure(0), 0)));
       }
 
       return true;
    }
 
-   if (controlIndex == AbletonDevice::kClickyEncoderTurn)
+   if (controlIndex == AbletonDevice::kClickyEncoderTurn && !abletonGrid->GetButtonState(AbletonDevice::kShiftButton))
    {
       int direction = midiValue <= 64 ? 1 : -1;
       mVoicing = ofClamp(mVoicing + direction, mVoicingSlider->GetMin(), mVoicingSlider->GetMax());
       //UpdateOutputNotes(gTime);
+
+      return true;
    }
 
    return false;
@@ -765,6 +775,9 @@ bool ChordKeyboard::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Abl
          return false;
    }
 
+   if (abletonGrid->GetButtonState(AbletonDevice::kShiftButton))
+      return false;
+
    std::string chordPitchNames;
    if (mInputPitchWrapped != -1)
       chordPitchNames += GetRomanNumeralForDegree(TheScale->GetToneFromPitch(mInputPitchWrapped)) + ": ";
@@ -776,7 +789,7 @@ bool ChordKeyboard::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Abl
 
    lcd->DrawLCDText(chordPitchNames.c_str(), 10, 15, 0, 12);
 
-   if (abletonGrid->GetButtonState(AbletonDevice::kClickyEncoderTouch))
+   if (abletonGrid->GetButtonState(AbletonDevice::kClickyEncoderTouch) && !abletonGrid->GetButtonState(AbletonDevice::kShiftButton))
    {
       lcd->DrawLCDText("voicing:", 10, 25, 0, 12);
       lcd->DrawLCDText(ofToString(mVoicing).c_str(), 10, 60, 0, 50);
@@ -825,6 +838,7 @@ void ChordKeyboard::GetPush2OverrideControls(std::vector<IUIControl*>& controls)
    controls.push_back(mPlayOptionsSelector);
    controls.push_back(mChordStyleSelector);
    controls.push_back(mQuantizeIntervalSelector);
+   controls.push_back(mVoicingSlider);
 }
 
 void ChordKeyboard::LoadLayout(const ofxJSONElement& moduleInfo)
