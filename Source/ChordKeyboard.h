@@ -63,7 +63,6 @@ public:
    bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
    bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass) override;
-   bool IsInAbletonGridFocusMode() const override { return true; }
 
    bool HasPush2OverrideControls() const override { return true; }
    void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const override;
@@ -262,4 +261,6 @@ private:
    std::array<double, 128> mLastNoteOffTime{};
 
    LockFreeQueue<NoteMessage> mNoteMessageQueue{};
+
+   Modulations mModulation{ true };
 };
