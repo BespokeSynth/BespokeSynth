@@ -161,6 +161,10 @@ private:
    bool mShowSoundSelector{ false };
    int mSoundSelectorIndex{ 0 };
 
+   bool mShowAddTrackSelector{ false };
+   int mAddTrackSelectorIndex{ 0 };
+   std::vector<std::string> mAddTrackSelectorList{};
+
    IDrawableModule* mDisplayModule{ nullptr };
    std::string mDisplayModuleContext{};
    ControlRecorder* mCurrentControlRecorder{ nullptr };
@@ -220,6 +224,7 @@ private:
    bool mPageWithinModules{ false };
    bool mBottomRowMode{ false };
    bool mRequireTouchForKnobAdjustment{ false };
+   double mLastClickyEncoderPressTime{ 0 };
 
    IAbletonGridController* mGridControlInterface{ nullptr };
 

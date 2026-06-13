@@ -140,20 +140,22 @@ void Prefab::OnClicked(float x, float y, bool right)
       TheSynth->SetGroupSelectContext(&mModuleContainer);
 }
 
+void Prefab::AddModule(IDrawableModule* module)
+{
+   if (IsAddableModule(module))
+      mModuleContainer.TakeModule(module);
+}
+
 void Prefab::MouseReleased()
 {
    IDrawableModule::MouseReleased();
 
    if (CanAddDropModules() && !VectorContains<IDrawableModule*>(this, TheSynth->GetGroupSelectedModules()))
    {
-      if (IsAddableModule(sJustReleasedModule))
-         mModuleContainer.TakeModule(sJustReleasedModule);
+      AddModule(sJustReleasedModule);
 
       for (auto* module : TheSynth->GetGroupSelectedModules())
-      {
-         if (IsAddableModule(module))
-            mModuleContainer.TakeModule(module);
-      }
+         AddModule(module);
    }
 }
 
@@ -221,6 +223,14 @@ void Prefab::GetModuleDimensions(float& width, float& height)
    }
 }
 
+void Prefab::Disband()
+{
+   auto modules = mModuleContainer.GetModules();
+   for (auto* module : modules)
+      GetOwningContainer()->TakeModule(module);
+   GetOwningContainer()->DeleteModule(this);
+}
+
 void Prefab::ButtonClicked(ClickButton* button, double time)
 {
    using namespace juce;
@@ -245,12 +255,7 @@ void Prefab::ButtonClicked(ClickButton* button, double time)
    }
 
    if (button == mDisbandButton)
-   {
-      auto modules = mModuleContainer.GetModules();
-      for (auto* module : modules)
-         GetOwningContainer()->TakeModule(module);
-      GetOwningContainer()->DeleteModule(this);
-   }
+      Disband();
 }
 
 void Prefab::CheckboxUpdated(Checkbox* checkbox, double time)
