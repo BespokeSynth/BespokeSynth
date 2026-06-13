@@ -478,7 +478,26 @@ void AbletonMoveControl::DrawToFramebuffer()
 
    bool needToDraw = true;
 
-   if (mCurrentControlRecorder != nullptr)
+   if (needToDraw && mShowAddTrackSelector)
+   {
+      const int kMaxDisplayEntries = 5;
+      int numValues = (int)mAddTrackSelectorList.size();
+      int displayOffset = std::clamp(mAddTrackSelectorIndex - 2, 0, std::max(numValues - kMaxDisplayEntries, 0));
+      int y = 12;
+      for (int i = displayOffset; i < numValues && i < displayOffset + kMaxDisplayEntries; ++i)
+      {
+         juce::File trackFile(mAddTrackSelectorList[i]);
+         std::string label = trackFile.getFileNameWithoutExtension().toStdString();
+         mLCD.DrawLCDText(label.c_str(), 13, y, LCDFONT_STYLE_REGULAR);
+         if (i == mAddTrackSelectorIndex)
+            mLCD.DrawArrow(9, y - 4, 4, false, LCDDrawMode::Fill);
+         y += 12;
+      }
+
+      needToDraw = false;
+   }
+
+   if (needToDraw && mCurrentControlRecorder != nullptr)
    {
       int displayKnobIndex = GetDisplayKnobIndex();
       if (displayKnobIndex != -1)
@@ -1188,6 +1207,13 @@ void AbletonMoveControl::UpdateLeds()
    else
       SetLed(kLedStar, 0);
 
+   if (mShowAddTrackSelector)
+      SetLed(kLedAdd, 127, mBottomRowMode ? 30 : -1);
+   else if (mBottomRowMode)
+      SetLed(kLedAdd, 10);
+   else
+      SetLed(kLedAdd, 0);
+
    if (mBottomRowMode)
    {
       SetLed(kButtonNew, kColorLightGrey, 0);
@@ -1771,6 +1797,22 @@ void AbletonMoveControl::OnMidiNote_Consume(MidiNote& note)
          }
          handled = true;
       }
+      if (note.mPitch == kButtonAdd)
+      {
+         if (note.mVelocity > 0)
+         {
+            mShowAddTrackSelector = true;
+            mAddTrackSelectorIndex = 0;
+
+            mAddTrackSelectorList.clear();
+            for (const auto& entry : juce::RangedDirectoryIterator{ juce::File{ ofToDataPath("trackorganizer") }, false, "*.pfb" })
+            {
+               const auto& file = entry.getFile();
+               mAddTrackSelectorList.push_back(file.getFullPathName().toStdString());
+            }
+         }
+         handled = true;
+      }
 
       if (handled && note.mVelocity == 0)
          mBottomRowMode = false;
@@ -2258,7 +2300,24 @@ void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
    }
    else if (control.mControl == kClickyEncoderButton)
    {
-      if (mShowSoundSelector)
+      if (mShowAddTrackSelector)
+      {
+         if (control.mValue > 0)
+         {
+            if (mSessionOrganizer)
+            {
+               std::string path = "";
+
+               if (mAddTrackSelectorIndex >= 0 && mAddTrackSelectorIndex < mAddTrackSelectorList.size())
+                  path = mAddTrackSelectorList[mAddTrackSelectorIndex];
+
+               if (path != "")
+                  mSessionOrganizer->LoadTrackPrefab(path);
+            }
+            mShowAddTrackSelector = false;
+         }
+      }
+      else if (mShowSoundSelector)
       {
          if (control.mValue > 0)
          {
@@ -2273,9 +2332,13 @@ void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
       }
       else
       {
-         if (control.mValue == 0)
+         if (control.mValue > 0)
          {
-            bool wasTap = gTime - mControlState[kClickyEncoderButton].mLastChangeTime < 300;
+            mLastClickyEncoderPressTime = gTime;
+         }
+         else
+         {
+            bool wasTap = gTime - mLastClickyEncoderPressTime < 300;
             if (wasTap)
             {
                if (mTrackRowOffset == 0)
@@ -2291,7 +2354,11 @@ void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
       int direction = control.mValue < 64 ? 1 : -1;
 
       TrackOrganizer* trackRow = GetActiveTrackRow();
-      if (mShowSoundSelector)
+      if (mShowAddTrackSelector)
+      {
+         mAddTrackSelectorIndex = std::clamp(mAddTrackSelectorIndex + direction, 0, int(mAddTrackSelectorList.size()) - 1);
+      }
+      else if (mShowSoundSelector)
       {
          IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
          if (soundSelector != nullptr)
@@ -2868,6 +2935,7 @@ void AbletonMoveControl::SetActiveTrackRow(int row, bool resetModuleIndex)
 
    mSelectedTrackRow = row;
    mShowSoundSelector = false;
+   mShowAddTrackSelector = false;
 
    if (row == kTrackRowGlobal)
    {

@@ -259,6 +259,7 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    juce::File(ofToDataPath("scripts")).createDirectory();
    juce::File(ofToDataPath("internal")).createDirectory();
    juce::File(ofToDataPath("vst")).createDirectory();
+   juce::File(ofToDataPath("trackorganizer")).createDirectory();
 
    SynthInit();
 

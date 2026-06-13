@@ -33,6 +33,8 @@
 #include "Amplifier.h"
 #include "AudioSend.h"
 #include "UIControlMacros.h"
+#include "Prefab.h"
+#include "pybind11/pybind11.h"
 
 #include <cstring>
 
@@ -54,6 +56,8 @@ void TrackOrganizer::CreateUIControls()
    TEXTENTRY(mNameEntry, "track name", 20, &mTrackName);
    DROPDOWN(mColorSelector, "color", &mColorIndex, 100);
    BUTTON(mSelectModulesButton, "select modules");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mSaveTrackButton, "save track");
    ENDUIBLOCK0();
 
    for (int i = 0; i < (int)AbletonDevice::kColors.size(); ++i)
@@ -161,6 +165,7 @@ void TrackOrganizer::DrawModule()
    mNameEntry->Draw();
    mColorSelector->Draw();
    mSelectModulesButton->Draw();
+   mSaveTrackButton->Draw();
 
    Amplifier* gain = GetGain();
    if (gain)
@@ -469,6 +474,27 @@ void TrackOrganizer::ButtonClicked(ClickButton* button, double time)
          GatherModules(TheSynth->GetGroupSelectedModules());
       else
          mSelectModulesOnMouseRelease = TheSynth->IsMouseButtonHeld(1);
+   }
+
+   if (button == mSaveTrackButton)
+   {
+      juce::FileChooser chooser("Save trackorganizer as...", juce::File(ofToDataPath("trackorganizer/" + mTrackName + ".pfb")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
+      if (chooser.browseForFileToSave(true))
+      {
+         std::string savePath = chooser.getResult().getFullPathName().toStdString();
+
+         ofRectangle boundingRect = GetBoundingRect();
+         ModuleFactory::Spawnable spawnable;
+         spawnable.mLabel = "prefab";
+         Prefab* spawnedPrefab = dynamic_cast<Prefab*>(TheSynth->SpawnModuleOnTheFly(spawnable, boundingRect.x, boundingRect.y, true, "trackorganizerprefab"));
+
+         for (IDrawableModule* module : mAllModules)
+            spawnedPrefab->AddModule(module);
+
+         spawnedPrefab->SavePrefab(savePath);
+
+         spawnedPrefab->Disband();
+      }
    }
 }
 

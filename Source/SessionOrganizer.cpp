@@ -38,10 +38,11 @@
 #include "AudioSend.h"
 #include "IControlVisualizer.h"
 #include "Snapshots.h"
+#include "Prefab.h"
 
 namespace
 {
-   float kPaddingTop = 15;
+   float kPaddingTop = 35;
    float kPaddingBottom = 5;
    float kPaddingLeft = 5;
    float kPaddingBetween = 5;
@@ -62,6 +63,10 @@ void SessionOrganizer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
+   UIBLOCK(3, 15);
+   BUTTON(mLoadTrackButton, "load track");
+   ENDUIBLOCK0();
+
    for (size_t i = 0; i < mTrackCables.size(); ++i)
    {
       mTrackCables[i] = new PatchCableSource(this, kConnectionType_Special);
@@ -69,6 +74,21 @@ void SessionOrganizer::CreateUIControls()
       mTrackCables[i]->SetManualPosition(8 + (int)i * 12, 8);
       AddPatchCableSource(mTrackCables[i]);
    }
+
+   ofColor cableColor = IDrawableModule::GetColor(kModuleCategory_Other);
+   cableColor.a *= .3f;
+
+   mDefaultOutputTargetCable = new PatchCableSource(this, kConnectionType_Special);
+   mDefaultOutputTargetCable->SetPredicateFilter(IsOfType<IAudioReceiver*>);
+   mDefaultOutputTargetCable->SetManualPosition(95, 25);
+   mDefaultOutputTargetCable->SetColor(cableColor);
+   AddPatchCableSource(mDefaultOutputTargetCable);
+
+   mDefaultSendTargetCable = new PatchCableSource(this, kConnectionType_Special);
+   mDefaultSendTargetCable->SetPredicateFilter(IsOfType<IAudioReceiver*>);
+   mDefaultSendTargetCable->SetManualPosition(110, 25);
+   mDefaultSendTargetCable->SetColor(cableColor);
+   AddPatchCableSource(mDefaultSendTargetCable);
 
    for (int i = 0; i < (int)mTrackColumns.size(); ++i)
       mTrackColumns[i].CreateUIControls(this, i);
@@ -100,6 +120,8 @@ void SessionOrganizer::DrawModule()
 
    for (int i = 0; i < (int)mTrackColumns.size(); ++i)
       mTrackColumns[i].Draw(this, i);
+
+   mLoadTrackButton->Draw();
 }
 
 ofVec2f SessionOrganizer::TrackColumn::GetPosition(int index) const
@@ -173,6 +195,18 @@ void SessionOrganizer::DrawModuleUnclipped()
       }
    }
 
+   if (mDefaultOutputTargetCable->IsHovered())
+   {
+      hoverCable = mDefaultOutputTargetCable;
+      tooltip = "default output target";
+   }
+
+   if (mDefaultSendTargetCable->IsHovered())
+   {
+      hoverCable = mDefaultSendTargetCable;
+      tooltip = "default send target";
+   }
+
    if (hoverCable != nullptr)
    {
       IClickable* target = hoverCable->GetTarget();
@@ -237,6 +271,79 @@ void SessionOrganizer::CheckboxUpdated(Checkbox* checkbox, double time)
       {
          if (TrackOrganizer* track = GetTrack(i))
             track->SetTrackEnabled(mTrackColumns[i].mEnabled);
+      }
+   }
+}
+
+void SessionOrganizer::ButtonClicked(ClickButton* button, double time)
+{
+   if (button == mLoadTrackButton)
+   {
+      juce::FileChooser chooser("Load prefab...", juce::File(ofToDataPath("trackorganizer")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
+      if (chooser.browseForFileToOpen())
+      {
+         std::string loadPath = chooser.getResult().getFullPathName().toStdString();
+
+         LoadTrackPrefab(loadPath);
+      }
+   }
+}
+
+void SessionOrganizer::LoadTrackPrefab(std::string loadPath)
+{
+   float lowestX = 0;
+   float highestY = GetRect().getMaxY();
+
+   if (IClickable* defaultOutputTarget = mDefaultOutputTargetCable->GetTarget())
+      highestY = defaultOutputTarget->GetRect().getMaxY();
+
+   for (int i = 0; i < (int)mTrackColumns.size(); ++i)
+   {
+      if (TrackOrganizer* track = GetTrack(i))
+      {
+         ofRectangle boundingRect = track->GetBoundingRect();
+         lowestX = std::min(lowestX, boundingRect.getMinX());
+         highestY = std::max(highestY, boundingRect.getMaxY());
+      }
+   }
+
+   ModuleFactory::Spawnable spawnable;
+   spawnable.mLabel = "prefab";
+   Prefab* spawnedPrefab = dynamic_cast<Prefab*>(TheSynth->SpawnModuleOnTheFly(spawnable, lowestX, highestY + 50, true, "trackorganizerprefab"));
+
+   spawnedPrefab->LoadPrefab(loadPath);
+
+   for (IDrawableModule* module : spawnedPrefab->GetContainer()->GetModules())
+   {
+      if (TrackOrganizer* trackOrganizer = dynamic_cast<TrackOrganizer*>(module))
+      {
+         AddTrack(trackOrganizer);
+
+         if (AudioSend* send = trackOrganizer->GetSend())
+         {
+            send->GetPatchCableSources()[0]->SetTarget(mDefaultOutputTargetCable->GetTarget());
+            send->GetPatchCableSources()[1]->SetTarget(mDefaultSendTargetCable->GetTarget());
+         }
+         else if (Amplifier* gain = trackOrganizer->GetGain())
+         {
+            gain->SetTarget(mDefaultOutputTargetCable->GetTarget());
+         }
+
+         break;
+      }
+   }
+
+   spawnedPrefab->Disband();
+}
+
+void SessionOrganizer::AddTrack(TrackOrganizer* track)
+{
+   for (int i = 0; i < (int)mTrackCables.size(); ++i)
+   {
+      if (mTrackCables[i]->GetTarget() == nullptr)
+      {
+         mTrackCables[i]->SetTarget(track);
+         break;
       }
    }
 }
