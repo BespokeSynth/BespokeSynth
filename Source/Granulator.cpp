@@ -279,7 +279,7 @@ void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferSta
 
    double phase = (std::clamp(gTime, mStartTime, mEndTime) - mStartTime) * mStartToEndInv;
    float alpha = Granulator::GetWindow(granulator->mWindowType, granulator->mWindowShape, granulator->mGrainLengthMs, phase) * gain;
-   if (alpha >= 0)
+   if (alpha > 0)
    {
       ofSetColor(255, 0, 0, alpha * 255);
       ofCircle(x + a * w, y + mDrawPos * h, MAX(3, h / MAX_GRAINS / 2));
