@@ -186,7 +186,6 @@ void SeaOfGrain::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-
    mLoadButton->Draw();
    mRecordInputCheckbox->Draw();
    mVolumeSlider->Draw();
@@ -219,7 +218,6 @@ void SeaOfGrain::DrawModule()
       ofTranslate(mBufferX, mBufferY);
       ofPushStyle();
 
-
       if (mHasRecordedInput)
       {
          mRecordBuffer.Draw(0, 0, mBufferW, mBufferH, mDisplayLength * gSampleRate);
@@ -241,7 +239,6 @@ void SeaOfGrain::DrawModule()
          ofRect(mBufferW * float(i) / mKeyboardNumPitches, mBufferH, mBufferW / mKeyboardNumPitches, 10);
       }
       ofPopStyle();
-
 
       for (int i = 0; i < kNumMPEVoices; ++i)
       {
@@ -385,7 +382,6 @@ void SeaOfGrain::LoadFile()
 
 void SeaOfGrain::ButtonClicked(ClickButton* button, double time)
 {
-
    if (button == mLoadButton)
       LoadFile();
 }
@@ -654,7 +650,6 @@ void SeaOfGrain::GrainManualVoice::Process(ChannelBuffer* output, int bufferSize
 
 void SeaOfGrain::GrainManualVoice::Draw(int index, float w, float h)
 {
-
    ofPushStyle();
    ofFill();
    float x = mPosition * w;
