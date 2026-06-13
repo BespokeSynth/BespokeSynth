@@ -143,10 +143,15 @@ void Granulator::QueueGrainSpawn(double spawnTime)
    mQueuedGrainSpawnTimes.enqueue(spawnTime);
 }
 
-void Granulator::Draw(float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain)
+void Granulator::Draw(float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain) const
 {
+   if (gain <= 0)
+      return;
+   ofPushStyle();
+   ofFill();
    for (int i = 0; i < MAX_GRAINS; ++i)
       mGrains[i].DrawGrain(i, x, y, w, h, bufferStart, viewLength, bufferLength, gain, this);
+   ofPopStyle();
 }
 
 void Granulator::DrawWindow(float x, float y, float w, float h)
@@ -266,16 +271,17 @@ void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float*
    }
 }
 
-void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain, const Granulator* granulator)
+void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain, const Granulator* granulator) const
 {
    float a = fmod((mPos - bufferStart), bufferLength) / viewLength;
    if (a < 0 || a > 1)
       return;
-   ofPushStyle();
-   ofFill();
+
    double phase = (std::clamp(gTime, mStartTime, mEndTime) - mStartTime) * mStartToEndInv;
    float alpha = Granulator::GetWindow(granulator->mWindowType, granulator->mWindowShape, granulator->mGrainLengthMs, phase) * gain;
-   ofSetColor(255, 0, 0, alpha * 255);
-   ofCircle(x + a * w, y + mDrawPos * h, MAX(3, h / MAX_GRAINS / 2));
-   ofPopStyle();
+   if (alpha > 0)
+   {
+      ofSetColor(255, 0, 0, alpha * 255);
+      ofCircle(x + a * w, y + mDrawPos * h, MAX(3, h / MAX_GRAINS / 2));
+   }
 }

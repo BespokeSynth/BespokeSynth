@@ -67,6 +67,7 @@ public:
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
+   void RefreshOptionRenderStates(int idx) const;
 
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
