@@ -95,13 +95,30 @@ void TapeLooper::Process(double time)
       {
          for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
             mRecordBuffer.WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
+
+         if (mRecording && mFirstLoop && mFirstLoopAudioStartMs == -1)
+         {
+            for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+            {
+               double channelTime = time;
+               for (int i = 0; i < bufferSize; ++i)
+               {
+                  if (mFirstLoopAudioStartMs != -1)
+                     break;
+                  const float kThreshold = .001f;
+                  if (fabsf(GetBuffer()->GetChannel(ch)[i]) > kThreshold)
+                     mFirstLoopAudioStartMs = channelTime;
+                  channelTime += gInvSampleRateMs;
+               }
+            }
+         }
       }
       else if (mState == TapeLooperState::Loop)
       {
-         double loopTime = time;
+         double channelTime = time;
          for (int i = 0; i < bufferSize; ++i)
          {
-            int samplesAgo = GetPlaybackSamplesAgo(loopTime);
+            int samplesAgo = GetPlaybackSamplesAgo(channelTime);
             if (samplesAgo != mLastPlayedSamplesAgo - 1) //playhead jumped
                mLoopWrapSmoother.StartSwitch();
             if (samplesAgo == mLastPlayedSamplesAgo)
@@ -115,7 +132,7 @@ void TapeLooper::Process(double time)
                GetVizBuffer()->Write(sample, ch);
             }
             mLastPlayedSamplesAgo = samplesAgo;
-            loopTime += gInvSampleRateMs;
+            channelTime += gInvSampleRateMs;
          }
          hasWrittenOutput = true;
       }
@@ -209,6 +226,13 @@ void TapeLooper::DrawModule()
 
          float displayLengthMs = displaySamples / gSampleRateMs;
          float msSinceLoopStart = gTime - mStartRecordingTimeMs;
+         if (mFirstLoop)
+         {
+            if (mFirstLoopAudioStartMs != -1)
+               msSinceLoopStart = gTime - mFirstLoopAudioStartMs;
+            else
+               msSinceLoopStart = 0;
+         }
          float loopStartX = bufferWidth - (msSinceLoopStart / displayLengthMs) * bufferWidth;
          float loopWidth = bufferWidth - loopStartX;
          ofRect(loopStartX, 0, loopWidth, bufferHeight);
@@ -280,9 +304,13 @@ void TapeLooper::SetRecording(bool record)
    else
    {
       int numBars = 0;
-      if (mFirstLoop && mStartRecordingTimeMs != -1)
+      bool wasRecording = false;
+      if (mFirstLoop && mFirstLoopAudioStartMs != -1)
       {
-         double recordingLengthMs = gTime - mStartRecordingTimeMs;
+         wasRecording = true;
+
+         double recordingLengthMs = gTime - mFirstLoopAudioStartMs;
+         mFirstLoopAudioStartMs = -1;
 
          const float kMinTempo = 80;
          const float kMaxTempo = 250;
@@ -313,15 +341,19 @@ void TapeLooper::SetRecording(bool record)
       }
       else if (mStartRecordingMeasureTime != -1)
       {
+         wasRecording = true;
          numBars = round(TheTransport->GetMeasureTime(gTime) - mStartRecordingMeasureTime);
 
          mStartRecordingMeasureTime = -1;
       }
 
-      if (numBars > 0)
-         StartLoop(numBars);
-      else
-         mState = TapeLooperState::Capture;
+      if (wasRecording)
+      {
+         if (numBars > 0)
+            StartLoop(numBars);
+         else
+            mState = TapeLooperState::Capture;
+      }
    }
 }
 
@@ -334,6 +366,11 @@ void TapeLooper::CheckboxUpdated(Checkbox* checkbox, double time)
 {
    if (checkbox == mRecordCheckbox)
       SetRecording(mRecording);
+   if (checkbox == mFirstLoopCheckbox)
+   {
+      if (mFirstLoop)
+         mFirstLoopAudioStartMs = -1;
+   }
 }
 
 void TapeLooper::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
