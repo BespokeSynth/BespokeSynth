@@ -115,6 +115,7 @@ private:
    double mLastCaptureMeasureTime{ 0.0 };
    double mStartRecordingMeasureTime{ -1 };
    double mStartRecordingTimeMs{ -1 };
+   double mFirstLoopAudioStartMs{ -1 };
    int mLastPlayedSamplesAgo{ 0 };
    SwitchAndRamp mLoopWrapSmoother;
 };
