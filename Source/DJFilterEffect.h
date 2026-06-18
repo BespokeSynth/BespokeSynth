@@ -74,6 +74,8 @@ private:
 
    FloatSlider* mTiltSlider{ nullptr };
    float mTilt{ 0.0f };
+   FloatSlider* mQSlider{ nullptr };
+   float mQ{ static_cast<float>(sqrt(2.0f) / 2) };
 
    ClickButton* mCenterButton{ nullptr };
 

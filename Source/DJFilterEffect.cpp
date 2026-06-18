@@ -41,9 +41,12 @@ void DJFilterEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mTiltSlider = new FloatSlider(this, "tilt", 4, 4, 80, 15, &mTilt, -1, 1);
+   mQSlider = new FloatSlider(this, "Q", 4, 20, 80, 15, &mQ, static_cast<float>(sqrt(2.0f) / 2), 18, 3);
    mCenterButton = new ClickButton(this, "center", 87, 4);
 
    mTiltSlider->SetControlVisualizer(this);
+   mQSlider->SetControlVisualizer(this);
+   mQSlider->SetMode(FloatSlider::kSquare);
 }
 
 DJFilterEffect::~DJFilterEffect()
@@ -87,20 +90,22 @@ void DJFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    {
       ComputeSliders(i);
 
-      float fLow = ofLerp(7000, 0, powf(std::clamp(-mTilt, 0.0f, 1.0f), 1.0f));
-      float fHigh = ofLerp(0, 5000, powf(std::clamp(mTilt, 0.0f, 1.0f), 2.0f));
+      float fLow = ofLerp(4000, 10, powf(std::clamp(-mTilt, 0.0f, 1.0f), 0.5f));
+      float fHigh = ofLerp(10, 5000, powf(std::clamp(mTilt, 0.0f, 1.0f), 2.0f));
 
-      if (fLow != mBiquadLow[0].mF)
+      if (fLow != mBiquadLow[0].mF || mQ != mBiquadLow[0].mQ)
       {
          mBiquadLow[0].mF = fLow;
+         mBiquadLow[0].mQ = mQ;
          mBiquadLow[0].UpdateFilterCoeff();
          for (int ch = 1; ch < buffer->NumActiveChannels(); ++ch)
             mBiquadLow[ch].CopyCoeffFrom(mBiquadLow[0]);
       }
 
-      if (fHigh != mBiquadHigh[0].mF)
+      if (fHigh != mBiquadHigh[0].mF || mQ != mBiquadHigh[0].mQ)
       {
          mBiquadHigh[0].mF = fHigh;
+         mBiquadHigh[0].mQ = mQ;
          mBiquadHigh[0].UpdateFilterCoeff();
          for (int ch = 1; ch < buffer->NumActiveChannels(); ++ch)
             mBiquadHigh[ch].CopyCoeffFrom(mBiquadHigh[0]);
@@ -160,6 +165,7 @@ void DJFilterEffect::DrawModule()
 {
    mTiltSlider->Draw();
    mCenterButton->Draw();
+   mQSlider->Draw();
 
    float w, h;
    GetModuleDimensions(w, h);
@@ -192,7 +198,9 @@ void DJFilterEffect::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIContro
       {
          float response = GetSignalResponseAt(freq);
          response *= GetVolumeFadeLevel();
-         float screenEnvelopeY = (.5f - .666f * log10(response)) * AbletonMoveLCD::kMoveDisplayHeight;
+         float screenEnvelopeY = AbletonMoveLCD::kMoveDisplayHeight;
+         if (response > 0)
+            screenEnvelopeY = (.5f - .666f * log10(response)) * AbletonMoveLCD::kMoveDisplayHeight;
          for (int screenY = screenEnvelopeY; screenY < AbletonMoveLCD::kMoveDisplayHeight; ++screenY)
             screen->DrawPixel(x, screenY, LCDDrawMode::Toggle);
       }
