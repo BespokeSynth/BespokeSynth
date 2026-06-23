@@ -923,7 +923,7 @@ void NoteCanvas::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 
 bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass)
 {
-   if (mEditCurrentPitchContext != -1)
+   if (IsInAbletonGridFocusMode())
    {
       IAbletonGridController* pitchContextGrid = dynamic_cast<IAbletonGridController*>(mPitchContextInterface);
       if (pitchContextGrid != nullptr)
@@ -998,6 +998,11 @@ bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Ableto
       return true;
    }
    return false;
+}
+
+bool NoteCanvas::IsInAbletonGridFocusMode() const
+{
+   return mEditCurrentPitchContext != -1 && mPitchContextInterface != nullptr && mCurrentEditElements.empty();
 }
 
 bool NoteCanvas::HasPush2OverrideControls() const

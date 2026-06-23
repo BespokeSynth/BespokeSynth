@@ -90,7 +90,7 @@ public:
    bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
    bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass) override;
-   bool IsInAbletonGridFocusMode() const override { return mEditCurrentPitchContext != -1 && mPitchContextInterface != nullptr; }
+   bool IsInAbletonGridFocusMode() const override;
 
    //IInputRecordable
    void SetRecording(bool record) override;
