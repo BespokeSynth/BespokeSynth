@@ -42,7 +42,7 @@ struct OscMap
 
 class OscController : public INonstandardController,
                       private juce::OSCReceiver,
-                      private juce::OSCReceiver::Listener<juce::OSCReceiver::MessageLoopCallback>
+                      private juce::OSCReceiver::Listener<juce::OSCReceiver::RealtimeCallback>
 {
 public:
    OscController(MidiDeviceListener* listener, std::string outAddress, int outPort, int inPort);
@@ -50,6 +50,7 @@ public:
 
    void Connect();
    void oscMessageReceived(const juce::OSCMessage& msg) override;
+   void oscBundleReceived(const juce::OSCBundle& bundle) override;
    void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1) override;
    int AddControl(std::string address, bool isFloat);
 

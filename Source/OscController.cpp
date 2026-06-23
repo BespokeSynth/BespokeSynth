@@ -354,6 +354,17 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
    }
 }
 
+void OscController::oscBundleReceived(const juce::OSCBundle& bundle)
+{
+   for (const juce::OSCBundle::Element* element = bundle.begin(); element != bundle.end(); ++element)
+   {
+      if (element->isMessage())
+         oscMessageReceived(element->getMessage());
+      else if (element->isBundle())
+         oscBundleReceived(element->getBundle());
+   }
+}
+
 int OscController::FindControl(std::string address)
 {
    for (int i = 0; i < mOscMap.size(); ++i)
