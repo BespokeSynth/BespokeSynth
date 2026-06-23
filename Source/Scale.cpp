@@ -447,6 +447,102 @@ void Scale::GetModuleDimensions(float& width, float& height)
    height = mIntonation == kIntonation_SclFile ? 109 : 62;
 }
 
+int Scale::GridToPitch(int x, int y) const
+{
+   int octave = 0;
+   if (x >= 7)
+      return -1;
+   if (y % 2 == 0) //black keys
+   {
+      const int kBlackKeys[] = { -1, 1, 3, -1, 6, 8, 10 };
+      if ((x % 7) == 0 || (x % 7) == 3)
+         return -1;
+      return kBlackKeys[x % 7] + octave * 12;
+   }
+   else //white keys
+   {
+      const int kWhiteKeys[] = { 0, 2, 4, 5, 7, 9, 11 };
+      return kWhiteKeys[x % 7] + octave * 12;
+   }
+}
+
+bool Scale::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
+{
+   int rangeStart = abletonGrid->GetGridStartIndex();
+   int rangeEnd = abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads();
+
+   if (controlIndex >= rangeStart && controlIndex < rangeEnd)
+   {
+      if (midiValue > 0)
+      {
+         int gridIndex = controlIndex - rangeStart;
+         int gridX = gridIndex % abletonGrid->GetGridNumCols();
+         int gridY = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
+
+         if (gridY < 2)
+         {
+            int pitch = GridToPitch(gridX, gridY);
+
+            if (pitch != -1)
+               SetRoot(pitch % 12);
+         }
+
+         if (gridY >= 2 && gridY < 4)
+         {
+            int scaleIndex = gridX + (gridY - 2) * 8 + 1;
+            SetScaleType(mScaleSelector->GetLabel(scaleIndex));
+         }
+
+         abletonGrid->DisplayScreenMessage("scale: " + mRootSelector->GetLabel(mScale.mScaleRoot) + " " + mScaleSelector->GetLabel(mScaleIndex), 1000);
+      }
+
+      return true;
+   }
+
+   return false;
+}
+
+void Scale::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
+{
+   int rangeStart = abletonGrid->GetGridStartIndex();
+   int rangeEnd = abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads();
+
+   for (int controlIndex = rangeStart; controlIndex <= rangeEnd; ++controlIndex)
+   {
+      int gridIndex = controlIndex - rangeStart;
+      int gridX = gridIndex % abletonGrid->GetGridNumCols();
+      int gridY = abletonGrid->GetGridNumRows() - 1 - gridIndex / abletonGrid->GetGridNumCols();
+
+      int color = AbletonDevice::kColorOff;
+      int flashColor = -1;
+      if (gridY < 2)
+      {
+         int pitch = GridToPitch(gridX, gridY) % 12;
+
+         if (pitch >= 0)
+         {
+            if (mScale.mScaleRoot == pitch)
+               color = AbletonDevice::kColorGreen;
+            else if (gridY == 0)
+               color = AbletonDevice::kColorDarkGreen;
+            else
+               color = AbletonDevice::kColorMintGreen;
+         }
+      }
+
+      if (gridY >= 2 && gridY < 4)
+      {
+         int scaleIndex = gridX + (gridY - 2) * 8 + 1;
+         if (scaleIndex == mScaleIndex)
+            color = AbletonDevice::kColorBrightMagenta;
+         else
+            color = AbletonDevice::kColorPalePink;
+      }
+
+      abletonGrid->SetLed(controlIndex, color, flashColor);
+   }
+}
+
 std::vector<int> Scale::GetPitchesForScale(std::string scaleType)
 {
    for (int i = 0; i < mScales.size(); ++i)
