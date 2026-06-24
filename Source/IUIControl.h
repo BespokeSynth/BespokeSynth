@@ -44,6 +44,13 @@ enum AnchorDirection
    kAnchor_Below_Padded
 };
 
+enum class SetValueMethod
+{
+   Direct,
+   Increment,
+   Modulator
+};
+
 class IUIControl : public IClickable
 {
 public:
@@ -52,7 +59,7 @@ public:
    virtual void Delete() { mIsDeleted = true; }
    void AddRemoteController() { ++mRemoteControlCount; }
    void RemoveRemoteController() { --mRemoteControlCount; }
-   virtual void SetFromMidiCC(float slider, double time, bool setViaModulator) = 0;
+   virtual void SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod) = 0;
    virtual float GetValueForMidiCC(float slider) const { return 0; }
    virtual void SetValue(float value, double time, bool forceUpdate = false) = 0;
    virtual void SetValueDirect(float value, double time) { SetValue(value, time); } //override if you need special control here

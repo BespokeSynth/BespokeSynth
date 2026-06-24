@@ -2080,7 +2080,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
             increment *= -1;
          auto value = dropDownList->GetMidiValue();
          value += increment;
-         dropDownList->SetFromMidiCC(value, NextBufferTime(false), false);
+         dropDownList->SetFromMidiCC(value, NextBufferTime(false), SetValueMethod::Increment);
          return;
       }
 
@@ -2118,7 +2118,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
       else
          val += change;
       val = ofClamp(val, 0, 1);
-      gHoveredUIControl->SetFromMidiCC(val, NextBufferTime(false), false);
+      gHoveredUIControl->SetFromMidiCC(val, NextBufferTime(false), SetValueMethod::Increment);
 
       gHoveredUIControl->NotifyMouseScrolled(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), xScroll, yScroll, isSmoothScroll, isInvertedScroll);
    }

@@ -123,7 +123,7 @@ void IModulator::Poll()
             if (mTargets[i].mUIControlTarget->ModulatorUsesLiteralValue())
                mTargets[i].mUIControlTarget->SetValue(mLastPollValue, NextBufferTime(false));
             else
-               mTargets[i].mUIControlTarget->SetFromMidiCC(mLastPollValue, NextBufferTime(false), true);
+               mTargets[i].mUIControlTarget->SetFromMidiCC(mLastPollValue, NextBufferTime(false), SetValueMethod::Modulator);
          }
       }
    }

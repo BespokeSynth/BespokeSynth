@@ -630,7 +630,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
                   //float sign = change > 0 ? 1 : -1;
                   //change = sign * sqrtf(fabsf(change)); //make response fall off for bigger changes
                   curValue += (increment * 127.0f) * change;
-                  uicontrol->SetFromMidiCC(curValue, NextBufferTime(false), false);
+                  uicontrol->SetFromMidiCC(curValue, NextBufferTime(false), SetValueMethod::Increment);
                }
             }
             else
@@ -639,7 +639,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
                   value = value > 0 ? 1 : 0;
                if (connection->mScaleOutput && (connection->mMidiOffValue != 0 || connection->mMidiOnValue != controlValueRange))
                   value = ofLerp(connection->mMidiOffValue / controlValueRange, connection->mMidiOnValue / controlValueRange, value);
-               uicontrol->SetFromMidiCC(value, NextBufferTime(false), false);
+               uicontrol->SetFromMidiCC(value, NextBufferTime(false), SetValueMethod::Direct);
             }
             uicontrol->StartBeacon();
          }

@@ -101,13 +101,16 @@ public:
       kSquare,
       kBezier
    };
+   void CopyBehaviorFrom(FloatSlider* slider);
    void SetMode(Mode mode) { mMode = mode; }
    Mode GetMode() const { return mMode; }
+   void AddDetent(float value);
+   void RemoveDetent(float value);
 
    bool CheckNeedsDraw() override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
+   void SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod) override;
    float GetValueForMidiCC(float slider) const override;
    void SetValue(float value, double time, bool forceUpdate = false) override;
    float GetValue() const override;
@@ -185,6 +188,9 @@ private:
    int mLastComputeSamplesIn{ 0 };
    double* mLastComputeCacheTime;
    float* mLastComputeCacheValue;
+   std::vector<float> mDetents;
+   double mLastHitDetentTimeMs{ 0 };
+   int mLastAdjustdDirection{ 0 };
 
    float mLastDisplayedValue{ std::numeric_limits<float>::max() };
 
@@ -237,7 +243,7 @@ public:
    bool CheckNeedsDraw() override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
+   void SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod) override;
    float GetValueForMidiCC(float slider) const override;
    void SetValue(float value, double time, bool forceUpdate = false) override;
    float GetValue() const override;

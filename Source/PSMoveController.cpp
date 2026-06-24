@@ -79,21 +79,21 @@ void PSMoveController::Poll()
    {
       mPitch = ofClamp(mPitch + gyros.x / 50000, 0, 1);
       if (mPitchUIControl)
-         mPitchUIControl->SetFromMidiCC(mPitch, NextBufferTime(false), false);
+         mPitchUIControl->SetFromMidiCC(mPitch, NextBufferTime(false), SetValueMethod::Direct);
       isButtonDown = true;
    }
    if (mMoveMgr.IsButtonDown(0, Btn_SQUARE))
    {
       mYaw = ofClamp(mYaw - gyros.z / 50000, 0, 1);
       if (mYawUIControl)
-         mYawUIControl->SetFromMidiCC(mYaw, NextBufferTime(false), false);
+         mYawUIControl->SetFromMidiCC(mYaw, NextBufferTime(false), SetValueMethod::Direct);
       isButtonDown = true;
    }
    if (mMoveMgr.IsButtonDown(0, Btn_T))
    {
       mRoll = ofClamp(mRoll + gyros.y / 80000, 0, 1);
       if (mRollUIControl)
-         mRollUIControl->SetFromMidiCC(mRoll, NextBufferTime(false), false);
+         mRollUIControl->SetFromMidiCC(mRoll, NextBufferTime(false), SetValueMethod::Direct);
       isButtonDown = true;
    }
    if (isButtonDown)
@@ -118,7 +118,7 @@ void PSMoveController::Poll()
    mMoveMgr.GetAccel(0, accel);
    mEnergy = ofClamp(accel.length() / 5000 - .8f, 0, 1);
    if (mEnergyUIControl)
-      mEnergyUIControl->SetFromMidiCC(mEnergy, NextBufferTime(false), false);
+      mEnergyUIControl->SetFromMidiCC(mEnergy, NextBufferTime(false), SetValueMethod::Direct);
 }
 
 void PSMoveController::Exit()

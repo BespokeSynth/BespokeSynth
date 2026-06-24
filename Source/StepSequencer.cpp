@@ -625,7 +625,7 @@ bool StepSequencer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int co
    if (controlIndex == AbletonDevice::kPitchBendIndex)
    {
       float val = midiValue / MidiDevice::kPitchBendMax;
-      mGridYOffDropdown->SetFromMidiCC(val, gTime, true);
+      mGridYOffDropdown->SetFromMidiCC(val, gTime, SetValueMethod::Modulator);
 
       return true;
    }

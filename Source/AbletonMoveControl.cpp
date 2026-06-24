@@ -2022,7 +2022,7 @@ void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
             {
                mSoundSelectorIndex = gRandom() % soundSelector->GetNumValues();
                int numValues = soundSelector->GetNumValues();
-               soundSelector->SetFromMidiCC(float(mSoundSelectorIndex) / (numValues - 1), NextBufferTime(true), false);
+               soundSelector->SetFromMidiCC(float(mSoundSelectorIndex) / (numValues - 1), NextBufferTime(true), SetValueMethod::Direct);
             }
          }
       }
@@ -2326,7 +2326,7 @@ void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
             if (soundSelector != nullptr)
             {
                int numValues = soundSelector->GetNumValues();
-               soundSelector->SetFromMidiCC(float(mSoundSelectorIndex) / (numValues - 1), NextBufferTime(true), false);
+               soundSelector->SetFromMidiCC(float(mSoundSelectorIndex) / (numValues - 1), NextBufferTime(true), SetValueMethod::Direct);
             }
          }
       }
@@ -2889,13 +2889,13 @@ void AbletonMoveControl::AdjustControlWithEncoder(IUIControl* control, float mid
       if (increment > 0 && gTime - sLastButtonClickTime > 400)
       {
          sLastButtonClickTime = gTime;
-         button->SetFromMidiCC(1.0f, NextBufferTime(false), false);
+         button->SetFromMidiCC(1.0f, NextBufferTime(false), SetValueMethod::Direct);
       }
    }
    else
    {
       float newValue = std::clamp(currentNormalized + increment, 0.0f, 1.0f);
-      control->SetFromMidiCC(newValue, NextBufferTime(false), false);
+      control->SetFromMidiCC(newValue, NextBufferTime(false), SetValueMethod::Increment);
    }
 
    MidiController::sLastActivityUIControl = control;

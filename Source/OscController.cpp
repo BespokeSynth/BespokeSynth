@@ -167,7 +167,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
             float new_value = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
             DropdownList* dropdown = dynamic_cast<DropdownList*>(control);
             if (is_percentage)
-               control->SetFromMidiCC(new_value, gTime, false);
+               control->SetFromMidiCC(new_value, gTime, SetValueMethod::Direct);
             else if (dropdown)
                dropdown->SetIndex(new_value, gTime, true);
             else
