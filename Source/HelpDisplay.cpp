@@ -198,6 +198,7 @@ void HelpDisplay::LoadTooltips()
 
    ModuleTooltipInfo moduleInfo;
    UIControlTooltipInfo controlInfo;
+   UIControlSubTooltipInfo subTooltipInfo;
 
    juce::File tooltipsFile(ofToResourcePath(UserPrefs.tooltips.Get()));
    if (tooltipsFile.existsAsFile())
@@ -211,19 +212,34 @@ void HelpDisplay::LoadTooltips()
          {
             juce::String line = lines[i].replace("\\n", "\n");
             std::vector<std::string> tokens = ofSplitString(line.toStdString(), "~");
-            if (tokens.size() == 2)
+            if (tokens.size() == 2) //2 tokens, ex: module~this is a module that does X.
             {
+               if (!controlInfo.controlName.empty())
+               {
+                  moduleInfo.controlTooltips.push_back(controlInfo);
+                  controlInfo.controlName.clear();
+               }
                if (!moduleInfo.module.empty())
                   sTooltips.push_back(moduleInfo); //add this one and start a new one
                moduleInfo.module = tokens[0];
                moduleInfo.tooltip = tokens[1];
                moduleInfo.controlTooltips.clear();
             }
-            else if (tokens.size() == 3)
+            else if (tokens.size() == 3) //3 tokens, ex: ~control~this dial does Y.
             {
+               if (!controlInfo.controlName.empty())
+                  moduleInfo.controlTooltips.push_back(controlInfo);
                controlInfo.controlName = tokens[1];
                controlInfo.tooltip = tokens[2];
-               moduleInfo.controlTooltips.push_back(controlInfo);
+            }
+            else if (tokens.size() == 4) //4 tokens, ex: ~~labelB~this dropdown does Z
+            {
+               subTooltipInfo.name = tokens[2];
+               subTooltipInfo.tooltip = tokens[3];
+               if (tokens[1] != "*")
+                  controlInfo.subTooltips.push_back(subTooltipInfo);
+               else
+                  moduleInfo.globalSubTooltips.push_back(subTooltipInfo);
             }
          }
       }
@@ -347,7 +363,7 @@ std::string HelpDisplay::GetUIControlTooltip(IUIControl* control)
    if (controlInfo && controlInfo->tooltip.size() > 0)
       tooltip = controlInfo->tooltip;
    else
-      tooltip = "[no tooltip found]";
+      tooltip = kNoTooltipFound;
 
    return name + ": " + tooltip;
 }
@@ -368,9 +384,82 @@ std::string HelpDisplay::GetModuleTooltipFromName(std::string moduleTypeName)
    if (moduleInfo && moduleInfo->tooltip.size() > 0)
       tooltip = moduleInfo->tooltip;
    else
-      tooltip = "[no tooltip found]";
+      tooltip = kNoTooltipFound;
 
    return moduleTypeName + ": " + tooltip;
+}
+
+std::string HelpDisplay::GetControlSubTooltip(IUIControl* control, const std::string& subTooltip)
+{
+   if (const auto cInfo = FindControlInfo(control))
+   {
+      for (auto& sub : cInfo->subTooltips)
+      {
+         if (sub.name == subTooltip)
+         {
+            return sub.name + ": " + (!sub.tooltip.empty() ? sub.tooltip : kNoTooltipFound);
+         }
+      }
+   }
+   //If nothing found, then we look in the module's shared subTooltip record.
+   if (auto mod = control->GetModuleParent())
+   {
+      if (const auto mInfo = FindModuleInfo(mod->GetTypeName()))
+      {
+         for (auto& sub : mInfo->globalSubTooltips)
+         {
+            if (sub.name == subTooltip)
+            {
+               return sub.name + ": " + (!sub.tooltip.empty() ? sub.tooltip : kNoTooltipFound);
+            }
+         }
+      }
+   }
+   return "";
+}
+
+std::string HelpDisplay::GetTooltipFromAddress(const std::string& address)
+{
+   if (address.empty())
+      return "";
+
+   //Tokenize
+   auto strings = ofSplitString(address, "~");
+   //TODO, best to cache this as it's probably not super cheap.
+   const int tokens = static_cast<int>(strings.size());
+
+   if (tokens == 1) //Asking for a module tooltip
+      return GetModuleTooltipFromName(strings[0]);
+   if (tokens == 2) //Asking for a tooltip of a control of a module.
+   {
+      ModuleTooltipInfo* moduleInfo = FindModuleInfo(strings[0]);
+      for (auto& control : moduleInfo->controlTooltips)
+      {
+         if (control.controlName == strings[1])
+            return strings[1] + ": " + (!control.tooltip.empty() ? control.tooltip : kNoTooltipFound);
+      }
+      return strings[1] + ": " + kNoTooltipFound;
+   }
+   if (tokens == 3) //Asking for a tooltip of a sub control of a control of a module.
+   {
+      ModuleTooltipInfo* moduleInfo = FindModuleInfo(strings[0]);
+      for (auto& control : moduleInfo->controlTooltips)
+      {
+         if (control.controlName == strings[1])
+         {
+            for (auto& sub : control.subTooltips)
+            {
+               if (sub.name == strings[2])
+                  return strings[2] + ": " + (!sub.tooltip.empty() ? sub.tooltip : kNoTooltipFound);
+            }
+            return strings[2] + ": " + kNoTooltipFound;
+         }
+      }
+      return strings[1] + ": " + kNoTooltipFound;
+   }
+   assert(false); //Asking for disappointment.
+
+   return "";
 }
 
 //static
@@ -456,7 +545,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
                continue;
             addedModuleNames.push_back(module->GetTypeName());
 
-            std::string moduleTooltip = "[no tooltip]";
+            std::string moduleTooltip = kNoTooltipFound;
             ModuleTooltipInfo* moduleInfo = FindModuleInfo(module->GetTypeName());
             if (moduleInfo)
             {
@@ -474,7 +563,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
                std::string controlName = control->Name();
                if (controlName != "enabled")
                {
-                  std::string controlTooltip = "[no tooltip]";
+                  std::string controlTooltip = kNoTooltipFound;
                   UIControlTooltipInfo* controlInfo = FindControlInfo(control);
                   if (controlInfo)
                   {

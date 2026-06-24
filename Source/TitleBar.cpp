@@ -75,7 +75,11 @@ void SpawnList::SetList(std::vector<ModuleFactory::Spawnable> spawnables)
          name += " " + mSpawnables[i].mDecorator;
       if (TheSynth->GetModuleFactory()->IsExperimental(name))
          name += " (exp.)";
-      mSpawnList->AddLabel(name, i);
+      DropdownListElement label;
+      label.mLabel = name;
+      label.mValue = i;
+      label.mTooltipAddress = name;
+      mSpawnList->AddLabel(label);
    }
 }
 

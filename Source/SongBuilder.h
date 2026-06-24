@@ -98,6 +98,7 @@ private:
    bool ShowSongSequencer() const { return mUseSequencer; }
    void RefreshSequencerDropdowns();
    void PlaySequence(double time, int startIndex);
+   static void DrawColourCircle(ofRectangle renderRect, bool isHovering, bool isDrawingOnPopup, const DropdownListElement& element);
 
    enum class ContextMenuItems
    {
