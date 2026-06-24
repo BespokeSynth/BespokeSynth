@@ -743,7 +743,7 @@ void FloatSlider::AddDetent(float value)
 
 void FloatSlider::RemoveDetent(float value)
 {
-   std::remove(mDetents.begin(), mDetents.end(), value);
+   RemoveFromVector(value, mDetents);
 }
 
 bool FloatSlider::CheckNeedsDraw()
