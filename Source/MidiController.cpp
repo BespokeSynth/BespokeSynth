@@ -475,7 +475,7 @@ void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
    int voiceIdx = -1;
 
-   float amount = (pitchBend.mValue - 8192.0f) / (8192.0f / mPitchBendRange);
+   float amount = (pitchBend.mValue - 8192.0f) * (mPitchBendRange / 8192.0f);
 
    if (mUseChannelAsVoice)
       voiceIdx = pitchBend.mChannel - 1;
@@ -2455,7 +2455,7 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    channelMap["16"] = (int)ChannelFilter::k16;
    mModuleSaveData.LoadEnum<ChannelFilter>("channelfilter", moduleInfo, (int)ChannelFilter::kAny, nullptr, &channelMap);
    mModuleSaveData.LoadInt("noteoffset", moduleInfo, 0, -999, 999, K(isTextField));
-   mModuleSaveData.LoadFloat("pitchbendrange", moduleInfo, 2, 1, 96, K(isTextField));
+   mModuleSaveData.LoadFloat("pitchbendrange", moduleInfo, 2, 0, 96, K(isTextField));
    mModuleSaveData.LoadInt("modwheelcc(1or74)", moduleInfo, 1, 0, 127, K(isTextField));
    mModuleSaveData.LoadFloat("modwheeloffset", moduleInfo, 0, 0, 1, K(isTextField));
    mModuleSaveData.LoadFloat("pressureoffset", moduleInfo, 0, 0, 1, K(isTextField));

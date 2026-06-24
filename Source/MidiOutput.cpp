@@ -130,7 +130,8 @@ void MidiOutputModule::OnTransportAdvanced(float amount)
       if (bend != mod.mLastPitchBend)
       {
          mod.mLastPitchBend = bend;
-         mDevice.SendPitchBend((int)ofMap(bend, -mPitchBendRange, mPitchBendRange, 0, 16383, K(clamp)), channel);
+         if (mPitchBendRange != 0)
+            mDevice.SendPitchBend((int)ofMap(bend, -mPitchBendRange, mPitchBendRange, 0, 16383, K(clamp)), channel);
       }
       float modWheel = mod.mModulation.modWheel ? mod.mModulation.modWheel->GetValue(0) : ModulationParameters::kDefaultModWheel;
       if (modWheel != mod.mLastModWheel)
@@ -162,7 +163,7 @@ void MidiOutputModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("controller", moduleInfo, "", FillDropdown<MidiController*>);
    mModuleSaveData.LoadInt("channel", moduleInfo, 1, 1, 16);
    mModuleSaveData.LoadBool("usevoiceaschannel", moduleInfo, false);
-   mModuleSaveData.LoadFloat("pitchbendrange", moduleInfo, 2, 1, 96, K(isTextField));
+   mModuleSaveData.LoadFloat("pitchbendrange", moduleInfo, 2, 0, 96, K(isTextField));
    mModuleSaveData.LoadInt("modwheelcc(1or74)", moduleInfo, 1, 0, 127, K(isTextField));
 
    SetUpFromSaveData();

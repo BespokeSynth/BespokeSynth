@@ -899,7 +899,8 @@ void VSTPlugin::Process(double time)
             if (bend != mod.mLastPitchBend)
             {
                mod.mLastPitchBend = bend;
-               mMidiBuffer.addEvent(juce::MidiMessage::pitchWheel(channel, (int)ofMap(bend, -mPitchBendRange, mPitchBendRange, 0, 16383, K(clamp))), 0);
+               if (mPitchBendRange != 0)
+                  mMidiBuffer.addEvent(juce::MidiMessage::pitchWheel(channel, (int)ofMap(bend, -mPitchBendRange, mPitchBendRange, 0, 16383, K(clamp))), 0);
             }
             float modWheel = mod.mModulation.modWheel ? mod.mModulation.modWheel->GetValue(0) : ModulationParameters::kDefaultModWheel;
             if (modWheel != mod.mLastModWheel)
@@ -1394,7 +1395,7 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 
    mModuleSaveData.LoadInt("channel", moduleInfo, 1, 0, 16);
    mModuleSaveData.LoadBool("usevoiceaschannel", moduleInfo, false);
-   mModuleSaveData.LoadFloat("pitchbendrange", moduleInfo, 2, 1, 96, K(isTextField));
+   mModuleSaveData.LoadFloat("pitchbendrange", moduleInfo, 2, 0, 96, K(isTextField));
    mModuleSaveData.LoadInt("modwheelcc(1or74)", moduleInfo, 1, 0, 127, K(isTextField));
    mModuleSaveData.LoadInt("numAdditionalStereoOutputs", moduleInfo, 0, 0, VSTPlugin::maxStereoOutputChannels, false);
 
