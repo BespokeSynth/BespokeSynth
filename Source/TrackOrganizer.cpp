@@ -489,7 +489,10 @@ void TrackOrganizer::ButtonClicked(ClickButton* button, double time)
          Prefab* spawnedPrefab = dynamic_cast<Prefab*>(TheSynth->SpawnModuleOnTheFly(spawnable, boundingRect.x, boundingRect.y, true, "trackorganizerprefab"));
 
          for (IDrawableModule* module : mAllModules)
-            spawnedPrefab->AddModule(module);
+         {
+            if (!module->IsDeleted())
+               spawnedPrefab->AddModule(module);
+         }
 
          spawnedPrefab->SavePrefab(savePath);
 
