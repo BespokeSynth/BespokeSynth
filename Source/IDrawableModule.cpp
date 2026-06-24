@@ -162,6 +162,9 @@ void IDrawableModule::Init()
 
 void IDrawableModule::BasePoll()
 {
+   if (mDeleted)
+      return;
+
    Poll();
    for (int i = 0; i < mUIControls.size(); ++i)
       mUIControls[i]->Poll();
