@@ -475,7 +475,7 @@ void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
    int voiceIdx = -1;
 
-   float amount = (pitchBend.mValue - 8192.0f) * mPitchBendRange / 8192.0f;
+   float amount = (pitchBend.mValue - 8192.0f) * (mPitchBendRange / 8192.0f);
 
    if (mUseChannelAsVoice)
       voiceIdx = pitchBend.mChannel - 1;
