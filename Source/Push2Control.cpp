@@ -1583,7 +1583,7 @@ void Push2Control::OnMidiControl_Consume(MidiControl& control)
          }
          else
          {
-            mSliderControls[controlIndex]->SetFromMidiCC(currentNormalized + increment, NextBufferTime(false), false);
+            mSliderControls[controlIndex]->SetFromMidiCC(currentNormalized + increment, NextBufferTime(false), SetValueMethod::Increment);
          }
       }
    }
@@ -1618,7 +1618,7 @@ void Push2Control::OnMidiControl_Consume(MidiControl& control)
                   if (dynamic_cast<ClickButton*>(mButtonControls[controlIndex]) != nullptr)
                      newValue = 1; //always "press" a button
 
-                  mButtonControls[controlIndex]->SetFromMidiCC(newValue, NextBufferTime(false), false);
+                  mButtonControls[controlIndex]->SetFromMidiCC(newValue, NextBufferTime(false), SetValueMethod::Direct);
                }
             }
             else

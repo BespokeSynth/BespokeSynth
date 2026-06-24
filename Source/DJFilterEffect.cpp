@@ -47,6 +47,8 @@ void DJFilterEffect::CreateUIControls()
    mTiltSlider->SetControlVisualizer(this);
    mQSlider->SetControlVisualizer(this);
    mQSlider->SetMode(FloatSlider::kSquare);
+
+   mTiltSlider->AddDetent(0);
 }
 
 DJFilterEffect::~DJFilterEffect()

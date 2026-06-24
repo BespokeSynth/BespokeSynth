@@ -560,7 +560,7 @@ int UIGrid::GetHighlightCol(double time) const
    return ret;
 }
 
-void UIGrid::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void UIGrid::SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod)
 {
    SetValue(slider, time);
 }

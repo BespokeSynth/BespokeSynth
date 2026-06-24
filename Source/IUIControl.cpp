@@ -241,7 +241,7 @@ void IUIControl::GetColors(ofColor& color, ofColor& textColor)
 void IUIControl::Randomize()
 {
    if (IsRandomizable())
-      SetFromMidiCC(ofRandom(1), NextBufferTime(false), true);
+      SetFromMidiCC(ofRandom(1), NextBufferTime(false), SetValueMethod::Modulator);
 }
 
 bool IUIControl::IsRandomizeControl()

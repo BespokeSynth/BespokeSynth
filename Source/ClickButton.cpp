@@ -226,7 +226,7 @@ bool ClickButton::MouseMoved(float x, float y)
    return false;
 }
 
-void ClickButton::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void ClickButton::SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod)
 {
    if (slider > 0)
       DoClick(time);

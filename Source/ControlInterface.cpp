@@ -569,7 +569,7 @@ void ControlInterface::ControlElement::SetUpControl()
          mFloatSlider->SetVar(mFloatVar);
 
       if (attachedToFloatSlider)
-         mFloatSlider->SetMode(attachedToFloatSlider->GetMode());
+         mFloatSlider->CopyBehaviorFrom(attachedToFloatSlider);
 
       mUIControl = mFloatSlider;
    }

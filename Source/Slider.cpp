@@ -134,6 +134,18 @@ void FloatSlider::Render()
    ofRect(mX, mY, mWidth, mHeight);
    ofNoFill();
 
+   for (float detent : mDetents)
+   {
+      if (detent > mMin && detent < mMax)
+      {
+         ofPushStyle();
+         ofSetColor(150, 150, 150, gModuleDrawAlpha);
+         float x = mX + 1 + (mWidth - 2) * ((detent - mMin) / float(mMax - mMin));
+         ofLine(x, mY + 1, x, mY + mHeight - 1);
+         ofPopStyle();
+      }
+   }
+
    bool showSmoothAdjustmentUI = AdjustSmooth() && (gHoveredUIControl == this || mSmooth > 0);
 
    if (mIsSmoothing && !showSmoothAdjustmentUI)
@@ -439,9 +451,35 @@ void FloatSlider::SmoothUpdated()
    }
 }
 
-void FloatSlider::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void FloatSlider::SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod)
 {
-   SetValue(GetValueForMidiCC(slider), time);
+   float currentValue = *mVar;
+   float newValue = GetValueForMidiCC(slider);
+
+   if (setValueMethod == SetValueMethod::Increment)
+   {
+      float adjustAmount = newValue - currentValue;
+      const float kDetentDelayTimeMs = 100;
+      if (time < mLastHitDetentTimeMs + kDetentDelayTimeMs &&
+          ((adjustAmount > 0 && mLastAdjustdDirection > 0) || (adjustAmount < 0 && mLastAdjustdDirection < 0)))
+      {
+         mLastHitDetentTimeMs = time;
+         return;
+      }
+
+      mLastHitDetentTimeMs = -1;
+
+      for (float detent : mDetents)
+      {
+         if ((currentValue < detent && newValue >= detent) || (currentValue > detent && newValue <= detent))
+         {
+            newValue = detent;
+            mLastHitDetentTimeMs = time;
+         }
+      }
+   }
+
+   SetValue(newValue, time);
 }
 
 float FloatSlider::GetValueForMidiCC(float slider) const
@@ -526,6 +564,13 @@ void FloatSlider::SetValue(float value, double time, bool forceUpdate /*= false*
 
    float* var = GetModifyValue();
    float oldVal = *var;
+
+   float adjustAmount = value - oldVal;
+   if (adjustAmount > 0)
+      mLastAdjustdDirection = 1;
+   else
+      mLastAdjustdDirection = -1;
+
    if (mRelative)
    {
       if (!mTouching || mRelativeOffset == -999)
@@ -682,6 +727,23 @@ void FloatSlider::Increment(float amount)
 void FloatSlider::ResetToOriginal()
 {
    SetValue(mOriginalValue, NextBufferTime(false));
+}
+
+void FloatSlider::CopyBehaviorFrom(FloatSlider* slider)
+{
+   mMode = slider->mMode;
+   mDetents = slider->mDetents;
+   mOriginalValue = slider->mOriginalValue;
+}
+
+void FloatSlider::AddDetent(float value)
+{
+   mDetents.push_back(value);
+}
+
+void FloatSlider::RemoveDetent(float value)
+{
+   std::remove(mDetents.begin(), mDetents.end(), value);
 }
 
 bool FloatSlider::CheckNeedsDraw()
@@ -1105,7 +1167,7 @@ void IntSlider::SetValueForMouse(float x, float y)
    }
 }
 
-void IntSlider::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void IntSlider::SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod)
 {
    slider = ofClamp(slider, 0, 1);
    SetValue(GetValueForMidiCC(slider), time);
