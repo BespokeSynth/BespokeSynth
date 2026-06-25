@@ -1140,7 +1140,7 @@ noisify~multiply input signal by white noise
 
 
 pitchshift~shifts a signal's pitch
-~ratio~amount to pitchshift by (a value of 1 indicates no shift)
+~ratio~frequency ratio (1 = no shift)\nUp: ratio = 2^(semitones/12)\nDown: ratio = 2^(-semitones/12)\nE.g. 1.26 = major 3rd up, 1.5 = perfect 5th up, 0.5 = octave down
 ~ratioselector~shortcuts to useful pitch ratios
 
 
