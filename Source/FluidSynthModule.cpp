@@ -201,13 +201,11 @@ void FluidSynth::DrawModule()
       mPresetsDropdown[i]->Draw();
    }
 
-#if 1
    float width;
    float height;
    mSelectSoundFontButton->GetDimensions(width, height);
    auto position = mSelectSoundFontButton->GetPosition(true);
    DrawTextNormal(mVersionString, position.x + width + 15, position.y);
-#endif
 
    const float kHighlightDurationMs = 250;
 
@@ -361,7 +359,7 @@ void FluidSynth::PollPresetLocked(int channel)
       int bank = fluid_preset_get_banknum(preset);
       int num = fluid_preset_get_num(preset);
 
-      ofLog() << "poll preset " << channel << " bank " << bank << " preset " << num;
+      //ofLog() << "poll preset " << channel << " bank " << bank << " preset " << num;
       mPresets[channel] = PRESET(bank, num);
    }
 
@@ -499,8 +497,8 @@ void FluidSynth::PlayNote(NoteMessage note)
       return;
    }
 
-   ofLog() << "fluidsynth playnote: " << note.voiceIdx << ", " << note.velocity << ", " << note.pitch;
-   if (note.voiceIdx < 0 || note.voiceIdx > kNumVoices)
+   //ofLog() << "fluidsynth playnote: " << note.voiceIdx << ", " << note.velocity << ", " << note.pitch;
+   if (note.voiceIdx < 0 || note.voiceIdx >= kNumVoices)
       note.voiceIdx = 0;
 
    ScopedMutex mutex(&mSynthMutex, "playNote()");
@@ -519,13 +517,12 @@ void FluidSynth::PlayNote(NoteMessage note)
       fluid_synth_cc(mSynth, note.voiceIdx, 1, modWheel * 127);
    }
 
-#if 0
-   if (note.modulation.pressure != nullptr)
+   //todo
+   /*if (note.modulation.pressure != nullptr)
    {
       float pressure = note.modulation.pressure->GetValue(0);
       fluid_synth_channel_pressure(mSynth, note.voiceIdx, (int)ofMap(pressure, 0, 1, 0, 127, K(clamp)));
-   }
-#endif
+   }*/
 
    fluid_synth_noteon(mSynth, note.voiceIdx, note.pitch, note.velocity);
    mNotesActive[note.voiceIdx] = std::max(mNotesActive[note.voiceIdx] + (note.velocity > 0 ? 1 : -1), 0);
@@ -537,8 +534,8 @@ void FluidSynth::SendCC(int control, int value, int voiceIdx)
    if (!mEnabled)
       return;
 
-   ofLog() << "fluidsynth cc";
-   if (voiceIdx < 0 || voiceIdx > kNumVoices)
+   //ofLog() << "fluidsynth cc";
+   if (voiceIdx < 0 || voiceIdx >= kNumVoices)
       voiceIdx = 0;
 
    ScopedMutex mutex(&mSynthMutex, "sendCC()");
