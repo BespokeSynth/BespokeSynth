@@ -68,7 +68,7 @@ void EnvelopeModulator::DrawModule()
    mAdsrDisplay->Draw();
 }
 
-void EnvelopeModulator::Start(double time, const ::ADSR& adsr)
+void EnvelopeModulator::Start(double time, const ADSR& adsr)
 {
    mAdsr.Start(time, 1, adsr);
 }

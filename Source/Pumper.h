@@ -70,7 +70,7 @@ private:
    FloatSlider* mCurveSlider{ nullptr };
    FloatSlider* mAttackSlider{ nullptr };
 
-   ::ADSR mAdsr;
+   ADSR mAdsr;
    NoteInterval mInterval{ NoteInterval::kInterval_4n };
    DropdownList* mIntervalSelector{ nullptr };
    float mLastValue{ 0 };
