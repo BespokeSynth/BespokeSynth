@@ -45,6 +45,9 @@
 #include "ControlInterface.h"
 #include "Beats.h"
 #include "AbletonDeviceShared.h"
+#include "Amplifier.h"
+#include "SessionOrganizer.h"
+#include "TrackOrganizer.h"
 
 #include "leathers/push"
 #include "leathers/unused-value"
@@ -869,6 +872,61 @@ PYBIND11_EMBEDDED_MODULE(abletongriddevice, m)
       {
          grid.DisplayScreenMessage(message, durationMs);
       }, "message"_a, "durationMs"_a = 500);
+}
+
+PYBIND11_EMBEDDED_MODULE(sessionorganizer, m)
+{
+   m.def("get", [](std::string path)
+   {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
+      auto* ret = dynamic_cast<SessionOrganizer*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<SessionOrganizer>(m, "sessionorganizer")
+      .def("get_track", [](SessionOrganizer& sessionOrganizer, int trackIndex)
+      {
+         return sessionOrganizer.GetTrack(trackIndex);
+      }, py::return_value_policy::reference);
+}
+
+PYBIND11_EMBEDDED_MODULE(trackorganizer, m)
+{
+   m.def("get", [](std::string path)
+   {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
+      auto* ret = dynamic_cast<TrackOrganizer*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<TrackOrganizer>(m, "trackorganizer")
+      .def("get_color", [](TrackOrganizer& trackOrganizer)
+      {
+         std::vector<float> color;
+         ofColor trackColor = trackOrganizer.GetColor();
+         color.push_back(trackColor.r / 255.0f);
+         color.push_back(trackColor.g / 255.0f);
+         color.push_back(trackColor.b / 255.0f);
+         return color;
+      })
+      .def("get_level", [](TrackOrganizer& trackOrganizer)
+      {
+         if (trackOrganizer.GetGain())
+         {
+            float level, watermarkLevel;
+            trackOrganizer.GetGain()->GetLevel(level, watermarkLevel);
+            return level;
+         }
+         return 0.0f;
+      })
+      .def("get_enabled_control", [](TrackOrganizer& trackOrganizer)
+      {
+         if (trackOrganizer.GetEnabledControl())
+            return trackOrganizer.GetEnabledControl()->Path();
+         return std::string();
+      });
 }
 
 PYBIND11_EMBEDDED_MODULE(module, m)
