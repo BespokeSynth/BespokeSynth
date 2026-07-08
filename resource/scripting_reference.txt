@@ -262,6 +262,22 @@ import abletongriddevice
          optional: durationMs = 500
 
 
+import sessionorganizer
+   static:
+      sessionorganizer.get(path)
+   instance:
+      s.get_track(trackIndex)
+
+
+import trackorganizer
+   static:
+      trackorganizer.get(path)
+   instance:
+      t.get_color()
+      t.get_level()
+      t.get_enabled_control()
+
+
 import module
    static:
       module.get(path)
