@@ -1122,8 +1122,28 @@ void SongBuilder::ControlTarget::CreateUIControls(SongBuilder* owner)
    mCycleDisplayTypeButton->SetCableTargetable(false);
 
    for (int i = 0; i < (int)owner->mColors.size(); ++i)
-      mColorSelector->AddLabel(owner->mColors[i].name, i);
+   {
+      DropdownListElement label;
+      label.mValue = i;
+      label.mLabel = owner->mColors[i].name;
+      label.mArgs = &owner->mColors[i].color;
+      label.mCustomRenderer = DrawColourCircle;
+      mColorSelector->AddLabel(label);
+   }
    mColorSelector->SetDrawTriangle(false);
+}
+
+void SongBuilder::DrawColourCircle(ofRectangle renderRect, bool isHovering, bool isDrawingOnPopup, const DropdownListElement& element)
+{
+   if (!isDrawingOnPopup)
+      return;
+   ofPushStyle();
+
+   float hHalf = renderRect.height / 2.0f;
+   auto col = static_cast<ofColor*>(element.mArgs);
+   ofSetColor(*col);
+   ofCircle(renderRect.x + renderRect.width - hHalf, renderRect.y + hHalf, 4.5f);
+   ofPopStyle();
 }
 
 void SongBuilder::ControlTarget::Draw(float x, float y, int numRows)

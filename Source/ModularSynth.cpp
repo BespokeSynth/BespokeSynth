@@ -767,22 +767,22 @@ void ModularSynth::Draw()
             tooltip = helpDisplay->GetModuleTooltipFromName(name);
             tooltipContainer = mQuickSpawn->GetOwningContainer();
          }
-         else if (gHoveredModule == GetTopModalFocusItem() && dynamic_cast<DropdownListModal*>(gHoveredModule))
+         else if (dynamic_cast<DropdownListModal*>(gHoveredModule))
          {
-            DropdownListModal* list = dynamic_cast<DropdownListModal*>(gHoveredModule);
-            if (list->GetOwner()->GetModuleParent() == TheTitleBar)
-            {
-               std::string moduleTypeName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
-               ofStringReplace(moduleTypeName, " (exp.)", "");
-               tooltip = helpDisplay->GetModuleTooltipFromName(moduleTypeName);
+            auto* modal = dynamic_cast<DropdownListModal*>(gHoveredModule);
+
+            //Pick the proper container.
+            if (modal->GetOwner()->GetModuleParent() == TheTitleBar)
                tooltipContainer = &mUILayerModuleContainer;
-            }
-            else if (dynamic_cast<EffectChain*>(list->GetOwner()->GetParent()) != nullptr)
-            {
-               std::string effectName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
-               tooltip = helpDisplay->GetModuleTooltipFromName(effectName);
-               tooltipContainer = list->GetModuleParent()->GetOwningContainer();
-            }
+            else
+               tooltipContainer = modal->GetModuleParent()->GetOwningContainer();
+
+            //Dropdown modals support both custom tooltip addresses and unique per-label tooltips.
+            auto label = modal->GetHoveredLabelObject();
+            if (!label.mTooltipAddress.empty())
+               tooltip = helpDisplay->GetTooltipFromAddress(label.mTooltipAddress);
+            else
+               tooltip = helpDisplay->GetControlSubTooltip(modal->GetOwner(), label.mLabel);
          }
          else if (GetMouseY(&mModuleContainer) < gHoveredModule->GetPosition().y && gHoveredModule->HasTitleBar()) //this means we're hovering over the module's title bar
          {

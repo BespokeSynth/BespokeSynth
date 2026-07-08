@@ -60,16 +60,18 @@ DropdownList::~DropdownList()
 {
 }
 
-void DropdownList::AddLabel(std::string label, int value)
+void DropdownList::AddLabel(const std::string& label, int value)
 {
    DropdownListElement element;
    element.mLabel = label;
    element.mValue = value;
-   mElements.push_back(element);
-
+   AddLabel(element);
+}
+void DropdownList::AddLabel(const DropdownListElement& item)
+{
+   mElements.push_back(item);
    CalculateWidth();
    mHeight = kItemSpacing;
-
    CalcSliderVal();
 }
 
@@ -83,33 +85,43 @@ void DropdownList::RemoveLabel(int value)
 
          CalculateWidth();
          mHeight = kItemSpacing;
-
          CalcSliderVal();
          break;
       }
    }
 }
 
-void DropdownList::SetLabel(std::string label, int value)
+void DropdownList::SetLabel(const std::string& label, int value)
 {
-   bool found = false;
    for (auto iter = mElements.begin(); iter != mElements.end(); ++iter)
    {
       if (iter->mValue == value)
       {
-         found = true;
          iter->mLabel = label;
 
          CalculateWidth();
          mHeight = kItemSpacing;
-
          CalcSliderVal();
-         break;
+         return;
       }
    }
+   AddLabel(label, value);
+}
+void DropdownList::SetLabel(const DropdownListElement& item, int value)
+{
+   for (auto iter = mElements.begin(); iter != mElements.end(); ++iter)
+   {
+      if (iter->mValue == value)
+      {
+         *iter = item;
 
-   if (!found)
-      AddLabel(label, value);
+         CalculateWidth();
+         mHeight = kItemSpacing;
+         CalcSliderVal();
+         return;
+      }
+   }
+   AddLabel(item);
 }
 
 void DropdownList::CalculateWidth()
@@ -117,7 +129,7 @@ void DropdownList::CalculateWidth()
    mMaxItemWidth = mWidth;
    for (int i = 0; i < mElements.size(); ++i)
    {
-      int width = GetStringWidth(mElements[i].mLabel) + (mDrawTriangle ? 15 : 3);
+      int width = GetStringWidth(mElements[i].mLabel) + mElements[i].mReservedWidth + (mDrawTriangle ? 15 : 3);
       if (width > mMaxItemWidth)
          mMaxItemWidth = width;
    }
@@ -143,6 +155,15 @@ std::string DropdownList::GetLabel(int val) const
          return mElements[i].mLabel;
    }
    return "";
+}
+DropdownListElement DropdownList::GetLabelObject(int val) const
+{
+   for (int i = 0; i < mElements.size(); ++i)
+   {
+      if (mElements[i].mValue == val)
+         return mElements[i];
+   }
+   return {};
 }
 
 bool DropdownList::HasLabel(int val) const
@@ -195,7 +216,12 @@ void DropdownList::Render()
 
       ofPushMatrix();
       ofClipWindow(mX, mY, w - (mDrawTriangle ? 12 : 0), h, true);
+      auto dropdownLabel = GetDisplayLabel(*mVar);
       DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12);
+      if (dropdownLabel.mCustomRenderer)
+      {
+         dropdownLabel.mCustomRenderer(ofRectangle(mX, mY, mWidth, mHeight), false, false, dropdownLabel);
+      }
       ofPopMatrix();
       if (mDrawTriangle)
       {
@@ -282,10 +308,18 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
       if (col >= displayColumns)
          break;
 
-      if (i == hoverIndex)
+      ofRectangle labelRect{
+         static_cast<float>(mMaxItemWidth * col),
+         (i % maxPerColumn) * kItemSpacing + pageHeaderShift,
+         static_cast<float>(mMaxItemWidth),
+         kItemSpacing
+      };
+      bool isHovering = i == hoverIndex;
+
+      if (isHovering)
       {
          ofSetColor(100, 100, 100, 100);
-         ofRect(mMaxItemWidth * col, (i % maxPerColumn) * kItemSpacing + pageHeaderShift, mMaxItemWidth, kItemSpacing);
+         ofRect(labelRect);
       }
 
       if (VectorContains(i, mSeparators))
@@ -303,6 +337,11 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
          ofSetColor(255, 255, 255);
 
       DrawTextNormal(mElements[i].mLabel, 1 + mMaxItemWidth * col, (i % maxPerColumn) * kItemSpacing + 12 + pageHeaderShift);
+
+      if (mElements[i].mCustomRenderer)
+      {
+         mElements[i].mCustomRenderer(labelRect, isHovering, true, mElements[i]);
+      }
    }
    ofSetColor(255, 255, 255);
 
@@ -531,7 +570,7 @@ void DropdownList::SetIndex(int i, double time, bool forceUpdate)
 
 void DropdownList::SetValue(float value, double time, bool forceUpdate /*= false*/)
 {
-   int intValue = (int)value;
+   int intValue = static_cast<int>(value);
    if (intValue != *mVar || forceUpdate)
    {
       int oldVal = *mVar;
@@ -552,7 +591,7 @@ float DropdownList::GetMidiValue() const
    return mSliderVal;
 }
 
-int DropdownList::FindItemIndex(float val) const
+int DropdownList::FindItemIndex(const int val) const
 {
    for (int i = 0; i < mElements.size(); ++i)
    {
@@ -565,12 +604,22 @@ int DropdownList::FindItemIndex(float val) const
 
 std::string DropdownList::GetDisplayValue(float val) const
 {
-   int itemIndex = FindItemIndex(val);
+   int itemIndex = FindItemIndex(static_cast<int>(val));
 
    if (itemIndex >= 0 && itemIndex < mElements.size())
       return mElements[itemIndex].mLabel;
    else
       return mUnknownItemString.c_str();
+}
+
+DropdownListElement DropdownList::GetDisplayLabel(int val) const
+{
+   int itemIndex = FindItemIndex(val);
+
+   if (itemIndex >= 0 && itemIndex < mElements.size())
+      return mElements[itemIndex];
+
+   return { mUnknownItemString };
 }
 
 void DropdownList::CalcSliderVal()
@@ -671,12 +720,17 @@ void DropdownListModal::DrawModule()
       mPageNextButton->Draw();
 }
 
-std::string DropdownListModal::GetHoveredLabel()
+std::string DropdownListModal::GetHoveredLabel() const
+{
+   return GetHoveredLabelObject().mLabel;
+}
+
+DropdownListElement DropdownListModal::GetHoveredLabelObject() const
 {
    int index = mOwner->GetItemIndexAt((int)mMouseX, (int)mMouseY);
    if (index >= 0 && index < mOwner->GetNumValues())
-      return mOwner->GetElement(index).mLabel;
-   return "";
+      return mOwner->GetElement(index);
+   return {};
 }
 
 bool DropdownListModal::MouseMoved(float x, float y)

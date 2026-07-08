@@ -29,12 +29,23 @@
 #include "IDrawableModule.h"
 #include "ClickButton.h"
 #include "IPulseReceiver.h"
-#include "PatchCableSource.h"
 
+
+struct DropdownListElement;
+typedef void (*DropdownRenderFn)(ofRectangle renderRect, bool isHovering, bool isDrawingOnPopup, const DropdownListElement& element);
 struct DropdownListElement
 {
-   std::string mLabel;
-   int mValue{ 0 };
+   std::string mLabel; //Text on the dropdown
+   int mValue{ 0 }; //Value of the dropdown, used for array indexing and modulation.
+
+   //Custom tooltip address. Format: "module~control~subcontrol"
+   //Can point to any tooltip in the tooltip files.
+   //By default displays this if present --> thismodule~thisdropdown~thislabel~tooltip. If not present, no tooltip is shown.
+   std::string mTooltipAddress{};
+
+   float mReservedWidth{ 0.0f }; //Try to reserve additional space for special rendering
+   DropdownRenderFn mCustomRenderer{ nullptr }; //If set, will call this function on draw, for custom rendering. Still draws the label.
+   void* mArgs{ nullptr }; //Optionally include an argument for rendering work.
 };
 
 class DropdownList;
@@ -71,7 +82,8 @@ public:
    bool ShouldClipContents() override { return false; }
    DropdownList* GetOwner() const { return mOwner; }
    bool MouseMoved(float x, float y) override;
-   std::string GetHoveredLabel();
+   std::string GetHoveredLabel() const;
+   DropdownListElement GetHoveredLabelObject() const;
    float GetMouseX() { return mMouseX; }
    float GetMouseY() { return mMouseY; }
    void SetShowPagingControls(bool show);
@@ -104,10 +116,13 @@ public:
    DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width = -1);
    DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, float width = -1);
    IDropdownListener* GetOwner() { return mOwner; }
-   void AddLabel(std::string label, int value);
+   void AddLabel(const std::string& label, int value);
+   void AddLabel(const DropdownListElement& item);
    void RemoveLabel(int value);
-   void SetLabel(std::string label, int value);
+   void SetLabel(const std::string& label, int value);
+   void SetLabel(const DropdownListElement& item, int value);
    std::string GetLabel(int val) const;
+   DropdownListElement GetLabelObject(int val) const;
    bool HasLabel(int val) const;
    void SetDisplayStyle(DropdownDisplayStyle style) { mDisplayStyle = style; }
    void Render() override;
@@ -151,6 +166,7 @@ public:
    float GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
    std::string GetDisplayValue(float val) const override;
+   DropdownListElement GetDisplayLabel(int val) const;
    bool InvertScrollDirection() override { return true; }
    void Increment(float amount) override;
    void Poll() override;
@@ -173,7 +189,7 @@ protected:
 private:
    void OnClicked(float x, float y, bool right) override;
    void CalcSliderVal();
-   int FindItemIndex(float val) const;
+   int FindItemIndex(int val) const;
    void CalculateWidth();
    ofVec2f GetModalListPosition() const;
 

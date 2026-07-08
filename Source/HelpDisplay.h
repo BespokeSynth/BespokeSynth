@@ -51,9 +51,17 @@ public:
    static void OpenDocsLink();
    static void OpenDiscordLink();
 
-   std::string GetUIControlTooltip(IUIControl* control);
-   std::string GetModuleTooltip(IDrawableModule* module);
-   std::string GetModuleTooltipFromName(std::string moduleTypeName);
+   std::string GetUIControlTooltip(IUIControl* control); //Returns the tooltip of this control.
+   std::string GetModuleTooltip(IDrawableModule* module); //Returns the tooltip of this module.
+   std::string GetModuleTooltipFromName(std::string moduleTypeName); //Returns the tooltip of the module with this name.
+   std::string GetControlSubTooltip(IUIControl* control, const std::string& subTooltip);
+
+   //Returns the address of the tooltip in format. "Name: Tooltip"
+   //Addresses:
+   //modulename
+   //modulename~uiname
+   //modulename~uiname~subuiname
+   std::string GetTooltipFromAddress(const std::string& address);
 
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override {}
@@ -73,10 +81,17 @@ private:
 
    void RenderScreenshot(int x, int y, int width, int height, std::string filename);
 
+   struct UIControlSubTooltipInfo
+   {
+      std::string name;
+      std::string tooltip;
+   };
+
    struct UIControlTooltipInfo
    {
       std::string controlName;
       std::string tooltip;
+      std::list<UIControlSubTooltipInfo> subTooltips;
    };
 
    struct ModuleTooltipInfo
@@ -84,6 +99,7 @@ private:
       std::string module;
       std::string tooltip;
       std::list<UIControlTooltipInfo> controlTooltips;
+      std::list<UIControlSubTooltipInfo> globalSubTooltips;
    };
 
    void LoadHelp();
@@ -117,4 +133,6 @@ private:
    };
    ScreenshotState mScreenshotState{ ScreenshotState::None };
    int mScreenshotCountdown{ 0 };
+
+   const std::string kNoTooltipFound = "[no tooltip found]";
 };

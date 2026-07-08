@@ -1000,6 +1000,13 @@ feedback~feed delayed audio back into earlier in the signal chain. use the "feed
 eq~multi-band equalizer, to adjust output levels at frequency ranges
 ~enabled*~enable this band?
 ~type*~what type of filter should this band use
+~*~lp~low pass
+~*~hp~high pass
+~*~bp~band pass
+~*~pk~peak
+~*~nt~notch
+~*~hs~high shelf
+~*~ls~low shelf
 ~f*~frequency cutoff for this band
 ~g*~gain for this band
 ~q*~resonance for this band
@@ -1992,6 +1999,43 @@ splitter~splits a stereo signal into two mono signals, or duplicates a mono sign
 scale~controls the global scale used by various modules
 ~root~root note of the scale
 ~scale~which set of notes to use
+~~ionian~1 2 3 4 5 6 7 (major)
+~~aeolian~1 2 b3 4 5 b6 b7 (minor)
+~~dorian~1 2 b3 4 5 6 b7 (minor)
+~~mixolydian~1 2 3 4 5 6 b7 (major)
+~~lydian~1 2 3 #4 5 6 7 (major)
+~~phrygian~1 b2 b3 4 5 b6 b7 (minor)
+~~locrian~1 b2 b3 4 b5 b6 b7 (minor)
+~~harmonic minor~1 2 b3 4 5 b6 7
+~~melodic minor~1 2 b3 4 5 6 7
+~~super locrian~1 b2 #2 3 b5 #5 b7
+~~neapolitan min~1 b2 b3 4 5 b6 7
+~~neapolitan maj~1 b2 b3 4 5 6 7
+~~enigmatic minor~1 b2 b3 #4 5 #6 7
+~~enigmatic~1 b2 3 #4 #5 #6 7
+~~composite~1 b2 3 #4 5 b6 7
+~~bhairav~1 b2 3 4 5 b6 7
+~~hungarian min~1 2 b3 #4 5 b6 7
+~~minor gypsy~1 b2 3 4 5 b6 b7
+~~persian~1 b2 3 4 b5 b6 7
+~~asc minor~1 2 b3 4 5 6 7
+~~diminished~1 b2 #2 3 #4 5 6 b7
+~~whole-half~1 2 b3 4 b5 b6 6 7
+~~whole tone~1 2 3 #4 #5 #6
+~~minor blues~1 b3 4 b5 5 b7
+~~minor penta~1 b3 4 5 b7
+~~major penta~1 2 3 5 6
+~~dominant sus~1 2 4 5 6 b7
+~~bebop locrian~1 2 b3 4 b5 b6 b7 7
+~~bebop dom~1 2 3 4 5 6 b7 7
+~~bebop major~1 2 3 4 5 b6 6 7
+~~hirajoshi~1 2 b3 5 b6
+~~in-sen~1 b2 4 5 b7
+~~iwato~1 b2 4 b5
+~~kumoi~1 2 b3 5 6
+~~pelog~1 b2 b3 3 5 b6
+~~spanish~1 b2 b3 3 4 #4 b6 b7
+~~chromatic~1 b2 2 b3 3 4 b5 5 #5 6 b7 7
 ~degree~
 ~intonation~which method to use to tune the scale
 ~PPO~pitches per octave
