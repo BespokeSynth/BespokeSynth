@@ -35,17 +35,17 @@ namespace
 {
    //clean layout: full-width waveform on top, three control columns below
    const float kMargin = 6;
-   const float kWaveX = 6;    //waveform spans the full module width
+   const float kWaveX = 6; //waveform spans the full module width
    const float kWaveY = 20;
    const float kWaveH = 96;
 
-   const float kRowY = 128;   //top of the three-column control row
+   const float kRowY = 128; //top of the three-column control row
 
-   const float kCol1X = 6;    //main controls
+   const float kCol1X = 6; //main controls
    const float kCol1W = 150;
-   const float kCol2X = 162;  //mode-specific params
+   const float kCol2X = 162; //mode-specific params
    const float kCol2W = 150;
-   const float kCol3X = 318;  //envelope
+   const float kCol3X = 318; //envelope
    const float kCol3W = 146;
 
    const float kRowStep = 18; //vertical spacing between controls in a column

@@ -32,7 +32,7 @@
 
 namespace
 {
-   const int kMaxVoxels = 2200;    //decimate the rasterised text down to this many points
+   const int kMaxVoxels = 2200; //decimate the rasterised text down to this many points
    const int kMaxBasePoints = 5200; //voxels * depth-layers ceiling
 
    //common cross-platform typefaces; "default" uses the app's sans font

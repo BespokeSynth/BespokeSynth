@@ -353,9 +353,24 @@ void CubeViz::DrawShape(float cx, float cy, float halfW, float halfH, float rx, 
                float px[4], py[4], pz[4];
                for (int c = 0; c < 4; ++c)
                {
-                  if (axis == 0) { px[c] = sign; py[c] = cu[c]; pz[c] = cv[c]; }
-                  else if (axis == 1) { px[c] = cu[c]; py[c] = sign; pz[c] = cv[c]; }
-                  else { px[c] = cu[c]; py[c] = cv[c]; pz[c] = sign; }
+                  if (axis == 0)
+                  {
+                     px[c] = sign;
+                     py[c] = cu[c];
+                     pz[c] = cv[c];
+                  }
+                  else if (axis == 1)
+                  {
+                     px[c] = cu[c];
+                     py[c] = sign;
+                     pz[c] = cv[c];
+                  }
+                  else
+                  {
+                     px[c] = cu[c];
+                     py[c] = cv[c];
+                     pz[c] = sign;
+                  }
                }
                float colorT = (face + (i + j) / (2.0f * g)) / 6.0f;
                addQuad(colorT, px[0], py[0], pz[0], px[1], py[1], pz[1], px[2], py[2], pz[2], px[3], py[3], pz[3]);
@@ -382,7 +397,10 @@ void CubeViz::DrawShape(float cx, float cy, float halfW, float halfH, float rx, 
       }
    }
 
-   std::sort(quads.begin(), quads.end(), [](const Quad& a, const Quad& b) { return a.depth < b.depth; });
+   std::sort(quads.begin(), quads.end(), [](const Quad& a, const Quad& b)
+             {
+                return a.depth < b.depth;
+             });
 
    //depth-based diffuse light: nearer facets brighter, far ones darker -> real 3D shading (not flat white)
    float dmin = 1e18f, dmax = -1e18f;

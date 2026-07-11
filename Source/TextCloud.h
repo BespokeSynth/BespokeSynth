@@ -87,8 +87,8 @@ private:
 
    struct Voxel
    {
-      float u, v;  //centred, normalised position (-0.5..0.5-ish)
-      float lum;   //0..1
+      float u, v; //centred, normalised position (-0.5..0.5-ish)
+      float lum; //0..1
    };
    std::vector<Voxel> mVoxels;
    char mText[MAX_TEXTENTRY_LENGTH]{}; //TextEntry copies using this fixed size - must match to avoid overflow
@@ -99,7 +99,7 @@ private:
    float mHighEnergy{ 0 };
 
    //controls
-   float mExtrude{ 0.35f };   //Z depth of the extruded slab
+   float mExtrude{ 0.35f }; //Z depth of the extruded slab
    float mSpinSpeed{ 0.6f };
    float mSensitivity{ 1.0f };
    float mDistort{ 0.0f };

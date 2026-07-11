@@ -157,7 +157,7 @@ private:
    Checkbox* mSnapScaleCheckbox{ nullptr };
 
    //granular
-   float mGrainPos{ 0.0f };  //0-1 scrub through sample
+   float mGrainPos{ 0.0f }; //0-1 scrub through sample
    float mGrainSizeMs{ 90.0f };
    float mGrainSpread{ 0.05f };
    float mGrainDensity{ 0.6f };
@@ -170,7 +170,7 @@ private:
 
    //spectral
    float mSpecPos{ 0.0f };
-   float mSpecTilt{ 0.0f };   //-1 darker .. +1 brighter
+   float mSpecTilt{ 0.0f }; //-1 darker .. +1 brighter
    float mSpecHarmonics{ 0.0f }; //0..1 boost of upper partials
    FloatSlider* mSpecPosSlider{ nullptr };
    FloatSlider* mSpecTiltSlider{ nullptr };
@@ -193,15 +193,15 @@ private:
 
       //classic / slice / repitch playhead (source-sample position)
       double mPos{ 0 };
-      int mDir{ 1 };            //ping-pong direction
+      int mDir{ 1 }; //ping-pong direction
       double mRegionStart{ 0 }; //slice / loop region
       double mRegionEnd{ 0 };
       bool mOneShotDone{ false };
 
       //granular scrub state
-      double mScrub{ 0 };       //source position the grains read around
-      double mGrainPhase{ 0 };  //0..1 through the current grain
-      double mGrainStart{ 0 };  //source pos this grain began at
+      double mScrub{ 0 }; //source position the grains read around
+      double mGrainPhase{ 0 }; //0..1 through the current grain
+      double mGrainStart{ 0 }; //source pos this grain began at
 
       //spectral phase (reads mSpecTable)
       double mSpecPhase{ 0 };

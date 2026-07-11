@@ -443,7 +443,10 @@ bool SearchPanel::LoadIndex()
       //derive the lowercased filename from the path (cheap - no juce::File construction)
       size_t slash = path.find_last_of("/\\");
       std::string fname = (slash == std::string::npos) ? path : path.substr(slash + 1);
-      std::transform(fname.begin(), fname.end(), fname.begin(), [](unsigned char c) { return (char)std::tolower(c); });
+      std::transform(fname.begin(), fname.end(), fname.begin(), [](unsigned char c)
+                     {
+                        return (char)std::tolower(c);
+                     });
 
       IndexedSample entry;
       entry.path = std::move(path);
@@ -511,7 +514,10 @@ void SearchPanel::UpdateResults()
    mSampleScroll = 0;
 
    std::string needle = mLastSearchText;
-   std::transform(needle.begin(), needle.end(), needle.begin(), [](unsigned char c) { return (char)std::tolower(c); });
+   std::transform(needle.begin(), needle.end(), needle.begin(), [](unsigned char c)
+                  {
+                     return (char)std::tolower(c);
+                  });
 
    std::vector<juce::String> prefixMatches;
    std::vector<juce::String> otherMatches;

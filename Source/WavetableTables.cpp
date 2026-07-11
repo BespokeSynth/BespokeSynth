@@ -671,7 +671,8 @@ float WavetableTables::ReadWarped(const WavetableFrameSet* table, float position
    const float* dataLow = table->GetFrameData(frameLow, oddOnly, evenOnly);
    const float* dataHigh = table->GetFrameData(frameHigh, oddOnly, evenOnly);
 
-   auto lookup = [](const float* frameData, float p01) {
+   auto lookup = [](const float* frameData, float p01)
+   {
       float idxF = p01 * WavetableFrameSet::kTableSize;
       int i0 = (int)idxF;
       int i1 = (i0 + 1) % WavetableFrameSet::kTableSize;

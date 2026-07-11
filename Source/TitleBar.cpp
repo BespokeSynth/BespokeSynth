@@ -451,7 +451,7 @@ void TitleBar::DrawModule()
       x += w + 5;
 
       if (x >= pixelWidth - 340) //reserve extra room on the right so the spawn dropdowns never run
-      {                          //into the palette/search/home/settings/help cluster or the cpu stats
+      { //into the palette/search/home/settings/help cluster or the cpu stats
          x = startX;
          y += 18;
       }

@@ -154,8 +154,16 @@ void CheckerBox::DrawPattern(float viewX, float viewY, float viewW, float viewH,
             }
             float r, g, b;
             CellColor(i, j, step, r, g, b);
-            if (channel == 1) { g = 0; b = 0; }
-            else if (channel == 2) { r = 0; g = 0; }
+            if (channel == 1)
+            {
+               g = 0;
+               b = 0;
+            }
+            else if (channel == 2)
+            {
+               r = 0;
+               g = 0;
+            }
             ofSetColor(r * 255, g * 255, b * 255, alpha);
             ofBeginShape();
             for (int k = 0; k < 4; ++k)
@@ -202,8 +210,16 @@ void CheckerBox::DrawPattern(float viewX, float viewY, float viewW, float viewH,
             qy[3] = cy + sinf(a0 + twist1) * r1;
             float r, g, b;
             CellColor(i, j, step, r, g, b);
-            if (channel == 1) { g = 0; b = 0; }
-            else if (channel == 2) { r = 0; g = 0; }
+            if (channel == 1)
+            {
+               g = 0;
+               b = 0;
+            }
+            else if (channel == 2)
+            {
+               r = 0;
+               g = 0;
+            }
             ofSetColor(r * 255, g * 255, b * 255, alpha);
             ofBeginShape();
             for (int k = 0; k < 4; ++k)

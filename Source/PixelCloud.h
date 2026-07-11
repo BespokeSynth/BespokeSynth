@@ -65,7 +65,7 @@ public:
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void OnClicked(float x, float y, bool right) override; //start a rotate-drag (cloud mode)
-   void Poll() override;                                  //continue the rotate-drag
+   void Poll() override; //continue the rotate-drag
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
@@ -104,8 +104,8 @@ private:
    //downsampled grid (rebuilt only when the image or density changes)
    int mCols{ 0 };
    int mRows{ 0 };
-   std::vector<float> mLum;                    //cols*rows
-   std::vector<float> mR, mG, mB;              //cols*rows, 0..1
+   std::vector<float> mLum; //cols*rows
+   std::vector<float> mR, mG, mB; //cols*rows, 0..1
 
    //audio analysis (audio thread writes, UI thread reads)
    float mAmplitude{ 0 };
@@ -113,14 +113,14 @@ private:
 
    //controls
    int mMode{ kMode_Ascii };
-   int mDensity{ 70 };       //grid width in cells
+   int mDensity{ 70 }; //grid width in cells
    float mGlitch{ 0.35f };
-   float mDepth{ 1.0f };     //z extrusion (cloud) / channel-split (ascii)
+   float mDepth{ 1.0f }; //z extrusion (cloud) / channel-split (ascii)
    float mSpinSpeed{ 0.6f };
    float mSensitivity{ 1.0f };
    float mGrain{ 0.05f };
    float mHueShift{ 0.0f };
-   int mColorMode{ 0 };      //0 image, 1 palette, 2 mono
+   int mColorMode{ 0 }; //0 image, 1 palette, 2 mono
    int mPaletteIndex{ 0 };
 
    DropdownList* mModeSelector{ nullptr };

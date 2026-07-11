@@ -90,7 +90,7 @@ private:
    //background audio-file index entry (declared early so index methods below can reference it)
    struct IndexedSample
    {
-      std::string path;      //full path, used to grab the sample
+      std::string path; //full path, used to grab the sample
       std::string lowerName; //lowercased filename, used for fast substring matching
    };
 
@@ -124,9 +124,9 @@ private:
    static std::string GetWidthFilePath();
    static std::string TruncatePathForDisplay(const std::string& path, int maxChars);
 
-   static const int kMaxResults = 10;          //module results
-   static const int kVisibleSampleRows = 30;   //sample rows drawn on screen at once (virtualized window)
-   static const int kMaxSampleMatches = 4000;  //full match list you can scroll through
+   static const int kMaxResults = 10; //module results
+   static const int kVisibleSampleRows = 30; //sample rows drawn on screen at once (virtualized window)
+   static const int kMaxSampleMatches = 4000; //full match list you can scroll through
    static const int kMaxLocationRows = 8;
    static const int kMinWidth = 150;
    static const int kMaxWidth = 640;
@@ -140,7 +140,7 @@ private:
 
    std::vector<ModuleFactory::Spawnable> mModuleResults;
    std::vector<juce::String> mSampleResults; //full ranked match list (scrollable)
-   int mSampleScroll{ 0 };                    //index of the first sample row shown (virtualized list)
+   int mSampleScroll{ 0 }; //index of the first sample row shown (virtualized list)
 
    std::array<ClickButton*, kMaxResults> mModuleButtons{ nullptr };
    std::array<ClickButton*, kVisibleSampleRows> mSampleButtons{ nullptr };

@@ -145,8 +145,8 @@ bool WavetableVoice::Process(double time, ChannelBuffer* out, int oversampling)
       for (int u = 0; useA && u < mVoiceParams->mUnison && u < kMaxUnison; ++u) //osc A can be switched off
       {
          float readPhase = (mVoiceParams->mSyncMode != Oscillator::SyncMode::None)
-                               ? mOscData[u].mSyncPhase
-                               : (mOscData[u].mPhase + mVoiceParams->mPhaseOffset * (1 + (float(u) / mVoiceParams->mUnison)));
+                           ? mOscData[u].mSyncPhase
+                           : (mOscData[u].mPhase + mVoiceParams->mPhaseOffset * (1 + (float(u) / mVoiceParams->mUnison)));
 
          float rawA;
          if (useB && mVoiceParams->mModType == WavetableModType::FM)
