@@ -46,6 +46,7 @@ void BiquadFilterEffect::CreateUIControls()
    mTypeSelector->AddLabel("bp", kFilterType_Bandpass);
    mTypeSelector->AddLabel("pk", kFilterType_Peak);
    mTypeSelector->AddLabel("ap", kFilterType_Allpass);
+   mTypeSelector->AddLabel("comb", kFilterType_Comb);
 
    mFSlider->SetMaxValueDisplay("inf");
    mFSlider->SetMode(FloatSlider::kSquare);
@@ -86,18 +87,32 @@ void BiquadFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (fadeOut)
       mDryBuffer.CopyFrom(buffer);
 
+   bool isComb = (mBiquad[0].mType == kFilterType_Comb);
+
    for (int i = 0; i < bufferSize; ++i)
    {
       ComputeSliders(i);
-      if (mCoefficientsHaveChanged)
+
+      if (isComb)
       {
-         mBiquad[0].UpdateFilterCoeff();
-         for (int ch = 1; ch < buffer->NumActiveChannels(); ++ch)
-            mBiquad[ch].CopyCoeffFrom(mBiquad[0]);
-         mCoefficientsHaveChanged = false;
+         //F slider repurposed as the comb's fundamental frequency (sets delay length), Q slider repurposed as feedback amount
+         int delaySamples = ofClamp((int)(gSampleRate / MAX(mBiquad[0].mF, 1.0f)), 1, kCombBufferSize - 1);
+         float feedback = ofClamp(mBiquad[0].mQ / mQSlider->GetMax(), 0, 0.98f);
+         for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
+            buffer->GetChannel(ch)[i] = ProcessComb(ch, buffer->GetChannel(ch)[i], feedback, delaySamples);
       }
-      for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
-         buffer->GetChannel(ch)[i] = mBiquad[ch].Filter(buffer->GetChannel(ch)[i]);
+      else
+      {
+         if (mCoefficientsHaveChanged)
+         {
+            mBiquad[0].UpdateFilterCoeff();
+            for (int ch = 1; ch < buffer->NumActiveChannels(); ++ch)
+               mBiquad[ch].CopyCoeffFrom(mBiquad[0]);
+            mCoefficientsHaveChanged = false;
+         }
+         for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
+            buffer->GetChannel(ch)[i] = mBiquad[ch].Filter(buffer->GetChannel(ch)[i]);
+      }
    }
 
    if (fadeOut)
@@ -130,20 +145,37 @@ void BiquadFilterEffect::DrawModule()
 
    float w, h;
    GetModuleDimensions(w, h);
-   ofSetColor(52, 204, 235);
-   ofSetLineWidth(1);
-   ofBeginShape();
-   const int kPixelStep = 1;
-   for (int x = 0; x < w + kPixelStep; x += kPixelStep)
+
+   if (mBiquad[0].mType == kFilterType_Comb)
    {
-      float freq = FreqForPos(x / w);
-      if (freq < gSampleRate / 2)
+      //comb filters have teeth spaced at multiples of the fundamental rather than a smooth biquad response curve;
+      //draw a simple comb-tooth pattern instead of the (meaningless here) biquad magnitude response
+      ofSetColor(52, 204, 235);
+      ofSetLineWidth(1);
+      const int kNumTeeth = 10;
+      for (int t = 0; t < kNumTeeth; ++t)
       {
-         float response = mBiquad[0].GetMagnitudeResponseAt(freq);
-         ofVertex(x, (.5f - .666f * log10(response)) * h);
+         float x = w * (t + 0.5f) / kNumTeeth;
+         ofLine(x, h, x, h * .15f);
       }
    }
-   ofEndShape(false);
+   else
+   {
+      ofSetColor(52, 204, 235);
+      ofSetLineWidth(1);
+      ofBeginShape();
+      const int kPixelStep = 1;
+      for (int x = 0; x < w + kPixelStep; x += kPixelStep)
+      {
+         float freq = FreqForPos(x / w);
+         if (freq < gSampleRate / 2)
+         {
+            float response = mBiquad[0].GetMagnitudeResponseAt(freq);
+            ofVertex(x, (.5f - .666f * log10(response)) * h);
+         }
+      }
+      ofEndShape(false);
+   }
 }
 
 void BiquadFilterEffect::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* control)
@@ -173,19 +205,45 @@ float BiquadFilterEffect::GetEffectAmount()
       return ofClamp(.3f + (mBiquad[0].mQ / mQSlider->GetMax()), 0, 1);
    if (mBiquad[0].mType == kFilterType_Peak)
       return ofClamp(fabsf(mBiquad[0].mDbGain / 96), 0, 1);
+   if (mBiquad[0].mType == kFilterType_Comb)
+      return ofClamp(mBiquad[0].mQ / mQSlider->GetMax(), 0, 1);
    return 0;
 }
 
 void BiquadFilterEffect::GetModuleDimensions(float& width, float& height)
 {
    width = 120;
+   if (mTypeSelector != nullptr)
+      width = MAX(width, mTypeSelector->GetPosition(true).x + mTypeSelector->GetRect().width + 4);
    height = 69;
 }
 
 void BiquadFilterEffect::Clear()
 {
    for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
+   {
       mBiquad[i].Clear();
+      for (int j = 0; j < kCombBufferSize; ++j)
+         mCombBuffer[i][j] = 0;
+      mCombWritePos[i] = 0;
+   }
+}
+
+float BiquadFilterEffect::ProcessComb(int channel, float input, float feedback, int delaySamples)
+{
+   int writePos = mCombWritePos[channel];
+   int readPos = writePos - delaySamples;
+   while (readPos < 0)
+      readPos += kCombBufferSize;
+   readPos %= kCombBufferSize;
+
+   float delayed = mCombBuffer[channel][readPos];
+   float output = input + feedback * delayed;
+   output = ofClamp(output, -10.0f, 10.0f); //safety clamp against runaway feedback
+
+   mCombBuffer[channel][writePos] = output;
+   mCombWritePos[channel] = (writePos + 1) % kCombBufferSize;
+   return output;
 }
 
 void BiquadFilterEffect::ResetFilter()

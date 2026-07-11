@@ -291,6 +291,9 @@ public:
    std::string GetLastSavePath() { return mCurrentSaveStatePath; }
    RollingBuffer* GetGlobalRecordBuffer() const { return mGlobalRecordBuffer; }
 
+   void ToggleRecording();
+   bool IsRecordingSession() const { return mIsRecordingSession; }
+
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
    juce::Component* GetFileChooserParent() const;
 
@@ -385,6 +388,8 @@ private:
 
    RollingBuffer* mGlobalRecordBuffer{ nullptr };
    int mRecordingLength{ 0 };
+
+   bool mIsRecordingSession{ false }; //ambient capture is on by default (matches legacy behavior); Record button lets the user explicitly stop/start a take
 
    struct LogEventItem
    {

@@ -89,4 +89,10 @@ private:
    ChannelBuffer mDryBuffer;
 
    bool mCoefficientsHaveChanged{ true };
+
+   //comb filter state (used only when mBiquad[0].mType == kFilterType_Comb; bypasses the biquad math entirely)
+   static constexpr int kCombBufferSize = 8192;
+   float ProcessComb(int channel, float input, float feedback, int delaySamples);
+   float mCombBuffer[ChannelBuffer::kMaxNumChannels][kCombBufferSize]{};
+   int mCombWritePos[ChannelBuffer::kMaxNumChannels]{};
 };

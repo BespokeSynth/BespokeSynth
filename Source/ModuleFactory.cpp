@@ -42,6 +42,9 @@
 #include "InputChannel.h"
 #include "OutputChannel.h"
 #include "WaveformViewer.h"
+#include "TextCloud.h"
+#include "CheckerBox.h"
+#include "PixelCloud.h"
 #include "FMSynth.h"
 #include "MidiController.h"
 #include "PSMoveController.h"
@@ -77,6 +80,9 @@
 #include "Producer.h"
 #include "ChaosEngine.h"
 #include "SingleOscillator.h"
+#include "MolderSampler.h"
+#include "Tracker.h"
+#include "Wavetable.h"
 #include "BandVocoder.h"
 #include "Capo.h"
 #include "ControlTactileFeedback.h"
@@ -94,6 +100,8 @@
 #include "SamplerGrid.h"
 #include "SignalGenerator.h"
 #include "Lissajous.h"
+#include "CubeViz.h"
+#include "BlobViz.h"
 #include "DebugAudioSource.h"
 #include "TimerDisplay.h"
 #include "DrumSynth.h"
@@ -297,6 +305,9 @@ ModuleFactory::ModuleFactory()
 {
    REGISTER(LooperRecorder, looperrecorder, kModuleCategory_Audio);
    REGISTER(WaveformViewer, waveformviewer, kModuleCategory_Audio);
+   REGISTER(TextCloud, textcloud, kModuleCategory_Visualizer);
+   REGISTER(CheckerBox, checkerbox, kModuleCategory_Visualizer);
+   REGISTER(PixelCloud, pixelcloud, kModuleCategory_Visualizer);
    REGISTER(EffectChain, effectchain, kModuleCategory_Audio);
    REGISTER(DrumPlayer, drumplayer, kModuleCategory_Synth);
    REGISTER(Chorder, chorder, kModuleCategory_Note);
@@ -329,6 +340,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(Snapshots, snapshots, kModuleCategory_Other);
    REGISTER(NoteStepSequencer, notesequencer, kModuleCategory_Instrument);
    REGISTER(SingleOscillator, oscillator, kModuleCategory_Synth);
+   REGISTER(MolderSampler, molder, kModuleCategory_Synth);
+   REGISTER(Tracker, tracker, kModuleCategory_Synth);
+   REGISTER(Wavetable, wavetable, kModuleCategory_Synth);
    REGISTER(BandVocoder, vocoder, kModuleCategory_Audio);
    REGISTER(Capo, capo, kModuleCategory_Note);
    REGISTER(VocoderCarrierInput, vocodercarrier, kModuleCategory_Audio);
@@ -344,6 +358,8 @@ ModuleFactory::ModuleFactory()
    REGISTER(SamplerGrid, samplergrid, kModuleCategory_Audio);
    REGISTER(SignalGenerator, signalgenerator, kModuleCategory_Synth);
    REGISTER(Lissajous, lissajous, kModuleCategory_Audio);
+   REGISTER(CubeViz, cubeviz, kModuleCategory_Visualizer);
+   REGISTER(BlobViz, blobviz, kModuleCategory_Visualizer);
    REGISTER(TimerDisplay, timerdisplay, kModuleCategory_Other);
    REGISTER(DrumSynth, drumsynth, kModuleCategory_Synth);
    //REGISTER(EigenChorder, eigenchorder, kModuleCategory_Note);

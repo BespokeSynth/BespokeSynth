@@ -112,6 +112,8 @@ extern float gControlTactileFeedback;
 extern float gDrawScale;
 extern bool gShowDevModules;
 extern float gCornerRoundness;
+extern bool gFlatUIStyle; //when true, disables the noise-texture dithering and uses flat, modern module styling
+extern bool gIsRecordingSession; //true while an explicit user-initiated recording session is active
 
 enum class NanoVGRenderContext
 {

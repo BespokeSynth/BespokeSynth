@@ -336,6 +336,18 @@ public:
    UserPrefFloat background_r{ "background_r", 0.09f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat background_g{ "background_g", 0.09f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat background_b{ "background_b", 0.09f, 0, 1, UserPrefCategory::Graphics };
+   UserPrefBool flat_ui_style{ "flat_ui_style", true, UserPrefCategory::Graphics };
+   UserPrefFloat module_corner_radius{ "module_corner_radius", 4, 0, 12, UserPrefCategory::Graphics };
+   UserPrefFloat module_background_alpha{ "module_background_alpha", 235, 0, 255, UserPrefCategory::Graphics };
+   UserPrefFloat module_saturation{ "module_saturation", 130, 0, 255, UserPrefCategory::Graphics };
+   UserPrefFloat module_brightness{ "module_brightness", 205, 0, 255, UserPrefCategory::Graphics };
+   UserPrefFloat hue_note{ "hue_note", 27, 0, 360, UserPrefCategory::Graphics };
+   UserPrefFloat hue_synth{ "hue_synth", 79, 0, 360, UserPrefCategory::Graphics };
+   UserPrefFloat hue_audio{ "hue_audio", 135, 0, 360, UserPrefCategory::Graphics };
+   UserPrefFloat hue_instrument{ "hue_instrument", 240, 0, 360, UserPrefCategory::Graphics };
+   UserPrefFloat hue_processor{ "hue_processor", 170, 0, 360, UserPrefCategory::Graphics };
+   UserPrefFloat hue_modulator{ "hue_modulator", 200, 0, 360, UserPrefCategory::Graphics };
+   UserPrefFloat hue_pulse{ "hue_pulse", 43, 0, 360, UserPrefCategory::Graphics };
    UserPrefFloat target_framerate{ "target_framerate", 60, 30, 144, UserPrefCategory::Graphics };
    UserPrefFloat motion_trails{ "motion_trails", 1, 0, 2, UserPrefCategory::Graphics };
    UserPrefBool draw_module_highlights{ "draw_module_highlights", true, UserPrefCategory::Graphics };

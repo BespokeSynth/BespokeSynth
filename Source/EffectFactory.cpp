@@ -28,6 +28,7 @@
 #include "BitcrushEffect.h"
 #include "DelayEffect.h"
 #include "BiquadFilterEffect.h"
+#include "FormantFilterEffect.h"
 #include "DistortionEffect.h"
 //#include "Stutter.h"
 #include "TremoloEffect.h"
@@ -68,7 +69,7 @@ EffectFactory::EffectFactory()
    Register("basiceq", &(EQEffect::Create));
    //Register("audiounit", &(AudioUnitEffect::Create));
    Register("pitchshift", &(PitchShiftEffect::Create));
-   //Register("formant", &(FormantFilterEffect::Create));
+   Register("formant", &(FormantFilterEffect::Create));
    Register("butterworth", &(ButterworthFilterEffect::Create));
    Register("gainstage", &(GainStageEffect::Create));
 }
