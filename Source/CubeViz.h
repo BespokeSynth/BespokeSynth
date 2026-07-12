@@ -100,7 +100,7 @@ private:
    int mPaletteIndex{ 0 };
 
    //randomize: each grid cell can get its own random shape
-   static const int kMaxCells = 100;
+   static constexpr int kMaxCells = 100;
    int mShapeGrid[kMaxCells];
    bool mRandomized{ false };
 

@@ -138,7 +138,7 @@ public:
    static float GetADSRScale(float velocity, float velToEnvelope);
    static float GetADSRCurve(float velocity, float velToEnvelope);
 
-   static const int kMaxUnison = 8;
+   static constexpr int kMaxUnison = 8;
 
 private:
    void DoParameterUpdate(int samplesIn,

@@ -120,7 +120,7 @@ private:
    WavetableVoiceParams mVoiceParams;
 
    //column 1: oscillator A
-   static const int kSampleTableChoice = -1;
+   static constexpr int kSampleTableChoice = -1;
    int mTableChoiceA{ 0 };
    DropdownList* mTableADropdown{ nullptr };
    FloatSlider* mPositionASlider{ nullptr };

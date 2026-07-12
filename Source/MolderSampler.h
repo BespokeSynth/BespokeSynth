@@ -175,7 +175,7 @@ private:
    FloatSlider* mSpecPosSlider{ nullptr };
    FloatSlider* mSpecTiltSlider{ nullptr };
    FloatSlider* mSpecHarmonicsSlider{ nullptr };
-   static const int kSpecSize = 1024;
+   static constexpr int kSpecSize = 1024;
    std::vector<float> mSpecTable; //frozen single-window tone (kSpecSize samples)
    bool mSpecDirty{ true };
 
@@ -206,7 +206,7 @@ private:
       //spectral phase (reads mSpecTable)
       double mSpecPhase{ 0 };
    };
-   static const int kNumVoices = 8;
+   static constexpr int kNumVoices = 8;
    std::array<Voice, kNumVoices> mVoices;
 
    ChannelBuffer mWriteBuffer;

@@ -47,8 +47,8 @@
 class WavetableFrameSet
 {
 public:
-   static const int kTableSize = 256;
-   static const int kMaxImportedFrames = 64;
+   static constexpr int kTableSize = 256;
+   static constexpr int kMaxImportedFrames = 64;
 
    explicit WavetableFrameSet(std::string name)
    : mName(std::move(name))

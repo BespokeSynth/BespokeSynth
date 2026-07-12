@@ -95,8 +95,8 @@ private:
    void RandomizeSteps();
    void RandomizeStep(int step); //randomize a single step's vol/decay/pitch/repeat
 
-   static const int kMaxSteps = 32;
-   static const int kMaxVoicesPerStep = 6;
+   static constexpr int kMaxSteps = 32;
+   static constexpr int kMaxVoicesPerStep = 6;
 
    struct Voice
    {

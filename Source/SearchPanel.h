@@ -124,14 +124,14 @@ private:
    static std::string GetWidthFilePath();
    static std::string TruncatePathForDisplay(const std::string& path, int maxChars);
 
-   static const int kMaxResults = 10; //module results
-   static const int kVisibleSampleRows = 30; //sample rows drawn on screen at once (virtualized window)
-   static const int kMaxSampleMatches = 4000; //full match list you can scroll through
-   static const int kMaxLocationRows = 8;
-   static const int kMinWidth = 150;
-   static const int kMaxWidth = 640;
-   static const int kHandleWidth = 9; //left-edge scrollbar strip
-   static const int kContentX = 14; //content starts to the right of the scrollbar strip
+   static constexpr int kMaxResults = 10; //module results
+   static constexpr int kVisibleSampleRows = 30; //sample rows drawn on screen at once (virtualized window)
+   static constexpr int kMaxSampleMatches = 4000; //full match list you can scroll through
+   static constexpr int kMaxLocationRows = 8;
+   static constexpr int kMinWidth = 150;
+   static constexpr int kMaxWidth = 640;
+   static constexpr int kHandleWidth = 9; //left-edge scrollbar strip
+   static constexpr int kContentX = 14; //content starts to the right of the scrollbar strip
 
    std::string mSearchTextBound; //required by TextEntry's constructor; the live typed text is polled every frame from mSearchEntry->GetText() instead (see DrawModule), since the bound var is only updated on enter/blur
    std::string mLastSearchText;
@@ -152,7 +152,7 @@ private:
    std::array<ClickButton*, kMaxLocationRows> mRemoveLocationButtons{ nullptr };
 
    //background audio-file index (built once off the UI thread, cached to disk, filtered per keystroke)
-   static const int kMaxIndexed = 200000; //safety cap on library size
+   static constexpr int kMaxIndexed = 200000; //safety cap on library size
    std::vector<IndexedSample> mSampleIndex;
    std::mutex mIndexMutex;
    std::thread mIndexThread;

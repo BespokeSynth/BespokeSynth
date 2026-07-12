@@ -107,13 +107,13 @@ private:
       float radius{ 0 };
       float r{ 1 }, g{ 1 }, b{ 1 };
    };
-   static const int kMaxBlobs = 5;
+   static constexpr int kMaxBlobs = 5;
    struct Frame
    {
       Blob blobs[kMaxBlobs];
       int count{ 0 };
    };
-   static const int kHistory = 72;
+   static constexpr int kHistory = 72;
    std::vector<Frame> mHistory;
    int mHistoryPos{ 0 };
    int mHistoryCount{ 0 };
