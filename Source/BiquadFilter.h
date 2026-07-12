@@ -41,8 +41,7 @@ enum FilterType
    kFilterType_HighShelf,
    kFilterType_LowShelfNoQ,
    kFilterType_HighShelfNoQ,
-   kFilterType_Allpass,
-   kFilterType_Comb //feedback comb filter: y[n] = x[n] + feedback*y[n-delay]; handled outside the biquad math (see BiquadFilterEffect)
+   kFilterType_Allpass
 };
 
 class BiquadFilter
