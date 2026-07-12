@@ -119,6 +119,7 @@ private:
    float mSpinSpeed{ 0.6f };
    float mSensitivity{ 1.0f };
    float mGrain{ 0.05f };
+   float mExposure{ 1.0f };
    float mHueShift{ 0.0f };
    int mColorMode{ 0 }; //0 image, 1 palette, 2 mono
    int mPaletteIndex{ 0 };
@@ -130,6 +131,7 @@ private:
    FloatSlider* mSpinSlider{ nullptr };
    FloatSlider* mSensitivitySlider{ nullptr };
    FloatSlider* mGrainSlider{ nullptr };
+   FloatSlider* mExposureSlider{ nullptr };
    FloatSlider* mHueShiftSlider{ nullptr };
    DropdownList* mColorModeSelector{ nullptr };
    DropdownList* mPaletteSelector{ nullptr };
@@ -145,5 +147,5 @@ private:
    float mLastDragY{ 0 };
 
    float mWidth{ 360 };
-   float mHeight{ 330 };
+   float mHeight{ 348 };
 };

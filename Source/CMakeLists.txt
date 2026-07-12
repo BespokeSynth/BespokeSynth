@@ -220,6 +220,8 @@ target_sources(BespokeSynth PRIVATE
     FourOnTheFloor.cpp
     FourOnTheFloor.h
     FreeverbEffect.cpp
+    StereoWidthEffect.cpp
+    StereoWidthEffect.h
     FreeverbEffect.h
     FreqDelay.cpp
     FreqDelay.h
@@ -313,6 +315,8 @@ target_sources(BespokeSynth PRIVATE
     Lissajous.cpp
     Lissajous.h
     CubeViz.cpp
+    VizRecorder.cpp
+    MovieOut.cpp
     CubeViz.h
     BlobViz.cpp
     BlobViz.h
@@ -372,6 +376,8 @@ target_sources(BespokeSynth PRIVATE
     ModulationVisualizer.cpp
     ModulationVisualizer.h
     ModulatorAccum.cpp
+    TableModulator.cpp
+    TableModulator.h
     ModulatorAccum.h
     ModulatorAdd.cpp
     ModulatorAdd.h
@@ -807,6 +813,8 @@ target_sources(BespokeSynth PRIVATE
     VolcaBeatsControl.h
     PixelCloud.cpp
     CheckerBox.cpp
+    ScopeViz.cpp
+    VideoCloud.cpp
     TextCloud.cpp
     WaveformViewer.cpp
     WaveformViewer.h

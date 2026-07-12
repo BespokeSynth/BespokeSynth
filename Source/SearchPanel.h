@@ -60,6 +60,11 @@ public:
 
    void CreateUIControls() override;
 
+   //public API for other modules (e.g. Tracker): walk the already-scanned sample library. Finds the
+   //entry closest to currentPath alphabetically, then returns the one `offset` positions away (wraps).
+   //Thread-safe against the background indexer. Returns false if the index is empty.
+   bool GetRelativeSamplePath(const std::string& currentPath, int offset, std::string& outPath);
+
    bool HasTitleBar() const override { return false; }
    bool IsSaveable() override { return false; }
    bool IsSingleton() const override { return true; }

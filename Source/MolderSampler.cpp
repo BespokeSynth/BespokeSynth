@@ -400,10 +400,11 @@ void MolderSampler::Process(double time)
             lvl = MAX(lvl, fabsf(in0[i]));
          if (mRecording && !mPendingFinalize)
          {
-            const size_t kMaxRecord = (size_t)(gSampleRate * 30); //30s cap
-            for (int i = 0; i < inSize && mRecordBuf.size() < kMaxRecord; ++i)
-               mRecordBuf.push_back(in0[i]);
-            if (mRecordBuf.size() >= kMaxRecord)
+            //write by index into the pre-allocated buffer - no heap allocation on the audio thread
+            const size_t cap = mRecordBuf.size();
+            for (int i = 0; i < inSize && mRecordLen < cap; ++i)
+               mRecordBuf[mRecordLen++] = in0[i];
+            if (mRecordLen >= cap)
                mPendingFinalize = true; //auto-stop; UI thread bakes the sample in Poll()
          }
       }
@@ -717,9 +718,10 @@ void MolderSampler::CheckboxUpdated(Checkbox* checkbox, double time)
    {
       if (mRecording)
       {
-         //armed -> start a fresh capture
-         mRecordBuf.clear();
-         mRecordBuf.reserve((size_t)(gSampleRate * 4));
+         //armed -> allocate the whole 30s capture buffer up front (UI thread), so the audio thread
+         //never has to allocate; it just writes into it by index
+         mRecordBuf.assign((size_t)(gSampleRate * 30), 0.0f);
+         mRecordLen = 0;
          mPendingFinalize = false;
       }
       else
@@ -732,7 +734,7 @@ void MolderSampler::CheckboxUpdated(Checkbox* checkbox, double time)
 
 void MolderSampler::FinalizeRecording()
 {
-   int n = (int)mRecordBuf.size();
+   int n = (int)mRecordLen; //only the samples actually written, not the full 30s buffer
    if (n <= 0)
       return;
    mSample.Create(n); //1-channel buffer at the engine sample rate (ratio 1)
@@ -746,6 +748,7 @@ void MolderSampler::FinalizeRecording()
    RebuildSlices();
    mSpecDirty = true;
    mRecordBuf.clear();
+   mRecordLen = 0;
 }
 
 void MolderSampler::DrawModule()

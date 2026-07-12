@@ -75,6 +75,8 @@ void TextCloud::CreateUIControls()
    y += 17;
    mGrainSlider = new FloatSlider(this, "grain", 3, y, 108, 14, &mGrain, 0.0f, 0.4f);
    y += 17;
+   mExposureSlider = new FloatSlider(this, "exposure", 3, y, 108, 14, &mExposure, 0.0f, 3.0f);
+   y += 17;
    mHueShiftSlider = new FloatSlider(this, "hue", 3, y, 108, 14, &mHueShift, 0.0f, 1.0f);
    y += 17;
    mColorModeSelector = new DropdownList(this, "color", 3, y, &mColorMode, 108);
@@ -282,6 +284,7 @@ void TextCloud::DrawModule()
             {
                PaletteColor(colT, rr, gg, bb);
             }
+            VizExpose(mExposure, rr, gg, bb); //brightness / exposure
 
             float ps = MAX(1.0f, scale / MAX(mAspectCols, mAspectRows) * 1.1f * persp);
 
@@ -346,6 +349,7 @@ void TextCloud::DrawModule()
    mBlurSlider->Draw();
    mBloomSlider->Draw();
    mGrainSlider->Draw();
+   mExposureSlider->Draw();
    mHueShiftSlider->Draw();
    mColorModeSelector->Draw();
    mPaletteSelector->Draw();

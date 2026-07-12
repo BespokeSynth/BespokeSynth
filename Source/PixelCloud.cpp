@@ -72,6 +72,8 @@ void PixelCloud::CreateUIControls()
    y += 17;
    mGrainSlider = new FloatSlider(this, "grain", 3, y, 100, 14, &mGrain, 0.0f, 0.4f);
    y += 17;
+   mExposureSlider = new FloatSlider(this, "exposure", 3, y, 100, 14, &mExposure, 0.0f, 3.0f);
+   y += 17;
    mHueShiftSlider = new FloatSlider(this, "hue", 3, y, 100, 14, &mHueShift, 0.0f, 1.0f);
    y += 17;
    mColorModeSelector = new DropdownList(this, "color", 3, y, &mColorMode, 100);
@@ -110,6 +112,7 @@ void PixelCloud::CellColor(int idx, float lum, float& rOut, float& gOut, float& 
    {
       rOut = gOut = bOut = lum;
    }
+   VizExpose(mExposure, rOut, gOut, bOut); //brightness / exposure
 }
 
 bool PixelCloud::LoadImageFile(const std::string& path)
@@ -445,6 +448,7 @@ void PixelCloud::DrawModule()
    mSpinSlider->Draw();
    mSensitivitySlider->Draw();
    mGrainSlider->Draw();
+   mExposureSlider->Draw();
    mHueShiftSlider->Draw();
    mColorModeSelector->Draw();
    mPaletteSelector->Draw();

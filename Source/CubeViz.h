@@ -96,11 +96,12 @@ private:
    int mCountY{ 1 }; //rows (vertical)
    bool mSymmetry{ false };
    float mGrain{ 0.06f };
+   float mExposure{ 1.0f };
    float mHueShift{ 0.0f };
    int mPaletteIndex{ 0 };
 
    //randomize: each grid cell can get its own random shape
-   static constexpr int kMaxCells = 100;
+   static const int kMaxCells = 100;
    int mShapeGrid[kMaxCells];
    bool mRandomized{ false };
 
@@ -119,9 +120,10 @@ private:
    ClickButton* mResetButton{ nullptr };
    Checkbox* mSymmetryCheckbox{ nullptr };
    FloatSlider* mGrainSlider{ nullptr };
+   FloatSlider* mExposureSlider{ nullptr };
    FloatSlider* mHueShiftSlider{ nullptr };
    DropdownList* mPaletteSelector{ nullptr };
 
    float mWidth{ 320 };
-   float mHeight{ 380 };
+   float mHeight{ 398 };
 };

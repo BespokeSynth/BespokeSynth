@@ -56,6 +56,14 @@ inline float VizClamp01(float v)
    return v < 0.0f ? 0.0f : (v > 1.0f ? 1.0f : v);
 }
 
+// exposure/brightness multiplier applied to a 0..1 colour (>1 brightens, <1 darkens)
+inline void VizExpose(float exposure, float& r, float& g, float& b)
+{
+   r = VizClamp01(r * exposure);
+   g = VizClamp01(g * exposure);
+   b = VizClamp01(b * exposure);
+}
+
 // t and hueShift in 0..1; writes 0..1 colour
 inline void VizPaletteColor(int idx, float t, float hueShift, float& rOut, float& gOut, float& bOut)
 {

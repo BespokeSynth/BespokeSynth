@@ -16,14 +16,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 //
-//  CheckerBox.h
+//  ScopeViz.h
 //  Bespoke
 //
-//  An optical-illusion checkerboard visualizer. A grid of contrasting checks flips colour at a
-//  speed you control, and can be warped: flat grid, bent/barrel, spiral, or a rotating "tunnel"
-//  (downward spiral) for zoom-illusions. Cheap immediate-mode drawing with grain and chromatic
-//  aberration on top. Colours come from black/white or the shared visualizer palettes. Audio-
-//  reactive pass-through nudges the flip rate and warp. No feedback buffer -> stays smooth.
+//  A real X/Y vector oscilloscope (the "oscilloscope music" look). It draws ONLY the incoming
+//  signal - silence draws nothing, and the shape comes entirely from the audio.
+//    - mono   : one input, plotted as X = signal, Y = 90 deg-shifted signal (Hilbert transform).
+//               A single sine -> a perfect circle; harmonics -> Lissajous figures (bowties etc).
+//    - stereo : X = left, Y = right (true scope; feed oscilloscope-music tracks or two oscillators).
+//  Phosphor glow is faked with additive line passes (brighter where the beam moves slowly), over a
+//  faint graticule, with palette/hue colouring and grain. CPU immediate-mode, no feedback buffer.
 //
 
 #pragma once
@@ -32,13 +34,15 @@
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "DropdownList.h"
+#include "Checkbox.h"
+#include <vector>
 
-class CheckerBox : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener
+class ScopeViz : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener
 {
 public:
-   CheckerBox();
-   virtual ~CheckerBox();
-   static IDrawableModule* Create() { return new CheckerBox(); }
+   ScopeViz();
+   virtual ~ScopeViz();
+   static IDrawableModule* Create() { return new ScopeViz(); }
    static bool AcceptsAudio() { return true; }
    static bool AcceptsNotes() { return false; }
    static bool AcceptsPulses() { return false; }
@@ -74,47 +78,41 @@ private:
       height = mHeight;
    }
 
-   enum Pattern
-   {
-      kPattern_Grid = 0,
-      kPattern_Bend,
-      kPattern_Spiral,
-      kPattern_Tunnel
-   };
+   void GlowLine(float x0, float y0, float x1, float y1, float r, float g, float b, float bright, float glow);
 
-   void CellColor(int i, int j, int step, float& rOut, float& gOut, float& bOut) const;
-   //draws the full checker for one colour channel pass (chroma aberration draws several offset passes)
-   void DrawPattern(float viewX, float viewY, float viewW, float viewH, int step, float amp,
-                    float offX, float offY, int channel, float alpha);
-
-   //audio analysis
+   //rolling capture (audio thread writes, UI thread reads)
+   static const int kScopeSize = 8192;
+   std::vector<float> mScopeL; //mono input
+   std::vector<float> mScopeQ; //90 deg-shifted mono (Hilbert output), aligned with a delayed input
+   int mWritePos{ 0 };
    float mAmplitude{ 0 };
 
-   //controls
-   float mSpeed{ 4.0f };
-   int mGridN{ 10 };
-   float mDistort{ 0.0f };
-   int mPattern{ kPattern_Grid };
-   float mChroma{ 0.25f };
-   float mGrain{ 0.04f };
-   float mExposure{ 1.0f };
-   float mSensitivity{ 1.0f };
-   int mColorMode{ 0 }; //0 black/white, 1 palette
-   float mHueShift{ 0.0f };
-   int mPaletteIndex{ 0 };
+   //Hilbert FIR (odd length, antisymmetric) -> quadrature signal for the mono mode
+   static const int kHilbertLen = 65;
+   static const int kHilbertMid = 32; //(len-1)/2, the group delay to align X against
+   std::vector<float> mHil;
 
-   FloatSlider* mSpeedSlider{ nullptr };
-   IntSlider* mGridSlider{ nullptr };
-   FloatSlider* mDistortSlider{ nullptr };
-   DropdownList* mPatternSelector{ nullptr };
-   FloatSlider* mChromaSlider{ nullptr };
-   FloatSlider* mGrainSlider{ nullptr };
+   //controls
+   float mGain{ 1.0f };
+   float mGlow{ 0.7f };
+   float mScaleAmt{ 0.9f };
+   float mExposure{ 1.0f };
+   int mDetail{ 900 };
+   float mGrain{ 0.03f };
+   float mHueShift{ 0.0f };
+   int mPaletteIndex{ 20 }; //matrix (green) by default - classic scope look
+   bool mShowGrid{ true };
+
+   FloatSlider* mGainSlider{ nullptr };
+   FloatSlider* mGlowSlider{ nullptr };
+   FloatSlider* mScaleSlider{ nullptr };
    FloatSlider* mExposureSlider{ nullptr };
-   FloatSlider* mSensitivitySlider{ nullptr };
-   DropdownList* mColorModeSelector{ nullptr };
+   IntSlider* mDetailSlider{ nullptr };
+   FloatSlider* mGrainSlider{ nullptr };
    FloatSlider* mHueShiftSlider{ nullptr };
    DropdownList* mPaletteSelector{ nullptr };
+   Checkbox* mGridCheckbox{ nullptr };
 
-   float mWidth{ 360 };
-   float mHeight{ 318 };
+   float mWidth{ 380 };
+   float mHeight{ 320 };
 };

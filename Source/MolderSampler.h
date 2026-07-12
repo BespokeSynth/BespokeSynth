@@ -112,7 +112,8 @@ private:
    bool mRecording{ false };
    bool mPendingFinalize{ false }; //audio thread requests, UI thread (Poll) bakes the sample
    Checkbox* mRecordCheckbox{ nullptr };
-   std::vector<float> mRecordBuf;
+   std::vector<float> mRecordBuf; //pre-allocated on the UI thread; the audio thread only writes by index (RT-safe)
+   size_t mRecordLen{ 0 };
    float mInputLevel{ 0 }; //smoothed input meter for feedback while armed
 
    int mMode{ kMode_Classic };
@@ -175,7 +176,7 @@ private:
    FloatSlider* mSpecPosSlider{ nullptr };
    FloatSlider* mSpecTiltSlider{ nullptr };
    FloatSlider* mSpecHarmonicsSlider{ nullptr };
-   static constexpr int kSpecSize = 1024;
+   static const int kSpecSize = 1024;
    std::vector<float> mSpecTable; //frozen single-window tone (kSpecSize samples)
    bool mSpecDirty{ true };
 
@@ -206,7 +207,7 @@ private:
       //spectral phase (reads mSpecTable)
       double mSpecPhase{ 0 };
    };
-   static constexpr int kNumVoices = 8;
+   static const int kNumVoices = 8;
    std::array<Voice, kNumVoices> mVoices;
 
    ChannelBuffer mWriteBuffer;

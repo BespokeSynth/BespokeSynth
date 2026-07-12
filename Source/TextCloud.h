@@ -106,6 +106,7 @@ private:
    float mBlur{ 0.0f };
    float mBloom{ 0.25f };
    float mGrain{ 0.04f };
+   float mExposure{ 1.0f };
    float mHueShift{ 0.0f };
    int mColorMode{ 0 }; //0 palette, 1 mono
    int mPaletteIndex{ 0 };
@@ -121,6 +122,7 @@ private:
    FloatSlider* mBlurSlider{ nullptr };
    FloatSlider* mBloomSlider{ nullptr };
    FloatSlider* mGrainSlider{ nullptr };
+   FloatSlider* mExposureSlider{ nullptr };
    FloatSlider* mHueShiftSlider{ nullptr };
    DropdownList* mColorModeSelector{ nullptr };
    DropdownList* mPaletteSelector{ nullptr };
@@ -137,5 +139,5 @@ private:
    int mAspectCols{ 1 };
 
    float mWidth{ 380 };
-   float mHeight{ 320 };
+   float mHeight{ 338 };
 };

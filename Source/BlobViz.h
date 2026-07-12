@@ -86,6 +86,7 @@ private:
    float mGlow{ 1.0f };
    float mGrain{ 0.05f };
    float mHueShift{ 0.0f };
+   float mExposure{ 1.0f };
    int mPaletteIndex{ 0 };
    int mNumBlobs{ 3 };
    int mSymmetry{ 1 };
@@ -96,6 +97,7 @@ private:
    FloatSlider* mGrainSlider{ nullptr };
    FloatSlider* mHueShiftSlider{ nullptr };
    DropdownList* mPaletteSelector{ nullptr };
+   FloatSlider* mExposureSlider{ nullptr };
    IntSlider* mNumBlobsSlider{ nullptr };
    IntSlider* mSymmetrySlider{ nullptr };
 
@@ -107,13 +109,13 @@ private:
       float radius{ 0 };
       float r{ 1 }, g{ 1 }, b{ 1 };
    };
-   static constexpr int kMaxBlobs = 5;
+   static const int kMaxBlobs = 5;
    struct Frame
    {
       Blob blobs[kMaxBlobs];
       int count{ 0 };
    };
-   static constexpr int kHistory = 72;
+   static const int kHistory = 72;
    std::vector<Frame> mHistory;
    int mHistoryPos{ 0 };
    int mHistoryCount{ 0 };

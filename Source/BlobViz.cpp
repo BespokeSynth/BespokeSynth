@@ -32,7 +32,7 @@ BlobViz::BlobViz()
 : IAudioProcessor(gBufferSize)
 {
    mWidth = 320;
-   mHeight = 260;
+   mHeight = 278;
    mHistory.resize(kHistory);
 }
 
@@ -51,6 +51,7 @@ void BlobViz::CreateUIControls()
    mHueShiftSlider = new FloatSlider(this, "hue", 3, 71, 92, 14, &mHueShift, 0.0f, 1.0f);
    mNumBlobsSlider = new IntSlider(this, "blobs", 3, 88, 92, 14, &mNumBlobs, 1, kMaxBlobs);
    mSymmetrySlider = new IntSlider(this, "symmetry", 3, 105, 92, 14, &mSymmetry, 1, 8);
+   mExposureSlider = new FloatSlider(this, "exposure", 3, 139, 92, 14, &mExposure, 0.0f, 3.0f);
    mPaletteSelector = new DropdownList(this, "palette", 3, 122, &mPaletteIndex, 92);
    for (int i = 0; i < kNumVizPalettes; ++i)
       mPaletteSelector->AddLabel(kVizPaletteNames[i], i);
@@ -149,6 +150,7 @@ void BlobViz::DrawModule()
          bl.y = cy + cosf((float)(gTime * (sp + 0.00022f)) + ph * 1.3f) * (0.35f + amp) * h * 0.22f;
          bl.radius = (0.05f + amp * 0.38f) * MIN(w, h) * (0.7f + 0.3f * sinf(ph));
          PaletteColor(ofClamp(t + i * 0.12f, 0.0f, 1.0f), bl.r, bl.g, bl.b);
+         VizExpose(mExposure, bl.r, bl.g, bl.b); //brightness / exposure
       }
       mHistoryPos = (mHistoryPos + 1) % kHistory;
       if (mHistoryCount < kHistory)
@@ -239,6 +241,7 @@ void BlobViz::DrawModule()
    mGlowSlider->Draw();
    mGrainSlider->Draw();
    mHueShiftSlider->Draw();
+   mExposureSlider->Draw();
    mNumBlobsSlider->Draw();
    mSymmetrySlider->Draw();
    mPaletteSelector->Draw();

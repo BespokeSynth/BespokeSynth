@@ -94,9 +94,11 @@ private:
    void TriggerStepHit(int step, double time);
    void RandomizeSteps();
    void RandomizeStep(int step); //randomize a single step's vol/decay/pitch/repeat
+   void ClearStep(int step); //delete/reset the sample loaded in a step
+   void SwitchStepSample(int step, int dir); //load the next/closest sample from the scanned library
 
-   static constexpr int kMaxSteps = 32;
-   static constexpr int kMaxVoicesPerStep = 6;
+   static const int kMaxSteps = 32;
+   static const int kMaxVoicesPerStep = 6;
 
    struct Voice
    {
@@ -109,6 +111,7 @@ private:
    {
       Sample mSample;
       bool mHasSample{ false };
+      std::string mPath; //file path of the loaded sample (used to find the next one in the library)
       float mVol{ 1.0f };
       float mDecayMs{ 250.0f };
       float mPitch{ 0.0f }; //semitones
@@ -120,6 +123,8 @@ private:
       FloatSlider* mPitchSlider{ nullptr };
       IntSlider* mRepeatSlider{ nullptr };
       ClickButton* mRandButton{ nullptr }; //per-step randomize
+      ClickButton* mClearButton{ nullptr }; //per-step delete/reset sample
+      ClickButton* mNextButton{ nullptr }; //per-step switch to next sample in the library
    };
 
    struct ScheduledHit
@@ -136,6 +141,8 @@ private:
    NoteInterval mInterval{ kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };
    ClickButton* mRandomizeButton{ nullptr };
+   float mGlobalVolume{ 1.0f }; //master volume for the whole tracker
+   FloatSlider* mGlobalVolumeSlider{ nullptr };
    int mCurStep{ -1 };
 
    ChannelBuffer mWriteBuffer;

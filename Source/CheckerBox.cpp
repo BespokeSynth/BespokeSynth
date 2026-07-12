@@ -57,6 +57,8 @@ void CheckerBox::CreateUIControls()
    y += 17;
    mGrainSlider = new FloatSlider(this, "grain", 3, y, 100, 14, &mGrain, 0.0f, 0.4f);
    y += 17;
+   mExposureSlider = new FloatSlider(this, "exposure", 3, y, 100, 14, &mExposure, 0.0f, 3.0f);
+   y += 17;
    mSensitivitySlider = new FloatSlider(this, "react", 3, y, 100, 14, &mSensitivity, 0.0f, 4.0f);
    y += 17;
    mColorModeSelector = new DropdownList(this, "color", 3, y, &mColorMode, 100);
@@ -90,6 +92,7 @@ void CheckerBox::CellColor(int i, int j, int step, float& rOut, float& gOut, flo
       //two contrasting samples of the palette; the flip swaps them
       VizPaletteColor(mPaletteIndex, on ? 0.15f : 0.65f, mHueShift, rOut, gOut, bOut);
    }
+   VizExpose(mExposure, rOut, gOut, bOut); //brightness / exposure
 }
 
 void CheckerBox::Process(double time)
@@ -290,6 +293,7 @@ void CheckerBox::DrawModule()
    mDistortSlider->Draw();
    mChromaSlider->Draw();
    mGrainSlider->Draw();
+   mExposureSlider->Draw();
    mSensitivitySlider->Draw();
    mColorModeSelector->Draw();
    mHueShiftSlider->Draw();

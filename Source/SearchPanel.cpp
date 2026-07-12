@@ -732,3 +732,30 @@ void SearchPanel::ButtonClicked(ClickButton* button, double time)
       }
    }
 }
+
+bool SearchPanel::GetRelativeSamplePath(const std::string& currentPath, int offset, std::string& outPath)
+{
+   std::lock_guard<std::mutex> lock(mIndexMutex);
+   if (mSampleIndex.empty())
+      return false;
+
+   //alphabetical view of the scanned library so "next" is deterministic and "closest" is meaningful
+   std::vector<std::string> paths;
+   paths.reserve(mSampleIndex.size());
+   for (const auto& e : mSampleIndex)
+      paths.push_back(e.path);
+   std::sort(paths.begin(), paths.end());
+
+   const int n = (int)paths.size();
+   //locate the current sample (or the closest alphabetical position if it isn't in the index)
+   int idx = 0;
+   auto it = std::lower_bound(paths.begin(), paths.end(), currentPath);
+   if (it != paths.end())
+      idx = (int)(it - paths.begin());
+   else
+      idx = n - 1;
+
+   int newIdx = ((idx + offset) % n + n) % n;
+   outPath = paths[newIdx];
+   return true;
+}

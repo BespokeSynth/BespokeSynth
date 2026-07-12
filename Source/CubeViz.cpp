@@ -79,6 +79,8 @@ void CubeViz::CreateUIControls()
    y += 17;
    mGrainSlider = new FloatSlider(this, "grain", 3, y, 100, 14, &mGrain, 0.0f, 0.5f);
    y += 17;
+   mExposureSlider = new FloatSlider(this, "exposure", 3, y, 100, 14, &mExposure, 0.0f, 3.0f);
+   y += 17;
    mHueShiftSlider = new FloatSlider(this, "hue", 3, y, 100, 14, &mHueShift, 0.0f, 1.0f);
    y += 17;
    mPaletteSelector = new DropdownList(this, "palette", 3, y, &mPaletteIndex, 100);
@@ -311,7 +313,9 @@ void CubeViz::DrawShape(float cx, float cy, float halfW, float halfH, float rx, 
       oz = z3;
    };
 
-   std::vector<Quad> quads;
+   //reused across every shape/frame (UI thread only) so we don't reallocate a vector each call
+   static std::vector<Quad> quads;
+   quads.clear();
 
    auto addQuad = [&](float colorT,
                       float p0x, float p0y, float p0z, float p1x, float p1y, float p1z,
@@ -415,7 +419,7 @@ void CubeViz::DrawShape(float cx, float cy, float halfW, float halfH, float rx, 
    ofFill();
    for (const Quad& q : quads)
    {
-      float shade = 0.35f + 0.65f * ((q.depth - dmin) / drange);
+      float shade = (0.35f + 0.65f * ((q.depth - dmin) / drange)) * mExposure; //exposure/brightness
       float pr, pg, pb;
       PaletteColor(paletteT + q.colorT * 0.85f, pr, pg, pb); //sweep the palette across the surface
       ofSetColor(ofClamp(pr * shade, 0.0f, 1.0f) * 255, ofClamp(pg * shade, 0.0f, 1.0f) * 255, ofClamp(pb * shade, 0.0f, 1.0f) * 255, 255);
@@ -527,6 +531,7 @@ void CubeViz::DrawModule()
    mResetButton->Draw();
    mSymmetryCheckbox->Draw();
    mGrainSlider->Draw();
+   mExposureSlider->Draw();
    mHueShiftSlider->Draw();
    mPaletteSelector->Draw();
 }

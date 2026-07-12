@@ -27,6 +27,8 @@
 #include "IAudioReceiver.h"
 #include "Profiler.h"
 #include "ofxJSONElement.h"
+#include "SearchPanel.h"
+#include "juce_core/juce_core.h"
 
 namespace
 {
@@ -36,7 +38,11 @@ namespace
    const float kSliderW = 80;
    const float kRepeatW = 64;
    const float kColGap = 6;
-   const float kVolX = kSampleX + kSampleW + 8;
+   const float kClearX = kSampleX + kSampleW + 4; //per-step delete button
+   const float kClearW = 15;
+   const float kNextX = kClearX + kClearW + 3; //per-step next-sample button
+   const float kNextW = 16;
+   const float kVolX = kNextX + kNextW + 8;
    const float kDecayX = kVolX + kSliderW + kColGap;
    const float kPitchX = kDecayX + kSliderW + kColGap;
    const float kRepeatX = kPitchX + kSliderW + kColGap;
@@ -64,6 +70,7 @@ void Tracker::CreateUIControls()
    mIntervalSelector = new DropdownList(this, "rate", 34, 2, (int*)(&mInterval), 46);
    mNumStepsSlider = new IntSlider(this, "steps", 150, 2, 120, 15, &mNumSteps, 1, kMaxSteps);
    mRandomizeButton = new ClickButton(this, "randomize", 290, 2);
+   mGlobalVolumeSlider = new FloatSlider(this, "volume", 400, 2, 110, 15, &mGlobalVolume, 0.0f, 2.0f);
 
    //full set of transport rates, fastest bar-divisions through slow note values
    mIntervalSelector->AddLabel("16", kInterval_16);
@@ -89,6 +96,10 @@ void Tracker::CreateUIControls()
       mSteps[i].mPitchSlider = new FloatSlider(this, ("pitch" + ofToString(i)).c_str(), (int)kPitchX, (int)y, (int)kSliderW, 15, &mSteps[i].mPitch, -24, 24);
       mSteps[i].mRepeatSlider = new IntSlider(this, ("rep" + ofToString(i)).c_str(), (int)kRepeatX, (int)y, (int)kRepeatW, 15, &mSteps[i].mRepeat, 1, 16);
       mSteps[i].mDecaySlider->SetMode(FloatSlider::kSquare);
+      mSteps[i].mClearButton = new ClickButton(this, ("clr" + ofToString(i)).c_str(), (int)kClearX, (int)y);
+      mSteps[i].mClearButton->SetLabel("x"); //delete/reset the loaded sample
+      mSteps[i].mNextButton = new ClickButton(this, ("nxt" + ofToString(i)).c_str(), (int)kNextX, (int)y);
+      mSteps[i].mNextButton->SetLabel(">"); //switch to the next sample in the scanned library
       mSteps[i].mRandButton = new ClickButton(this, ("rnd" + ofToString(i)).c_str(), (int)kRandX, (int)y);
       mSteps[i].mRandButton->SetLabel("R"); //compact per-row randomize
    }
@@ -228,7 +239,7 @@ void Tracker::Process(double time)
             {
                int c = MIN(ch, dataCh - 1);
                float smp = GetInterpolatedSample(v.mOffset, data->GetChannel(c), len);
-               mWriteBuffer.GetChannel(ch)[i] += smp * step.mVol * env * 0.5f;
+               mWriteBuffer.GetChannel(ch)[i] += smp * step.mVol * env * mGlobalVolume * 0.5f;
             }
             v.mOffset += rate;
             v.mEnvTimeMs += gInvSampleRateMs;
@@ -254,7 +265,37 @@ void Tracker::SampleDropped(int x, int y, Sample* sample)
       return;
 
    mSteps[row].mSample.CopyFrom(sample);
+   mSteps[row].mPath = sample->GetReadPath(); //remember where it came from, for the "next sample" button
    mSteps[row].mHasSample = true;
+}
+
+void Tracker::ClearStep(int step)
+{
+   if (step < 0 || step >= kMaxSteps)
+      return;
+   for (auto& v : mSteps[step].mVoices)
+      v.mActive = false;
+   mSteps[step].mHasSample = false;
+   mSteps[step].mPath = "";
+}
+
+void Tracker::SwitchStepSample(int step, int dir)
+{
+   if (step < 0 || step >= kMaxSteps || TheSearchPanel == nullptr)
+      return;
+   std::string next;
+   if (!TheSearchPanel->GetRelativeSamplePath(mSteps[step].mPath, dir, next) || next.empty())
+      return;
+   //briefly mark the step empty so the audio thread doesn't read the buffer while it's reloaded
+   for (auto& v : mSteps[step].mVoices)
+      v.mActive = false;
+   mSteps[step].mHasSample = false;
+   if (mSteps[step].mSample.Read(next.c_str()))
+   {
+      mSteps[step].mSample.SetName(juce::File(next).getFileName().toStdString());
+      mSteps[step].mPath = next;
+      mSteps[step].mHasSample = true;
+   }
 }
 
 void Tracker::DrawModule()
@@ -266,9 +307,12 @@ void Tracker::DrawModule()
    mIntervalSelector->Draw();
    mNumStepsSlider->Draw();
    mRandomizeButton->Draw();
+   mGlobalVolumeSlider->Draw();
 
    float hy = kRowsTop - 3;
    DrawTextNormal("sample", kSampleX, hy, 11);
+   DrawTextNormal("del", kClearX - 2, hy, 9);
+   DrawTextNormal("nxt", kNextX - 2, hy, 9);
    DrawTextNormal("vol", kVolX, hy, 11);
    DrawTextNormal("decay", kDecayX, hy, 11);
    DrawTextNormal("pitch", kPitchX, hy, 11);
@@ -283,6 +327,9 @@ void Tracker::DrawModule()
       mSteps[i].mPitchSlider->SetShowing(shown);
       mSteps[i].mRepeatSlider->SetShowing(shown);
       mSteps[i].mRandButton->SetShowing(shown);
+      //delete + next-sample buttons only make sense when a sample is loaded
+      mSteps[i].mClearButton->SetShowing(shown && mSteps[i].mHasSample);
+      mSteps[i].mNextButton->SetShowing(shown);
       if (!shown)
          continue;
 
@@ -313,6 +360,8 @@ void Tracker::DrawModule()
       mSteps[i].mPitchSlider->Draw();
       mSteps[i].mRepeatSlider->Draw();
       mSteps[i].mRandButton->Draw();
+      mSteps[i].mClearButton->Draw();
+      mSteps[i].mNextButton->Draw();
    }
 }
 
@@ -339,12 +388,22 @@ void Tracker::ButtonClicked(ClickButton* button, double time)
       RandomizeSteps();
       return;
    }
-   //per-step randomize: find which step's dice was clicked
+   //per-step buttons: find which row's dice / delete / next was clicked
    for (int i = 0; i < kMaxSteps; ++i)
    {
       if (button == mSteps[i].mRandButton)
       {
          RandomizeStep(i);
+         return;
+      }
+      if (button == mSteps[i].mClearButton)
+      {
+         ClearStep(i);
+         return;
+      }
+      if (button == mSteps[i].mNextButton)
+      {
+         SwitchStepSample(i, 1);
          return;
       }
    }

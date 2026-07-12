@@ -41,6 +41,7 @@
 #include "LiveGranulator.h"
 #include "DCRemoverEffect.h"
 #include "FreeverbEffect.h"
+#include "StereoWidthEffect.h"
 #include "EQEffect.h"
 //#include "AudioUnitEffect.h"
 #include "PitchShiftEffect.h"
@@ -72,6 +73,7 @@ EffectFactory::EffectFactory()
    Register("formant", &(FormantFilterEffect::Create));
    Register("butterworth", &(ButterworthFilterEffect::Create));
    Register("gainstage", &(GainStageEffect::Create));
+   Register("stereo", &(StereoWidthEffect::Create));
 }
 
 void EffectFactory::Register(std::string type, CreateEffectFn creator)
