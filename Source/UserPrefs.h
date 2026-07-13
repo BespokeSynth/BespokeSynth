@@ -290,6 +290,11 @@ public:
    float LastTargetFramerate;
    ofxJSONElement mUserPrefsFile;
    std::vector<UserPref*> mUserPrefs;
+
+   ///////////////
+   /// GENERAL ///
+   ///////////////
+
    UserPrefDropdownString devicetype{ "devicetype", "auto", 200, UserPrefCategory::General };
    UserPrefDropdownString audio_output_device{ "audio_output_device", "auto", 350, UserPrefCategory::General };
    UserPrefDropdownString audio_input_device{ "audio_input_device", "none", 350, UserPrefCategory::General };
@@ -313,6 +318,7 @@ public:
    UserPrefBool autosave{ "autosave", false, UserPrefCategory::General };
    UserPrefBool show_tooltips_on_load{ "show_tooltips_on_load", true, UserPrefCategory::General };
    UserPrefBool show_welcome_screen{ "show_welcome_screen", true, UserPrefCategory::General };
+   UserPrefBool unsafe_cable_connections{ "unsafe_cable_connections", false, UserPrefCategory::General };
    UserPrefBool show_minimap{ "show_minimap", false, UserPrefCategory::General };
    UserPrefFloat minimap_margin{ "minimap_margin", 10, 0, 50, UserPrefCategory::General };
    UserPrefDropdownString minimap_corner{ "minimap_corner", "Top right", 150, UserPrefCategory::General };
@@ -324,6 +330,10 @@ public:
    UserPrefTextEntryInt max_output_channels{ "max_output_channels", 16, 1, 1024, 5, UserPrefCategory::General };
    UserPrefTextEntryInt max_input_channels{ "max_input_channels", 16, 1, 1024, 5, UserPrefCategory::General };
    UserPrefString plugin_preference_order{ "plugin_preference_order", "VST3;VST;AudioUnit;LV2", 70, UserPrefCategory::General };
+
+   ////////////////
+   /// GRAPHICS ///
+   ////////////////
 
    UserPrefBool draw_background_lissajous{ "draw_background_lissajous", true, UserPrefCategory::Graphics };
    UserPrefBool background_lissajous_autocorrelate{ "background_lissajous_autocorrelate", true, UserPrefCategory::Graphics };
@@ -350,6 +360,10 @@ public:
 #endif
       -100, 100, 5, UserPrefCategory::Graphics
    };
+
+   /////////////
+   /// PATHS ///
+   /////////////
 
    UserPrefString recordings_path{ "recordings_path", "recordings/", 70, UserPrefCategory::Paths };
    UserPrefString samples_path{ "samples_path", "samples/", 70, UserPrefCategory::Paths };
