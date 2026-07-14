@@ -5,6 +5,238 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## [unreleased] - ####-##-##
+
+The unreleased section is grouped by calendar quarter so users on nightly builds can tell when changes landed during the long post-1.3.0 development cycle. Quarters are listed newest-first.
+
+
+### 2026 Q2 (April–May 2026)
+
+#### Added
+
+- The `audiosyncer` module, to make it easier to visually beatmatch audio to an external source
+- The `sessionorganizer` module, to create a central point to control `trackorganizer`s
+- The ability to record knob automation and add LFOs from inside `abletonmove`
+- Modes in `abletonlink` to only send or only receive tempo, and a beat offset setting
+- Per-value LED feedback colors for `midicontroller` connections
+- Support for 16, 24, and 32-bit WAV export
+- Resizable curve editor
+- Novation Launchkey 61 MK4 controller layout
+
+#### Changed
+
+- ctrl-shift-click on any UI control randomizes that control; ctrl-shift-click on a module randomizes every control on the module
+- "Set" and "increment" `midicontroller` actions no longer depend on incoming velocity, so they fire reliably from buttons that don't send velocity
+- Cleaned up key modifier labelling so that certain modifier chords are explicitly labelled
+- The `prefab` quickspawn dropdown is now alphabetically sorted
+- Autosaves are no longer listed on the welcome screen alongside saved files
+- Autosaves shown elsewhere now follow the same date sort order as other save files
+- `abletonmove`'s `soundselector` keeps the selected module's knobs accessible while you're choosing a sound, instead of locking them out
+- `trackorganizer` draws module borders in a way that no longer breaks visually when modules overlap
+- Multipage dropdowns open on the page containing the currently-selected value, instead of always on page 1
+
+#### Fixed
+
+- Build compatibility with JUCE versions ≥ 8.0.11
+- Rare crash when something logged from the audio thread while the console was being drawn
+- LFO visualization rendered incorrectly on sliders whose range wasn't 0–1
+- `abletonmovecontrol` could no longer reach modulators because of incorrect control offsets
+- The save/load file chooser sometimes opened in the wrong directory
+- The "delete" button in the `beats` module wasn't visible
+- `NoteTable` mapped grid-controller rows with the wrong y offset
+- Added a failsafe so a `CustomDivisor` of 1 no longer breaks dependent modules
+
+
+### 2026 Q1 (January–March 2026)
+
+#### Added
+
+- A welcome screen on startup that lists recently-opened files, with new/load buttons and a way to reopen it from the title bar menu
+- The `dopplershift` module — pitch-shifts a sound based on simulated source/listener motion
+- The `zerocrossrate` audio analyzer module
+- A pitch shifter to the `beats` module
+- Python scripting hooks for building custom interfaces on the Ableton Push and Move controllers
+- A hook for dumping a module's internal debug text to a file (useful when reporting bugs)
+- A "reset preset" button for plugins, restoring their dropdown to a fresh state
+- A free LFO-interval mode in the `tremolo` module (independent of transport)
+- `midicontroller` layouts for Novation Launchkey Mk4 25 and the Launchkey pads
+- A `midicontroller` layout for the Launchpad Pro
+- A live visualization on the `abletonmove` LCD when you touch certain controls, so you can see what you're adjusting
+- Per-clip length and volume settings in the `beats` module, with automatic guessing of how many bars each clip is
+- The ability to adjust a modulator's range from `abletonmove`, plus additional on-screen visualization of modulated parameters
+- More `abletonmove` transport control surface coverage in `abletonmovecontrol`
+
+#### Changed
+
+- `arpeggiator` now responds more musically to MIDI channel pressure
+- `songbuilder` track/scene colorization is clearer at a glance
+- Tweaks to the welcome screen and to the default filename used for new savestates
+
+#### Fixed
+
+- Crash on startup when a recently-opened file in the welcome list no longer exists on disk
+- Transport reset was applied a measure later than expected
+- Cables to/from a module were broken if the module was renamed after the cable was connected
+- The `binaryvalue` module rendered with the wrong dimensions
+- `sampler` could crash on an incoming note when it had no sample loaded
+- `notestepper` no longer lets you exceed its maximum step count
+- UI controls inside canvas modules used to accumulate as canvas elements were added/deleted
+- `snapshots` failed to persist its per-snapshot module data into the .bsk file
+- `gridkeyboard` couldn't play chords when feeding Bespoke's built-in synths
+- `gridkeyboard` chord mode could cut notes short and release the wrong chord
+- `audiorouter` crashed when an output cable pointed at a no-longer-existing target
+- `midicontroller` UI flickering during input
+- Various small fixes inside the `script` module
+- Octave up/down keybind now respects the Pitch-Per-Octave setting (matters in microtonal scales)
+- Button width was not recomputed when you set an override display name
+- `abletonmovecontrol` LEDs failed to light correctly in some scenarios
+
+
+### 2025 Q4 (October–December 2025)
+
+#### Changed
+
+- `abletonmovecontrol` now shows the current timeline on its LCD, has improved transport control, supports tap-tempo, and can mirror the move's LCD inside Bespoke for visibility while patching
+- Plugins remember the last preset you selected in their preset dropdown across reloads
+- The `oscoutput` module is now resizable horizontally so longer addresses fit
+
+
+### 2025 Q3 (July–September 2025)
+
+#### Added
+
+- The `voicemanager` module, for centrally managing voice allocation across modules
+- The `abletonmovecontrol` and `trackorganizer` modules, the foundation of Bespoke's Ableton Move integration
+- The `interface` module, for building custom UI panels that control other modules
+- The `taptempo` module — tap a button repeatedly to set transport tempo
+- The `velocitytoduration` module — convert note velocity into note duration
+- The `binaryvalue` module — display a numeric value as on/off bits
+- Multi-channel audio output from plugin modules (previously stereo-only)
+- The ability to capture the last 16 bars retroactively in `looperrecorder`, so you can keep a happy accident you didn't mean to record
+- ADSRs can now use the value of their first stage as their start value, instead of always starting from 0
+- A free-running mode for `curvelooper` that doesn't sync to transport
+- `bespoke.get_controls` in the python script API — list a module's controls
+- `me.get_text()` / `me.set_text()` in the python script API — read/write text-entry contents
+- New layouts for the `gridkeyboard` module
+- The ability to remove individual parameter sliders from a `plugin` module's UI
+- A hidden button over the `plugin` module's parameter count that loads parameters in bundles of 100, for plugins with thousands of parameters
+- A way to reset a `plugin` module's parameter dropdown and sliders to the just-spawned state
+- Selectable grain window shapes in the `granulator` and `seaofgrain` modules (Hann, Tukey, etc.)
+- Notes played into `seaofgrain` are now scheduled to play at the correct sample-accurate time, rather than just toggling grain spawning on/off
+- Seeded randomness for the LFO's s&h and perlin modes, resettable via a pulse so you can repeat a random pattern over an interval
+- A "reset on load" mode for `pulselimit` — counter resets when a savestate is loaded
+
+#### Changed
+
+- The `gain` module's slider now uses a curved response instead of linear, so equal slider movement produces more even perceived-loudness changes
+- Widened the `songbuilder` module's labels so longer track/scene names fit
+- Curve modules can be set to steeper shapes by default, and now share their range with the editor slider's limits
+- Doubled the maximum buffer length of the `looper` module
+- You can now feed notes into `buffershuffler` faster than it plays them back, enabling glitchy effects
+- Level meters in the `gain` module are now off by default (they were a CPU hit when many gain modules were in use)
+- The `notefilter` module now also filters note-off messages, not just note-on
+- Once you wiggle a `plugin` module parameter, it stays in the dropdown for the rest of the session instead of being replaced by the next one
+- Tweaked the scroll-wheel behavior on dropdown lists for finer control
+- Reworked the layout and structure of the `plugin` module UI
+- The `beats` module can now switch its loaded sample by receiving specific notes (chromatic sample-select)
+- The Bespoke title bar follows the system dark-theme setting on Windows
+- Many small UX changes across `abletonmovecontrol` to support a more polished workflow
+- Audio buffer visualisations now scale to fit their contents and show any DC offset present
+- Module resizing/sizing is now stored consistently across all module types (resolves several long-standing per-module bugs)
+- `seaofgrain` can now be played with regular non-MPE notes, not only MPE-aware controllers
+- The `granulator` module auto-scales its output volume based on the number of active grains, preventing volume jumps as grain count changes
+- Improved the LFO "spread" parameter behavior. Existing patches keep the old behavior so they don't change sound on load
+
+#### Fixed
+
+- The `comment` module no longer hijacks the per-module save-data slot, so it stops conflicting with other modules
+- `trackorganizer` cables remain grabbable only while they are actually drawn
+- A cue at the very start of a `sampleplayer` could not be grabbed or played; it can now
+- Committing a `looperrecorder`/`looperrewriter` to a `looper` no longer hitches audio — the commit is spread across several process calls
+- Removing a not-yet-connected `abletonmovecontrol` no longer crashes
+- The `boundstopulse` module no longer misbehaves when its input goes below min or above max
+- MIDI inputs now disconnect cleanly instead of leaking the connection
+- The `ramper` module now correctly handles a transport reset mid-ramp instead of getting stuck
+- Float sliders no longer produce NaNs when a logarithmic-type slider has its minimum set to 0
+- Crash fixed when extending a `looper`'s length beyond the maximum buffer size
+- MIDI file imports into `notecanvas` now load correctly at most tempos
+- The `envelope` module now produces correct output when connected to controls other than FloatSliders (e.g. integer sliders, dropdowns)
+- The `pitchbender` module can now be disabled, like other modules
+- `basslinesequencer` could not resume self-advance after stopping; now it can
+- The `polyrhythms` module now correctly sends note-off messages (previously left notes hanging)
+- Plugins stop processing audio when their output isn't connected, saving CPU
+- Plugin internal buffers are no longer recreated on every change — only when truly needed
+- Reworked cable handling when duplicating modules so cables are properly carried/dropped instead of getting in inconsistent states
+- Added a null check to prevent a crash when loading certain savestates
+- Samples can now be played back at negative speed without crashing
+- The `sampler` module no longer processes audio when no sample is loaded and a note arrives
+- Mono-input visualization for `stereorotation` now displays correctly
+- Fixed a regression introduced by the module-size refactor where `basslinesequencer` (and possibly other modules) wasn't applying its resize
+
+#### Removed
+
+- The `pan` setting from the triangle menu of the `panner` module
+
+
+### 2025 Q2 (April–June 2025)
+
+#### Added
+
+- The `stereorotation` module — rotates a stereo signal through the stereo field
+- A latency calculator module, for measuring I/O latency or the round-trip latency added by VSTs and other modules
+- Latency-offset support when writing directly into a `looper` (previously only possible going through `looperrecorder`)
+- A "milliseconds" delay mode in `notedelayer` (in addition to musical-time modes)
+- Python script commands for controlling the `snapshots` module
+- Grid-control and X/Y offset sliders in the `snapshots` module, for snapshotting more types of state
+- Angle sliders that rotate the rings of a `circlesequencer`
+- A `midicontroller` layout for the Behringer BCR2000
+- A `midicontroller` layout for the Novation Launchpad X
+
+#### Changed
+
+- Made the `multitapdelay` module more compact on screen
+- Disabled effect chains no longer alter signal volume (the wet/dry mix sliders were leaking through)
+- In script-evaluated slider expressions, the current slider value is now accessible as `x` (was `current_value`)
+- Autosaves are now written from template files, so newly-loaded autosaves carry the same starting structure as a fresh project
+
+#### Fixed
+
+- Reclaimed some memory by removing an unused internal buffer
+- Added macOS entitlements so plugins that rely on iLok can authenticate from inside Bespoke
+- `basslinesequencer` did not sustain notes correctly when driving a real 303 over MIDI
+- `stereorotation` was writing over downstream audio instead of mixing into it
+- Multiple crashes triggered by feeding invalid cue points to `import_sampleplayer_cue` in scripts
+- Race when multiple threads accessed `sSnapshotHighlightControls` at once
+- `seaofgrain` produced mono output when given a mono sample; it now correctly outputs stereo
+- Values typed into a TextEntry are now clamped to that field's range, instead of accepting out-of-range values
+- The modulation range is recalculated correctly when you replace a modulator's single target
+- Bespoke now recovers gracefully when an audio interface is disconnected and reconnected mid-session
+- `selector` could not select the last item in its list
+- `noteoctaver` could leave notes stuck on after a retrigger
+- Null-pointer dereference when grid input from a `midicontroller` ran a script via `GridModule::OnGridButton` → `ScriptModule::RunCode` (race between MIDI thread and main thread)
+- `looperrecorder`'s `num_loopers` is now clamped to the legal range (1 ≤ n ≤ max)
+
+
+### 2025 Q1 (January–March 2025)
+
+#### Added
+
+- The `wander` modulator — slowly drifts a value around using a random walk
+- The `basslinesequencer` module, a new monophonic sequencer geared toward 303-style acid bass lines (slides, accents, ghost notes)
+- `module.set_focus()` in the python script API, equivalent to the OSC focus command
+- `bespoke.location_recall` and `bespoke.location_store` in python, for saving and recalling viewport positions/zoom from a script
+- A batch of new features for the long-neglected `sampler` module (see module help for details)
+- The `acciaccatura` note-effect module, which adds a fast grace-note bend in front of each played note
+- The ability to reset an LFO's phase by sending it a pulse
+
+#### Fixed
+
+- Significant performance boost in plugin processing by passing internal buffers by reference instead of copying them
+- Buffer overflow in `NoteTable::PlayColumn` that was causing intermittent crashes
+- Multiple `script` modules can now receive `on_sysex` events at the same time, instead of only one of them
+- Python `me.get()` and `me.set()` now resolve module paths correctly when the script lives inside a `prefab`
+
+
 ## [1.3.0] - 2024-12-22
 
 ### Added
@@ -590,7 +822,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Commit log diffs
 
-[unreleased]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.2.1...main
+[unreleased]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.3.0...main
+[1.3.0]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/BespokeSynth/BespokeSynth/compare/v1.0.0...v1.1.0
