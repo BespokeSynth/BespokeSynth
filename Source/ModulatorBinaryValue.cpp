@@ -38,6 +38,9 @@ ModulatorBinaryValue::ModulatorBinaryValue()
       mBits[i].SetOwner(this);
       mBits[i].SetIndex(NUM_BITS - i - 1);
    }
+   for (int i = 0; i < 1 << NUM_BITS; i++)
+      mPermutations[i].value = i;
+   std::sort(mPermutations.begin(), mPermutations.end());
 }
 
 void ModulatorBinaryValue::CreateUIControls()
@@ -53,6 +56,7 @@ void ModulatorBinaryValue::CreateUIControls()
 
    mCodeSelector->AddLabel("byte", kCodeByte);
    mCodeSelector->AddLabel("gray", kCodeGray);
+   mCodeSelector->AddLabel("permutation", kCodePermutation);
 
    for (int i = 0; i < NUM_BITS; ++i)
    {
@@ -93,6 +97,8 @@ void ModulatorBinaryValue::PostRepatch(PatchCableSource* cableSource, bool fromU
 int ModulatorBinaryValue::GetBitValue(int index)
 {
    int value = (int)mInput;
+   if (mCode == kCodePermutation)
+      value = mPermutations[value % (1 << NUM_BITS)].value;
    if (mCode == kCodeGray)
       value = value ^ (value >> 1);
    return (value & (1 << index)) != 0;
