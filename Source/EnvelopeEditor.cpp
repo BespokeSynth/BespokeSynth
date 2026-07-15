@@ -186,7 +186,7 @@ void EnvelopeControl::OnClicked(float x, float y, bool right)
                mAdsr->GetStageData(mHighlightPoint + 1).time += mAdsr->GetStageData(mHighlightPoint).time;
                mAdsr->GetStageData(mHighlightPoint + 1).curve = mAdsr->GetStageData(mHighlightPoint).curve;
 
-               for (int i = mHighlightPoint; i < mAdsr->GetNumStages(); ++i)
+               for (int i = mHighlightPoint; i < mAdsr->GetNumStages() - 1; ++i)
                {
                   mAdsr->GetStageData(i).time = mAdsr->GetStageData(i + 1).time;
                   mAdsr->GetStageData(i).target = mAdsr->GetStageData(i + 1).target;
@@ -206,29 +206,36 @@ void EnvelopeControl::OnClicked(float x, float y, bool right)
                mHighlightCurve != -1 &&
                (mClickStart - ofVec2f(x, y)).lengthSquared() < pointClickRadius * pointClickRadius)
       {
-         float clickTime = GetTimeForX(x);
-         if (clickTime > GetPreSustainTime())
-            clickTime -= GetReleaseTime() - GetPreSustainTime();
-
-         for (int i = mAdsr->GetNumStages(); i > mHighlightCurve; --i)
+         if (mAdsr->GetNumStages() >= MAX_ADSR_STAGES)
          {
-            mAdsr->GetStageData(i).time = mAdsr->GetStageData(i - 1).time;
-            mAdsr->GetStageData(i).target = mAdsr->GetStageData(i - 1).target;
-            mAdsr->GetStageData(i).curve = mAdsr->GetStageData(i - 1).curve;
+            mHighlightCurve = -1;
          }
-         float priorStageTimes = 0;
-         for (int i = 0; i < mHighlightCurve; ++i)
-            priorStageTimes += mAdsr->GetStageData(i).time;
-         mAdsr->GetStageData(mHighlightCurve).time = clickTime - priorStageTimes;
-         mAdsr->GetStageData(mHighlightCurve).target = GetValueForY(y);
-         mAdsr->GetStageData(mHighlightCurve + 1).time -= mAdsr->GetStageData(mHighlightCurve).time;
-         mAdsr->SetNumStages(mAdsr->GetNumStages() + 1);
-         if (mAdsr->GetHasSustainStage() &&
-             mHighlightCurve <= mAdsr->GetSustainStage())
-            mAdsr->SetSustainStage(mAdsr->GetSustainStage() + 1);
+         else
+         {
+            float clickTime = GetTimeForX(x);
+            if (clickTime > GetPreSustainTime())
+               clickTime -= GetReleaseTime() - GetPreSustainTime();
 
-         mHighlightPoint = mHighlightCurve;
-         mHighlightCurve = -1;
+            for (int i = mAdsr->GetNumStages(); i > mHighlightCurve; --i)
+            {
+               mAdsr->GetStageData(i).time = mAdsr->GetStageData(i - 1).time;
+               mAdsr->GetStageData(i).target = mAdsr->GetStageData(i - 1).target;
+               mAdsr->GetStageData(i).curve = mAdsr->GetStageData(i - 1).curve;
+            }
+            float priorStageTimes = 0;
+            for (int i = 0; i < mHighlightCurve; ++i)
+               priorStageTimes += mAdsr->GetStageData(i).time;
+            mAdsr->GetStageData(mHighlightCurve).time = clickTime - priorStageTimes;
+            mAdsr->GetStageData(mHighlightCurve).target = GetValueForY(y);
+            mAdsr->GetStageData(mHighlightCurve + 1).time -= mAdsr->GetStageData(mHighlightCurve).time;
+            mAdsr->SetNumStages(mAdsr->GetNumStages() + 1);
+            if (mAdsr->GetHasSustainStage() &&
+                mHighlightCurve <= mAdsr->GetSustainStage())
+               mAdsr->SetSustainStage(mAdsr->GetSustainStage() + 1);
+
+            mHighlightPoint = mHighlightCurve;
+            mHighlightCurve = -1;
+         }
       }
 
       mLastClickTime = gTime;
@@ -508,7 +515,10 @@ void EnvelopeEditor::DrawModule()
       }
 
       //move release level checkbox below final stage control
-      ofVec2f pos = mStageControls[numStages - 1].mSustainCheckbox->GetPosition(K(local));
+      int lastVisibleStage = numStages - 1;
+      if (lastVisibleStage >= (int)mStageControls.size())
+         lastVisibleStage = (int)mStageControls.size() - 1;
+      ofVec2f pos = mStageControls[lastVisibleStage].mSustainCheckbox->GetPosition(K(local));
       mFreeReleaseLevelCheckbox->SetPosition(pos.x, pos.y);
    }
 }
