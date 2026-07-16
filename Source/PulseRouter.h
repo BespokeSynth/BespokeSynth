@@ -1,4 +1,4 @@
-﻿/**
+/**
 bespoke synth, a software modular synthesizer
     Copyright (C) 2021 Ryan Challinor (contact: awwbees@gmail.com)
 
