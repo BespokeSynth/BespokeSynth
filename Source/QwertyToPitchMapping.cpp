@@ -1,4 +1,4 @@
-﻿#include "QwertyToPitchMapping.h"
+#include "QwertyToPitchMapping.h"
 #include "UserPrefs.h"
 
 /*Returns the pitch of a computer key char, according to the user selected layout.
