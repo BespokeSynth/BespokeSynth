@@ -82,6 +82,7 @@ struct SpawnListManager
    SpawnList mAudioModules;
    SpawnList mModulatorModules;
    SpawnList mPulseModules;
+   SpawnList mVisualizerModules;
    SpawnList mOtherModules;
    SpawnList mPlugins;
    SpawnList mPrefabs;
@@ -128,6 +129,7 @@ public:
 
    HelpDisplay* GetHelpDisplay() { return mHelpDisplay; }
    void ShowHelp();
+   void ApplyColorPalette(int index);
 
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
@@ -168,10 +170,14 @@ private:
    ClickButton* mSaveStateAsButton{ nullptr };
    ClickButton* mLoadStateButton{ nullptr };
    ClickButton* mWriteAudioButton{ nullptr };
+   ClickButton* mRecordButton{ nullptr };
+   DropdownList* mPaletteDropdown{ nullptr };
+   int mPaletteIndex{ -1 };
    DropdownList* mLoadLayoutDropdown{ nullptr };
    ClickButton* mDisplayHelpButton{ nullptr };
    ClickButton* mDisplayUserPrefsEditorButton{ nullptr };
    ClickButton* mHomeButton{ nullptr };
+   ClickButton* mSearchToggleButton{ nullptr };
    Checkbox* mEventLookaheadCheckbox{ nullptr };
    int mLoadLayoutIndex{ -1 };
    Checkbox* mShouldAutosaveCheckbox{ nullptr };

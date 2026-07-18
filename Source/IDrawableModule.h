@@ -58,6 +58,7 @@ enum ModuleCategory
    kModuleCategory_Modulator,
    kModuleCategory_Pulse,
    kModuleCategory_Other,
+   kModuleCategory_Visualizer,
    kModuleCategory_Unknown
 };
 
@@ -127,6 +128,7 @@ public:
    virtual void FilesDropped(std::vector<std::string> files, int x, int y) {}
    virtual std::string GetTitleLabel() const { return Name(); }
    virtual bool HasTitleBar() const { return true; }
+   virtual bool CanBeMoved() const { return true; } //override to false for docked/pinned panels that should never be click-dragged
    static float TitleBarHeight() { return mTitleBarHeight; }
    static ofColor GetColor(ModuleCategory type);
    virtual void SetEnabled(bool enabled) {}
@@ -136,7 +138,7 @@ public:
    virtual bool CanDropSample() const { return false; }
    void BasePoll(); //calls poll, using this to guarantee base poll is always called
    bool IsWithinRect(const ofRectangle& rect);
-   bool IsVisible();
+   virtual bool IsVisible();
    std::vector<IDrawableModule*> GetChildren() const { return mChildren; }
    virtual bool IsResizable() const { return false; }
    virtual void Resize(float width, float height)

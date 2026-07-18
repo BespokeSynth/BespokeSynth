@@ -28,10 +28,12 @@
 #include "SynthGlobals.h"
 #include "Profiler.h"
 #include "ModuleFactory.h"
+#include "UserPrefs.h"
 #include "ModuleSaveDataPanel.h"
 #include "HelpDisplay.h"
 #include "Prefab.h"
 #include "UserPrefsEditor.h"
+#include "SearchPanel.h"
 #include "UIControlMacros.h"
 #include "VSTPlugin.h"
 #include "VSTScanner.h"
@@ -150,7 +152,9 @@ void TitleBar::CreateUIControls()
    BUTTON(mSaveStateAsButton, "save as");
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(10);
-   BUTTON(mWriteAudioButton, "write audio");
+   BUTTON(mWriteAudioButton, "export audio");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mRecordButton, "record");
    UIBLOCK_NEWLINE();
    //BUTTON(mResetLayoutButton, "new patch");
    BUTTON(mWelcomeScreenButton, "load/new");
@@ -163,6 +167,32 @@ void TitleBar::CreateUIControls()
    mDisplayHelpButton = new ClickButton(this, " ? ", 380, 1);
    mDisplayUserPrefsEditorButton = new ClickButton(this, "settings", 330, 1);
    mHomeButton = new ClickButton(this, "home", 330, 1);
+   mSearchToggleButton = new ClickButton(this, "search", 330, 1); //toggles the right-docked search/browser panel open/closed
+   mPaletteDropdown = new DropdownList(this, "palette", 330, 1, &mPaletteIndex);
+   mPaletteDropdown->AddLabel("classic", 0);
+   mPaletteDropdown->AddLabel("neon", 1);
+   mPaletteDropdown->AddLabel("pastel", 2);
+   mPaletteDropdown->AddLabel("mono", 3);
+   mPaletteDropdown->AddLabel("sunset", 4);
+   mPaletteDropdown->AddLabel("ocean", 5);
+   mPaletteDropdown->AddLabel("acid", 6);
+   mPaletteDropdown->AddLabel("vaporwave", 7);
+   mPaletteDropdown->AddLabel("toxic", 8);
+   mPaletteDropdown->AddLabel("bloodmoon", 9);
+   mPaletteDropdown->AddLabel("cyberpunk", 10);
+   mPaletteDropdown->AddLabel("glitch", 11);
+   mPaletteDropdown->AddLabel("midnight", 12);
+   mPaletteDropdown->AddLabel("aurora", 13);
+   mPaletteDropdown->AddLabel("forest", 14);
+   mPaletteDropdown->AddLabel("candy", 15);
+   mPaletteDropdown->AddLabel("ember", 16);
+   mPaletteDropdown->AddLabel("arctic", 17);
+   mPaletteDropdown->AddLabel("grape", 18);
+   mPaletteDropdown->AddLabel("sepia", 19);
+   mPaletteDropdown->AddLabel("matrix", 20);
+   mPaletteDropdown->AddLabel("dracula", 21);
+   mPaletteDropdown->AddLabel("solarized", 22);
+   mPaletteDropdown->AddLabel("mono light", 23);
    mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 20, &mLoadLayoutIndex);
    mSaveLayoutButton = new ClickButton(this, "save layout", 280, 19);
 
@@ -204,6 +234,7 @@ SpawnListManager::SpawnListManager(IDropdownListener* owner)
 , mAudioModules(owner, 0, 0, "audio effects:", kModuleCategory_Audio, true)
 , mModulatorModules(owner, 0, 0, "modulators:", kModuleCategory_Modulator, true)
 , mPulseModules(owner, 0, 0, "pulse:", kModuleCategory_Pulse, true)
+, mVisualizerModules(owner, 0, 0, "visualizers:", kModuleCategory_Visualizer, true)
 , mPlugins(owner, 0, 0, kPluginsDropdownLabel, kModuleCategory_Synth, true)
 , mOtherModules(owner, 0, 0, "other:", kModuleCategory_Other, true)
 , mPrefabs(owner, 0, 0, "prefabs:", kModuleCategory_Other, false)
@@ -218,6 +249,7 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mAudioModules.SetList(factory->GetSpawnableModules(kModuleCategory_Audio));
    mModulatorModules.SetList(factory->GetSpawnableModules(kModuleCategory_Modulator));
    mPulseModules.SetList(factory->GetSpawnableModules(kModuleCategory_Pulse));
+   mVisualizerModules.SetList(factory->GetSpawnableModules(kModuleCategory_Visualizer));
    mOtherModules.SetList(factory->GetSpawnableModules(kModuleCategory_Other));
 
    SetUpPluginsDropdown();
@@ -229,6 +261,7 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mDropdowns.push_back(&mAudioModules);
    mDropdowns.push_back(&mModulatorModules);
    mDropdowns.push_back(&mPulseModules);
+   mDropdowns.push_back(&mVisualizerModules);
    mDropdowns.push_back(&mPlugins);
    mDropdowns.push_back(&mOtherModules);
    mDropdowns.push_back(&mPrefabs);
@@ -373,6 +406,21 @@ void TitleBar::DrawModule()
    if (mLoadStateButton)
       mLoadStateButton->Draw();
    mWriteAudioButton->Draw();
+
+   mRecordButton->SetName(TheSynth->IsRecordingSession() ? "stop" : "record");
+   mRecordButton->Draw();
+   if (TheSynth->IsRecordingSession())
+   {
+      //pulsing red dot next to the record button while a take is being captured
+      ofPushStyle();
+      float pulse = ofMap(sin(gTime / 300 * PI * 2), -1, 1, .5f, 1);
+      ofFill();
+      ofSetColor(255, 60, 60, 255 * pulse);
+      ofRectangle recordRect = mRecordButton->GetRect();
+      ofCircle(recordRect.x - 7, recordRect.y + recordRect.height / 2, 3.5f);
+      ofPopStyle();
+   }
+
    mLoadLayoutDropdown->Draw();
    if (mResetLayoutButton)
       mResetLayoutButton->Draw();
@@ -384,7 +432,7 @@ void TitleBar::DrawModule()
       mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPause);
    mPlayPauseButton->Draw();
 
-   float startX = 400;
+   float startX = 470; //leaves room on row 1 for the palette dropdown that now sits after 'record'
    float startY = 2;
 
    if (pixelWidth < kDoubleHeightThreshold)
@@ -402,8 +450,8 @@ void TitleBar::DrawModule()
       spawnList->GetList()->GetDimensions(w, h);
       x += w + 5;
 
-      if (x >= pixelWidth - 260)
-      {
+      if (x >= pixelWidth - 340) //reserve extra room on the right so the spawn dropdowns never run
+      { //into the palette/search/home/settings/help cluster or the cpu stats
          x = startX;
          y += 18;
       }
@@ -433,6 +481,12 @@ void TitleBar::DrawModule()
    mDisplayUserPrefsEditorButton->Draw();
    mHomeButton->SetPosition(mDisplayUserPrefsEditorButton->GetPosition(true).x - mHomeButton->GetRect().width - 5, 4);
    mHomeButton->Draw();
+   //palette (colour presets) now lives in the top-LEFT cluster, right after the 'record' button
+   mPaletteDropdown->SetPosition(mRecordButton->GetPosition(true).x + mRecordButton->GetRect().width + 10, mRecordButton->GetPosition(true).y - 1);
+   mPaletteDropdown->Draw();
+   //search toggle stays on the right, just left of the 'home' button
+   mSearchToggleButton->SetPosition(mHomeButton->GetPosition(true).x - mSearchToggleButton->GetRect().width - 5, 4);
+   mSearchToggleButton->Draw();
    mEventLookaheadCheckbox->Draw();
    mShouldAutosaveCheckbox->Draw();
 }
@@ -575,8 +629,97 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal, double time)
       return;
    }
 
+   if (list == mPaletteDropdown)
+   {
+      ApplyColorPalette(mPaletteIndex);
+      return;
+   }
+
    for (auto* spawnList : mSpawnLists.GetDropdowns())
       spawnList->OnSelection(list);
+}
+
+void TitleBar::ApplyColorPalette(int index)
+{
+   //Each palette now themes the WHOLE app: the 7 module-category hues + module saturation/
+   //brightness (as before), PLUS the window background and the animated lissajous scope, which
+   //are derived from a per-palette background hue (bgHue/bgSat/bgBright) and lissajous brightness
+   //(lissBright). Background/lissajous are set both on the live statics (so it changes instantly)
+   //and on UserPrefs (so it persists).
+   //
+   //   module hues .......... hueNote, hueSynth, hueAudio, hueInstrument, hueProcessor, hueModulator, huePulse
+   //   module look .......... saturation, brightness
+   //   window theming ....... bgHue, bgSat, bgBright (dark tint), lissBright (scope glow)
+   //all values are in the 0-255 range that ofColor::setHsb expects.
+   struct Palette
+   {
+      float hueNote, hueSynth, hueAudio, hueInstrument, hueProcessor, hueModulator, huePulse, saturation, brightness;
+      float bgHue, bgSat, bgBright, lissBright;
+   };
+
+   static const Palette kPalettes[] = {
+      { 27, 79, 135, 240, 170, 200, 43, 130, 205, 160, 30, 23, 80 }, //classic
+      { 330, 140, 190, 260, 30, 90, 55, 230, 235, 190, 120, 26, 150 }, //neon
+      { 27, 79, 135, 240, 170, 200, 43, 70, 235, 190, 40, 30, 95 }, //pastel
+      { 0, 0, 0, 0, 0, 0, 0, 0, 200, 0, 0, 20, 80 }, //mono
+      { 15, 350, 30, 340, 10, 45, 25, 190, 220, 12, 130, 26, 100 }, //sunset - warm maroon bg
+      { 195, 170, 220, 190, 205, 180, 160, 170, 210, 140, 130, 24, 95 }, //ocean - deep teal bg
+      { 90, 310, 55, 170, 20, 280, 130, 255, 255, 60, 120, 22, 120 }, //acid - toxic lime/magenta/yellow
+      { 320, 185, 280, 340, 200, 260, 170, 200, 235, 205, 110, 28, 120 }, //vaporwave - pink/cyan/purple
+      { 75, 110, 45, 150, 90, 130, 60, 245, 245, 60, 140, 20, 110 }, //toxic - radioactive green
+      { 5, 15, 350, 25, 10, 340, 0, 210, 160, 2, 160, 20, 80 }, //bloodmoon - deep dim reds
+      { 195, 320, 50, 280, 210, 300, 45, 235, 230, 185, 140, 24, 130 }, //cyberpunk - blue/magenta/yellow
+      { 10, 200, 95, 310, 55, 250, 150, 255, 200, 150, 60, 22, 110 }, //glitch - wide clashing hues
+      { 170, 190, 150, 200, 160, 210, 175, 150, 220, 170, 150, 20, 85 }, //midnight - deep navy, cool blues
+      { 130, 90, 160, 200, 110, 260, 140, 190, 235, 130, 120, 24, 110 }, //aurora - teal/green/purple glow
+      { 75, 60, 100, 40, 90, 130, 55, 160, 210, 75, 90, 22, 85 }, //forest - greens/browns
+      { 235, 130, 45, 210, 160, 280, 50, 220, 245, 220, 90, 30, 120 }, //candy - pink/cyan/yellow on plum
+      { 8, 20, 350, 30, 15, 40, 25, 200, 225, 15, 150, 22, 100 }, //ember - near-black warm reds/gold
+      { 150, 170, 130, 190, 140, 200, 160, 90, 240, 150, 50, 30, 95 }, //arctic - icy blue-grey
+      { 200, 215, 180, 230, 195, 260, 210, 180, 225, 200, 130, 24, 100 }, //grape - deep purple
+      { 28, 35, 20, 40, 30, 45, 25, 120, 210, 28, 80, 28, 85 }, //sepia - warm brown vintage
+      { 90, 95, 85, 100, 90, 110, 80, 220, 235, 90, 180, 16, 130 }, //matrix - black-green terminal
+      { 215, 130, 90, 265, 175, 280, 60, 170, 235, 175, 40, 34, 100 }, //dracula - classic dark editor
+      { 170, 130, 90, 40, 20, 215, 60, 150, 220, 130, 120, 30, 90 }, //solarized - solarized-dark base
+      { 0, 0, 0, 0, 0, 0, 0, 0, 90, 0, 0, 225, 160 } //mono light - dark modules on a light bg
+   };
+
+   if (index < 0 || index >= (int)(sizeof(kPalettes) / sizeof(kPalettes[0])))
+      return;
+
+   const Palette& p = kPalettes[index];
+   UserPrefs.hue_note.Get() = p.hueNote;
+   UserPrefs.hue_synth.Get() = p.hueSynth;
+   UserPrefs.hue_audio.Get() = p.hueAudio;
+   UserPrefs.hue_instrument.Get() = p.hueInstrument;
+   UserPrefs.hue_processor.Get() = p.hueProcessor;
+   UserPrefs.hue_modulator.Get() = p.hueModulator;
+   UserPrefs.hue_pulse.Get() = p.huePulse;
+   UserPrefs.module_saturation.Get() = p.saturation;
+   UserPrefs.module_brightness.Get() = p.brightness;
+
+   //derive the window background (a dark tint) and the lissajous scope colour from the palette's
+   //background hue, then push them to both the live render statics and UserPrefs
+   ofColor bg;
+   bg.setHsb((int)p.bgHue, (int)p.bgSat, (int)p.bgBright);
+   ofColor liss;
+   liss.setHsb((int)p.bgHue, (int)(p.bgSat * 0.85f), (int)p.lissBright);
+
+   ModularSynth::sBackgroundR = bg.r / 255.0f;
+   ModularSynth::sBackgroundG = bg.g / 255.0f;
+   ModularSynth::sBackgroundB = bg.b / 255.0f;
+   UserPrefs.background_r.Get() = ModularSynth::sBackgroundR;
+   UserPrefs.background_g.Get() = ModularSynth::sBackgroundG;
+   UserPrefs.background_b.Get() = ModularSynth::sBackgroundB;
+
+   ModularSynth::sBackgroundLissajousR = liss.r / 255.0f;
+   ModularSynth::sBackgroundLissajousG = liss.g / 255.0f;
+   ModularSynth::sBackgroundLissajousB = liss.b / 255.0f;
+   UserPrefs.lissajous_r.Get() = ModularSynth::sBackgroundLissajousR;
+   UserPrefs.lissajous_g.Get() = ModularSynth::sBackgroundLissajousG;
+   UserPrefs.lissajous_b.Get() = ModularSynth::sBackgroundLissajousB;
+
+   DisplayTemporaryMessage("palette applied: " + mPaletteDropdown->GetLabel(index));
 }
 
 void TitleBar::ButtonClicked(ClickButton* button, double time)
@@ -596,12 +739,16 @@ void TitleBar::ButtonClicked(ClickButton* button, double time)
       TheSynth->LoadStatePopup();
    if (button == mWriteAudioButton)
       TheSynth->SaveOutput();
+   if (button == mRecordButton)
+      TheSynth->ToggleRecording();
    if (button == mDisplayHelpButton)
       ShowHelp();
    if (button == mDisplayUserPrefsEditorButton)
       TheSynth->GetUserPrefsEditor()->Show();
    if (button == mHomeButton)
       TheSynth->GetLocationZoomer()->GoHome();
+   if (button == mSearchToggleButton && TheSearchPanel != nullptr)
+      TheSearchPanel->SetShowing(!TheSearchPanel->IsShowing()); //Bitwig-style: open/close the browser panel
    if (button == mResetLayoutButton)
    {
       auto buttonRect = mResetLayoutButton->GetRect();

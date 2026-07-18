@@ -28,6 +28,7 @@
 #include "BitcrushEffect.h"
 #include "DelayEffect.h"
 #include "BiquadFilterEffect.h"
+#include "FormantFilterEffect.h"
 #include "DistortionEffect.h"
 //#include "Stutter.h"
 #include "TremoloEffect.h"
@@ -40,6 +41,7 @@
 #include "LiveGranulator.h"
 #include "DCRemoverEffect.h"
 #include "FreeverbEffect.h"
+#include "StereoWidthEffect.h"
 #include "EQEffect.h"
 //#include "AudioUnitEffect.h"
 #include "PitchShiftEffect.h"
@@ -68,9 +70,10 @@ EffectFactory::EffectFactory()
    Register("basiceq", &(EQEffect::Create));
    //Register("audiounit", &(AudioUnitEffect::Create));
    Register("pitchshift", &(PitchShiftEffect::Create));
-   //Register("formant", &(FormantFilterEffect::Create));
+   Register("formant", &(FormantFilterEffect::Create));
    Register("butterworth", &(ButterworthFilterEffect::Create));
    Register("gainstage", &(GainStageEffect::Create));
+   Register("stereo", &(StereoWidthEffect::Create));
 }
 
 void EffectFactory::Register(std::string type, CreateEffectFn creator)

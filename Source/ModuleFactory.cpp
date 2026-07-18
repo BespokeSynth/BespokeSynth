@@ -42,6 +42,16 @@
 #include "InputChannel.h"
 #include "OutputChannel.h"
 #include "WaveformViewer.h"
+#include "TextCloud.h"
+#include "CheckerBox.h"
+#include "TransformViz.h"
+#include "LiquidifierViz.h"
+#include "MacroKnobs.h"
+#include "VisualEffectsViz.h"
+#include "VisualSwitcherViz.h"
+#include "ScopeViz.h"
+#include "VideoCloud.h"
+#include "PixelCloud.h"
 #include "FMSynth.h"
 #include "MidiController.h"
 #include "PSMoveController.h"
@@ -77,6 +87,9 @@
 #include "Producer.h"
 #include "ChaosEngine.h"
 #include "SingleOscillator.h"
+#include "MolderSampler.h"
+#include "Tracker.h"
+#include "Wavetable.h"
 #include "BandVocoder.h"
 #include "Capo.h"
 #include "ControlTactileFeedback.h"
@@ -94,6 +107,11 @@
 #include "SamplerGrid.h"
 #include "SignalGenerator.h"
 #include "Lissajous.h"
+#include "CubeViz.h"
+#include "MovieOut.h"
+#include "Composite.h"
+#include "ShaderViz.h"
+#include "BlobViz.h"
 #include "DebugAudioSource.h"
 #include "TimerDisplay.h"
 #include "DrumSynth.h"
@@ -236,6 +254,7 @@
 #include "NoteStepper.h"
 #include "M185Sequencer.h"
 #include "ModulatorAccum.h"
+#include "TableModulator.h"
 #include "GridSliders.h"
 #include "NoteRatchet.h"
 #include "NoteSorter.h"
@@ -297,6 +316,15 @@ ModuleFactory::ModuleFactory()
 {
    REGISTER(LooperRecorder, looperrecorder, kModuleCategory_Audio);
    REGISTER(WaveformViewer, waveformviewer, kModuleCategory_Audio);
+   REGISTER(TextCloud, textcloud, kModuleCategory_Visualizer);
+   REGISTER(CheckerBox, checkerbox, kModuleCategory_Visualizer);
+   REGISTER(TransformViz, transformviz, kModuleCategory_Visualizer);
+   REGISTER(LiquidifierViz, liquidifier, kModuleCategory_Visualizer);
+   REGISTER(VisualEffectsViz, viseffects, kModuleCategory_Visualizer);
+   REGISTER(VisualSwitcherViz, switcher, kModuleCategory_Visualizer);
+   REGISTER(ScopeViz, scopeviz, kModuleCategory_Visualizer);
+   REGISTER(VideoCloud, videocloud, kModuleCategory_Visualizer);
+   REGISTER(PixelCloud, pixelcloud, kModuleCategory_Visualizer);
    REGISTER(EffectChain, effectchain, kModuleCategory_Audio);
    REGISTER(DrumPlayer, drumplayer, kModuleCategory_Synth);
    REGISTER(Chorder, chorder, kModuleCategory_Note);
@@ -329,6 +357,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(Snapshots, snapshots, kModuleCategory_Other);
    REGISTER(NoteStepSequencer, notesequencer, kModuleCategory_Instrument);
    REGISTER(SingleOscillator, oscillator, kModuleCategory_Synth);
+   REGISTER(MolderSampler, molder, kModuleCategory_Synth);
+   REGISTER(Tracker, tracker, kModuleCategory_Synth);
+   REGISTER(Wavetable, wavetable, kModuleCategory_Synth);
    REGISTER(BandVocoder, vocoder, kModuleCategory_Audio);
    REGISTER(Capo, capo, kModuleCategory_Note);
    REGISTER(VocoderCarrierInput, vocodercarrier, kModuleCategory_Audio);
@@ -344,6 +375,11 @@ ModuleFactory::ModuleFactory()
    REGISTER(SamplerGrid, samplergrid, kModuleCategory_Audio);
    REGISTER(SignalGenerator, signalgenerator, kModuleCategory_Synth);
    REGISTER(Lissajous, lissajous, kModuleCategory_Audio);
+   REGISTER(CubeViz, cubeviz, kModuleCategory_Visualizer);
+   REGISTER(MovieOut, movieout, kModuleCategory_Visualizer);
+   REGISTER(Composite, composite, kModuleCategory_Visualizer);
+   REGISTER(ShaderViz, shaderviz, kModuleCategory_Visualizer);
+   REGISTER(BlobViz, blobviz, kModuleCategory_Visualizer);
    REGISTER(TimerDisplay, timerdisplay, kModuleCategory_Other);
    REGISTER(DrumSynth, drumsynth, kModuleCategory_Synth);
    //REGISTER(EigenChorder, eigenchorder, kModuleCategory_Note);
@@ -365,8 +401,11 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteFilter, notefilter, kModuleCategory_Note);
    REGISTER(PulseRouter, pulserouter, kModuleCategory_Pulse);
    REGISTER(RandomNoteGenerator, randomnote, kModuleCategory_Instrument);
+
    REGISTER(NoteToFreq, notetofreq, kModuleCategory_Modulator);
+   REGISTER(MacroKnobs, macroknobs, kModuleCategory_Other);
    REGISTER(MacroSlider, macroslider, kModuleCategory_Modulator);
+   REGISTER(TableModulator, tablemod, kModuleCategory_Modulator);
    REGISTER(NoteVibrato, vibrato, kModuleCategory_Note);
    REGISTER(ModulationVisualizer, modulationvizualizer, kModuleCategory_Note);
    REGISTER(PitchDive, pitchdive, kModuleCategory_Note);

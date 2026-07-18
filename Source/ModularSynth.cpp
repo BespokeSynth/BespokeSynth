@@ -24,6 +24,7 @@
 #include "PatchCable.h"
 #include "ADSRDisplay.h"
 #include "QuickSpawnMenu.h"
+#include "SearchPanel.h"
 #include "AudioToCV.h"
 #include "ScriptModule.h"
 #include "DrumPlayer.h"
@@ -283,6 +284,7 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    sBackgroundG = UserPrefs.background_g.Get();
    sBackgroundB = UserPrefs.background_b.Get();
    sCableAlpha = UserPrefs.cable_alpha.Get();
+   gFlatUIStyle = UserPrefs.flat_ui_style.Get();
 
    Time time = Time::getCurrentTime();
    if (fabsf(sBackgroundR - UserPrefs.background_r.GetDefault()) < .001f && fabsf(sBackgroundG - UserPrefs.background_g.GetDefault()) < .001f && fabsf(sBackgroundB - UserPrefs.background_b.GetDefault()) < .001f && time.getMonth() + 1 == 10 && time.getDayOfMonth() == 31)
@@ -2229,7 +2231,7 @@ void ModularSynth::CheckClick(IDrawableModule* clickedModule, float x, float y, 
    float modulePosX = x - moduleRect.x;
    float modulePosY = y - moduleRect.y;
 
-   if (modulePosY < 0 && clickedModule != TheTitleBar && (!clickedModule->HasEnabledCheckbox() || modulePosX > 20) && modulePosX < moduleRect.width - 15)
+   if (modulePosY < 0 && clickedModule != TheTitleBar && clickedModule->CanBeMoved() && (!clickedModule->HasEnabledCheckbox() || modulePosX > 20) && modulePosX < moduleRect.width - 15)
       SetMoveModule(clickedModule, moduleRect.x - x, moduleRect.y - y, false);
 
    float parentX = 0;
@@ -2337,6 +2339,15 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
          module->GetPosition(moduleX, moduleY);
          module->SampleDropped(x - moduleX, y - moduleY, GetHeldSample());
       }
+      else if (mMouseMovedSignificantlySincePressed)
+      {
+         //dropped on empty canvas rather than onto an existing sample-accepting module - spawn a fresh sample player preloaded with this sample
+         ModuleFactory::Spawnable spawnable{};
+         spawnable.mLabel = "sampleplayer";
+         IDrawableModule* newModule = SpawnModuleOnTheFly(spawnable, x, y);
+         if (newModule != nullptr)
+            newModule->SampleDropped(0, 0, GetHeldSample());
+      }
       ClearHeldSample();
    }
 
@@ -2439,8 +2450,11 @@ void ModularSynth::AudioOut(float* const* output, int bufferSize, int nChannels)
    }
 
    /////////// AUDIO PROCESSING ENDS HERE /////////////
-   mRecordingLength += bufferSize * oversampling;
-   mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
+   if (mIsRecordingSession)
+   {
+      mRecordingLength += bufferSize * oversampling;
+      mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
+   }
 
    Profiler::PrintCounters();
 }
@@ -2728,6 +2742,7 @@ void ModularSynth::ResetLayout()
    delete TheTitleBar;
    delete TheSaveDataPanel;
    delete mQuickSpawn;
+   delete TheSearchPanel;
    delete mUserPrefsEditor;
    delete mNoteOutputQueue;
 
@@ -2767,6 +2782,14 @@ void ModularSynth::ResetLayout()
    mQuickSpawn->Init();
    mUILayerModuleContainer.AddModule(mQuickSpawn);
    mModuleContainer.AddModule(mQuickSpawn->GetMainContainerFollower());
+
+   SearchPanel* searchPanel = new SearchPanel();
+   searchPanel->SetPosition(ofGetWidth() / gDrawScale - 220, 40);
+   searchPanel->SetName("searchpanel");
+   searchPanel->SetTypeName("searchpanel", kModuleCategory_Other);
+   searchPanel->CreateUIControls();
+   searchPanel->Init();
+   mUILayerModuleContainer.AddModule(searchPanel);
 
    mUserPrefsEditor = new UserPrefsEditor();
    mUserPrefsEditor->SetName("userprefseditor");
@@ -3910,6 +3933,29 @@ void ModularSynth::SaveOutput()
    mRecordingLength = 0;
 
    TheTitleBar->DisplayTemporaryMessage("wrote " + filename);
+}
+
+void ModularSynth::ToggleRecording()
+{
+   mIsRecordingSession = !mIsRecordingSession;
+   gIsRecordingSession = mIsRecordingSession;
+
+   if (mIsRecordingSession)
+   {
+      //starting a fresh take: clear the rolling buffer so "export audio"
+      //captures exactly what happens from this moment forward
+      ScopedMutex mutex(&mAudioThreadMutex, "ToggleRecording()");
+      mGlobalRecordBuffer->ClearBuffer();
+      mRecordingLength = 0;
+      TheTitleBar->DisplayTemporaryMessage("recording started");
+   }
+   else
+   {
+      //stopping: immediately export exactly what was captured during this
+      //take, before any further audio can roll the buffer forward
+      SaveOutput();
+      TheTitleBar->DisplayTemporaryMessage("recording stopped and exported");
+   }
 }
 
 const String& ModularSynth::GetTextFromClipboard() const

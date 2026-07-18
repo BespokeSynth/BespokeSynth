@@ -220,6 +220,8 @@ target_sources(BespokeSynth PRIVATE
     FourOnTheFloor.cpp
     FourOnTheFloor.h
     FreeverbEffect.cpp
+    StereoWidthEffect.cpp
+    StereoWidthEffect.h
     FreeverbEffect.h
     FreqDelay.cpp
     FreqDelay.h
@@ -312,6 +314,15 @@ target_sources(BespokeSynth PRIVATE
     LinnstrumentControl.h
     Lissajous.cpp
     Lissajous.h
+    CubeViz.cpp
+    VizRecorder.cpp
+    MovieOut.cpp
+    Composite.cpp
+    VizGL.cpp
+    ShaderViz.cpp
+    CubeViz.h
+    BlobViz.cpp
+    BlobViz.h
     LiveGranulator.cpp
     LiveGranulator.h
     LocationZoomer.cpp
@@ -368,6 +379,8 @@ target_sources(BespokeSynth PRIVATE
     ModulationVisualizer.cpp
     ModulationVisualizer.h
     ModulatorAccum.cpp
+    TableModulator.cpp
+    TableModulator.h
     ModulatorAccum.h
     ModulatorAdd.cpp
     ModulatorAdd.h
@@ -636,6 +649,8 @@ target_sources(BespokeSynth PRIVATE
     Sample.h
     SampleBrowser.cpp
     SampleBrowser.h
+    SearchPanel.cpp
+    SearchPanel.h
     SampleCanvas.cpp
     SampleCanvas.h
     SampleCapturer.cpp
@@ -680,8 +695,18 @@ target_sources(BespokeSynth PRIVATE
     SimplexFont.h
     SingleOscillator.cpp
     SingleOscillator.h
+    MolderSampler.cpp
+    MolderSampler.h
     SingleOscillatorVoice.cpp
     SingleOscillatorVoice.h
+    Wavetable.cpp
+    Wavetable.h
+    WavetableVoice.cpp
+    WavetableVoice.h
+    WavetableTables.cpp
+    WavetableTables.h
+    Tracker.cpp
+    Tracker.h
     Slider.cpp
     Slider.h
     SliderSequencer.cpp
@@ -789,6 +814,16 @@ target_sources(BespokeSynth PRIVATE
     VoiceSetter.h
     VolcaBeatsControl.cpp
     VolcaBeatsControl.h
+    PixelCloud.cpp
+    CheckerBox.cpp
+    TransformViz.cpp
+    LiquidifierViz.cpp
+    VisualEffectsViz.cpp
+    VisualSwitcherViz.cpp
+    MacroKnobs.cpp
+    ScopeViz.cpp
+    VideoCloud.cpp
+    TextCloud.cpp
     WaveformViewer.cpp
     WaveformViewer.h
     Waveshaper.cpp

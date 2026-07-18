@@ -76,6 +76,8 @@ float gControlTactileFeedback = 0;
 float gDrawScale = 1;
 bool gShowDevModules = false;
 float gCornerRoundness = 1;
+bool gFlatUIStyle = true;
+bool gIsRecordingSession = false;
 std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels{};
 
 std::array<NVGcontext*, (int)NanoVGRenderContext::Num> gNanoVGRenderContexts{};
@@ -596,6 +598,7 @@ void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, fl
 
    ofPopStyle();
 }
+
 
 void StringCopy(char* dest, const char* source, int destLength)
 {
