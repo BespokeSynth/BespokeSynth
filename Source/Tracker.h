@@ -56,6 +56,7 @@ public:
    static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
+   void Init() override;
 
    //IAudioSource
    void Process(double time) override;

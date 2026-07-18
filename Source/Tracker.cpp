@@ -104,8 +104,15 @@ void Tracker::CreateUIControls()
       mSteps[i].mRandButton->SetLabel("R"); //compact per-row randomize
    }
 
-   UpdateTransportListener();
    UpdateDimensions();
+}
+
+void Tracker::Init()
+{
+   //Transport::AddListener asserts the module is initialized, so add the listener in Init() (after
+   //IDrawableModule::Init sets that flag), not in CreateUIControls
+   IDrawableModule::Init();
+   UpdateTransportListener();
 }
 
 void Tracker::UpdateTransportListener()

@@ -137,8 +137,8 @@ void Composite::CreateUIControls()
 
    for (int i = 0; i < kMaxLayers; ++i)
    {
-      mLayerData[i].opacitySlider = new FloatSlider(this, "op", 0, 0, 72, 14, &mLayerData[i].opacity, 0.0f, 1.0f);
-      mLayerData[i].blendDropdown = new DropdownList(this, "blend", 0, 0, &mLayerData[i].blendMode, 80);
+      mLayerData[i].opacitySlider = new FloatSlider(this, ("op" + ofToString(i)).c_str(), 0, 0, 72, 14, &mLayerData[i].opacity, 0.0f, 1.0f);
+      mLayerData[i].blendDropdown = new DropdownList(this, ("blend" + ofToString(i)).c_str(), 0, 0, &mLayerData[i].blendMode, 80);
       mLayerData[i].blendDropdown->AddLabel("normal", 0);
       mLayerData[i].blendDropdown->AddLabel("add", 1);
       mLayerData[i].blendDropdown->AddLabel("screen", 2);
@@ -151,8 +151,8 @@ void Composite::CreateUIControls()
       mLayerData[i].blendDropdown->AddLabel("hard light", 9);
       mLayerData[i].opacitySlider->SetShowing(false);
       mLayerData[i].blendDropdown->SetShowing(false);
-      AddUIControl(mLayerData[i].opacitySlider);
-      AddUIControl(mLayerData[i].blendDropdown);
+      //note: FloatSlider/DropdownList constructors already register the control with this module,
+      //so we must NOT call AddUIControl again (double-registering asserts as a duplicate name)
    }
 
    mFpsSelector = new DropdownList(this, "max fps", 200, 4, &mMaxFps, 44);
