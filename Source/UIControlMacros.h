@@ -145,6 +145,12 @@
    lastUIControl = button;                                  \
    UIBLOCK_SHIFTDOWN();                                     \
    UIBLOCK_UPDATEEXTENTS();
+#define BUTTON_SIZE(button, name, width, height)     \
+   button = new ClickButton(UICONTROL_BASICS(name)); \
+   button->SetDimensions(width, height);             \
+   lastUIControl = button;                           \
+   UIBLOCK_SHIFTDOWN();                              \
+   UIBLOCK_UPDATEEXTENTS();
 
 #define TEXTENTRY(entry, name, length, var)                    \
    entry = new TextEntry(UICONTROL_BASICS(name), length, var); \

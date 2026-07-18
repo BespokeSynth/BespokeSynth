@@ -61,7 +61,6 @@ namespace
    const float kSaveStateButtonPadY = 10;
 }
 
-
 bool WelcomeScreen::AlreadyHasFile(const juce::File& file)
 {
    for (const auto& recentFile : mRecentFiles)
@@ -77,10 +76,6 @@ void WelcomeScreen::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK(kSaveStateButtonStartX, 30);
-   BUTTON(mNewPatchButton, "new patch");
-   UIBLOCK_SHIFTRIGHT();
-   BUTTON(mLoadPatchButton, "load patch");
-   UIBLOCK_SHIFTRIGHT();
    BUTTON(mShowHelpButton, "help");
    UIBLOCK_SHIFTRIGHT();
    BUTTON(mShowSettingsButton, "settings");
@@ -91,8 +86,11 @@ void WelcomeScreen::CreateUIControls()
    mDiscordLinkButton = new ClickButton(this, "bespoke discord", 324, 53);
    mTutorialVideoLinkButton = new ClickButton(this, "youtu.be/SYBc8X2IxqM", 176, 72);
 
-   mWidth = ofGetWidth() / TheSynth->GetUIScale() - 100;
-   mHeight = ofGetHeight() / TheSynth->GetUIScale() - 200;
+   float uiScreenWidth = ofGetWidth() / TheSynth->GetUIScale();
+   float uiScreenHeight = ofGetHeight() / TheSynth->GetUIScale();
+   mWidth = uiScreenWidth - 100;
+   mHeight = uiScreenHeight - 200;
+   SetPosition(uiScreenWidth / 2 - mWidth / 2, uiScreenHeight / 2 - mHeight / 2);
 
    const int kMaxDesiredFiles = 10;
 
@@ -166,12 +164,13 @@ void WelcomeScreen::CreateUIControls()
       }
    }
 
+   int i = 1;
    for (auto& recentFile : mRecentFiles)
    {
       if (y + kSaveStateButtonHeight + 20 > mHeight)
          break;
 
-      recentFile.mButton = new ClickButton(this, ("recentfile" + ofToString((int)mRecentFiles.size())).c_str(), x, y);
+      recentFile.mButton = new ClickButton(this, ("recentfile" + ofToString(i)).c_str(), x, y);
       recentFile.mButton->SetOverrideDisplayName("");
       recentFile.mButton->SetDimensions(kSaveStateButtonWidth, kSaveStateButtonHeight);
 
@@ -181,6 +180,8 @@ void WelcomeScreen::CreateUIControls()
          x = kSaveStateButtonStartX;
          y += kSaveStateButtonHeight + kSaveStateButtonPadY;
       }
+
+      ++i;
    }
 
    mCloseButton = new ClickButton(this, "close", 10, mHeight - 20);
@@ -188,10 +189,7 @@ void WelcomeScreen::CreateUIControls()
 
 void WelcomeScreen::Show()
 {
-   SetPosition(50 / TheSynth->GetUIScale() - TheSynth->GetDrawOffset().x, 150 / TheSynth->GetUIScale() - TheSynth->GetDrawOffset().y);
-
-   SetShowing(true);
-   TheSynth->MoveToFront(this);
+   TheSynth->PushModalFocusItem(this);
 }
 
 void WelcomeScreen::DrawModule()
@@ -208,8 +206,6 @@ void WelcomeScreen::DrawModule()
 
    DrawTextBold("welcome to bespoke!", 15, 20, 18);
 
-   mNewPatchButton->Draw();
-   mLoadPatchButton->Draw();
    mShowHelpButton->Draw();
    mShowSettingsButton->Draw();
 
@@ -295,17 +291,19 @@ void WelcomeScreen::ButtonClicked(ClickButton* button, double time)
       HelpDisplay::OpenDocsLink();
    if (button == mDiscordLinkButton)
       HelpDisplay::OpenDiscordLink();
-   if (button == mNewPatchButton)
-      TheSynth->ReloadInitialLayout();
-   if (button == mLoadPatchButton)
-      TheSynth->LoadStatePopup();
    if (button == mShowHelpButton)
+   {
+      TheSynth->PopModalFocusItem();
       TheTitleBar->ShowHelp();
+   }
    if (button == mShowSettingsButton)
+   {
+      TheSynth->PopModalFocusItem();
       TheSynth->GetUserPrefsEditor()->Show();
+   }
 
    if (button == mCloseButton)
-      SetShowing(false);
+      TheSynth->PopModalFocusItem();
 }
 
 void WelcomeScreen::CheckboxUpdated(Checkbox* checkbox, double time)

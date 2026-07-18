@@ -50,6 +50,7 @@ public:
    bool AlwaysOnTop() override { return true; }
    bool CanMinimize() override { return false; }
    bool IsSingleton() const override { return true; }
+   bool HasTitleBar() const override { return false; }
 
    void Show();
 
@@ -91,8 +92,6 @@ private:
    ClickButton* mTutorialVideoLinkButton{ nullptr };
    ClickButton* mDocsLinkButton{ nullptr };
    ClickButton* mDiscordLinkButton{ nullptr };
-   ClickButton* mNewPatchButton{ nullptr };
-   ClickButton* mLoadPatchButton{ nullptr };
    ClickButton* mShowHelpButton{ nullptr };
    ClickButton* mShowSettingsButton{ nullptr };
    ClickButton* mCloseButton{ nullptr };

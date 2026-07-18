@@ -106,6 +106,7 @@ private:
    void OnClicked(float x, float y, bool right) override;
    float mWidth{ 20 };
    float mHeight{ 15 };
+   float mTextWidth{ 20 };
    double mClickTime{ -9999 };
    IButtonListener* mOwner{ nullptr };
    ButtonDisplayStyle mDisplayStyle{ ButtonDisplayStyle::kText };
