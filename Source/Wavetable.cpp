@@ -175,11 +175,11 @@ void Wavetable::CreateUIControls()
    UIBLOCK(kOscBX, kOscBControlsTop, kColWidthOsc);
    DROPDOWN(mTableBDropdown, "table b", &mTableChoiceB, kColWidthOsc - 3);
    UIBLOCK_NEWLINE();
-   FLOATSLIDER(mPositionBSlider, "position", &mVoiceParams.mPositionB, 0, 1);
-   FLOATSLIDER(mVolBSlider, "vol", &mVoiceParams.mVolB, 0, 1);
-   FLOATSLIDER_DIGITS(mDetuneBSlider, "detune", &mVoiceParams.mDetuneB, -.05f, .05f, 3);
-   INTSLIDER(mUnisonBSlider, "unison", &mVoiceParams.mUnisonB, 1, WavetableVoice::kMaxUnison);
-   FLOATSLIDER(mUnisonWidthBSlider, "width", &mVoiceParams.mUnisonWidthB, 0, 1);
+   FLOATSLIDER(mPositionBSlider, "position b", &mVoiceParams.mPositionB, 0, 1);
+   FLOATSLIDER(mVolBSlider, "vol b", &mVoiceParams.mVolB, 0, 1);
+   FLOATSLIDER_DIGITS(mDetuneBSlider, "detune b", &mVoiceParams.mDetuneB, -.05f, .05f, 3);
+   INTSLIDER(mUnisonBSlider, "unison b", &mVoiceParams.mUnisonB, 1, WavetableVoice::kMaxUnison);
+   FLOATSLIDER(mUnisonWidthBSlider, "width b", &mVoiceParams.mUnisonWidthB, 0, 1);
    ENDUIBLOCK(width, height);
    mWidth = MAX(width, mWidth);
    mHeight = MAX(height, mHeight);

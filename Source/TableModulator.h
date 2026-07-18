@@ -53,6 +53,7 @@ public:
    static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
+   void Init() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsEnabled() const override { return mEnabled; }

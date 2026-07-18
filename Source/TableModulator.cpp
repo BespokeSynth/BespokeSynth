@@ -90,7 +90,13 @@ void TableModulator::CreateUIControls()
    mTargetCableSource = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCableSource->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCableSource);
+}
 
+void TableModulator::Init()
+{
+   //Transport::AddListener asserts the module is initialized, so add the listener in Init() (after
+   //IDrawableModule::Init sets that flag), not in CreateUIControls
+   IDrawableModule::Init();
    UpdateTransportListener();
 }
 

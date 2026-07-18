@@ -60,7 +60,13 @@ void VisualSwitcherViz::CreateUIControls()
    mTargetCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
    mTargetCable->SetManualPosition(mWidth - 12, 12);
    AddPatchCableSource(mTargetCable);
+}
 
+void VisualSwitcherViz::Init()
+{
+   //add the transport listener here, not in CreateUIControls: Transport::AddListener asserts the
+   //module is initialized, which only becomes true after IDrawableModule::Init() runs
+   IDrawableModule::Init();
    UpdateTransportListener();
 }
 

@@ -19,6 +19,7 @@ public:
    static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
+   void Init() override;
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override
    {
