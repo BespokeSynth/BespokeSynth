@@ -63,9 +63,9 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsEnabled() const override { return mEnabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override { }
-   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override { }
-   void DropdownUpdated(DropdownList* list, int oldVal, double time) override { }
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
    void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

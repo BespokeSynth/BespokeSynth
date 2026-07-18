@@ -26,7 +26,7 @@ struct NVGLUframebuffer;
 class VizRecorder
 {
 public:
-   VizRecorder() { }
+   VizRecorder() {}
    ~VizRecorder();
 
    bool IsRecording() const { return mRecording; }

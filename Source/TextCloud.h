@@ -67,7 +67,7 @@ public:
    void OnClicked(float x, float y, bool right) override;
    void Poll() override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override { }
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
 
@@ -99,7 +99,7 @@ private:
       float lum; //0..1
    };
    std::vector<Voxel> mVoxels;
-   char mText[MAX_TEXTENTRY_LENGTH]{ }; //TextEntry copies using this fixed size - must match to avoid overflow
+   char mText[MAX_TEXTENTRY_LENGTH]{}; //TextEntry copies using this fixed size - must match to avoid overflow
    std::string mLastBuilt;
 
    //audio analysis (audio thread writes, UI thread reads)

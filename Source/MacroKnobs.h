@@ -24,7 +24,7 @@ public:
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
 
-   void TextEntryComplete(TextEntry* entry) override { }
+   void TextEntryComplete(TextEntry* entry) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

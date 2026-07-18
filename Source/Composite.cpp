@@ -379,8 +379,8 @@ void Composite::CompositeLayers(int count, int w, int h)
 
    //bind a valid texture to all 6 units (unused ones point at layer 0 so nothing is incomplete)
    GLint units[kMaxLayers] = { 0, 1, 2, 3, 4, 5 };
-   float opacities[kMaxLayers]{ };
-   int modes[kMaxLayers]{ };
+   float opacities[kMaxLayers]{};
+   int modes[kMaxLayers]{};
    for (int i = 0; i < kMaxLayers; ++i)
    {
       glActiveTexture(GL_TEXTURE0 + i);

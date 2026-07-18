@@ -43,7 +43,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override { }
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
 
    //IVisualNode
    unsigned int GetOutputTexture() override { return VizGL::FboTexture(mOut); }
@@ -59,8 +59,8 @@ public:
    }
    void Cook();
 
-   void SaveState(FileStreamOut& out) override { }
-   void LoadState(FileStreamIn& in, int rev) override { }
+   void SaveState(FileStreamOut& out) override {}
+   void LoadState(FileStreamIn& in, int rev) override {}
 
    bool EnsureShader();
 

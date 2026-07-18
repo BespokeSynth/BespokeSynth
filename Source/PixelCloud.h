@@ -69,9 +69,9 @@ public:
    void OnClicked(float x, float y, bool right) override; //start a rotate-drag (cloud mode)
    void Poll() override; //continue the rotate-drag
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override { }
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void DropdownUpdated(DropdownList* list, int oldVal, double time) override { }
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;

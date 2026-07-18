@@ -11,7 +11,7 @@
 class IVisualNode
 {
 public:
-   virtual ~IVisualNode() { }
+   virtual ~IVisualNode() {}
 
    //return the GL texture id of this node's most recent output (0 if nothing yet)
    virtual unsigned int GetOutputTexture() = 0;

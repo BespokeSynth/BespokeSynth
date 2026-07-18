@@ -60,9 +60,9 @@ public:
    void CookIfNeeded(int frameId) override;
 
    void ButtonClicked(ClickButton* button, double time) override;
-   void DropdownUpdated(DropdownList* list, int oldVal, double time) override { }
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override { }
-   void CheckboxUpdated(Checkbox* checkbox, double time) override { }
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override {}
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -100,7 +100,7 @@ private:
    int mMaxFps{ 20 }; //cap the (expensive) composite recompute rate
    int mLastCookFrame{ -1 };
    double mLastCompositeMs{ -10000 };
-   float mLayerAspect[kMaxLayers]{ }; //w/h of each layer's source, for aspect-correct fitting
+   float mLayerAspect[kMaxLayers]{}; //w/h of each layer's source, for aspect-correct fitting
 
    //global post-process applied to the composited result (in the shader)
    float mExposure{ 1.0f };
@@ -120,8 +120,8 @@ private:
    FloatSlider* mSaturationSlider{ nullptr };
 
    //gpu resources (created lazily on the GL thread)
-   NVGLUframebuffer* mLayerFB[kMaxLayers]{ };
-   unsigned int mLayerTex[kMaxLayers]{ }; //resolved per frame: node output tex, or the legacy FBO tex
+   NVGLUframebuffer* mLayerFB[kMaxLayers]{};
+   unsigned int mLayerTex[kMaxLayers]{}; //resolved per frame: node output tex, or the legacy FBO tex
    NVGLUframebuffer* mResultFB{ nullptr };
    int mFBW{ 0 };
    int mFBH{ 0 };

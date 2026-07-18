@@ -81,7 +81,7 @@ public:
    bool IsVisible() override { return IsShowing(); }
    bool CanBeMoved() const override { return false; } //docked/pinned - never click-draggable, so it can't be dragged off its docked position
 
-   void TextEntryComplete(TextEntry* entry) override { }
+   void TextEntryComplete(TextEntry* entry) override {}
    void ButtonClicked(ClickButton* button, double time) override;
 
    void Poll() override;
