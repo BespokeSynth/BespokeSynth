@@ -133,7 +133,7 @@ void VisualSwitcherViz::Cook()
 
    if (!targets.empty())
    {
-      mActiveIndex = mActiveIndex % targets.size();
+      mActiveIndex = mActiveIndex % (int)targets.size();
       IVisualNode* activeNode = targets[mActiveIndex];
       if (activeNode != nullptr)
       {

@@ -80,7 +80,7 @@ void MacroKnobs::DrawModule()
       for (int s = 0; s <= numSegments; ++s)
       {
          float angle = startAngle + (endAngle - startAngle) * s / numSegments;
-         float angleRad = angle * M_PI / 180.0f;
+         float angleRad = angle * 3.14159265359f / 180.0f;
          float px = cx + cos(angleRad) * (kKnobRadius - 4);
          float py = cy + sin(angleRad) * (kKnobRadius - 4);
          ofVertex(px, py);
@@ -90,7 +90,7 @@ void MacroKnobs::DrawModule()
       // Knob pointer
       ofSetColor(255, 255, 255);
       ofFill();
-      float angleRad = endAngle * M_PI / 180.0f;
+      float angleRad = endAngle * 3.14159265359f / 180.0f;
       float px = cx + cos(angleRad) * (kKnobRadius - 10);
       float py = cy + sin(angleRad) * (kKnobRadius - 10);
       ofCircle(px, py, 3);
