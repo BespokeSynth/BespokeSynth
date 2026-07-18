@@ -86,7 +86,7 @@ void VizRecorder::CaptureFrame(const std::function<void()>& drawViz)
    //don't let the writer fall too far behind (drop frames instead of ballooning memory)
    {
       std::lock_guard<std::mutex> lk(mQueueMutex);
-      if (mQueue.size() > 45)
+      if ((int)mQueue.size() > 45)
          return;
    }
 
@@ -152,7 +152,7 @@ void VizRecorder::CaptureFrameFromTexture(IVisualNode* node, int outW, int outH)
    //don't let the writer fall too far behind (drop frames instead of ballooning memory)
    {
       std::lock_guard<std::mutex> lk(mQueueMutex);
-      if (mQueue.size() > 45)
+      if ((int)mQueue.size() > 45)
          return;
    }
 

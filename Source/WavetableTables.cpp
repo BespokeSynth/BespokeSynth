@@ -167,7 +167,7 @@ std::shared_ptr<WavetableFrameSet> WavetableTables::BuildFromSample(const float*
       float mean = 0;
       for (float s : frame)
          mean += s;
-      mean /= frame.size();
+      mean /= (float)frame.size();
       float peak = 0.0001f;
       for (float& s : frame)
       {

@@ -631,7 +631,7 @@ void MolderSampler::OnClicked(float x, float y, bool right)
       //3) slice mode: click adds a marker, double-click (or right-click) removes the nearest one
       if (mMode == kMode_Slice)
       {
-         if (mSliceStarts.size() < 2)
+         if ((int)mSliceStarts.size() < 2)
             RebuildSlices();
 
          double now = gTime;
@@ -886,7 +886,7 @@ void MolderSampler::DrawModule()
       }
 
       //slice markers
-      if (mMode == kMode_Slice && mSliceStarts.size() >= 2)
+      if (mMode == kMode_Slice && (int)mSliceStarts.size() >= 2)
       {
          ofSetColor(255, 210, 90, 180);
          for (int b = 0; b < (int)mSliceStarts.size(); ++b)
