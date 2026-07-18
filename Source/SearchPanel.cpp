@@ -140,6 +140,7 @@ void SearchPanel::Poll()
    SetPosition(rightEdge - mWidth, panelY);
 
    // Poll whether afplay subprocess has finished
+#ifndef _WIN32
    if (mPreviewPid > 0)
    {
       int status;
@@ -150,6 +151,7 @@ void SearchPanel::Poll()
          mPreviewingRow = -1;
       }
    }
+#endif
 }
 
 void SearchPanel::DrawModule()
@@ -819,6 +821,7 @@ void SearchPanel::StartPreview(const std::string& path)
 
    // Spawn afplay as a child process (macOS built-in, handles all formats
    // and sample-rate conversion natively, no threading issues)
+#ifndef _WIN32
    pid_t pid = fork();
    if (pid == 0)
    {
@@ -828,17 +831,20 @@ void SearchPanel::StartPreview(const std::string& path)
    }
    else if (pid > 0)
    {
-      mPreviewPid = pid;
+      mPreviewPid = (int)pid;
    }
+#endif
 }
 
 void SearchPanel::StopPreview()
 {
+#ifndef _WIN32
    if (mPreviewPid > 0)
    {
-      kill(mPreviewPid, SIGTERM);
-      waitpid(mPreviewPid, nullptr, WNOHANG);
+      kill((pid_t)mPreviewPid, SIGTERM);
+      waitpid((pid_t)mPreviewPid, nullptr, WNOHANG);
       mPreviewPid = -1;
    }
+#endif
    mPreviewingRow = -1;
 }

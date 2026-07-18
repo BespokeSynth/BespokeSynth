@@ -47,10 +47,12 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#ifndef _WIN32
 #include <sys/types.h>
 #include <signal.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#endif
 #include "IDrawableModule.h"
 #include "TextEntry.h"
 #include "ClickButton.h"
@@ -186,7 +188,7 @@ private:
    int mScrollVisible{ 0 };
 
    // Sample preview via afplay subprocess (macOS native, correct threading)
-   pid_t mPreviewPid{ -1 };
+   int mPreviewPid{ -1 }; //pid of the afplay preview process (-1 = none); int for MSVC portability
    int mPreviewingRow{ -1 };
    void StartPreview(const std::string& path);
    void StopPreview();
