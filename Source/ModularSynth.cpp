@@ -2786,11 +2786,9 @@ void ModularSynth::ResetLayout()
       mWelcomeScreen->SetName("welcome");
       mWelcomeScreen->CreateUIControls();
       mWelcomeScreen->Init();
+      mWelcomeScreen->SetOwningContainer(GetUIContainer());
       if (!mIsLoadingState && sFrameCount < 10 && UserPrefs.show_welcome_screen.Get())
          mWelcomeScreen->Show();
-      else
-         mWelcomeScreen->SetShowing(false);
-      mModuleContainer.AddModule(mWelcomeScreen);
    }
 
    GetDrawOffset().set(0, 0);
@@ -3638,7 +3636,7 @@ void ModularSynth::OnConsoleInput(std::string command /* = "" */)
       }
       else if (tokens[0] == "welcomescreen")
       {
-         mWelcomeScreen->Show();
+         PushModalFocusItem(mWelcomeScreen);
       }
       else if (tokens[0] == "dump" && tokens.size() >= 2)
       {
@@ -3937,8 +3935,6 @@ void ModularSynth::SetFatalError(std::string error)
          mUserPrefsEditor->Show();
       if (TheTitleBar != nullptr)
          TheTitleBar->SetShowing(false);
-      if (mWelcomeScreen != nullptr)
-         mWelcomeScreen->SetShowing(false);
    }
 }
 
