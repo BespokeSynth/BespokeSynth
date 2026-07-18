@@ -131,7 +131,13 @@ void VideoCloud::CreateUIControls()
       mPaletteSelector->AddLabel(kVizPaletteNames[i], i);
 
    y += 15;
+}
 
+void VideoCloud::Init()
+{
+   //Transport::AddListener asserts the module is initialized, so add the listener in Init() (after
+   //IDrawableModule::Init sets that flag), not in CreateUIControls
+   IDrawableModule::Init();
    UpdateTransportListener();
 }
 

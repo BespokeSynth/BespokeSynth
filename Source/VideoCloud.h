@@ -54,6 +54,7 @@ public:
    static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
+   void Init() override;
 
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override
