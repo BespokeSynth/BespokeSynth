@@ -23,6 +23,11 @@
 #include "CubeViz.h"
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
+#include "juce_opengl/juce_opengl.h"
+using namespace juce::gl;
+#include "nanovg/nanovg.h"
+#include "nanovg/nanovg_gl.h"
+#include "nanovg/nanovg_gl_utils.h"
 #include "ModularSynth.h"
 #include "IAudioReceiver.h"
 #include "Profiler.h"
@@ -52,6 +57,7 @@ CubeViz::CubeViz()
 
 CubeViz::~CubeViz()
 {
+   VizGL::DestroyFbo(mOutputFbo);
 }
 
 void CubeViz::CreateUIControls()
@@ -84,6 +90,7 @@ void CubeViz::CreateUIControls()
    mHueShiftSlider = new FloatSlider(this, "hue", 3, y, 100, 14, &mHueShift, 0.0f, 1.0f);
    y += 17;
    mPaletteSelector = new DropdownList(this, "palette", 3, y, &mPaletteIndex, 100);
+   y += 17;
 
    mShapeSelector->AddLabel("cube", 0);
    mShapeSelector->AddLabel("sphere", 1);
@@ -433,13 +440,39 @@ void CubeViz::DrawShape(float cx, float cy, float halfW, float halfH, float rx, 
    ofPopStyle();
 }
 
-void CubeViz::DrawModule()
+unsigned int CubeViz::GetOutputTexture()
 {
-   if (Minimized() || IsVisible() == false)
-      return;
+   return mOutputFbo.fb ? mOutputFbo.fb->texture : 0;
+}
 
-   float w, h;
-   GetDimensions(w, h);
+void CubeViz::CookIfNeeded(int frameId)
+{
+   if (mLastCookFrame == frameId && frameId != 0)
+      return;
+   mLastCookFrame = frameId;
+
+   NVGcontext* recVG = gNanoVGRenderContexts[(int)NanoVGRenderContext::Screenshot];
+   if (!recVG)
+      return;
+   int w = MAX(1080, ((int)mWidth & ~1));
+   int h = MAX(1080, ((int)mHeight & ~1));
+
+   NVGcontext* mainVG = gNanoVG;
+   gNanoVG = recVG;
+
+   VizGL::EnsureFbo(mOutputFbo, w, h);
+
+   GLint prevFBO = 0;
+   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFBO);
+   GLint prevVp[4];
+   glGetIntegerv(GL_VIEWPORT, prevVp);
+
+   VizGL::BindFbo(mOutputFbo);
+   glViewport(0, 0, w, h);
+   glClearColor(0, 0, 0, 1);
+   glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+   nvgBeginFrame(gNanoVG, w, h, 1);
+
    float cx = w * 0.5f;
    float cy = h * 0.5f;
 
@@ -520,6 +553,22 @@ void CubeViz::DrawModule()
          ofPopStyle();
       }
    }
+
+   nvgEndFrame(gNanoVG);
+   VizGL::UnbindFbo();
+   glBindFramebuffer(GL_FRAMEBUFFER, prevFBO);
+   glViewport(prevVp[0], prevVp[1], prevVp[2], prevVp[3]);
+   gNanoVG = mainVG;
+}
+
+void CubeViz::DrawModule()
+{
+   if (Minimized() || IsVisible() == false)
+      return;
+
+   CookIfNeeded(0);
+
+   VizGL::DrawTexture(mOutputFbo.fb ? mOutputFbo.fb->texture : 0, 0, 0, mWidth, mHeight);
 
    mSensitivitySlider->Draw();
    mSpinSlider->Draw();

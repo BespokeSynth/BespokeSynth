@@ -47,6 +47,10 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <sys/types.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include "IDrawableModule.h"
 #include "TextEntry.h"
 #include "ClickButton.h"
@@ -77,7 +81,7 @@ public:
    bool IsVisible() override { return IsShowing(); }
    bool CanBeMoved() const override { return false; } //docked/pinned - never click-draggable, so it can't be dragged off its docked position
 
-   void TextEntryComplete(TextEntry* entry) override {}
+   void TextEntryComplete(TextEntry* entry) override { }
    void ButtonClicked(ClickButton* button, double time) override;
 
    void Poll() override;
@@ -149,6 +153,7 @@ private:
 
    std::array<ClickButton*, kMaxResults> mModuleButtons{ nullptr };
    std::array<ClickButton*, kVisibleSampleRows> mSampleButtons{ nullptr };
+   std::array<ClickButton*, kVisibleSampleRows> mPreviewButtons{ nullptr }; //▶ buttons beside each sample row
 
    //Bitwig-style "Locations": user-added root folders searched in addition to the default samples path
    std::vector<std::string> mSearchLocations;
@@ -179,6 +184,12 @@ private:
    float mScrollTrackH{ 0 };
    int mScrollTotal{ 0 };
    int mScrollVisible{ 0 };
+
+   // Sample preview via afplay subprocess (macOS native, correct threading)
+   pid_t mPreviewPid{ -1 };
+   int mPreviewingRow{ -1 };
+   void StartPreview(const std::string& path);
+   void StopPreview();
 };
 
 extern SearchPanel* TheSearchPanel;

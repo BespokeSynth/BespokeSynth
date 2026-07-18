@@ -19,11 +19,10 @@
 //  CheckerBox.h
 //  Bespoke
 //
-//  An optical-illusion checkerboard visualizer. A grid of contrasting checks flips colour at a
-//  speed you control, and can be warped: flat grid, bent/barrel, spiral, or a rotating "tunnel"
-//  (downward spiral) for zoom-illusions. Cheap immediate-mode drawing with grain and chromatic
-//  aberration on top. Colours come from black/white or the shared visualizer palettes. Audio-
-//  reactive pass-through nudges the flip rate and warp. No feedback buffer -> stays smooth.
+//  Optical-illusion checkerboard visualizer. Same module as before (grid/bend/spiral/tunnel patterns,
+//  colour flip, chroma aberration, grain, black-white or palette colours, audio-reactive) but rendered
+//  on the GPU via a fragment shader instead of CPU quads. Also exposes its output as an IVisualNode so
+//  it plugs into the visual graph (Composite / VizFilter).
 //
 
 #pragma once
@@ -32,8 +31,10 @@
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "DropdownList.h"
+#include "IVisualNode.h"
+#include "VizGL.h"
 
-class CheckerBox : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener
+class CheckerBox : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IVisualNode
 {
 public:
    CheckerBox();
@@ -57,13 +58,19 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsEnabled() const override { return mEnabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
-   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override { }
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override { }
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override { }
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   //IVisualNode
+   unsigned int GetOutputTexture() override { return VizGL::FboTexture(mOut); }
+   int GetOutputWidth() const override { return mOut.w; }
+   int GetOutputHeight() const override { return mOut.h; }
+   void CookIfNeeded(int frameId) override { Cook(); }
 
 private:
    //IDrawableModule
@@ -82,15 +89,13 @@ private:
       kPattern_Tunnel
    };
 
-   void CellColor(int i, int j, int step, float& rOut, float& gOut, float& bOut) const;
-   //draws the full checker for one colour channel pass (chroma aberration draws several offset passes)
-   void DrawPattern(float viewX, float viewY, float viewW, float viewH, int step, float amp,
-                    float offX, float offY, int channel, float alpha);
+   bool EnsureShader();
+   void Cook();
 
    //audio analysis
    float mAmplitude{ 0 };
 
-   //controls
+   //controls (unchanged from the original)
    float mSpeed{ 4.0f };
    int mGridN{ 10 };
    float mDistort{ 0.0f };
@@ -99,7 +104,7 @@ private:
    float mGrain{ 0.04f };
    float mExposure{ 1.0f };
    float mSensitivity{ 1.0f };
-   int mColorMode{ 0 }; //0 black/white, 1 palette
+   int mColorMode{ 0 };
    float mHueShift{ 0.0f };
    int mPaletteIndex{ 0 };
 
@@ -115,6 +120,17 @@ private:
    FloatSlider* mHueShiftSlider{ nullptr };
    DropdownList* mPaletteSelector{ nullptr };
 
+   //gpu
+   VizGL::Fbo mOut;
+   unsigned int mProgram{ 0 };
+   bool mShaderTried{ false };
+   int mResW{ 256 };
+   int mResH{ 256 };
+
+   int mLocTime{ -1 }, mLocStep{ -1 }, mLocReact{ -1 }, mLocDistort{ -1 }, mLocPattern{ -1 };
+   int mLocChroma{ -1 }, mLocGrain{ -1 }, mLocExposure{ -1 }, mLocColorMode{ -1 }, mLocGrid{ -1 }, mLocRes{ -1 };
+   int mLocPalA{ -1 }, mLocPalB{ -1 }, mLocPalC{ -1 }, mLocPalD{ -1 }, mLocHue{ -1 };
+
    float mWidth{ 360 };
-   float mHeight{ 318 };
+   float mHeight{ 300 };
 };

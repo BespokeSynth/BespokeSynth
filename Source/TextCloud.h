@@ -34,10 +34,12 @@
 #include "Slider.h"
 #include "DropdownList.h"
 #include "TextEntry.h"
+#include "IVisualNode.h"
+#include "VizGL.h"
 #include <string>
 #include <vector>
 
-class TextCloud : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public ITextEntryListener
+class TextCloud : public IAudioProcessor, public IDrawableModule, public IVisualNode, public IFloatSliderListener, public IDropdownListener, public ITextEntryListener
 {
 public:
    TextCloud();
@@ -65,7 +67,7 @@ public:
    void OnClicked(float x, float y, bool right) override;
    void Poll() override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override { }
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
 
@@ -82,6 +84,12 @@ private:
       height = mHeight;
    }
 
+   //IVisualNode
+   void CookIfNeeded(int frameId) override;
+   unsigned int GetOutputTexture() override;
+   int GetOutputWidth() const override { return mOutputFbo.w; }
+   int GetOutputHeight() const override { return mOutputFbo.h; }
+
    void RebuildVoxels();
    void PaletteColor(float t, float& rOut, float& gOut, float& bOut) const;
 
@@ -91,7 +99,7 @@ private:
       float lum; //0..1
    };
    std::vector<Voxel> mVoxels;
-   char mText[MAX_TEXTENTRY_LENGTH]{}; //TextEntry copies using this fixed size - must match to avoid overflow
+   char mText[MAX_TEXTENTRY_LENGTH]{ }; //TextEntry copies using this fixed size - must match to avoid overflow
    std::string mLastBuilt;
 
    //audio analysis (audio thread writes, UI thread reads)
@@ -140,4 +148,7 @@ private:
 
    float mWidth{ 380 };
    float mHeight{ 338 };
+
+   VizGL::Fbo mOutputFbo;
+   int mLastCookFrame{ -1 };
 };

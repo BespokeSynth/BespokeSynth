@@ -35,9 +35,11 @@
 #include "DropdownList.h"
 #include "Checkbox.h"
 #include "ClickButton.h"
+#include "IVisualNode.h"
+#include "VizGL.h"
 #include <vector>
 
-class CubeViz : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener
+class CubeViz : public IAudioProcessor, public IDrawableModule, public IVisualNode, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener
 {
 public:
    CubeViz();
@@ -61,9 +63,9 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsEnabled() const override { return mEnabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
-   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override { }
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override { }
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override { }
    void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -78,6 +80,12 @@ private:
       width = mWidth;
       height = mHeight;
    }
+
+   //IVisualNode
+   void CookIfNeeded(int frameId) override;
+   unsigned int GetOutputTexture() override;
+   int GetOutputWidth() const override { return mOutputFbo.w; }
+   int GetOutputHeight() const override { return mOutputFbo.h; }
 
    void PaletteColor(float t, float& rOut, float& gOut, float& bOut) const;
    void SurfacePoint(int shape, float u01, float v01, float& x, float& y, float& z) const;
@@ -126,4 +134,7 @@ private:
 
    float mWidth{ 320 };
    float mHeight{ 398 };
+
+   VizGL::Fbo mOutputFbo;
+   int mLastCookFrame{ -1 };
 };

@@ -23,6 +23,11 @@
 #include "BlobViz.h"
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
+#include "juce_opengl/juce_opengl.h"
+using namespace juce::gl;
+#include "nanovg/nanovg.h"
+#include "nanovg/nanovg_gl.h"
+#include "nanovg/nanovg_gl_utils.h"
 #include "ModularSynth.h"
 #include "IAudioReceiver.h"
 #include "Profiler.h"
@@ -38,6 +43,7 @@ BlobViz::BlobViz()
 
 BlobViz::~BlobViz()
 {
+   VizGL::DestroyFbo(mOutputFbo);
 }
 
 void BlobViz::CreateUIControls()
@@ -101,13 +107,39 @@ void BlobViz::Process(double time)
    GetBuffer()->Reset();
 }
 
-void BlobViz::DrawModule()
+unsigned int BlobViz::GetOutputTexture()
 {
-   if (Minimized() || IsVisible() == false)
-      return;
+   return mOutputFbo.fb ? mOutputFbo.fb->texture : 0;
+}
 
-   float w, h;
-   GetDimensions(w, h);
+void BlobViz::CookIfNeeded(int frameId)
+{
+   if (mLastCookFrame == frameId && frameId != 0)
+      return;
+   mLastCookFrame = frameId;
+
+   NVGcontext* recVG = gNanoVGRenderContexts[(int)NanoVGRenderContext::Screenshot];
+   if (!recVG)
+      return;
+   int w = MAX(1080, ((int)mWidth & ~1));
+   int h = MAX(1080, ((int)mHeight & ~1));
+
+   NVGcontext* mainVG = gNanoVG;
+   gNanoVG = recVG;
+
+   VizGL::EnsureFbo(mOutputFbo, w, h);
+
+   GLint prevFBO = 0;
+   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFBO);
+   GLint prevVp[4];
+   glGetIntegerv(GL_VIEWPORT, prevVp);
+
+   VizGL::BindFbo(mOutputFbo);
+   glViewport(0, 0, w, h);
+   glClearColor(0, 0, 0, 1);
+   glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+   nvgBeginFrame(gNanoVG, w, h, 1);
+
    float cx = w * 0.5f;
    float cy = h * 0.5f;
 
@@ -234,6 +266,22 @@ void BlobViz::DrawModule()
          ofPopStyle();
       }
    }
+
+   nvgEndFrame(gNanoVG);
+   VizGL::UnbindFbo();
+   glBindFramebuffer(GL_FRAMEBUFFER, prevFBO);
+   glViewport(prevVp[0], prevVp[1], prevVp[2], prevVp[3]);
+   gNanoVG = mainVG;
+}
+
+void BlobViz::DrawModule()
+{
+   if (Minimized() || IsVisible() == false)
+      return;
+
+   CookIfNeeded(0);
+
+   VizGL::DrawTexture(mOutputFbo.fb ? mOutputFbo.fb->texture : 0, 0, 0, mWidth, mHeight);
 
    //controls drawn on top
    mSensitivitySlider->Draw();

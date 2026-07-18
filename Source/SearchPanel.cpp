@@ -71,6 +71,10 @@ void SearchPanel::CreateUIControls()
       mSampleButtons[i] = new ClickButton(this, ("sampleresult" + ofToString(i)).c_str(), -1, -1);
       mSampleButtons[i]->SetDisplayStyle(ButtonDisplayStyle::kSampleIcon);
       mSampleButtons[i]->SetShowing(false);
+
+      mPreviewButtons[i] = new ClickButton(this, ("samplepreview" + ofToString(i)).c_str(), -1, -1);
+      mPreviewButtons[i]->SetLabel(">"); // ASCII play indicator — always renders
+      mPreviewButtons[i]->SetShowing(false);
    }
 
    LoadLocations();
@@ -134,6 +138,18 @@ void SearchPanel::Poll()
    mWidth = (int)ofClamp((float)mUserWidth, (float)kMinWidth, (float)kMaxWidth);
    mHeight = (int)MAX(ofGetHeight() / scale - topMargin - bottomMargin, 200.0f);
    SetPosition(rightEdge - mWidth, panelY);
+
+   // Poll whether afplay subprocess has finished
+   if (mPreviewPid > 0)
+   {
+      int status;
+      if (waitpid(mPreviewPid, &status, WNOHANG) != 0)
+      {
+         // process finished or error
+         mPreviewPid = -1;
+         mPreviewingRow = -1;
+      }
+   }
 }
 
 void SearchPanel::DrawModule()
@@ -264,15 +280,29 @@ void SearchPanel::DrawModule()
          int resultIdx = mSampleScroll + i;
          if (i < visible && resultIdx < totalSamples)
          {
+            const float kPlayBtnW = 16;
+            const float kGap = 2;
+
+            // ▶ preview button — show > while stopped, || while playing
+            bool isPlaying = (mPreviewingRow == i);
+            mPreviewButtons[i]->SetShowing(true);
+            mPreviewButtons[i]->SetLabel(isPlaying ? "||" : ">");
+            mPreviewButtons[i]->SetPosition(kContentX, rowY);
+            mPreviewButtons[i]->SetDimensions(kPlayBtnW, rowHeight - 1);
+            mPreviewButtons[i]->Draw();
+
+            // sample name button pushed right of the play button
             mSampleButtons[i]->SetShowing(true);
             mSampleButtons[i]->SetLabel(juce::File(mSampleResults[resultIdx]).getFileName().toStdString().c_str());
-            mSampleButtons[i]->SetPosition(kContentX, rowY);
+            mSampleButtons[i]->SetPosition(kContentX + kPlayBtnW + kGap, rowY);
+            mSampleButtons[i]->SetDimensions(mWidth - kContentX - kPlayBtnW - kGap - 4, rowHeight - 1);
             mSampleButtons[i]->Draw();
             rowY += rowHeight;
          }
          else
          {
             mSampleButtons[i]->SetShowing(false);
+            mPreviewButtons[i]->SetShowing(false);
          }
       }
 
@@ -297,7 +327,10 @@ void SearchPanel::DrawModule()
       mScrollTotal = 0;
       mScrollVisible = 0;
       for (int i = 0; i < kVisibleSampleRows; ++i)
+      {
          mSampleButtons[i]->SetShowing(false);
+         mPreviewButtons[i]->SetShowing(false);
+      }
    }
 
    //mWidth/mHeight are docked and driven by Poll(), not by content, so this panel stays a
@@ -723,6 +756,26 @@ void SearchPanel::ButtonClicked(ClickButton* button, double time)
    //through the scroll offset to the actual result
    for (int i = 0; i < kVisibleSampleRows; ++i)
    {
+      if (button == mPreviewButtons[i])
+      {
+         if (mPreviewingRow == i)
+         {
+            // second click on same row = stop
+            StopPreview();
+         }
+         else
+         {
+            int resultIdx = mSampleScroll + i;
+            if (resultIdx >= 0 && resultIdx < (int)mSampleResults.size())
+            {
+               StopPreview();
+               StartPreview(mSampleResults[resultIdx].toStdString());
+               mPreviewingRow = i;
+            }
+         }
+         return;
+      }
+
       if (button == mSampleButtons[i])
       {
          int resultIdx = mSampleScroll + i;
@@ -758,4 +811,34 @@ bool SearchPanel::GetRelativeSamplePath(const std::string& currentPath, int offs
    int newIdx = ((idx + offset) % n + n) % n;
    outPath = paths[newIdx];
    return true;
+}
+
+void SearchPanel::StartPreview(const std::string& path)
+{
+   StopPreview();
+
+   // Spawn afplay as a child process (macOS built-in, handles all formats
+   // and sample-rate conversion natively, no threading issues)
+   pid_t pid = fork();
+   if (pid == 0)
+   {
+      // child — exec afplay then exit
+      execlp("afplay", "afplay", path.c_str(), (char*)nullptr);
+      _exit(1);
+   }
+   else if (pid > 0)
+   {
+      mPreviewPid = pid;
+   }
+}
+
+void SearchPanel::StopPreview()
+{
+   if (mPreviewPid > 0)
+   {
+      kill(mPreviewPid, SIGTERM);
+      waitpid(mPreviewPid, nullptr, WNOHANG);
+      mPreviewPid = -1;
+   }
+   mPreviewingRow = -1;
 }

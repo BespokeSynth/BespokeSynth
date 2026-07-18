@@ -16,8 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
 //
-//  CheckerBox.cpp
-//  Bespoke
+//  CheckerBox.cpp  (GPU port - same behavior as the original, rendered with a fragment shader)
 //
 
 #include "CheckerBox.h"
@@ -27,7 +26,69 @@
 #include "IAudioReceiver.h"
 #include "Profiler.h"
 #include "VizPalettes.h"
+#include "juce_opengl/juce_opengl.h"
 #include <cmath>
+
+using namespace juce::gl;
+
+namespace
+{
+   const char* kFragSrc =
+   "#version 150\n"
+   "in vec2 vUv;\n"
+   "out vec4 fragColor;\n"
+   "uniform float uTime, uStep, uReact, uDistort, uChroma, uGrain, uExposure, uGrid, uHue;\n"
+   "uniform int uPattern, uColorMode;\n"
+   "uniform vec2 uRes;\n"
+   "uniform vec3 uPalA, uPalB, uPalC, uPalD;\n"
+   "float hash(vec2 p){ return fract(sin(dot(p, vec2(41.3, 289.1))) * 43758.5453); }\n"
+   "vec3 palette(float t){ return clamp(uPalA + uPalB*cos(6.2831853*(uPalC*t + uPalD + uHue)), 0.0, 1.0); }\n"
+   "vec3 cellColor(float m){\n"
+   "  vec3 col;\n"
+   "  if(uColorMode==0){ float v = (m<0.5)?1.0:0.06; col=vec3(v); }\n"
+   "  else { col = palette((m<0.5)?0.15:0.65); }\n"
+   "  return clamp(col*uExposure, 0.0, 1.0);\n"
+   "}\n"
+   "vec3 checker(vec2 uv){\n"
+   "  float t = uTime*0.001;\n"
+   "  float i, j;\n"
+   "  if(uPattern<=1){\n" // grid / bend
+   "    float d = uDistort*(0.7+uReact);\n"
+   "    float bend = (uPattern==1)? d : d*0.25;\n"
+   "    vec2 n = uv-0.5;\n"
+   "    float r2 = dot(n,n);\n"
+   "    float warp = 1.0 + bend*(0.9*r2*4.0)*(0.6+0.4*sin(t*2.0));\n"
+   "    vec2 wn = n*warp + bend*0.06*vec2(sin(t*3.0+n.y*10.0), sin(t*2.5+n.x*10.0));\n"
+   "    vec2 cell = (wn+0.5)*uGrid;\n"
+   "    i=floor(cell.x); j=floor(cell.y);\n"
+   "  } else {\n" // spiral / tunnel
+   "    float d = uDistort*(0.7+uReact);\n"
+   "    vec2 n = uv-0.5; n.x *= uRes.x/max(1.0,uRes.y);\n"
+   "    float rr = clamp(length(n)*2.0, 0.0, 1.0);\n"
+   "    float ang = atan(n.y, n.x);\n"
+   "    float rings = uGrid;\n"
+   "    float sectors = max(6.0, uGrid);\n"
+   "    float twist = d*3.0;\n"
+   "    float rot = (uPattern==3)? t*(1.0+uReact)*1.5 : t*0.2;\n"
+   "    float f = (uPattern==3)? pow(rr, 1.0/2.2) : rr;\n"
+   "    i = floor(f*rings);\n"
+   "    float aa = ang - twist*f - rot;\n"
+   "    j = floor((aa/6.2831853)*sectors);\n"
+   "  }\n"
+   "  float m = mod(i+j+uStep, 2.0);\n"
+   "  return cellColor(m);\n"
+   "}\n"
+   "void main(){\n"
+   "  vec2 uv = vUv;\n"
+   "  vec3 col;\n"
+   "  if(uChroma>0.01){\n"
+   "    float dx = uChroma*(1.0/max(2.0,uGrid))*0.9 + uReact*0.02;\n"
+   "    col = vec3(checker(uv+vec2(dx,0.0)).r, checker(uv).g, checker(uv-vec2(dx,0.0)).b);\n"
+   "  } else { col = checker(uv); }\n"
+   "  col += (hash(vUv*uRes + uTime*0.001)*2.0-1.0)*uGrain;\n"
+   "  fragColor = vec4(clamp(col, 0.0, 1.0), 1.0);\n"
+   "}\n";
+}
 
 CheckerBox::CheckerBox()
 : IAudioProcessor(gBufferSize)
@@ -38,6 +99,7 @@ CheckerBox::CheckerBox()
 
 CheckerBox::~CheckerBox()
 {
+   VizGL::DestroyFbo(mOut);
 }
 
 void CheckerBox::CreateUIControls()
@@ -77,22 +139,8 @@ void CheckerBox::CreateUIControls()
 
    for (int i = 0; i < kNumVizPalettes; ++i)
       mPaletteSelector->AddLabel(kVizPaletteNames[i], i);
-}
 
-void CheckerBox::CellColor(int i, int j, int step, float& rOut, float& gOut, float& bOut) const
-{
-   bool on = (((i + j + step) & 1) == 0);
-   if (mColorMode == 0)
-   {
-      float v = on ? 1.0f : 0.06f;
-      rOut = gOut = bOut = v;
-   }
-   else
-   {
-      //two contrasting samples of the palette; the flip swaps them
-      VizPaletteColor(mPaletteIndex, on ? 0.15f : 0.65f, mHueShift, rOut, gOut, bOut);
-   }
-   VizExpose(mExposure, rOut, gOut, bOut); //brightness / exposure
+   y += 17;
 }
 
 void CheckerBox::Process(double time)
@@ -121,116 +169,92 @@ void CheckerBox::Process(double time)
    GetBuffer()->Reset();
 }
 
-void CheckerBox::DrawPattern(float viewX, float viewY, float viewW, float viewH, int step, float amp,
-                             float offX, float offY, int channel, float alpha)
+bool CheckerBox::EnsureShader()
 {
-   int n = ofClamp(mGridN, 2, 24);
-   float cx = viewX + viewW * 0.5f + offX;
-   float cy = viewY + viewH * 0.5f + offY;
-   float t = (float)(gTime * 0.001);
-   float distort = mDistort * (0.7f + amp * 1.0f);
+   if (mShaderTried)
+      return mProgram != 0;
+   mShaderTried = true;
 
-   ofFill();
+   mProgram = VizGL::CompileProgram(kFragSrc);
+   if (mProgram == 0)
+      return false;
 
-   if (mPattern == kPattern_Grid || mPattern == kPattern_Bend)
-   {
-      float bend = (mPattern == kPattern_Bend) ? distort : distort * 0.25f;
-      for (int j = 0; j < n; ++j)
-      {
-         for (int i = 0; i < n; ++i)
-         {
-            //four corners, warped by a barrel/wave field
-            float qx[4], qy[4];
-            const int cx4[4] = { 0, 1, 1, 0 };
-            const int cy4[4] = { 0, 0, 1, 1 };
-            for (int k = 0; k < 4; ++k)
-            {
-               float gx = (i + cx4[k]) / (float)n; //0..1
-               float gy = (j + cy4[k]) / (float)n;
-               float nx = gx - 0.5f, ny = gy - 0.5f;
-               float r2 = nx * nx + ny * ny;
-               float warp = 1.0f + bend * (0.9f * r2 * 4.0f) * (0.6f + 0.4f * sinf(t * 2.0f));
-               float wx = nx * warp + bend * 0.06f * sinf(t * 3.0f + gy * 10.0f);
-               float wy = ny * warp + bend * 0.06f * sinf(t * 2.5f + gx * 10.0f);
-               qx[k] = viewX + viewW * 0.5f + wx * viewW + offX;
-               qy[k] = viewY + viewH * 0.5f + wy * viewH + offY;
-            }
-            float r, g, b;
-            CellColor(i, j, step, r, g, b);
-            if (channel == 1)
-            {
-               g = 0;
-               b = 0;
-            }
-            else if (channel == 2)
-            {
-               r = 0;
-               g = 0;
-            }
-            ofSetColor(r * 255, g * 255, b * 255, alpha);
-            ofBeginShape();
-            for (int k = 0; k < 4; ++k)
-               ofVertex(qx[k], qy[k]);
-            ofEndShape(true);
-         }
-      }
-   }
-   else
-   {
-      //polar: rings x sectors. spiral = twist by ring; tunnel = exponential zoom + rotation
-      float maxR = MIN(viewW, viewH) * 0.5f;
-      int rings = n;
-      int sectors = MAX(6, n);
-      float twist = distort * 3.0f;
-      float rot = (mPattern == kPattern_Tunnel) ? t * (1.0f + amp) * 1.5f : t * 0.2f;
-      for (int i = 0; i < rings; ++i)
-      {
-         float f0 = i / (float)rings;
-         float f1 = (i + 1) / (float)rings;
-         //tunnel packs rings toward the centre (perspective zoom); spiral spaces them evenly
-         if (mPattern == kPattern_Tunnel)
-         {
-            f0 = powf(f0, 2.2f);
-            f1 = powf(f1, 2.2f);
-         }
-         float r0 = maxR * f0;
-         float r1 = maxR * f1;
-         float twist0 = twist * f0;
-         float twist1 = twist * f1;
-         for (int j = 0; j < sectors; ++j)
-         {
-            float a0 = (j / (float)sectors) * FTWO_PI + rot;
-            float a1 = ((j + 1) / (float)sectors) * FTWO_PI + rot;
-            float qx[4], qy[4];
-            //inner-left, inner-right along ring0; outer-right, outer-left along ring1
-            qx[0] = cx + cosf(a0 + twist0) * r0;
-            qy[0] = cy + sinf(a0 + twist0) * r0;
-            qx[1] = cx + cosf(a1 + twist0) * r0;
-            qy[1] = cy + sinf(a1 + twist0) * r0;
-            qx[2] = cx + cosf(a1 + twist1) * r1;
-            qy[2] = cy + sinf(a1 + twist1) * r1;
-            qx[3] = cx + cosf(a0 + twist1) * r1;
-            qy[3] = cy + sinf(a0 + twist1) * r1;
-            float r, g, b;
-            CellColor(i, j, step, r, g, b);
-            if (channel == 1)
-            {
-               g = 0;
-               b = 0;
-            }
-            else if (channel == 2)
-            {
-               r = 0;
-               g = 0;
-            }
-            ofSetColor(r * 255, g * 255, b * 255, alpha);
-            ofBeginShape();
-            for (int k = 0; k < 4; ++k)
-               ofVertex(qx[k], qy[k]);
-            ofEndShape(true);
-         }
-      }
-   }
+   mLocTime = glGetUniformLocation(mProgram, "uTime");
+   mLocStep = glGetUniformLocation(mProgram, "uStep");
+   mLocReact = glGetUniformLocation(mProgram, "uReact");
+   mLocDistort = glGetUniformLocation(mProgram, "uDistort");
+   mLocPattern = glGetUniformLocation(mProgram, "uPattern");
+   mLocChroma = glGetUniformLocation(mProgram, "uChroma");
+   mLocGrain = glGetUniformLocation(mProgram, "uGrain");
+   mLocExposure = glGetUniformLocation(mProgram, "uExposure");
+   mLocColorMode = glGetUniformLocation(mProgram, "uColorMode");
+   mLocGrid = glGetUniformLocation(mProgram, "uGrid");
+   mLocRes = glGetUniformLocation(mProgram, "uRes");
+   mLocHue = glGetUniformLocation(mProgram, "uHue");
+   mLocPalA = glGetUniformLocation(mProgram, "uPalA");
+   mLocPalB = glGetUniformLocation(mProgram, "uPalB");
+   mLocPalC = glGetUniformLocation(mProgram, "uPalC");
+   mLocPalD = glGetUniformLocation(mProgram, "uPalD");
+   return true;
+}
+
+void CheckerBox::Cook()
+{
+   if (!EnsureShader())
+      return;
+   if (!VizGL::EnsureFbo(mOut, mResW, mResH))
+      return;
+
+   float amp = ofClamp(mAmplitude * mSensitivity * 6.0f, 0.0f, 1.0f);
+   float step = floorf((float)(gTime * 0.001) * mSpeed * 4.0f * (1.0f + amp));
+
+   int pi = mPaletteIndex;
+   if (pi < 0)
+      pi = 0;
+   if (pi >= kNumVizPalettes)
+      pi = kNumVizPalettes - 1;
+   const VizPal& pal = kVizPalettes[pi];
+
+   float t = (float)gTime;
+   float distort = mDistort, chroma = mChroma, grain = mGrain, expo = mExposure, grid = (float)mGridN, hue = mHueShift;
+   int pattern = mPattern, colorMode = mColorMode;
+   float rw = (float)mOut.w, rh = (float)mOut.h;
+
+   VizGL::RunShaderPass(mOut, mProgram, [=]()
+                        {
+                           if (mLocTime >= 0)
+                              glUniform1f(mLocTime, t);
+                           if (mLocStep >= 0)
+                              glUniform1f(mLocStep, step);
+                           if (mLocReact >= 0)
+                              glUniform1f(mLocReact, amp);
+                           if (mLocDistort >= 0)
+                              glUniform1f(mLocDistort, distort);
+                           if (mLocChroma >= 0)
+                              glUniform1f(mLocChroma, chroma);
+                           if (mLocGrain >= 0)
+                              glUniform1f(mLocGrain, grain);
+                           if (mLocExposure >= 0)
+                              glUniform1f(mLocExposure, expo);
+                           if (mLocGrid >= 0)
+                              glUniform1f(mLocGrid, grid);
+                           if (mLocHue >= 0)
+                              glUniform1f(mLocHue, hue);
+                           if (mLocPattern >= 0)
+                              glUniform1i(mLocPattern, pattern);
+                           if (mLocColorMode >= 0)
+                              glUniform1i(mLocColorMode, colorMode);
+                           if (mLocRes >= 0)
+                              glUniform2f(mLocRes, rw, rh);
+                           if (mLocPalA >= 0)
+                              glUniform3f(mLocPalA, pal.a[0], pal.a[1], pal.a[2]);
+                           if (mLocPalB >= 0)
+                              glUniform3f(mLocPalB, pal.b[0], pal.b[1], pal.b[2]);
+                           if (mLocPalC >= 0)
+                              glUniform3f(mLocPalC, pal.c[0], pal.c[1], pal.c[2]);
+                           if (mLocPalD >= 0)
+                              glUniform3f(mLocPalD, pal.d[0], pal.d[1], pal.d[2]);
+                        });
 }
 
 void CheckerBox::DrawModule()
@@ -252,38 +276,22 @@ void CheckerBox::DrawModule()
    const float viewY = 3;
    const float viewW = MAX(20.0f, w - viewX - 4);
    const float viewH = MAX(20.0f, h - viewY - 4);
+   int rw = MAX(1080, ((int)viewW & ~1));
+   int rh = MAX(1080, ((int)viewH & ~1));
 
-   float amp = ofClamp(mAmplitude * mSensitivity * 6.0f, 0.0f, 1.0f);
+   mResW = rw;
+   mResH = rh;
 
-   //the flip step advances with real time * speed (and a nudge from the audio)
-   int step = (int)((float)(gTime * 0.001) * mSpeed * 4.0f * (1.0f + amp));
-
-   ofPushStyle();
-   if (mChroma > 0.01f)
+   if (EnsureShader())
    {
-      //chromatic aberration: red & blue passes offset either side, additive, plus the full pass
-      float dx = mChroma * (viewW / MAX(2, mGridN)) * 0.9f + amp * 6.0f;
-      DrawPattern(viewX, viewY, viewW, viewH, step, amp, -dx, 0, 1, 150); //red
-      DrawPattern(viewX, viewY, viewW, viewH, step, amp, dx, 0, 2, 150); //blue
-      DrawPattern(viewX, viewY, viewW, viewH, step, amp, 0, 0, 0, 190); //full, slightly translucent
+      Cook();
+      VizGL::DrawTexture(GetOutputTexture(), viewX, viewY, viewW, viewH);
    }
    else
    {
-      DrawPattern(viewX, viewY, viewW, viewH, step, amp, 0, 0, 0, 255);
-   }
-   ofPopStyle();
-
-   //grain
-   if (mGrain > 0.001f)
-   {
       ofPushStyle();
-      ofFill();
-      int gn = (int)(mGrain * viewW * viewH * 0.015f);
-      for (int i = 0; i < gn; ++i)
-      {
-         ofSetColor(255, 255, 255, ofRandom(6, 26));
-         ofRect(viewX + ofRandom(0, viewW), viewY + ofRandom(0, viewH), 1, 1);
-      }
+      ofSetColor(240, 140, 120);
+      DrawTextNormal("shader unavailable (see console)", (int)viewX + 6, (int)viewY + 18, 11);
       ofPopStyle();
    }
 

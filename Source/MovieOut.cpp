@@ -9,6 +9,7 @@
 #include "ModuleFactory.h"
 #include "PatchCableSource.h"
 #include "IUIControl.h"
+#include "IVisualNode.h"
 #include <vector>
 
 MovieOut::MovieOut()
@@ -161,44 +162,55 @@ void MovieOut::DrawModule()
    //centered and cover-fit into the chosen aspect-ratio frame
    if (mRecorder.IsRecording() && target != nullptr)
    {
-      float tx = 0, ty = 0;
-      target->GetPosition(tx, ty);
-      float fw = (float)mFrameW;
-      float fh = (float)mFrameH;
-      mRecorder.CaptureFrame([target, tx, ty, fw, fh]()
-                             {
-                                //hide the target's controls for the recorded frame so we capture
-                                //just the visualization (the live module on screen is untouched)
-                                std::vector<IUIControl*> controls = target->GetUIControls();
-                                std::vector<bool> wasShowing(controls.size());
-                                for (size_t i = 0; i < controls.size(); ++i)
+      //fast path: IVisualNode targets expose a GPU texture — read pixels directly without
+      //re-rendering through NanoVG. This avoids context collisions and extra copies.
+      IVisualNode* vn = dynamic_cast<IVisualNode*>(target);
+      if (vn != nullptr)
+      {
+         mRecorder.CaptureFrameFromTexture(vn, mFrameW, mFrameH);
+      }
+      else
+      {
+         //legacy path: re-render the module into an offscreen NanoVG framebuffer
+         float tx = 0, ty = 0;
+         target->GetPosition(tx, ty);
+         float fw = (float)mFrameW;
+         float fh = (float)mFrameH;
+         mRecorder.CaptureFrame([target, tx, ty, fw, fh]()
                                 {
-                                   wasShowing[i] = controls[i]->IsShowing();
-                                   controls[i]->SetShowing(false);
-                                }
+                                   //hide the target's controls for the recorded frame so we capture
+                                   //just the visualization (the live module on screen is untouched)
+                                   std::vector<IUIControl*> controls = target->GetUIControls();
+                                   std::vector<bool> wasShowing(controls.size());
+                                   for (size_t i = 0; i < controls.size(); ++i)
+                                   {
+                                      wasShowing[i] = controls[i]->IsShowing();
+                                      controls[i]->SetShowing(false);
+                                   }
 
-                                float tw = 1, th = 1;
-                                target->GetDimensions(tw, th);
-                                if (tw < 1)
-                                   tw = 1;
-                                if (th < 1)
-                                   th = 1;
-                                //cover-fit: scale so the module fills the frame, then center it
-                                //(overflow is clipped by the framebuffer viewport)
-                                float cover = MAX(fw / tw, fh / th);
-                                float offX = (fw - tw * cover) * 0.5f;
-                                float offY = (fh - th * cover) * 0.5f;
+                                   float tw = 1, th = 1;
+                                   target->GetDimensions(tw, th);
+                                   if (tw < 1)
+                                      tw = 1;
+                                   if (th < 1)
+                                      th = 1;
+                                   //cover-fit: scale so the module fills the frame, then center it
+                                   //(overflow is clipped by the framebuffer viewport)
+                                   float cover = MAX(fw / tw, fh / th);
+                                   float offX = (fw - tw * cover) * 0.5f;
+                                   float offY = (fh - th * cover) * 0.5f;
 
-                                ofPushMatrix();
-                                ofTranslate(offX, offY, 0);
-                                ofScale(cover, cover, 1);
-                                ofTranslate(-tx, -ty, 0);
-                                target->Render();
-                                ofPopMatrix();
+                                   ofPushMatrix();
+                                   ofTranslate(offX, offY, 0);
+                                   ofScale(cover, cover, 1);
+                                   ofTranslate(-tx, -ty, 0);
+                                   target->Render();
+                                   ofPopMatrix();
 
-                                for (size_t i = 0; i < controls.size(); ++i)
-                                   controls[i]->SetShowing(wasShowing[i]);
-                             });
+                                   for (size_t i = 0; i < controls.size(); ++i)
+                                      controls[i]->SetShowing(wasShowing[i]);
+                                });
+      }
    }
 }
 

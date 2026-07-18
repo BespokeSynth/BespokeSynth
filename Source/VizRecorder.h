@@ -18,22 +18,32 @@
 #include <atomic>
 #include <functional>
 
+#include "IVisualNode.h"
+#include "VizGL.h"
+
 struct NVGLUframebuffer;
 
 class VizRecorder
 {
 public:
-   VizRecorder() {}
+   VizRecorder() { }
    ~VizRecorder();
 
    bool IsRecording() const { return mRecording; }
-   std::string Status() const { return mStatus; }
+   std::string Status() const
+   {
+      std::lock_guard<std::mutex> lk(mQueueMutex);
+      return mStatus;
+   }
 
    //toggle recording on/off (call from a checkbox/button); w,h are the capture resolution
    void Toggle(int w, int h);
 
    //called every frame while recording: `drawViz` must render the visualization into [0,0,w,h]
    void CaptureFrame(const std::function<void()>& drawViz);
+
+   //fast path: read pixels directly from an IVisualNode's GPU texture (no NanoVG re-render)
+   void CaptureFrameFromTexture(IVisualNode* node, int outW, int outH);
 
 private:
    void Stop(); //flush writer + encode with ffmpeg + cleanup
@@ -47,6 +57,9 @@ private:
    int mFBW{ 0 };
    int mFBH{ 0 };
    std::vector<unsigned char> mScratch; //glReadPixels target (RGB)
+   unsigned int mReadFBO{ 0 }; //GL FBO used to read back IVisualNode textures directly
+   VizGL::Fbo mWriteFbo; //NanoVG FBO used as the target for the scale/crop shader pass
+   unsigned int mCopyProgram{ 0 };
    int mFrameCount{ 0 };
    double mLastCaptureMs{ -1000 };
    std::string mTempDir;
@@ -55,7 +68,7 @@ private:
 
    //background PNG writer
    std::thread mWriter;
-   std::mutex mQueueMutex;
+   mutable std::mutex mQueueMutex;
    std::condition_variable mQueueCv;
    std::deque<std::pair<int, std::vector<unsigned char>>> mQueue;
    std::atomic<bool> mWriterRun{ false };

@@ -23,6 +23,11 @@
 #include "VideoCloud.h"
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
+#include "juce_opengl/juce_opengl.h"
+using namespace juce::gl;
+#include "nanovg/nanovg.h"
+#include "nanovg/nanovg_gl.h"
+#include "nanovg/nanovg_gl_utils.h"
 #include "ModularSynth.h"
 #include "IAudioReceiver.h"
 #include "Profiler.h"
@@ -55,6 +60,7 @@ VideoCloud::VideoCloud()
 
 VideoCloud::~VideoCloud()
 {
+   VizGL::DestroyFbo(mOutputFbo);
    if (mLoaderThread.joinable())
       mLoaderThread.join();
    TheTransport->RemoveListener(this);
@@ -123,6 +129,8 @@ void VideoCloud::CreateUIControls()
 
    for (int i = 0; i < kNumVizPalettes; ++i)
       mPaletteSelector->AddLabel(kVizPaletteNames[i], i);
+
+   y += 15;
 
    UpdateTransportListener();
 }
@@ -298,13 +306,38 @@ void VideoCloud::Process(double time)
    GetBuffer()->Reset();
 }
 
-void VideoCloud::DrawModule()
+unsigned int VideoCloud::GetOutputTexture()
 {
-   if (Minimized() || IsVisible() == false)
-      return;
+   return mOutputFbo.fb ? mOutputFbo.fb->texture : 0;
+}
 
-   float w, h;
-   GetDimensions(w, h);
+void VideoCloud::CookIfNeeded(int frameId)
+{
+   if (mLastCookFrame == frameId && frameId != 0)
+      return;
+   mLastCookFrame = frameId;
+
+   NVGcontext* recVG = gNanoVGRenderContexts[(int)NanoVGRenderContext::Screenshot];
+   if (!recVG)
+      return;
+   int w = MAX(1080, ((int)mWidth & ~1));
+   int h = MAX(1080, ((int)mHeight & ~1));
+
+   NVGcontext* mainVG = gNanoVG;
+   gNanoVG = recVG;
+
+   VizGL::EnsureFbo(mOutputFbo, w, h);
+
+   GLint prevFBO = 0;
+   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFBO);
+   GLint prevVp[4];
+   glGetIntegerv(GL_VIEWPORT, prevVp);
+
+   VizGL::BindFbo(mOutputFbo);
+   glViewport(0, 0, w, h);
+   glClearColor(0, 0, 0, 1);
+   glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+   nvgBeginFrame(gNanoVG, w, h, 1);
 
    ofPushStyle();
    ofFill();
@@ -505,6 +538,22 @@ void VideoCloud::DrawModule()
       DrawTextNormal(mStatus, viewX + 10, viewY + viewH * 0.5f, 13);
       ofPopStyle();
    }
+
+   nvgEndFrame(gNanoVG);
+   VizGL::UnbindFbo();
+   glBindFramebuffer(GL_FRAMEBUFFER, prevFBO);
+   glViewport(prevVp[0], prevVp[1], prevVp[2], prevVp[3]);
+   gNanoVG = mainVG;
+}
+
+void VideoCloud::DrawModule()
+{
+   if (Minimized() || IsVisible() == false)
+      return;
+
+   CookIfNeeded(0);
+
+   VizGL::DrawTexture(mOutputFbo.fb ? mOutputFbo.fb->texture : 0, 0, 0, mWidth, mHeight);
 
    mIntervalSelector->SetShowing(mSync);
    mDensitySlider->Draw();

@@ -35,13 +35,15 @@
 #include "Slider.h"
 #include "DropdownList.h"
 #include "Checkbox.h"
+#include "IVisualNode.h"
+#include "VizGL.h"
 #include <string>
 #include <vector>
 #include <thread>
 #include <atomic>
 #include <mutex>
 
-class VideoCloud : public IAudioProcessor, public IDrawableModule, public ITimeListener, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener
+class VideoCloud : public IAudioProcessor, public IDrawableModule, public IVisualNode, public ITimeListener, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener
 {
 public:
    VideoCloud();
@@ -71,7 +73,7 @@ public:
    //ITimeListener
    void OnTimeEvent(double time) override;
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override { }
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
@@ -88,6 +90,12 @@ private:
       width = mWidth;
       height = mHeight;
    }
+
+   //IVisualNode
+   void CookIfNeeded(int frameId) override;
+   unsigned int GetOutputTexture() override;
+   int GetOutputWidth() const override { return mOutputFbo.w; }
+   int GetOutputHeight() const override { return mOutputFbo.h; }
 
    void LoadWorker(std::string path); //runs on a background thread: ffmpeg + frame decode
    std::string FindFfmpeg() const;
@@ -159,4 +167,7 @@ private:
 
    float mWidth{ 470 };
    float mHeight{ 388 };
+
+   VizGL::Fbo mOutputFbo;
+   int mLastCookFrame{ -1 };
 };

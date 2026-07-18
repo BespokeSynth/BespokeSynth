@@ -317,6 +317,9 @@ target_sources(BespokeSynth PRIVATE
     CubeViz.cpp
     VizRecorder.cpp
     MovieOut.cpp
+    Composite.cpp
+    VizGL.cpp
+    ShaderViz.cpp
     CubeViz.h
     BlobViz.cpp
     BlobViz.h
@@ -813,6 +816,11 @@ target_sources(BespokeSynth PRIVATE
     VolcaBeatsControl.h
     PixelCloud.cpp
     CheckerBox.cpp
+    TransformViz.cpp
+    LiquidifierViz.cpp
+    VisualEffectsViz.cpp
+    VisualSwitcherViz.cpp
+    MacroKnobs.cpp
     ScopeViz.cpp
     VideoCloud.cpp
     TextCloud.cpp

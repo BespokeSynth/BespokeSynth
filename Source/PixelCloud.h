@@ -35,10 +35,12 @@
 #include "Slider.h"
 #include "DropdownList.h"
 #include "Checkbox.h"
+#include "IVisualNode.h"
+#include "VizGL.h"
 #include <string>
 #include <vector>
 
-class PixelCloud : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener
+class PixelCloud : public IAudioProcessor, public IDrawableModule, public IVisualNode, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener
 {
 public:
    PixelCloud();
@@ -67,9 +69,9 @@ public:
    void OnClicked(float x, float y, bool right) override; //start a rotate-drag (cloud mode)
    void Poll() override; //continue the rotate-drag
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override { }
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
-   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override { }
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -83,6 +85,12 @@ private:
       width = mWidth;
       height = mHeight;
    }
+
+   //IVisualNode
+   void CookIfNeeded(int frameId) override;
+   unsigned int GetOutputTexture() override;
+   int GetOutputWidth() const override { return mOutputFbo.w; }
+   int GetOutputHeight() const override { return mOutputFbo.h; }
 
    bool LoadImageFile(const std::string& path);
    void RebuildGrid();
@@ -148,4 +156,7 @@ private:
 
    float mWidth{ 360 };
    float mHeight{ 348 };
+
+   VizGL::Fbo mOutputFbo;
+   int mLastCookFrame{ -1 };
 };

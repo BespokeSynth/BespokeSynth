@@ -44,6 +44,11 @@
 #include "WaveformViewer.h"
 #include "TextCloud.h"
 #include "CheckerBox.h"
+#include "TransformViz.h"
+#include "LiquidifierViz.h"
+#include "MacroKnobs.h"
+#include "VisualEffectsViz.h"
+#include "VisualSwitcherViz.h"
 #include "ScopeViz.h"
 #include "VideoCloud.h"
 #include "PixelCloud.h"
@@ -104,6 +109,8 @@
 #include "Lissajous.h"
 #include "CubeViz.h"
 #include "MovieOut.h"
+#include "Composite.h"
+#include "ShaderViz.h"
 #include "BlobViz.h"
 #include "DebugAudioSource.h"
 #include "TimerDisplay.h"
@@ -311,6 +318,10 @@ ModuleFactory::ModuleFactory()
    REGISTER(WaveformViewer, waveformviewer, kModuleCategory_Audio);
    REGISTER(TextCloud, textcloud, kModuleCategory_Visualizer);
    REGISTER(CheckerBox, checkerbox, kModuleCategory_Visualizer);
+   REGISTER(TransformViz, transformviz, kModuleCategory_Visualizer);
+   REGISTER(LiquidifierViz, liquidifier, kModuleCategory_Visualizer);
+   REGISTER(VisualEffectsViz, viseffects, kModuleCategory_Visualizer);
+   REGISTER(VisualSwitcherViz, switcher, kModuleCategory_Visualizer);
    REGISTER(ScopeViz, scopeviz, kModuleCategory_Visualizer);
    REGISTER(VideoCloud, videocloud, kModuleCategory_Visualizer);
    REGISTER(PixelCloud, pixelcloud, kModuleCategory_Visualizer);
@@ -366,6 +377,8 @@ ModuleFactory::ModuleFactory()
    REGISTER(Lissajous, lissajous, kModuleCategory_Audio);
    REGISTER(CubeViz, cubeviz, kModuleCategory_Visualizer);
    REGISTER(MovieOut, movieout, kModuleCategory_Visualizer);
+   REGISTER(Composite, composite, kModuleCategory_Visualizer);
+   REGISTER(ShaderViz, shaderviz, kModuleCategory_Visualizer);
    REGISTER(BlobViz, blobviz, kModuleCategory_Visualizer);
    REGISTER(TimerDisplay, timerdisplay, kModuleCategory_Other);
    REGISTER(DrumSynth, drumsynth, kModuleCategory_Synth);
@@ -388,7 +401,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteFilter, notefilter, kModuleCategory_Note);
    REGISTER(PulseRouter, pulserouter, kModuleCategory_Pulse);
    REGISTER(RandomNoteGenerator, randomnote, kModuleCategory_Instrument);
+
    REGISTER(NoteToFreq, notetofreq, kModuleCategory_Modulator);
+   REGISTER(MacroKnobs, macroknobs, kModuleCategory_Other);
    REGISTER(MacroSlider, macroslider, kModuleCategory_Modulator);
    REGISTER(TableModulator, tablemod, kModuleCategory_Modulator);
    REGISTER(NoteVibrato, vibrato, kModuleCategory_Note);
@@ -610,13 +625,13 @@ IDrawableModule* ModuleFactory::MakeModule(std::string type)
 
 std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleCategory moduleCategory)
 {
-   std::vector<ModuleFactory::Spawnable> modules{};
+   std::vector<ModuleFactory::Spawnable> modules{ };
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if (iter->second.mCategory == moduleCategory &&
           (!iter->second.mIsHidden || gShowDevModules))
       {
-         ModuleFactory::Spawnable spawnable{};
+         ModuleFactory::Spawnable spawnable{ };
          spawnable.mLabel = iter->first;
          modules.push_back(spawnable);
       }
@@ -628,7 +643,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(ModuleC
       std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
       for (const auto& effect : effects)
       {
-         ModuleFactory::Spawnable spawnable{};
+         ModuleFactory::Spawnable spawnable{ };
          spawnable.mLabel = effect;
          spawnable.mDecorator = kEffectChainSuffix;
          spawnable.mSpawnMethod = SpawnMethod::EffectChain;
@@ -674,13 +689,13 @@ namespace
 
 std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::string keys, bool continuousString)
 {
-   std::vector<ModuleFactory::Spawnable> modules{};
+   std::vector<ModuleFactory::Spawnable> modules{ };
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if ((!iter->second.mIsHidden || gShowDevModules) &&
           CheckHeldKeysMatch(iter->first, keys, continuousString))
       {
-         ModuleFactory::Spawnable spawnable{};
+         ModuleFactory::Spawnable spawnable{ };
          spawnable.mLabel = iter->first;
          modules.push_back(spawnable);
       }
@@ -701,7 +716,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
 
    for (int i = 0; i < (int)matchingVsts.size() && i < kMaxQuickspawnVstCount; ++i)
    {
-      ModuleFactory::Spawnable spawnable{};
+      ModuleFactory::Spawnable spawnable{ };
       auto& pluginDesc = matchingVsts[i];
       spawnable.mLabel = pluginDesc.name.toStdString();
       spawnable.mDecorator = "[" + ModuleFactory::Spawnable::GetPluginLabel(pluginDesc) + "]";
@@ -723,7 +738,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
    {
       if (CheckHeldKeysMatch(midicontroller, keys, continuousString))
       {
-         ModuleFactory::Spawnable spawnable{};
+         ModuleFactory::Spawnable spawnable{ };
          spawnable.mLabel = midicontroller;
          spawnable.mDecorator = kMidiControllerSuffix;
          spawnable.mSpawnMethod = SpawnMethod::MidiController;
@@ -736,7 +751,7 @@ std::vector<ModuleFactory::Spawnable> ModuleFactory::GetSpawnableModules(std::st
    {
       if (CheckHeldKeysMatch(effect, keys, continuousString))
       {
-         ModuleFactory::Spawnable spawnable{};
+         ModuleFactory::Spawnable spawnable{ };
          spawnable.mLabel = effect;
          spawnable.mDecorator = kEffectChainSuffix;
          spawnable.mSpawnMethod = SpawnMethod::EffectChain;

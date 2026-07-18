@@ -32,9 +32,11 @@
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "DropdownList.h"
+#include "IVisualNode.h"
+#include "VizGL.h"
 #include <vector>
 
-class BlobViz : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener
+class BlobViz : public IAudioProcessor, public IDrawableModule, public IVisualNode, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener
 {
 public:
    BlobViz();
@@ -58,9 +60,9 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsEnabled() const override { return mEnabled; }
 
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
-   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
-   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override { }
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override { }
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override { }
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -74,6 +76,13 @@ private:
       width = mWidth;
       height = mHeight;
    }
+
+   //IVisualNode
+   void CookIfNeeded(int frameId) override;
+   unsigned int GetOutputTexture() override;
+   int GetOutputWidth() const override { return mOutputFbo.w; }
+   int GetOutputHeight() const override { return mOutputFbo.h; }
+
    void PaletteColor(float t, float& rOut, float& gOut, float& bOut) const;
 
    //audio analysis (written on the audio thread, read on the UI thread - plain floats only)
@@ -119,4 +128,7 @@ private:
    std::vector<Frame> mHistory;
    int mHistoryPos{ 0 };
    int mHistoryCount{ 0 };
+
+   VizGL::Fbo mOutputFbo;
+   int mLastCookFrame{ -1 };
 };
