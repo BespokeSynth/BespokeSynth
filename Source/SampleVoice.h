@@ -35,7 +35,7 @@ class IDrawableModule;
 class SampleVoiceParams : public IVoiceParams
 {
 public:
-   ::ADSR mAdsr{ 1, 0, 1, 10 };
+   ADSR mAdsr{ 1, 0, 1, 10 };
    float mVol{ 1 };
    Sample* mSample{ nullptr };
    float mSamplePitch{ 48 };
@@ -62,7 +62,7 @@ public:
    bool IsDone(double time) override;
 
 private:
-   ::ADSR mAdsr;
+   ADSR mAdsr;
    SampleVoiceParams* mVoiceParams{};
    float mPos{ 0 };
    IDrawableModule* mOwner{ nullptr };

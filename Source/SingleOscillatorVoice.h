@@ -38,7 +38,7 @@
 class OscillatorVoiceParams : public IVoiceParams
 {
 public:
-   ::ADSR mAdsr{ 10, 0, 1, 10 };
+   ADSR mAdsr{ 10, 0, 1, 10 };
    float mVol{ .25 };
    float mPulseWidth{ .5 };
    Oscillator::SyncMode mSyncMode{ Oscillator::SyncMode::None };
@@ -56,7 +56,7 @@ public:
    float mFilterCutoffMax{ SINGLEOSCILLATOR_NO_CUTOFF };
    float mFilterCutoffMin{ 10 };
    float mFilterQ{ float(sqrt(2) / 2) };
-   ::ADSR mFilterAdsr{ 1, 0, 1, 1000 };
+   ADSR mFilterAdsr{ 1, 0, 1, 1000 };
 
    float mVelToVolume{ 1.0 };
    float mVelToEnvelope{ 0 };
@@ -99,10 +99,10 @@ private:
       float mCurrentPhaseInc{ 0 };
    };
    OscData mOscData[kMaxUnison];
-   ::ADSR mAdsr;
+   ADSR mAdsr;
    OscillatorVoiceParams* mVoiceParams{ nullptr };
 
-   ::ADSR mFilterAdsr;
+   ADSR mFilterAdsr;
    BiquadFilter mFilterLeft;
    BiquadFilter mFilterRight;
    bool mUseFilter{ false };

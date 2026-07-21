@@ -91,7 +91,7 @@ private:
 
    float mVol{ .05 };
    float mPhase{ 0 };
-   ::ADSR mAdsr[NUM_PARTIALS]{};
+   ADSR mAdsr[NUM_PARTIALS]{};
    float mAmp[NUM_PARTIALS]{};
    float mPhases[NUM_PARTIALS]{};
    float mDetune[NUM_PARTIALS]{};
