@@ -590,11 +590,14 @@ void ModularSynth::Draw()
 
    ofTranslate(GetDrawOffset().x, GetDrawOffset().y);
 
-   if (ShouldShowGridSnap())
+   //the grid draws either while the grid-snap modifier key is held (existing behavior) or, if the
+   //user has turned on "show grid" in the menu, all the time - same grid, just a different reason
+   //to show it
+   if (ShouldShowGridSnap() || UserPrefs.show_grid.Get())
    {
       ofPushStyle();
       ofSetLineWidth(.5f);
-      ofSetColor(255, 255, 255, 40);
+      ofSetColor(255, 255, 255, 255 * UserPrefs.grid_opacity.Get());
       float gridSnapSize = UserPrefs.grid_snap_size.Get();
       int gridLinesVertical = (int)ceil((ofGetWidth() / gDrawScale) / gridSnapSize);
       for (int i = 0; i < gridLinesVertical; ++i)
@@ -1349,6 +1352,7 @@ bool ModularSynth::ShouldShowGridSnap() const
    return (mMoveModule || (!mGroupSelectedModules.empty() && IsMouseButtonHeld(1))) && (IsKeyModifierComboHeld(KeyModifierCombo::GridSnap) || IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter));
 }
 
+
 bool ModularSynth::IsKeyModifierComboHeld(KeyModifierCombo combo) const
 {
    if (combo == KeyModifierCombo::FineTune)
@@ -1440,14 +1444,18 @@ void ModularSynth::MouseMoved(int intX, int intY)
       float newX = x + mMoveModuleOffsetX;
       float newY = y + mMoveModuleOffsetY;
 
-      if (ShouldShowGridSnap())
+      //snap continuously while dragging, either because the grid-snap modifier key is held
+      //(existing behavior) or because "snap to grid" is turned on in the menu (Bitwig-style: always
+      //snaps, no modifier key needed) - snapping applies live during the drag, not just on drop
+      if (ShouldShowGridSnap() || UserPrefs.snap_to_grid_enabled.Get())
       {
-         newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
-         newY = round((newY - mMoveModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mMoveModule->TitleBarHeight();
+         float gridSize = UserPrefs.grid_snap_size.Get();
+         newX = round(newX / gridSize) * gridSize;
+         newY = round((newY - mMoveModule->TitleBarHeight()) / gridSize) * gridSize + mMoveModule->TitleBarHeight();
          if (IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter)) // Snap to center of the module
          {
-            newX -= std::fmod(mMoveModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
-            newY -= std::fmod(mMoveModule->GetRect().height / 2, UserPrefs.grid_snap_size.Get());
+            newX -= std::fmod(mMoveModule->GetRect().width / 2, gridSize);
+            newY -= std::fmod(mMoveModule->GetRect().height / 2, gridSize);
          }
       }
 
@@ -1759,14 +1767,15 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       float newX = x + mMoveModuleOffsetX;
       float newY = y + mMoveModuleOffsetY;
 
-      if (ShouldShowGridSnap())
+      if (ShouldShowGridSnap() || UserPrefs.snap_to_grid_enabled.Get())
       {
-         newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
-         newY = round((newY - mLastClickedModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mLastClickedModule->TitleBarHeight();
+         float gridSize = UserPrefs.grid_snap_size.Get();
+         newX = round(newX / gridSize) * gridSize;
+         newY = round((newY - mLastClickedModule->TitleBarHeight()) / gridSize) * gridSize + mLastClickedModule->TitleBarHeight();
          if (IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter)) // Snap to center of the module
          {
-            newX -= std::fmod(mLastClickedModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
-            newY -= std::fmod(mLastClickedModule->GetRect().height / 2, UserPrefs.grid_snap_size.Get());
+            newX -= std::fmod(mLastClickedModule->GetRect().width / 2, gridSize);
+            newY -= std::fmod(mLastClickedModule->GetRect().height / 2, gridSize);
          }
       }
 
@@ -1784,14 +1793,15 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       float newX = x + mMoveModuleOffsetX;
       float newY = y + mMoveModuleOffsetY;
 
-      if (ShouldShowGridSnap())
+      if (ShouldShowGridSnap() || UserPrefs.snap_to_grid_enabled.Get())
       {
-         newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
-         newY = round((newY - mMoveModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mMoveModule->TitleBarHeight();
+         float gridSize = UserPrefs.grid_snap_size.Get();
+         newX = round(newX / gridSize) * gridSize;
+         newY = round((newY - mMoveModule->TitleBarHeight()) / gridSize) * gridSize + mMoveModule->TitleBarHeight();
          if (IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter)) // Snap to center of the module
          {
-            newX -= std::fmod(mMoveModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
-            newY -= std::fmod(mMoveModule->GetRect().height / 2, UserPrefs.grid_snap_size.Get());
+            newX -= std::fmod(mMoveModule->GetRect().width / 2, gridSize);
+            newY -= std::fmod(mMoveModule->GetRect().height / 2, gridSize);
          }
       }
 
@@ -2755,19 +2765,19 @@ void ModularSynth::ResetLayout()
    titleBar->Init();
    mUILayerModuleContainer.AddModule(titleBar);
 
-   if (UserPrefs.show_minimap.Get())
-   {
-      mMinimap = std::make_unique<Minimap>();
-      mMinimap->SetName("minimap");
-      mMinimap->SetTypeName("minimap", kModuleCategory_Other);
-      mMinimap->SetShouldDrawOutline(false);
-      mMinimap->CreateUIControls();
-      mMinimap->SetShowing(true);
-      mMinimap->Init();
-      mUILayerModuleContainer.AddModule(mMinimap.get());
+   //always create the minimap (rather than only when the pref is on) so that toggling "show minimap"
+   //in the menu can show/hide it live via SetShowMinimap(), instead of only taking effect on next launch
+   mMinimap = std::make_unique<Minimap>();
+   mMinimap->SetName("minimap");
+   mMinimap->SetTypeName("minimap", kModuleCategory_Other);
+   mMinimap->SetShouldDrawOutline(false);
+   mMinimap->CreateUIControls();
+   mMinimap->SetShowing(UserPrefs.show_minimap.Get());
+   mMinimap->Init();
+   mUILayerModuleContainer.AddModule(mMinimap.get());
 
+   if (UserPrefs.show_minimap.Get())
       TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup, it collides with minimap, and a user who has customized the settings likely doesn't need it
-   }
 
    ModuleSaveDataPanel* saveDataPanel = new ModuleSaveDataPanel();
    saveDataPanel->SetPosition(-200, 50);
@@ -2819,6 +2829,12 @@ void ModularSynth::ResetLayout()
    SetUIScale(UserPrefs.ui_scale.Get());
 
    mNoteOutputQueue = new NoteOutputQueue();
+}
+
+void ModularSynth::SetShowMinimap(bool show)
+{
+   if (mMinimap != nullptr)
+      mMinimap->SetShowing(show);
 }
 
 bool ModularSynth::LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayout /*= true*/)

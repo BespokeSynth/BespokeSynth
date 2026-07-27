@@ -307,6 +307,8 @@ public:
    UserPrefDropdownString cable_drop_behavior{ "cable_drop_behavior", "show quickspawn", 150, UserPrefCategory::General };
    UserPrefDropdownString qwerty_to_pitch_mode{ "qwerty_to_pitch_mode", "Ableton", 150, UserPrefCategory::General };
    UserPrefFloat grid_snap_size{ "grid_snap_size", 30, 5, 150, UserPrefCategory::General };
+   UserPrefBool snap_to_grid_enabled{ "snap_to_grid_enabled", false, UserPrefCategory::General }; //Bitwig-style: always snap module drags to the grid, not just while holding the grid-snap modifier key
+   UserPrefFloat grid_opacity{ "grid_opacity", 40.0f / 255.0f, 0, 1, UserPrefCategory::Graphics }; //0-1 alpha for the canvas grid lines, set via the "grid view" preset dropdown in the menu
    UserPrefFloat scroll_multiplier_vertical{ "scroll_multiplier_vertical", 1, -2, 2, UserPrefCategory::General };
    UserPrefFloat scroll_multiplier_horizontal{ "scroll_multiplier_horizontal", 1, -2, 2, UserPrefCategory::General };
    UserPrefBool wrap_mouse_on_pan{ "wrap_mouse_on_pan", true, UserPrefCategory::General };
@@ -351,6 +353,7 @@ public:
    UserPrefFloat target_framerate{ "target_framerate", 60, 30, 144, UserPrefCategory::Graphics };
    UserPrefFloat motion_trails{ "motion_trails", 1, 0, 2, UserPrefCategory::Graphics };
    UserPrefBool draw_module_highlights{ "draw_module_highlights", true, UserPrefCategory::Graphics };
+   UserPrefBool show_grid{ "show_grid", false, UserPrefCategory::Graphics }; //always-visible canvas grid (independent of the grid-snap modifier key)
    UserPrefTextEntryFloat mouse_offset_x{ "mouse_offset_x", 0, -100, 100, 5, UserPrefCategory::Graphics };
    UserPrefTextEntryFloat mouse_offset_y
    {

@@ -160,6 +160,8 @@ public:
    void ReloadInitialLayout() { mWantReloadInitialLayout = true; }
    bool HasFatalError() { return mFatalError != ""; }
 
+   void SetShowMinimap(bool show); //lets the "show minimap" checkbox toggle it live, instead of only taking effect on next launch
+
    void AddLissajousDrawer(IDrawableModule* module) { mLissajousDrawers.push_back(module); }
    bool IsLissajousDrawer(IDrawableModule* module) { return VectorContains(module, mLissajousDrawers); }
 

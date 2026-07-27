@@ -147,54 +147,36 @@ void TitleBar::CreateUIControls()
    BUTTON_STYLE(mPlayPauseButton, "play/pause", ButtonDisplayStyle::kPause);
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(10);
-   //BUTTON(mLoadStateButton, "load");
-   //UIBLOCK_SHIFTRIGHT();
-   BUTTON(mSaveStateButton, "save");
-   UIBLOCK_SHIFTRIGHT();
-   BUTTON(mSaveStateAsButton, "save as");
-   UIBLOCK_SHIFTRIGHT();
-   UIBLOCK_SHIFTX(10);
-   BUTTON(mWriteAudioButton, "export audio");
-   UIBLOCK_SHIFTRIGHT();
-   BUTTON(mRecordButton, "record");
+   //record is a small icon button here for quick access; save/save as/load/write audio/lookahead/
+   //autosave all now live in the "menu" dropdown only, to keep this top row from overlapping the
+   //spawn-list dropdowns to the right
+   BUTTON_STYLE(mRecordButton, "record", ButtonDisplayStyle::kRecord);
    UIBLOCK_NEWLINE();
-   //BUTTON(mResetLayoutButton, "new patch");
    BUTTON(mWelcomeScreenButton, "load/new");
-   UIBLOCK_SHIFTRIGHT();
-   CHECKBOX(mEventLookaheadCheckbox, "lookahead (exp.)", &Transport::sDoEventLookahead);
-   UIBLOCK_SHIFTRIGHT();
-   CHECKBOX(mShouldAutosaveCheckbox, "autosave", &ModularSynth::sShouldAutosave);
    ENDUIBLOCK0();
+
+   //mMenuButton is 32px tall but the small icon buttons default to 15px - both start at the same top
+   //y, so without this they look pinned to the top of the row instead of centered against the menu
+   //button. Nudge them down by half the height difference so the row reads as vertically aligned.
+   {
+      float menuW, menuH;
+      mMenuButton->GetDimensions(menuW, menuH);
+
+      float ppW, ppH, ppX, ppY;
+      mPlayPauseButton->GetDimensions(ppW, ppH);
+      mPlayPauseButton->GetPosition(ppX, ppY, true);
+      mPlayPauseButton->SetPosition(ppX, ppY + (menuH - ppH) / 2);
+
+      float rW, rH, rX, rY;
+      mRecordButton->GetDimensions(rW, rH);
+      mRecordButton->GetPosition(rX, rY, true);
+      mRecordButton->SetPosition(rX, rY + (menuH - rH) / 2);
+   }
 
    mDisplayHelpButton = new ClickButton(this, " ? ", 380, 1);
    mDisplayUserPrefsEditorButton = new ClickButton(this, "settings", 330, 1);
    mHomeButton = new ClickButton(this, "home", 330, 1);
    mSearchToggleButton = new ClickButton(this, "search", 330, 1); //toggles the right-docked search/browser panel open/closed
-   mPaletteDropdown = new DropdownList(this, "palette", 330, 1, &mPaletteIndex);
-   mPaletteDropdown->AddLabel("classic", 0);
-   mPaletteDropdown->AddLabel("neon", 1);
-   mPaletteDropdown->AddLabel("pastel", 2);
-   mPaletteDropdown->AddLabel("mono", 3);
-   mPaletteDropdown->AddLabel("sunset", 4);
-   mPaletteDropdown->AddLabel("ocean", 5);
-   mPaletteDropdown->AddLabel("acid", 6);
-   mPaletteDropdown->AddLabel("vaporwave", 7);
-   mPaletteDropdown->AddLabel("toxic", 8);
-   mPaletteDropdown->AddLabel("bloodmoon", 9);
-   mPaletteDropdown->AddLabel("cyberpunk", 10);
-   mPaletteDropdown->AddLabel("glitch", 11);
-   mPaletteDropdown->AddLabel("midnight", 12);
-   mPaletteDropdown->AddLabel("aurora", 13);
-   mPaletteDropdown->AddLabel("forest", 14);
-   mPaletteDropdown->AddLabel("candy", 15);
-   mPaletteDropdown->AddLabel("ember", 16);
-   mPaletteDropdown->AddLabel("arctic", 17);
-   mPaletteDropdown->AddLabel("grape", 18);
-   mPaletteDropdown->AddLabel("sepia", 19);
-   mPaletteDropdown->AddLabel("matrix", 20);
-   mPaletteDropdown->AddLabel("dracula", 21);
-   mPaletteDropdown->AddLabel("solarized", 22);
-   mPaletteDropdown->AddLabel("mono light", 23);
    mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 20, &mLoadLayoutIndex);
    mSaveLayoutButton = new ClickButton(this, "save layout", 280, 19);
 
@@ -399,30 +381,18 @@ void TitleBar::DrawModule()
 
    mMenuButton->Draw();
    mSaveLayoutButton->Draw();
-   mSaveStateButton->Draw();
-   mSaveStateAsButton->Draw();
-   if (mLoadStateButton)
-      mLoadStateButton->Draw();
-   mWriteAudioButton->Draw();
 
-   mRecordButton->SetName(TheSynth->IsRecordingSession() ? "stop" : "record");
+   //the icon itself shows the pulsing red fill while a take is being captured (see ClickButton's
+   //kRecord style), so no separate dot overlay is needed here
+   mRecordButton->SetIsActive(TheSynth->IsRecordingSession());
    mRecordButton->Draw();
-   if (TheSynth->IsRecordingSession())
-   {
-      //pulsing red dot next to the record button while a take is being captured
-      ofPushStyle();
-      float pulse = ofMap(sin(gTime / 300 * PI * 2), -1, 1, .5f, 1);
-      ofFill();
-      ofSetColor(255, 60, 60, 255 * pulse);
-      ofRectangle recordRect = mRecordButton->GetRect();
-      ofCircle(recordRect.x - 7, recordRect.y + recordRect.height / 2, 3.5f);
-      ofPopStyle();
-   }
 
    mLoadLayoutDropdown->Draw();
+   //show the arrow icon while paused (clicking resumes) and the pause icon while playing (clicking pauses)
+   mPlayPauseButton->SetDisplayStyle(TheSynth->IsAudioPaused() ? ButtonDisplayStyle::kPlay : ButtonDisplayStyle::kPause);
    mPlayPauseButton->Draw();
 
-   float startX = 470; //leaves room on row 1 for the palette dropdown that now sits after 'record'
+   float startX = 250; //top row is now just menu/play-pause/record, so this can sit much closer than before
    float startY = 2;
 
    bool newline = true;
@@ -443,7 +413,7 @@ void TitleBar::DrawModule()
       x += w + 5;
 
       if (x >= pixelWidth - 340) //reserve extra room on the right so the spawn dropdowns never run
-      { //into the palette/search/home/settings/help cluster or the cpu stats
+      { //into the search/home/settings/help cluster or the cpu stats
          x = startX;
          y += 18;
          newline = true;
@@ -474,14 +444,9 @@ void TitleBar::DrawModule()
    mDisplayUserPrefsEditorButton->Draw();
    mHomeButton->SetPosition(mDisplayUserPrefsEditorButton->GetPosition(true).x - mHomeButton->GetRect().width - 5, 4);
    mHomeButton->Draw();
-   //palette (colour presets) now lives in the top-LEFT cluster, right after the 'record' button
-   mPaletteDropdown->SetPosition(mRecordButton->GetPosition(true).x + mRecordButton->GetRect().width + 10, mRecordButton->GetPosition(true).y - 1);
-   mPaletteDropdown->Draw();
    //search toggle stays on the right, just left of the 'home' button
    mSearchToggleButton->SetPosition(mHomeButton->GetPosition(true).x - mSearchToggleButton->GetRect().width - 5, 4);
    mSearchToggleButton->Draw();
-   mEventLookaheadCheckbox->Draw();
-   mShouldAutosaveCheckbox->Draw();
 }
 
 void TitleBar::DrawModuleUnclipped()
@@ -619,12 +584,6 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal, double time)
       return;
    }
 
-   if (list == mPaletteDropdown)
-   {
-      ApplyColorPalette(mPaletteIndex);
-      return;
-   }
-
    for (auto* spawnList : mSpawnLists.GetDropdowns())
       spawnList->OnSelection(list);
 }
@@ -645,33 +604,51 @@ void TitleBar::ApplyColorPalette(int index)
    {
       float hueNote, hueSynth, hueAudio, hueInstrument, hueProcessor, hueModulator, huePulse, saturation, brightness;
       float bgHue, bgSat, bgBright, lissBright;
+      float alpha; //module_background_alpha (0-255) - lets a palette also control how see-through/solid module panels are
    };
 
    static const Palette kPalettes[] = {
-      { 27, 79, 135, 240, 170, 200, 43, 130, 205, 160, 30, 23, 80 }, //classic
-      { 330, 140, 190, 260, 30, 90, 55, 230, 235, 190, 120, 26, 150 }, //neon
-      { 27, 79, 135, 240, 170, 200, 43, 70, 235, 190, 40, 30, 95 }, //pastel
-      { 0, 0, 0, 0, 0, 0, 0, 0, 200, 0, 0, 20, 80 }, //mono
-      { 15, 350, 30, 340, 10, 45, 25, 190, 220, 12, 130, 26, 100 }, //sunset - warm maroon bg
-      { 195, 170, 220, 190, 205, 180, 160, 170, 210, 140, 130, 24, 95 }, //ocean - deep teal bg
-      { 90, 310, 55, 170, 20, 280, 130, 255, 255, 60, 120, 22, 120 }, //acid - toxic lime/magenta/yellow
-      { 320, 185, 280, 340, 200, 260, 170, 200, 235, 205, 110, 28, 120 }, //vaporwave - pink/cyan/purple
-      { 75, 110, 45, 150, 90, 130, 60, 245, 245, 60, 140, 20, 110 }, //toxic - radioactive green
-      { 5, 15, 350, 25, 10, 340, 0, 210, 160, 2, 160, 20, 80 }, //bloodmoon - deep dim reds
-      { 195, 320, 50, 280, 210, 300, 45, 235, 230, 185, 140, 24, 130 }, //cyberpunk - blue/magenta/yellow
-      { 10, 200, 95, 310, 55, 250, 150, 255, 200, 150, 60, 22, 110 }, //glitch - wide clashing hues
-      { 170, 190, 150, 200, 160, 210, 175, 150, 220, 170, 150, 20, 85 }, //midnight - deep navy, cool blues
-      { 130, 90, 160, 200, 110, 260, 140, 190, 235, 130, 120, 24, 110 }, //aurora - teal/green/purple glow
-      { 75, 60, 100, 40, 90, 130, 55, 160, 210, 75, 90, 22, 85 }, //forest - greens/browns
-      { 235, 130, 45, 210, 160, 280, 50, 220, 245, 220, 90, 30, 120 }, //candy - pink/cyan/yellow on plum
-      { 8, 20, 350, 30, 15, 40, 25, 200, 225, 15, 150, 22, 100 }, //ember - near-black warm reds/gold
-      { 150, 170, 130, 190, 140, 200, 160, 90, 240, 150, 50, 30, 95 }, //arctic - icy blue-grey
-      { 200, 215, 180, 230, 195, 260, 210, 180, 225, 200, 130, 24, 100 }, //grape - deep purple
-      { 28, 35, 20, 40, 30, 45, 25, 120, 210, 28, 80, 28, 85 }, //sepia - warm brown vintage
-      { 90, 95, 85, 100, 90, 110, 80, 220, 235, 90, 180, 16, 130 }, //matrix - black-green terminal
-      { 215, 130, 90, 265, 175, 280, 60, 170, 235, 175, 40, 34, 100 }, //dracula - classic dark editor
-      { 170, 130, 90, 40, 20, 215, 60, 150, 220, 130, 120, 30, 90 }, //solarized - solarized-dark base
-      { 0, 0, 0, 0, 0, 0, 0, 0, 90, 0, 0, 225, 160 } //mono light - dark modules on a light bg
+      { 27, 79, 135, 240, 170, 200, 43, 130, 205, 160, 30, 23, 80, 235 }, //classic
+      { 330, 140, 190, 260, 30, 90, 55, 230, 235, 190, 120, 26, 150, 235 }, //neon
+      { 27, 79, 135, 240, 170, 200, 43, 70, 235, 190, 40, 30, 95, 235 }, //pastel
+      { 0, 0, 0, 0, 0, 0, 0, 0, 200, 0, 0, 20, 80, 235 }, //mono
+      { 15, 350, 30, 340, 10, 45, 25, 190, 220, 12, 130, 26, 100, 235 }, //sunset - warm maroon bg
+      { 195, 170, 220, 190, 205, 180, 160, 170, 210, 140, 130, 24, 95, 235 }, //ocean - deep teal bg
+      { 90, 310, 55, 170, 20, 280, 130, 255, 255, 60, 120, 22, 120, 235 }, //acid - toxic lime/magenta/yellow
+      { 320, 185, 280, 340, 200, 260, 170, 200, 235, 205, 110, 28, 120, 235 }, //vaporwave - pink/cyan/purple
+      { 75, 110, 45, 150, 90, 130, 60, 245, 245, 60, 140, 20, 110, 235 }, //toxic - radioactive green
+      { 5, 15, 350, 25, 10, 340, 0, 210, 160, 2, 160, 20, 80, 235 }, //bloodmoon - deep dim reds
+      { 195, 320, 50, 280, 210, 300, 45, 235, 230, 185, 140, 24, 130, 235 }, //cyberpunk - blue/magenta/yellow
+      { 10, 200, 95, 310, 55, 250, 150, 255, 200, 150, 60, 22, 110, 235 }, //glitch - wide clashing hues
+      { 170, 190, 150, 200, 160, 210, 175, 150, 220, 170, 150, 20, 85, 235 }, //midnight - deep navy, cool blues
+      { 130, 90, 160, 200, 110, 260, 140, 190, 235, 130, 120, 24, 110, 235 }, //aurora - teal/green/purple glow
+      { 75, 60, 100, 40, 90, 130, 55, 160, 210, 75, 90, 22, 85, 235 }, //forest - greens/browns
+      { 235, 130, 45, 210, 160, 280, 50, 220, 245, 220, 90, 30, 120, 235 }, //candy - pink/cyan/yellow on plum
+      { 8, 20, 350, 30, 15, 40, 25, 200, 225, 15, 150, 22, 100, 235 }, //ember - near-black warm reds/gold
+      { 150, 170, 130, 190, 140, 200, 160, 90, 240, 150, 50, 30, 95, 235 }, //arctic - icy blue-grey
+      { 200, 215, 180, 230, 195, 260, 210, 180, 225, 200, 130, 24, 100, 235 }, //grape - deep purple
+      { 28, 35, 20, 40, 30, 45, 25, 120, 210, 28, 80, 28, 85, 235 }, //sepia - warm brown vintage
+      { 90, 95, 85, 100, 90, 110, 80, 220, 235, 90, 180, 16, 130, 235 }, //matrix - black-green terminal
+      { 215, 130, 90, 265, 175, 280, 60, 170, 235, 175, 40, 34, 100, 235 }, //dracula - classic dark editor
+      { 170, 130, 90, 40, 20, 215, 60, 150, 220, 130, 120, 30, 90, 235 }, //solarized - solarized-dark base
+      { 0, 0, 0, 0, 0, 0, 0, 0, 90, 0, 0, 225, 160, 235 }, //mono light - dark modules on a light bg
+      //true monochromatic palettes: every module category shares ONE hue, only saturation/brightness/
+      //alpha vary - these are the ones that specifically play with module_background_alpha
+      { 210, 210, 210, 210, 210, 210, 210, 60, 90, 210, 40, 18, 70, 235 }, //mono ink - dark opaque blue-grey, solid panels
+      { 0, 0, 0, 0, 0, 0, 0, 0, 130, 0, 0, 30, 85, 235 }, //mono slate - true neutral grey, solid panels
+      { 40, 40, 40, 40, 40, 40, 40, 190, 210, 35, 90, 26, 110, 235 }, //mono amber - warm monochrome, solid panels
+      { 150, 150, 150, 150, 150, 150, 150, 150, 200, 150, 60, 22, 100, 235 }, //mono jade - green monochrome, solid panels
+      { 340, 340, 340, 340, 340, 340, 340, 160, 220, 340, 60, 26, 110, 195 }, //mono blush - pink monochrome, slightly translucent
+      { 0, 0, 0, 0, 0, 0, 0, 0, 235, 0, 0, 15, 60, 70 } //mono ghost - near-white, very translucent "glass" panels
+   };
+
+   //names in the same order as kPalettes above, used only for the confirmation message (the palette
+   //dropdown itself now lives in the menu popup, not on TitleBar, so we can't read its label directly)
+   static const char* kPaletteNames[] = {
+      "classic", "neon", "pastel", "mono", "sunset", "ocean", "acid", "vaporwave", "toxic", "bloodmoon",
+      "cyberpunk", "glitch", "midnight", "aurora", "forest", "candy", "ember", "arctic", "grape", "sepia",
+      "matrix", "dracula", "solarized", "mono light", "mono ink", "mono slate", "mono amber", "mono jade",
+      "mono blush", "mono ghost"
    };
 
    if (index < 0 || index >= (int)(sizeof(kPalettes) / sizeof(kPalettes[0])))
@@ -687,6 +664,7 @@ void TitleBar::ApplyColorPalette(int index)
    UserPrefs.hue_pulse.Get() = p.huePulse;
    UserPrefs.module_saturation.Get() = p.saturation;
    UserPrefs.module_brightness.Get() = p.brightness;
+   UserPrefs.module_background_alpha.Get() = p.alpha;
 
    //derive the window background (a dark tint) and the lissajous scope colour from the palette's
    //background hue, then push them to both the live render statics and UserPrefs
@@ -709,7 +687,7 @@ void TitleBar::ApplyColorPalette(int index)
    UserPrefs.lissajous_g.Get() = ModularSynth::sBackgroundLissajousG;
    UserPrefs.lissajous_b.Get() = ModularSynth::sBackgroundLissajousB;
 
-   DisplayTemporaryMessage("palette applied: " + mPaletteDropdown->GetLabel(index));
+   DisplayTemporaryMessage(std::string("palette applied: ") + kPaletteNames[index]);
 }
 
 void TitleBar::ButtonClicked(ClickButton* button, double time)
@@ -721,16 +699,8 @@ void TitleBar::ButtonClicked(ClickButton* button, double time)
       else
          TheSynth->SaveLayout();
    }
-   if (button == mSaveStateButton)
-      TheSynth->SaveCurrentState();
-   if (button == mSaveStateAsButton)
-      TheSynth->SaveStatePopup();
-   if (button == mLoadStateButton)
-      TheSynth->LoadStatePopup();
-   if (button == mWriteAudioButton)
-      TheSynth->SaveOutput();
    if (button == mRecordButton)
-      TheSynth->ToggleRecording();
+      TheSynth->ToggleRecording(); //toggles start/stop; stop auto-exports to UserPrefs.recordings_path
    if (button == mDisplayHelpButton)
       ShowHelp();
    if (button == mDisplayUserPrefsEditorButton)
@@ -742,8 +712,12 @@ void TitleBar::ButtonClicked(ClickButton* button, double time)
    if (button == mMenuButton)
    {
       auto buttonRect = mMenuButton->GetRect();
+      float popupWidth, popupHeight;
+      mMenuPopup.GetDimensions(popupWidth, popupHeight);
       mMenuPopup.SetOwningContainer(GetOwningContainer());
-      mMenuPopup.SetPosition(buttonRect.x, buttonRect.y + buttonRect.height + 2);
+      //center the popup under the button rather than left-aligning it, since the popup is much
+      //wider than the "menu" button itself
+      mMenuPopup.SetPosition(buttonRect.x + buttonRect.width / 2 - popupWidth / 2, buttonRect.y + buttonRect.height + 2);
       TheSynth->PushModalFocusItem(&mMenuPopup);
    }
    if (button == mPlayPauseButton)
@@ -800,19 +774,63 @@ MenuPopup::MenuPopup()
 void MenuPopup::CreateUIControls()
 {
    const float kButtonWidth = 130;
+   const float kButtonHeight = 20; //was 32 - way more than a single line of text needs, which is what
+   //made the gap between the label and the next button look so large
 
    UIBLOCK0();
-   BUTTON_SIZE(mWelcomeScreenButton, "recents", kButtonWidth, 32);
-   BUTTON_SIZE(mResetLayoutButton, "new", kButtonWidth, 32);
-   BUTTON_SIZE(mLoadStateButton, "load", kButtonWidth, 32);
-   BUTTON_SIZE(mSaveStateButton, "save", kButtonWidth, 32);
-   BUTTON_SIZE(mSaveStateAsButton, "save as", kButtonWidth, 32);
-   BUTTON_SIZE(mWriteAudioButton, "write audio", kButtonWidth, 32);
-   BUTTON_SIZE(mHomeButton, "move canvas home", kButtonWidth, 32);
+   BUTTON_SIZE(mWelcomeScreenButton, "recents", kButtonWidth, kButtonHeight);
+   BUTTON_SIZE(mResetLayoutButton, "new", kButtonWidth, kButtonHeight);
+   BUTTON_SIZE(mLoadStateButton, "load", kButtonWidth, kButtonHeight);
+   BUTTON_SIZE(mSaveStateButton, "save", kButtonWidth, kButtonHeight);
+   BUTTON_SIZE(mSaveStateAsButton, "save as", kButtonWidth, kButtonHeight);
+   BUTTON_SIZE(mWriteAudioButton, "write audio", kButtonWidth, kButtonHeight);
+   BUTTON_SIZE(mRecordButton, "record", kButtonWidth, kButtonHeight);
    CHECKBOX(mEventLookaheadCheckbox, "lookahead (exp.)", &Transport::sDoEventLookahead);
    CHECKBOX(mShouldAutosaveCheckbox, "autosave", &ModularSynth::sShouldAutosave);
    CHECKBOX(mShowTooltipsCheckbox, "show tooltips", &HelpDisplay::sShowTooltips);
+   CHECKBOX(mShowGridCheckbox, "show grid", &UserPrefs.show_grid.Get());
+   CHECKBOX(mSnapToGridCheckbox, "snap to grid", &UserPrefs.snap_to_grid_enabled.Get());
+   CHECKBOX(mShowMinimapCheckbox, "show minimap", &UserPrefs.show_minimap.Get());
    ENDUIBLOCK(mWidth, mHeight);
+
+   //palette lives as its own dropdown here (outside the UIBLOCK row) so it doesn't get squeezed by
+   //kButtonWidth - it was previously a top-bar dropdown that overlapped the spawn-category dropdowns
+   mPaletteDropdown = new DropdownList(this, "palette", 0, mHeight + 4, &mPaletteIndex);
+   mPaletteDropdown->AddLabel("classic", 0);
+   mPaletteDropdown->AddLabel("neon", 1);
+   mPaletteDropdown->AddLabel("pastel", 2);
+   mPaletteDropdown->AddLabel("mono", 3);
+   mPaletteDropdown->AddLabel("sunset", 4);
+   mPaletteDropdown->AddLabel("ocean", 5);
+   mPaletteDropdown->AddLabel("acid", 6);
+   mPaletteDropdown->AddLabel("vaporwave", 7);
+   mPaletteDropdown->AddLabel("toxic", 8);
+   mPaletteDropdown->AddLabel("bloodmoon", 9);
+   mPaletteDropdown->AddLabel("cyberpunk", 10);
+   mPaletteDropdown->AddLabel("glitch", 11);
+   mPaletteDropdown->AddLabel("midnight", 12);
+   mPaletteDropdown->AddLabel("aurora", 13);
+   mPaletteDropdown->AddLabel("forest", 14);
+   mPaletteDropdown->AddLabel("candy", 15);
+   mPaletteDropdown->AddLabel("ember", 16);
+   mPaletteDropdown->AddLabel("arctic", 17);
+   mPaletteDropdown->AddLabel("grape", 18);
+   mPaletteDropdown->AddLabel("sepia", 19);
+   mPaletteDropdown->AddLabel("matrix", 20);
+   mPaletteDropdown->AddLabel("dracula", 21);
+   mPaletteDropdown->AddLabel("solarized", 22);
+   mPaletteDropdown->AddLabel("mono light", 23);
+   mPaletteDropdown->AddLabel("mono ink", 24);
+   mPaletteDropdown->AddLabel("mono slate", 25);
+   mPaletteDropdown->AddLabel("mono amber", 26);
+   mPaletteDropdown->AddLabel("mono jade", 27);
+   mPaletteDropdown->AddLabel("mono blush", 28);
+   mPaletteDropdown->AddLabel("mono ghost", 29);
+   mHeight += 20; //make room for the palette dropdown row we just added below the button block
+
+   //grid opacity: a normal continuous slider rather than a preset dropdown
+   mGridOpacitySlider = new FloatSlider(this, "grid opacity", 0, mHeight + 4, kButtonWidth, 15, &UserPrefs.grid_opacity.Get(), 0, 1);
+   mHeight += 20; //make room for the grid-opacity slider row
 
    mNewPatchConfirmPopup.CreateUIControls();
 }
@@ -825,10 +843,28 @@ void MenuPopup::DrawModule()
    mLoadStateButton->Draw();
    mResetLayoutButton->Draw();
    mWriteAudioButton->Draw();
-   mHomeButton->Draw();
+   mRecordButton->SetName(TheSynth->IsRecordingSession() ? "stop && export" : "record");
+   mRecordButton->Draw();
    mEventLookaheadCheckbox->Draw();
    mShouldAutosaveCheckbox->Draw();
    mShowTooltipsCheckbox->Draw();
+   mShowGridCheckbox->Draw();
+   mSnapToGridCheckbox->Draw();
+   mShowMinimapCheckbox->Draw();
+   mPaletteDropdown->Draw();
+   mGridOpacitySlider->Draw();
+}
+
+void MenuPopup::DropdownUpdated(DropdownList* list, int oldVal, double time)
+{
+   if (list == mPaletteDropdown)
+      TheTitleBar->ApplyColorPalette(mPaletteIndex); //leave the menu open so the user can try a few palettes in a row
+}
+
+void MenuPopup::CheckboxUpdated(Checkbox* checkbox, double time)
+{
+   if (checkbox == mShowMinimapCheckbox)
+      TheSynth->SetShowMinimap(UserPrefs.show_minimap.Get()); //the checkbox already flips the pref directly; this makes it also take effect immediately instead of only on next launch
 }
 
 void MenuPopup::ButtonClicked(ClickButton* button, double time)
@@ -853,9 +889,9 @@ void MenuPopup::ButtonClicked(ClickButton* button, double time)
       TheSynth->SaveOutput();
       TheSynth->PopModalFocusItem();
    }
-   if (button == mHomeButton)
+   if (button == mRecordButton)
    {
-      TheSynth->GetLocationZoomer()->GoHome();
+      TheSynth->ToggleRecording(); //toggles start/stop; stop auto-exports to UserPrefs.recordings_path
       TheSynth->PopModalFocusItem();
    }
    if (button == mResetLayoutButton)

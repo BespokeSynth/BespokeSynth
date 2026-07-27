@@ -49,7 +49,11 @@ void SearchPanel::CreateUIControls()
 
    mSearchEntry = new TextEntry(this, "search", -1, -1, 24, &mSearchTextBound);
    mSearchEntry->SetRequireEnter(false);
-   mSearchEntry->DrawLabel(true);
+   //NOTE: label intentionally left off (DrawLabel stays false/default) - TextEntry::GetDimensions()
+   //adds mLabelSize on top of an override width when a label is drawn, which silently pushed this
+   //box's right edge past the panel's own edge no matter how the override width was computed. The
+   //panel context already makes it obvious this is a search box, so we just skip the label instead
+   //of teaching GetDimensions to subtract it back out.
 
    mAddLocationButton = new ClickButton(this, "+ add folder", -1, -1);
    mRescanButton = new ClickButton(this, "rescan", -1, -1);
@@ -184,8 +188,10 @@ void SearchPanel::DrawModule()
    //number of chars a truncated path/label can show at the current width
    const int labelChars = MAX(6, (mWidth - kContentX - 22) / 7);
 
-   //search field fills the top row and is clamped to the panel width so it never spills outside
-   mSearchEntry->SetOverrideWidth((float)(mWidth - kContentX - 4));
+   //search field fills the top row and is clamped to the panel width so it never spills outside -
+   //extra right-side margin (10 instead of 4) so the box visibly sits inside the panel with breathing
+   //room rather than looking like it's crossing/touching the panel's edge
+   mSearchEntry->SetOverrideWidth((float)(mWidth - kContentX - 10));
    mSearchEntry->SetPosition(kContentX, 2);
    mSearchEntry->Draw();
 

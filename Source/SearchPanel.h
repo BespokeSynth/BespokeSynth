@@ -136,7 +136,9 @@ private:
    static std::string TruncatePathForDisplay(const std::string& path, int maxChars);
 
    static constexpr int kMaxResults = 10; //module results
-   static constexpr int kVisibleSampleRows = 30; //sample rows drawn on screen at once (virtualized window)
+   static constexpr int kVisibleSampleRows = 60; //sample rows drawn on screen at once (virtualized window) - was 30, which
+   //left a block of dead space at the bottom of the panel on tall screens/high fitRows since the row count was capped
+   //here regardless of how much room the (full-height, docked) panel actually had
    static constexpr int kMaxSampleMatches = 4000; //full match list you can scroll through
    static constexpr int kMaxLocationRows = 8;
    static constexpr int kMinWidth = 150;
