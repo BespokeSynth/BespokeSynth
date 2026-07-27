@@ -169,7 +169,15 @@ target_sources(BespokeSynth PRIVATE
     DotGrid.cpp
     DotGrid.h
     DotSequencer.cpp
+    BouncingBalls.cpp
+    Radar.cpp
+    SampleUniverse.cpp
+    EffectMatrix.cpp
     DotSequencer.h
+    BouncingBalls.h
+    Radar.h
+    SampleUniverse.h
+    EffectMatrix.h
     DropdownList.cpp
     DropdownList.h
     DrumPlayer.cpp
@@ -308,6 +316,8 @@ target_sources(BespokeSynth PRIVATE
     LaunchpadNoteDisplayer.h
     LevelMeterDisplay.cpp
     LevelMeterDisplay.h
+    LimiterEffect.cpp
+    LimiterEffect.h
     LinkwitzRileyFilter.cpp
     LinkwitzRileyFilter.h
     LinnstrumentControl.cpp
@@ -766,6 +776,8 @@ target_sources(BespokeSynth PRIVATE
     UIGrid.h
     UnstableModWheel.cpp
     UnstableModWheel.h
+    PaulStretch.cpp
+    PaulStretch.h
     UnstablePitch.cpp
     UnstablePitch.h
     UnstablePressure.cpp

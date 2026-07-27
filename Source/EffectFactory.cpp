@@ -48,6 +48,7 @@
 #include "ButterworthFilterEffect.h"
 #include "GainStageEffect.h"
 #include "DJFilterEffect.h"
+#include "LimiterEffect.h"
 
 EffectFactory::EffectFactory()
 {
@@ -74,6 +75,7 @@ EffectFactory::EffectFactory()
    Register("butterworth", &(ButterworthFilterEffect::Create));
    Register("gainstage", &(GainStageEffect::Create));
    Register("stereo", &(StereoWidthEffect::Create));
+   Register("limiter", &(LimiterEffect::Create));
 }
 
 void EffectFactory::Register(std::string type, CreateEffectFn creator)

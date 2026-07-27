@@ -148,7 +148,7 @@ void SearchPanel::Poll()
       {
          // process finished or error
          mPreviewPid = -1;
-         mPreviewingRow = -1;
+         mPreviewingResultIdx = -1;
       }
    }
 #endif
@@ -286,7 +286,7 @@ void SearchPanel::DrawModule()
             const float kGap = 2;
 
             // ▶ preview button — show > while stopped, || while playing
-            bool isPlaying = (mPreviewingRow == i);
+            bool isPlaying = (mPreviewingResultIdx == resultIdx);
             mPreviewButtons[i]->SetShowing(true);
             mPreviewButtons[i]->SetLabel(isPlaying ? "||" : ">");
             mPreviewButtons[i]->SetPosition(kContentX, rowY);
@@ -760,19 +760,19 @@ void SearchPanel::ButtonClicked(ClickButton* button, double time)
    {
       if (button == mPreviewButtons[i])
       {
-         if (mPreviewingRow == i)
+         int resultIdx = mSampleScroll + i;
+         if (mPreviewingResultIdx == resultIdx)
          {
             // second click on same row = stop
             StopPreview();
          }
          else
          {
-            int resultIdx = mSampleScroll + i;
             if (resultIdx >= 0 && resultIdx < (int)mSampleResults.size())
             {
                StopPreview();
                StartPreview(mSampleResults[resultIdx].toStdString());
-               mPreviewingRow = i;
+               mPreviewingResultIdx = resultIdx;
             }
          }
          return;
@@ -846,5 +846,5 @@ void SearchPanel::StopPreview()
       mPreviewPid = -1;
    }
 #endif
-   mPreviewingRow = -1;
+   mPreviewingResultIdx = -1;
 }

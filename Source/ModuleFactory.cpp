@@ -35,7 +35,11 @@
 #include "EffectChain.h"
 #include "LooperRecorder.h"
 #include "Chorder.h"
+#include "BouncingBalls.h"
+#include "Radar.h"
 #include "Arpeggiator.h"
+#include "SampleUniverse.h"
+#include "EffectMatrix.h"
 #include "Razor.h"
 #include "Monophonify.h"
 #include "StepSequencer.h"
@@ -242,6 +246,7 @@
 #include "PlaySequencer.h"
 #include "UnstablePitch.h"
 #include "UnstableModWheel.h"
+#include "PaulStretch.h"
 #include "UnstablePressure.h"
 #include "ChordHolder.h"
 #include "LooperGranulator.h"
@@ -328,7 +333,11 @@ ModuleFactory::ModuleFactory()
    REGISTER(EffectChain, effectchain, kModuleCategory_Audio);
    REGISTER(DrumPlayer, drumplayer, kModuleCategory_Synth);
    REGISTER(Chorder, chorder, kModuleCategory_Note);
+   REGISTER(BouncingBalls, bouncingballs, kModuleCategory_Note);
+   REGISTER(Radar, radar, kModuleCategory_Note);
    REGISTER(Arpeggiator, arpeggiator, kModuleCategory_Note);
+   REGISTER(SampleUniverse, sampleuniverse, kModuleCategory_Audio);
+   REGISTER(EffectMatrix, effectmatrix, kModuleCategory_Audio);
    REGISTER(Monophonify, portamento, kModuleCategory_Note);
    REGISTER(StepSequencer, drumsequencer, kModuleCategory_Instrument);
    REGISTER(LaunchpadKeyboard, gridkeyboard, kModuleCategory_Instrument);
@@ -498,6 +507,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PlaySequencer, playsequencer, kModuleCategory_Instrument);
    REGISTER(UnstablePitch, unstablepitch, kModuleCategory_Note);
    REGISTER(UnstableModWheel, unstablemodwheel, kModuleCategory_Note);
+   REGISTER(PaulStretch, paulstretch, kModuleCategory_Audio);
    REGISTER(UnstablePressure, unstablepressure, kModuleCategory_Note);
    REGISTER(ChordHolder, chordholder, kModuleCategory_Note);
    REGISTER(LooperGranulator, loopergranulator, kModuleCategory_Other);

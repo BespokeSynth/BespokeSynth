@@ -189,7 +189,7 @@ private:
 
    // Sample preview via afplay subprocess (macOS native, correct threading)
    int mPreviewPid{ -1 }; //pid of the afplay preview process (-1 = none); int for MSVC portability
-   int mPreviewingRow{ -1 };
+   int mPreviewingResultIdx{ -1 };
    void StartPreview(const std::string& path);
    void StopPreview();
 };
