@@ -213,6 +213,7 @@ private:
    ClickButton* mSearchToggleButton{ nullptr };
    Checkbox* mEventLookaheadCheckbox{ nullptr };
    int mLoadLayoutIndex{ -1 };
+   Checkbox* mShouldAutosaveCheckbox{ nullptr };
 
    HelpDisplay* mHelpDisplay{ nullptr };
 
