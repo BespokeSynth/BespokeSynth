@@ -1908,18 +1908,11 @@ arpeggiator~arpeggiates held notes. there are several vestigial features in this
 
 
 titlebar~
+~menu~show the main menu
 ~save layout~[none]
-~load~load a saved .bsk file to restore state
-~save~save current state as .bsk file, to be restored later
-~save as~save current state as a new .bsk file
-~new patch~reset to the layout specified in "layout" in userprefs.json
-~write audio~write the last 30 minutes of audio to your specified recordings_path
 ~ ? ~show help
 ~settings~adjust preferences, saved as userprefs.json
-~home~Moves the viewport to the "home" position, useful if you lost where you are in your savestate
 ~load layout~[none]
-~lookahead (exp.)~use lookahead scheduling, which is necessary for scriptmodule. gets automatically turned on when you use scriptmodule. so far, lookahead scheduling seems to not create any issues, but leaving this checkbox here just in case.
-~autosave~every time a new module is added, trigger a save to data/savestate/autosave/, to help reload state in the event of a crash. can be quite slow if using modules with large samples.
 ~play/pause~stop all audio processing (shift-p)
 
 
@@ -1927,6 +1920,20 @@ titlebar~
 newpatchconfirm~
 ~confirm~clear everything and start fresh
 ~cancel~dismiss this
+
+
+
+menupopup~
+~recents~show the welcome panel, with recently used files
+~load~load a saved .bsk file to restore state
+~save~save current state as .bsk file, to be restored later
+~save as~save current state as a new .bsk file
+~new~reset to the layout specified in "layout" in userprefs.json
+~write audio~write the last 30 minutes of audio to your specified recordings_path
+~move canvas home~Moves the viewport to the "home" position, useful if you lost where you are in your savestate
+~lookahead (exp.)~use lookahead scheduling, which is necessary for scriptmodule. gets automatically turned on when you use scriptmodule. so far, lookahead scheduling seems to not create any issues, but leaving this checkbox here just in case.
+~autosave~every time a new module is added, trigger a save to data/savestate/autosave/, to help reload state in the event of a crash. can be quite slow if using modules with large samples.
+~show tooltips~displays these tooltips. you can also toggle them with the F1 key, and you can turn these on or off by default in the "settings" menu.
 
 
 

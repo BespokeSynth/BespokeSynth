@@ -132,8 +132,8 @@ TitleBar::TitleBar()
    mHelpDisplay = dynamic_cast<HelpDisplay*>(HelpDisplay::Create());
    mHelpDisplay->SetTypeName("helpdisplay", kModuleCategory_Other);
 
-   mNewPatchConfirmPopup.SetTypeName("newpatchconfirm", kModuleCategory_Other);
-   mNewPatchConfirmPopup.SetName("newpatchconfirm");
+   mMenuPopup.SetTypeName("menupopup", kModuleCategory_Other);
+   mMenuPopup.SetName("menupopup");
 
    SetShouldDrawOutline(false);
 }
@@ -142,6 +142,8 @@ void TitleBar::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK(140, 1);
+   BUTTON_SIZE(mMenuButton, "menu", 50, 32);
+   UIBLOCK_SHIFTRIGHT();
    BUTTON_STYLE(mPlayPauseButton, "play/pause", ButtonDisplayStyle::kPause);
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(10);
@@ -203,7 +205,7 @@ void TitleBar::CreateUIControls()
 
    ListLayouts();
 
-   mNewPatchConfirmPopup.CreateUIControls();
+   mMenuPopup.CreateUIControls();
 }
 
 TitleBar::~TitleBar()
@@ -357,11 +359,6 @@ bool TitleBar::MouseMoved(float x, float y)
    return false;
 }
 
-namespace
-{
-   const float kDoubleHeightThreshold = 1200;
-}
-
 float TitleBar::GetPixelWidth() const
 {
    return ofGetWidth() / GetOwningContainer()->GetDrawScale();
@@ -400,6 +397,7 @@ void TitleBar::DrawModule()
 
    DrawTextRightJustify(info, pixelWidth - 140, 32);
 
+   mMenuButton->Draw();
    mSaveLayoutButton->Draw();
    mSaveStateButton->Draw();
    mSaveStateAsButton->Draw();
@@ -422,29 +420,23 @@ void TitleBar::DrawModule()
    }
 
    mLoadLayoutDropdown->Draw();
-   if (mResetLayoutButton)
-      mResetLayoutButton->Draw();
-   if (mWelcomeScreenButton)
-      mWelcomeScreenButton->Draw();
-   if (TheSynth->IsAudioPaused())
-      mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPlay);
-   else
-      mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPause);
    mPlayPauseButton->Draw();
 
    float startX = 470; //leaves room on row 1 for the palette dropdown that now sits after 'record'
    float startY = 2;
 
-   if (pixelWidth < kDoubleHeightThreshold)
-   {
-      startX = 10;
-      startY += 16 * 2 + 4;
-   }
-
+   bool newline = true;
+   mNumDropdownRows = 0;
    float x = startX;
    float y = startY;
    for (auto* spawnList : mSpawnLists.GetDropdowns())
    {
+      if (newline)
+      {
+         newline = false;
+         ++mNumDropdownRows;
+      }
+
       spawnList->SetPosition(x, y);
       float w, h;
       spawnList->GetList()->GetDimensions(w, h);
@@ -454,6 +446,7 @@ void TitleBar::DrawModule()
       { //into the palette/search/home/settings/help cluster or the cpu stats
          x = startX;
          y += 18;
+         newline = true;
       }
    }
 
@@ -601,10 +594,7 @@ void TitleBar::GetModuleDimensions(float& width, float& height)
    }
 
    width = ofGetWidth() / GetOwningContainer()->GetDrawScale() + 5;
-   if (GetPixelWidth() < kDoubleHeightThreshold)
-      height = 36 * 2;
-   else
-      height = 36;
+   height = std::max(mNumDropdownRows, 2) * 18;
 }
 
 void TitleBar::CheckboxUpdated(Checkbox* checkbox, double time)
@@ -749,15 +739,13 @@ void TitleBar::ButtonClicked(ClickButton* button, double time)
       TheSynth->GetLocationZoomer()->GoHome();
    if (button == mSearchToggleButton && TheSearchPanel != nullptr)
       TheSearchPanel->SetShowing(!TheSearchPanel->IsShowing()); //Bitwig-style: open/close the browser panel
-   if (button == mResetLayoutButton)
+   if (button == mMenuButton)
    {
-      auto buttonRect = mResetLayoutButton->GetRect();
-      mNewPatchConfirmPopup.SetOwningContainer(GetOwningContainer());
-      mNewPatchConfirmPopup.SetPosition(buttonRect.x, buttonRect.y + buttonRect.height + 2);
-      TheSynth->PushModalFocusItem(&mNewPatchConfirmPopup);
+      auto buttonRect = mMenuButton->GetRect();
+      mMenuPopup.SetOwningContainer(GetOwningContainer());
+      mMenuPopup.SetPosition(buttonRect.x, buttonRect.y + buttonRect.height + 2);
+      TheSynth->PushModalFocusItem(&mMenuPopup);
    }
-   if (button == mWelcomeScreenButton)
-      TheSynth->GetWelcomeScreen()->Show();
    if (button == mPlayPauseButton)
       TheSynth->SetAudioPaused(!TheSynth->IsAudioPaused());
 }
@@ -801,4 +789,86 @@ void NewPatchConfirmPopup::ButtonClicked(ClickButton* button, double time)
       TheSynth->ReloadInitialLayout();
    if (button == mCancelButton)
       TheSynth->PopModalFocusItem();
+}
+
+MenuPopup::MenuPopup()
+{
+   mNewPatchConfirmPopup.SetTypeName("newpatchconfirm", kModuleCategory_Other);
+   mNewPatchConfirmPopup.SetName("newpatchconfirm");
+}
+
+void MenuPopup::CreateUIControls()
+{
+   const float kButtonWidth = 130;
+
+   UIBLOCK0();
+   BUTTON_SIZE(mWelcomeScreenButton, "recents", kButtonWidth, 32);
+   BUTTON_SIZE(mResetLayoutButton, "new", kButtonWidth, 32);
+   BUTTON_SIZE(mLoadStateButton, "load", kButtonWidth, 32);
+   BUTTON_SIZE(mSaveStateButton, "save", kButtonWidth, 32);
+   BUTTON_SIZE(mSaveStateAsButton, "save as", kButtonWidth, 32);
+   BUTTON_SIZE(mWriteAudioButton, "write audio", kButtonWidth, 32);
+   BUTTON_SIZE(mHomeButton, "move canvas home", kButtonWidth, 32);
+   CHECKBOX(mEventLookaheadCheckbox, "lookahead (exp.)", &Transport::sDoEventLookahead);
+   CHECKBOX(mShouldAutosaveCheckbox, "autosave", &ModularSynth::sShouldAutosave);
+   CHECKBOX(mShowTooltipsCheckbox, "show tooltips", &HelpDisplay::sShowTooltips);
+   ENDUIBLOCK(mWidth, mHeight);
+
+   mNewPatchConfirmPopup.CreateUIControls();
+}
+
+void MenuPopup::DrawModule()
+{
+   mWelcomeScreenButton->Draw();
+   mSaveStateButton->Draw();
+   mSaveStateAsButton->Draw();
+   mLoadStateButton->Draw();
+   mResetLayoutButton->Draw();
+   mWriteAudioButton->Draw();
+   mHomeButton->Draw();
+   mEventLookaheadCheckbox->Draw();
+   mShouldAutosaveCheckbox->Draw();
+   mShowTooltipsCheckbox->Draw();
+}
+
+void MenuPopup::ButtonClicked(ClickButton* button, double time)
+{
+   if (button == mSaveStateButton)
+   {
+      TheSynth->SaveCurrentState();
+      TheSynth->PopModalFocusItem();
+   }
+   if (button == mSaveStateAsButton)
+   {
+      TheSynth->SaveStatePopup();
+      TheSynth->PopModalFocusItem();
+   }
+   if (button == mLoadStateButton)
+   {
+      TheSynth->LoadStatePopup();
+      TheSynth->PopModalFocusItem();
+   }
+   if (button == mWriteAudioButton)
+   {
+      TheSynth->SaveOutput();
+      TheSynth->PopModalFocusItem();
+   }
+   if (button == mHomeButton)
+   {
+      TheSynth->GetLocationZoomer()->GoHome();
+      TheSynth->PopModalFocusItem();
+   }
+   if (button == mResetLayoutButton)
+   {
+      auto buttonRect = mResetLayoutButton->GetRect();
+      mNewPatchConfirmPopup.SetOwningContainer(GetOwningContainer());
+      mNewPatchConfirmPopup.SetPosition(buttonRect.x, buttonRect.y + buttonRect.height + 2);
+      TheSynth->PushModalFocusItem(&mNewPatchConfirmPopup);
+      //TheSynth->ReloadInitialLayout();
+   }
+   if (button == mWelcomeScreenButton)
+   {
+      TheSynth->PopModalFocusItem();
+      TheSynth->GetWelcomeScreen()->Show();
+   }
 }

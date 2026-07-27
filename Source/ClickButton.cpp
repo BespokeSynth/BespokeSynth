@@ -67,6 +67,7 @@ void ClickButton::UpdateWidth()
       mWidth = GetStringWidth(GetDisplayName()) + 3 + .25f * strnlen(GetDisplayName().c_str(), 50);
       if (mDisplayStyle == ButtonDisplayStyle::kSampleIcon || mDisplayStyle == ButtonDisplayStyle::kFolderIcon)
          mWidth += 20;
+      mTextWidth = mWidth;
    }
 }
 
@@ -94,7 +95,9 @@ void ClickButton::Render()
    if (mDisplayStyle == ButtonDisplayStyle::kText)
    {
       ofSetColor(textColor);
-      DrawTextNormal(GetDisplayName(), mX + 2, mY + 12);
+      float textX = mX + 2 + (mWidth - mTextWidth) / 2;
+      float textY = mY + 12 + (mHeight - 15) / 2;
+      DrawTextNormal(GetDisplayName(), textX, textY);
    }
    else if (mDisplayStyle == ButtonDisplayStyle::kPlay)
    {
