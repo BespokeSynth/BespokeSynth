@@ -690,6 +690,12 @@ std::shared_ptr<WavetableFrameSet> Wavetable::LoadImportedTable(FileStreamIn& in
    int frameCount;
    in >> frameCount;
 
+   //sanity-clamp frameCount before looping/allocating - a corrupted or desynced stream (or a
+   //hand-edited file) could otherwise drive a huge or negative count here, causing a giant
+   //allocation or crash on load
+   const int kMaxImportedFrames = 4096;
+   LoadStateValidate(frameCount >= 0 && frameCount <= kMaxImportedFrames);
+
    auto table = std::make_shared<WavetableFrameSet>(name);
    for (int f = 0; f < frameCount; ++f)
    {

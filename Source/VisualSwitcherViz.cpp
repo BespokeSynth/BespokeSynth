@@ -206,7 +206,8 @@ void VisualSwitcherViz::SaveState(FileStreamOut& out)
 
 void VisualSwitcherViz::LoadState(FileStreamIn& in, int rev)
 {
-   int moduleRev;
-   in >> moduleRev;
+   //note: don't manually read an extra rev int here - IDrawableModule::LoadState already consumes
+   //the rev int that IDrawableModule::SaveState wrote. An extra read here desyncs the stream and
+   //corrupts every read after it (this was the cause of crashes reopening saved patches).
    IDrawableModule::LoadState(in, rev);
 }
