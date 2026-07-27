@@ -29,8 +29,9 @@ PaulStretch::~PaulStretch()
 
 void PaulStretch::UpdateFFTSize(int newSize)
 {
-   if (newSize == mCurrentFFTSize) return;
-   
+   if (newSize == mCurrentFFTSize)
+      return;
+
    mCurrentFFTSize = newSize;
    mFFT = std::make_unique<FFT>(mCurrentFFTSize);
 
@@ -44,7 +45,7 @@ void PaulStretch::UpdateFFTSize(int newSize)
    {
       mWindow[i] = 0.5f * (1.0f - std::cos(kTwoPi * i / (mCurrentFFTSize - 1)));
    }
-   
+
    if (!mInputBuffer || mInputBuffer->Size() != mCurrentFFTSize * 4)
    {
       mInputBuffer = std::make_unique<RollingBuffer>(mCurrentFFTSize * 4);
@@ -66,18 +67,18 @@ void PaulStretch::CreateUIControls()
    mPlayStartSlider = new FloatSlider(this, "start", 5, 100, 110, 15, &mPlayStart, 0.0f, 1.0f);
    mPlayEndSlider = new FloatSlider(this, "end", 5, 120, 110, 15, &mPlayEnd, 0.0f, 1.0f);
    mCurrentSlider = new FloatSlider(this, "current", 5, 140, 110, 15, &mCurrentPct, 0.0f, 1.0f);
-   
+
    mWindowSizeSlider = new FloatSlider(this, "window size", 120, 20, 110, 15, &mWindowSizeIdx, 0.0f, (float)(kNumWindowSizes - 1));
    mWindowSizeSlider->SetMode(FloatSlider::kSquare); // Integer steps
 
    mPitchShiftSlider = new FloatSlider(this, "pitch shift", 120, 40, 110, 15, &mPitchShift, -24.0f, 24.0f);
    mFineTuneSlider = new FloatSlider(this, "fine tune", 120, 60, 110, 15, &mFineTune, -100.0f, 100.0f);
    mFreqShiftSlider = new FloatSlider(this, "freq shift", 120, 80, 110, 15, &mFreqShift, -1000.0f, 1000.0f);
-   
+
    mUnisonSlider = new FloatSlider(this, "unison", 120, 100, 110, 15, &mUnison, 1.0f, 8.0f);
    mUnisonSlider->SetMode(FloatSlider::kSquare); // Integer steps
    mDetuneSlider = new FloatSlider(this, "detune", 120, 120, 110, 15, &mDetune, 0.0f, 100.0f);
-   
+
    mLoopCheckbox = new Checkbox(this, "loop", 120, 140, &mLoop);
 
    mWidth = 240;
@@ -86,8 +87,9 @@ void PaulStretch::CreateUIControls()
 
 void PaulStretch::FilesDropped(std::vector<std::string> files, int x, int y)
 {
-   if (files.empty()) return;
-   
+   if (files.empty())
+      return;
+
    Sample* sample = new Sample();
    sample->Read(files[0].c_str());
    UpdateSample(sample, true);
@@ -111,7 +113,7 @@ void PaulStretch::UpdateSample(Sample* sample, bool ownsSample)
    mSample = sample;
    mOwnsSample = ownsSample;
    mSamplePlayPosition = 0;
-   
+
    if (ownedOldSample)
       delete oldSamplePtr;
 
@@ -144,7 +146,7 @@ void PaulStretch::DrawModule()
    ofSetColor(255, 255, 255, 255);
    ofRect(0, 0, mWidth, mHeight);
    ofPopStyle();
-   
+
    if (mSample && mSample->LengthInSamples() > 0 && mSample->Data())
    {
       if (mSample->LengthInSamples() != mDrawBuffer.BufferSize())
@@ -152,33 +154,33 @@ void PaulStretch::DrawModule()
          mDrawBuffer.Resize(mSample->LengthInSamples());
          mDrawBuffer.CopyFrom(mSample->Data());
       }
-      
+
       float sampleWidth = 230;
       float sampleHeight = 100;
       ofPushMatrix();
       ofTranslate(5, 185); // Draw below the sliders
-      
+
       ofPushStyle();
       ofSetColor(20, 20, 20, 255);
       ofRect(0, 0, sampleWidth, sampleHeight);
       ofPopStyle();
-      
+
       DrawAudioBuffer(sampleWidth, sampleHeight, &mDrawBuffer, 0, mSample->LengthInSamples(), mSamplePlayPosition);
-      
+
       ofPushStyle();
       // Draw loop start and end lines
       ofSetColor(0, 255, 0, 150);
       float startX = mPlayStart * sampleWidth;
       ofLine(startX, 0, startX, sampleHeight);
-      
+
       ofSetColor(255, 0, 0, 150);
       float endX = mPlayEnd * sampleWidth;
       ofLine(endX, 0, endX, sampleHeight);
-      
+
       ofSetColor(255, 255, 255, 200);
       DrawTextNormal(mSample->Name(), 5, 12);
       ofPopStyle();
-      
+
       ofPopMatrix();
    }
    else
@@ -188,19 +190,19 @@ void PaulStretch::DrawModule()
       float sampleHeight = 100;
       ofPushMatrix();
       ofTranslate(5, 165); // Draw below the sliders
-      
+
       ofPushStyle();
       ofSetColor(20, 20, 20, 255);
       ofRect(0, 0, sampleWidth, sampleHeight);
       ofPopStyle();
-      
+
       GetVizBuffer()->Draw(0, 0, sampleWidth, sampleHeight, GetVizBuffer()->Size());
-      
+
       ofPushStyle();
       ofSetColor(255, 255, 255, 150);
       DrawTextNormal("live input", 5, 12);
       ofPopStyle();
-      
+
       ofPopMatrix();
    }
 
@@ -278,7 +280,7 @@ void PaulStretch::Process(double time)
 
       float readStep = hopSize / std::max(1.0f, mStretch);
       int readOffset = (int)readStep;
-      
+
       for (int ch = 0; ch < numChannels && ch < 2; ++ch)
       {
          if (mSample && mSample->LengthInSamples() > 0)
@@ -286,10 +288,12 @@ void PaulStretch::Process(double time)
             // Read from sample with loop start/end logic
             float loopStart = mSample->LengthInSamples() * std::min(mPlayStart, mPlayEnd);
             float loopEnd = mSample->LengthInSamples() * std::max(mPlayStart, mPlayEnd);
-            if (loopEnd <= loopStart) loopEnd = loopStart + 1;
-            
+            if (loopEnd <= loopStart)
+               loopEnd = loopStart + 1;
+
             // Ensure playhead is within bounds
-            if (mSamplePlayPosition < loopStart || mSamplePlayPosition >= loopEnd) {
+            if (mSamplePlayPosition < loopStart || mSamplePlayPosition >= loopEnd)
+            {
                mSamplePlayPosition = loopStart;
             }
 
@@ -297,7 +301,8 @@ void PaulStretch::Process(double time)
             for (int i = 0; i < mCurrentFFTSize; ++i)
             {
                int sampleIdx = intPlayPos + i;
-               if (sampleIdx >= loopEnd) {
+               if (sampleIdx >= loopEnd)
+               {
                   if (mLoop)
                      sampleIdx = (int)loopStart + (sampleIdx - (int)loopEnd) % (int)(loopEnd - loopStart);
                   else
@@ -315,7 +320,8 @@ void PaulStretch::Process(double time)
             {
                readOffset = mInputBuffer->Size() - mCurrentFFTSize;
             }
-            if (readOffset < 0) readOffset = 0;
+            if (readOffset < 0)
+               readOffset = 0;
 
             mInputBuffer->ReadChunk(mFftInput.data(), mCurrentFFTSize, readOffset, ch);
          }
@@ -330,13 +336,13 @@ void PaulStretch::Process(double time)
          // Spectral Processing (Phase Randomization, Filters, Pitch Shift)
          int numFreqs = mCurrentFFTSize / 2 + 1;
          std::vector<float> magnitudes(numFreqs, 0.0f);
-         
+
          // 1. Calculate Magnitudes
          for (int k = 0; k < numFreqs; ++k)
          {
             magnitudes[k] = std::sqrt(mFftReal[k] * mFftReal[k] + mFftImag[k] * mFftImag[k]);
          }
-         
+
          // 2. Pitch Shift, Fine Tune, Frequency Shift, Unison & Phase Randomization
          float unisonVoices = std::max(1.0f, std::round(mUnison));
          if (std::abs(mPitchShift) > 0.01f || std::abs(mFineTune) > 0.01f || std::abs(mFreqShift) > 0.01f || unisonVoices > 1.1f)
@@ -344,13 +350,13 @@ void PaulStretch::Process(double time)
             std::vector<float> complexReal(numFreqs, 0.0f);
             std::vector<float> complexImag(numFreqs, 0.0f);
             float freqShiftBins = mFreqShift * mCurrentFFTSize / gSampleRate;
-            
+
             for (int v = 0; v < unisonVoices; ++v)
             {
                float voiceDetuneCents = (unisonVoices <= 1.0f) ? 0.0f : (-mDetune + (2.0f * mDetune * v / (unisonVoices - 1.0f)));
                float totalPitchShift = mPitchShift + (mFineTune + voiceDetuneCents) / 100.0f;
                float pitchRatio = std::pow(2.0f, -totalPitchShift / 12.0f);
-               
+
                for (int k = 0; k < numFreqs; ++k)
                {
                   float sourceK = k * pitchRatio - freqShiftBins;
@@ -360,20 +366,20 @@ void PaulStretch::Process(double time)
                      int k2 = k1 + 1;
                      float frac = sourceK - k1;
                      float interpolatedMag = magnitudes[k1] * (1.0f - frac) + magnitudes[k2] * frac;
-                     
+
                      if (interpolatedMag > 1e-6f)
                      {
                         // True unison requires independent phases for each voice!
                         float sourcePhase = std::atan2(mFftImag[k1], mFftReal[k1]);
                         float phase = sourcePhase * (1.0f - mPhaseRand) + dist(rng) * mPhaseRand;
-                        
+
                         complexReal[k] += interpolatedMag * std::cos(phase);
                         complexImag[k] += interpolatedMag * std::sin(phase);
                      }
                   }
                }
             }
-            
+
             float normalize = 1.0f / std::sqrt(unisonVoices);
             for (int k = 0; k < numFreqs; ++k)
             {
@@ -408,7 +414,7 @@ void PaulStretch::Process(double time)
          mFFT->Inverse(mFftReal.data(), mFftImag.data(), mFftOut.data());
 
          // Apply window to output and overlap-add to output buffer
-         // mayer_ifft scales by N/2, and 75% overlap Hann^2 scales by 1.5. 
+         // mayer_ifft scales by N/2, and 75% overlap Hann^2 scales by 1.5.
          // Total scale = 0.75 * N. To normalize, multiply by 1 / (0.75 * N).
          float scale = 1.33333333f / mCurrentFFTSize;
          for (int i = 0; i < mCurrentFFTSize; ++i)
@@ -417,14 +423,15 @@ void PaulStretch::Process(double time)
          int writeOffset = mOutputBuffer[ch].readPos;
          mOutputBuffer[ch].Add(mFftOut.data(), mCurrentFFTSize, writeOffset);
       }
-      
+
       // Advance playhead if sample is loaded
       if (mSample && mSample->LengthInSamples() > 0)
       {
          float loopStart = mSample->LengthInSamples() * std::min(mPlayStart, mPlayEnd);
          float loopEnd = mSample->LengthInSamples() * std::max(mPlayStart, mPlayEnd);
-         if (loopEnd <= loopStart) loopEnd = loopStart + 1;
-         
+         if (loopEnd <= loopStart)
+            loopEnd = loopStart + 1;
+
          mSamplePlayPosition += readStep;
          if (mSamplePlayPosition >= loopEnd)
          {

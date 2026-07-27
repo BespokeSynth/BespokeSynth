@@ -18,9 +18,12 @@ EffectMatrix::EffectMatrix()
    mPitchBuffer1.resize(PITCH_BUF_SIZE, 0.0f);
    mStutterBuffer0.resize(STUTTER_BUF_SIZE, 0.0f);
    mStutterBuffer1.resize(STUTTER_BUF_SIZE, 0.0f);
-   mRevBuf1L.resize(REV_DEL_1, 0.0f); mRevBuf1R.resize(REV_DEL_1, 0.0f);
-   mRevBuf2L.resize(REV_DEL_2, 0.0f); mRevBuf2R.resize(REV_DEL_2, 0.0f);
-   mRevBuf3L.resize(REV_DEL_3, 0.0f); mRevBuf3R.resize(REV_DEL_3, 0.0f);
+   mRevBuf1L.resize(REV_DEL_1, 0.0f);
+   mRevBuf1R.resize(REV_DEL_1, 0.0f);
+   mRevBuf2L.resize(REV_DEL_2, 0.0f);
+   mRevBuf2R.resize(REV_DEL_2, 0.0f);
+   mRevBuf3L.resize(REV_DEL_3, 0.0f);
+   mRevBuf3R.resize(REV_DEL_3, 0.0f);
    mDelayBuffer0.resize(DELAY_BUF_SIZE, 0.0f);
    mDelayBuffer1.resize(DELAY_BUF_SIZE, 0.0f);
 }
@@ -115,30 +118,35 @@ void EffectMatrix::Process(double time)
 
    // Transport tracking for 16-step grid
    double stepDuration = TheTransport->GetMeasureFraction(mQuantizeInterval);
-   if (stepDuration <= 0.0001) stepDuration = 0.125;
+   if (stepDuration <= 0.0001)
+      stepDuration = 0.125;
 
    double measureTime = TheTransport->GetMeasureTime(time) - mPlayStartTime;
-   if (measureTime < 0) measureTime = 0;
+   if (measureTime < 0)
+      measureTime = 0;
 
    double patternDuration = stepDuration * NUM_STEPS;
    double progress = fmod(measureTime / patternDuration, 1.0);
-   if (progress < 0.0) progress = 0.0;
+   if (progress < 0.0)
+      progress = 0.0;
 
    int step = (int)(progress * NUM_STEPS);
-   if (step >= NUM_STEPS) step = NUM_STEPS - 1;
-   if (step < 0) step = 0;
+   if (step >= NUM_STEPS)
+      step = NUM_STEPS - 1;
+   if (step < 0)
+      step = 0;
 
    mCurrentStep = step;
    mPlayheadProgress = (float)progress;
 
    // Active step effects
    float bitcrushVal = mGrid[kFx_Bitcrush][step];
-   float filterVal   = mGrid[kFx_Filter][step];
-   float pitchVal    = mGrid[kFx_Pitch][step];
-   float stutterVal  = mGrid[kFx_Stutter][step];
-   float reverbVal   = mGrid[kFx_Reverb][step];
-   float gateVal     = mGrid[kFx_Gate][step];
-   float delayVal    = mGrid[kFx_Delay][step];
+   float filterVal = mGrid[kFx_Filter][step];
+   float pitchVal = mGrid[kFx_Pitch][step];
+   float stutterVal = mGrid[kFx_Stutter][step];
+   float reverbVal = mGrid[kFx_Reverb][step];
+   float gateVal = mGrid[kFx_Gate][step];
+   float delayVal = mGrid[kFx_Delay][step];
 
    float* inL = inputBuffer->GetChannel(0);
    float* inR = numChannels > 1 ? inputBuffer->GetChannel(1) : inputBuffer->GetChannel(0);
@@ -198,8 +206,10 @@ void EffectMatrix::Process(double time)
          mPitchReadPos[0] += shiftRate;
          mPitchReadPos[1] += shiftRate;
 
-         if (mPitchReadPos[0] >= PITCH_BUF_SIZE) mPitchReadPos[0] -= (PITCH_BUF_SIZE / 2);
-         if (mPitchReadPos[1] >= PITCH_BUF_SIZE) mPitchReadPos[1] -= (PITCH_BUF_SIZE / 2);
+         if (mPitchReadPos[0] >= PITCH_BUF_SIZE)
+            mPitchReadPos[0] -= (PITCH_BUF_SIZE / 2);
+         if (mPitchReadPos[1] >= PITCH_BUF_SIZE)
+            mPitchReadPos[1] -= (PITCH_BUF_SIZE / 2);
 
          int rIdx0 = ((int)mPitchReadPos[0]) % PITCH_BUF_SIZE;
          int rIdx1 = ((int)mPitchReadPos[1]) % PITCH_BUF_SIZE;
@@ -217,7 +227,8 @@ void EffectMatrix::Process(double time)
          mStutterBuffer1[mStutterWritePos] = wetR;
 
          int stutterLen = (int)(gSampleRate * 0.125f * (1.1f - stutterVal));
-         if (stutterLen < 256) stutterLen = 256;
+         if (stutterLen < 256)
+            stutterLen = 256;
 
          mStutterReadPos = (mStutterReadPos + 1) % stutterLen;
          int readIdx = (mStutterWritePos - stutterLen + mStutterReadPos + STUTTER_BUF_SIZE) % STUTTER_BUF_SIZE;
@@ -264,11 +275,13 @@ void EffectMatrix::Process(double time)
       if (delayVal > 0.05f)
       {
          int delayTimeSamples = (int)(gSampleRate * (0.5f - delayVal * 0.45f));
-         if (delayTimeSamples < 10) delayTimeSamples = 10;
-         if (delayTimeSamples >= DELAY_BUF_SIZE) delayTimeSamples = DELAY_BUF_SIZE - 1;
+         if (delayTimeSamples < 10)
+            delayTimeSamples = 10;
+         if (delayTimeSamples >= DELAY_BUF_SIZE)
+            delayTimeSamples = DELAY_BUF_SIZE - 1;
 
          int readPos = (mDelayWritePos - delayTimeSamples + DELAY_BUF_SIZE) % DELAY_BUF_SIZE;
-         
+
          float dl = mDelayBuffer0[readPos];
          float dr = mDelayBuffer1[readPos];
 
@@ -346,13 +359,13 @@ void EffectMatrix::DrawModule()
    };
 
    static const ofColor fxColors[NUM_FX] = {
-      ofColor(255, 60, 120),  // Bitcrush: Pink
-      ofColor(40, 180, 255),  // Filter: Blue
-      ofColor(255, 150, 30),  // Pitch: Orange
-      ofColor(80, 230, 100),  // Stutter: Lime Green
-      ofColor(170, 70, 240),  // Reverb: Purple
-      ofColor(0, 230, 230),   // Gate: Cyan
-      ofColor(255, 255, 0)    // Delay: Yellow
+      ofColor(255, 60, 120), // Bitcrush: Pink
+      ofColor(40, 180, 255), // Filter: Blue
+      ofColor(255, 150, 30), // Pitch: Orange
+      ofColor(80, 230, 100), // Stutter: Lime Green
+      ofColor(170, 70, 240), // Reverb: Purple
+      ofColor(0, 230, 230), // Gate: Cyan
+      ofColor(255, 255, 0) // Delay: Yellow
    };
 
    // Draw grid cells
@@ -432,7 +445,7 @@ void EffectMatrix::OnClicked(float x, float y, bool right)
       }
       else
       {
-         if (mGrid[row][col] < 0.05f) 
+         if (mGrid[row][col] < 0.05f)
             mGrid[row][col] = 1.0f;
          mDragStartValue = mGrid[row][col];
       }
@@ -446,7 +459,8 @@ bool EffectMatrix::MouseMoved(float x, float y)
 {
    IDrawableModule::MouseMoved(x, y);
 
-   if (!mIsDraggingCell) return false;
+   if (!mIsDraggingCell)
+      return false;
 
    float deltaY = mDragStartY - y; // moving up is positive delta
    float newVal = ofClamp(mDragStartValue + deltaY * 0.01f, 0.0f, 1.0f);
@@ -494,7 +508,7 @@ void EffectMatrix::RandomizeGrid(int rowToRandomize)
    float fillChance = density * 0.85f;
 
    int rowStart = (rowToRandomize == -1) ? 0 : rowToRandomize;
-   int rowEnd   = (rowToRandomize == -1) ? NUM_FX : rowToRandomize + 1;
+   int rowEnd = (rowToRandomize == -1) ? NUM_FX : rowToRandomize + 1;
 
    for (int row = rowStart; row < rowEnd; ++row)
    {
@@ -519,22 +533,26 @@ void EffectMatrix::ApplyPreset(FxPreset preset)
       case kPreset_GlitchStutter:
          for (int i = 0; i < NUM_STEPS; ++i)
          {
-            if (i % 4 == 3) mGrid[kFx_Stutter][i] = 0.8f;
-            if (i % 8 == 7) mGrid[kFx_Bitcrush][i] = 1.0f;
+            if (i % 4 == 3)
+               mGrid[kFx_Stutter][i] = 0.8f;
+            if (i % 8 == 7)
+               mGrid[kFx_Bitcrush][i] = 1.0f;
          }
          break;
       case kPreset_BitcrushDrop:
          for (int i = 8; i < NUM_STEPS; ++i)
          {
             mGrid[kFx_Bitcrush][i] = (float)(i - 8) / 8.0f;
-            if (i % 2 == 1) mGrid[kFx_Gate][i] = 0.9f;
+            if (i % 2 == 1)
+               mGrid[kFx_Gate][i] = 0.9f;
          }
          break;
       case kPreset_FilterRiser:
          for (int i = 0; i < NUM_STEPS; ++i)
          {
             mGrid[kFx_Filter][i] = (float)i / (NUM_STEPS - 1);
-            if (i >= 12) mGrid[kFx_Reverb][i] = 0.7f;
+            if (i >= 12)
+               mGrid[kFx_Reverb][i] = 0.7f;
          }
          break;
       case kPreset_ChaosRandom:
@@ -543,28 +561,39 @@ void EffectMatrix::ApplyPreset(FxPreset preset)
       case kPreset_DenseChaos:
          for (int i = 0; i < NUM_STEPS; ++i)
          {
-            if (ofRandom(1.0f) < 0.8f) mGrid[(int)ofRandom(0, NUM_FX)][i] = ofRandom(0.7f, 1.0f);
+            if (ofRandom(1.0f) < 0.8f)
+               mGrid[(int)ofRandom(0, NUM_FX)][i] = ofRandom(0.7f, 1.0f);
          }
          break;
       case kPreset_RhythmicEcho:
          for (int i = 0; i < NUM_STEPS; ++i)
          {
-            if (i % 4 == 0) mGrid[kFx_Stutter][i] = 0.5f;
-            if (i % 3 == 0) mGrid[kFx_Delay][i] = 0.8f;
+            if (i % 4 == 0)
+               mGrid[kFx_Stutter][i] = 0.5f;
+            if (i % 3 == 0)
+               mGrid[kFx_Delay][i] = 0.8f;
          }
          break;
       case kPreset_AmbientWash:
          for (int i = 0; i < NUM_STEPS; ++i)
          {
-            if (i % 8 == 0) { mGrid[kFx_Reverb][i] = 1.0f; mGrid[kFx_Filter][i] = 0.3f; }
-            if (i % 4 == 2) { mGrid[kFx_Pitch][i] = 0.6f; }
+            if (i % 8 == 0)
+            {
+               mGrid[kFx_Reverb][i] = 1.0f;
+               mGrid[kFx_Filter][i] = 0.3f;
+            }
+            if (i % 4 == 2)
+            {
+               mGrid[kFx_Pitch][i] = 0.6f;
+            }
          }
          break;
       case kPreset_SteppedRiser:
          for (int i = 0; i < NUM_STEPS; ++i)
          {
             mGrid[kFx_Filter][i] = (i / (float)NUM_STEPS);
-            if (i > 8) mGrid[kFx_Bitcrush][i] = (i - 8) / 8.0f;
+            if (i > 8)
+               mGrid[kFx_Bitcrush][i] = (i - 8) / 8.0f;
          }
          break;
       default:

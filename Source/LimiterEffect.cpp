@@ -51,7 +51,7 @@ void LimiterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double
 void LimiterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    PROFILER(LimiterEffect);
-   
+
    ComputeSliders(buffer->BufferSize());
 
    if (!mEnabled)
@@ -82,7 +82,7 @@ void LimiterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       float gain = 1.0f;
       if (mEnvelope > threshLinear && mEnvelope > 0.0)
          gain = threshLinear / mEnvelope;
-         
+
       minGR = std::min(minGR, (double)gain);
 
       for (int ch = 0; ch < numChannels; ++ch)
@@ -91,7 +91,7 @@ void LimiterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
          buffer->GetChannel(ch)[i] = in * gain * outGainLinear;
       }
    }
-   
+
    // smooth the UI meter slightly to avoid flickering
    mGainReduction = mGainReduction * 0.9 + minGR * 0.1;
 }
@@ -102,26 +102,28 @@ void LimiterEffect::DrawModule()
    mReleaseSlider->Draw();
    mInGainSlider->Draw();
    mOutGainSlider->Draw();
-   
+
    ofPushStyle();
-   
+
    int meterX = 122;
    int meterY = 20;
    int meterW = 10;
    int meterH = 75;
-   
+
    // draw meter background
    ofSetColor(30, 30, 30);
    ofRect(meterX, meterY, meterW, meterH);
-   
+
    float grDb = lin2dB((float)mGainReduction);
-   if (grDb < -20.0f) grDb = -20.0f;
-   if (grDb > 0.0f) grDb = 0.0f;
-   
+   if (grDb < -20.0f)
+      grDb = -20.0f;
+   if (grDb > 0.0f)
+      grDb = 0.0f;
+
    float fillPct = -grDb / 20.0f;
-   
+
    ofSetColor(100, 200, 100);
    ofRect(meterX, meterY, meterW, meterH * fillPct);
-   
+
    ofPopStyle();
 }

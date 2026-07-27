@@ -41,7 +41,7 @@ public:
    virtual ~EffectMatrix();
 
    static IDrawableModule* Create() { return new EffectMatrix(); }
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsEnabled() const override { return mEnabled; }
 

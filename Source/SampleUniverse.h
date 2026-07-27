@@ -111,7 +111,7 @@ private:
    Checkbox* mReversePathCheckbox{ nullptr };
    DropdownList* mQuantizeLengthSelector;
    NoteInterval mQuantizeInterval{ NoteInterval::kInterval_4n };
-   
+
    DropdownList* mShapeSelector;
    ShapePreset mCurrentShape{ kShape_Random };
 

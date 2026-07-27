@@ -112,7 +112,8 @@ void SampleUniverse::Process(double time)
       if (voice.playing && voice.sampleIndex >= 0 && voice.sampleIndex < (int)mSamples.size())
       {
          UniverseSample& us = mSamples[voice.sampleIndex];
-         if (us.sample == nullptr) continue;
+         if (us.sample == nullptr)
+            continue;
          ChannelBuffer* sampleData = us.sample->Data();
          int sampleLength = us.sample->LengthInSamples();
          int maxLen = MIN(sampleLength, (int)(gSampleRate * 0.3f)); // 300ms hit decay
@@ -126,7 +127,8 @@ void SampleUniverse::Process(double time)
                if (voice.playPos < maxLen)
                {
                   int idx = (int)voice.playPos;
-                  if (idx >= sampleLength) idx = sampleLength - 1;
+                  if (idx >= sampleLength)
+                     idx = sampleLength - 1;
 
                   float env = 1.0f;
                   float fadeOut = gSampleRate * 0.05f; // 50ms fade-out
@@ -158,7 +160,8 @@ void SampleUniverse::Process(double time)
       double measureTime = TheTransport->GetMeasureTime(time) - mPlayStartTime;
       double pathDuration = TheTransport->GetMeasureFraction(mQuantizeInterval);
 
-      if (pathDuration <= 0.0001) pathDuration = 1.0;
+      if (pathDuration <= 0.0001)
+         pathDuration = 1.0;
 
       if (!mLoopPath && measureTime >= pathDuration)
       {
@@ -178,18 +181,23 @@ void SampleUniverse::Process(double time)
          }
 
          double progress = measureTime / pathDuration;
-         if (progress < 0.0) progress = 0.0;
-         if (progress >= 1.0) progress = 0.9999;
+         if (progress < 0.0)
+            progress = 0.0;
+         if (progress >= 1.0)
+            progress = 0.9999;
 
          int numPts = (int)mRecordedPath.size();
          int rawPos = (int)(progress * numPts);
-         if (rawPos >= numPts) rawPos = numPts - 1;
-         if (rawPos < 0) rawPos = 0;
+         if (rawPos >= numPts)
+            rawPos = numPts - 1;
+         if (rawPos < 0)
+            rawPos = 0;
 
          int currPos = mReversePath ? (numPts - 1 - rawPos) : rawPos;
          int prevPos = ofClamp((int)mPlayheadPos, 0, numPts - 1);
 
-         auto ScanSinglePos = [&](int scanPos) {
+         auto ScanSinglePos = [&](int scanPos)
+         {
             if (scanPos >= 0 && scanPos < numPts)
             {
                ofVec2f pos = mRecordedPath[scanPos];
@@ -208,7 +216,8 @@ void SampleUniverse::Process(double time)
             }
          };
 
-         auto ScanRange = [&](int start, int end, int step) {
+         auto ScanRange = [&](int start, int end, int step)
+         {
             start = ofClamp(start, 0, numPts - 1);
             end = ofClamp(end, 0, numPts - 1);
             if (step > 0)
@@ -315,8 +324,10 @@ void SampleUniverse::DrawModule()
          float fIdx = t * (mRecordedPath.size() - 1);
          int idx0 = (int)fIdx;
          int idx1 = idx0 + 1;
-         if (idx0 < 0) idx0 = 0;
-         if (idx1 >= (int)mRecordedPath.size()) idx1 = (int)mRecordedPath.size() - 1;
+         if (idx0 < 0)
+            idx0 = 0;
+         if (idx1 >= (int)mRecordedPath.size())
+            idx1 = (int)mRecordedPath.size() - 1;
          float frac = fIdx - idx0;
 
          float px = mRecordedPath[idx0].x + (mRecordedPath[idx1].x - mRecordedPath[idx0].x) * frac;
@@ -443,7 +454,8 @@ bool SampleUniverse::MouseMoved(float x, float y)
 {
    IDrawableModule::MouseMoved(x, y);
 
-   if (!mIsDrawing) return false;
+   if (!mIsDrawing)
+      return false;
 
    float rx = x - mArenaX;
    float ry = y - mArenaY;
@@ -493,12 +505,15 @@ void SampleUniverse::MouseReleased()
 
 static ofVec2f GetPolygonPoint(const std::vector<ofVec2f>& points, float t)
 {
-   if (points.empty()) return ofVec2f(0.5f, 0.5f);
-   if (points.size() == 1) return points[0];
-   
+   if (points.empty())
+      return ofVec2f(0.5f, 0.5f);
+   if (points.size() == 1)
+      return points[0];
+
    float p = t * (points.size() - 1);
    int idx = (int)p;
-   if (idx >= points.size() - 1) return points.back();
+   if (idx >= points.size() - 1)
+      return points.back();
    float frac = p - idx;
    ofVec2f v1 = points[idx];
    ofVec2f v2 = points[idx + 1];
@@ -538,30 +553,67 @@ ofVec2f SampleUniverse::GetShapePosition(ShapePreset shape, float t, int i, int 
       case kShape_Square:
       {
          float p = t * 4.0f;
-         if (p < 1.0f) { nx = p; ny = 0.0f; }
-         else if (p < 2.0f) { nx = 1.0f; ny = p - 1.0f; }
-         else if (p < 3.0f) { nx = 1.0f - (p - 2.0f); ny = 1.0f; }
-         else { nx = 0.0f; ny = 1.0f - (p - 3.0f); }
+         if (p < 1.0f)
+         {
+            nx = p;
+            ny = 0.0f;
+         }
+         else if (p < 2.0f)
+         {
+            nx = 1.0f;
+            ny = p - 1.0f;
+         }
+         else if (p < 3.0f)
+         {
+            nx = 1.0f - (p - 2.0f);
+            ny = 1.0f;
+         }
+         else
+         {
+            nx = 0.0f;
+            ny = 1.0f - (p - 3.0f);
+         }
          break;
       }
       case kShape_Triangle:
       {
          float p = t * 3.0f;
-         if (p < 1.0f) { nx = p; ny = 1.0f; }
-         else if (p < 2.0f) { nx = 1.0f - (p - 1.0f) * 0.5f; ny = 1.0f - (p - 1.0f); }
-         else { nx = 0.5f - (p - 2.0f) * 0.5f; ny = p - 2.0f; }
+         if (p < 1.0f)
+         {
+            nx = p;
+            ny = 1.0f;
+         }
+         else if (p < 2.0f)
+         {
+            nx = 1.0f - (p - 1.0f) * 0.5f;
+            ny = 1.0f - (p - 1.0f);
+         }
+         else
+         {
+            nx = 0.5f - (p - 2.0f) * 0.5f;
+            ny = p - 2.0f;
+         }
          break;
       }
       case kShape_Cross:
       {
-         if (t < 0.5f) { nx = t * 2.0f; ny = 0.5f; }
-         else { nx = 0.5f; ny = (t - 0.5f) * 2.0f; }
+         if (t < 0.5f)
+         {
+            nx = t * 2.0f;
+            ny = 0.5f;
+         }
+         else
+         {
+            nx = 0.5f;
+            ny = (t - 0.5f) * 2.0f;
+         }
          break;
       }
       case kShape_Star:
       {
          int seg = (int)(t * 5.0f);
-         if (seg > 4) seg = 4;
+         if (seg > 4)
+            seg = 4;
          float p = (t * 5.0f) - seg;
          float t1 = (seg * 2 * 2 * PI / 5.0f) - PI / 2.0f;
          float t2 = ((seg + 1) * 2 * 2 * PI / 5.0f) - PI / 2.0f;
@@ -583,23 +635,26 @@ ofVec2f SampleUniverse::GetShapePosition(ShapePreset shape, float t, int i, int 
       }
       case kShape_Cat:
       {
-         static const std::vector<ofVec2f> pts = { {0.1f, 0.1f}, {0.3f, 0.3f}, {0.7f, 0.3f}, {0.9f, 0.1f}, {0.9f, 0.7f}, {0.5f, 0.9f}, {0.1f, 0.7f}, {0.1f, 0.1f} };
+         static const std::vector<ofVec2f> pts = { { 0.1f, 0.1f }, { 0.3f, 0.3f }, { 0.7f, 0.3f }, { 0.9f, 0.1f }, { 0.9f, 0.7f }, { 0.5f, 0.9f }, { 0.1f, 0.7f }, { 0.1f, 0.1f } };
          ofVec2f pt = GetPolygonPoint(pts, t);
-         nx = pt.x; ny = pt.y;
+         nx = pt.x;
+         ny = pt.y;
          break;
       }
       case kShape_Frog:
       {
-         static const std::vector<ofVec2f> pts = { {0.2f, 0.1f}, {0.4f, 0.3f}, {0.6f, 0.3f}, {0.8f, 0.1f}, {0.9f, 0.5f}, {0.5f, 0.9f}, {0.1f, 0.5f}, {0.2f, 0.1f} };
+         static const std::vector<ofVec2f> pts = { { 0.2f, 0.1f }, { 0.4f, 0.3f }, { 0.6f, 0.3f }, { 0.8f, 0.1f }, { 0.9f, 0.5f }, { 0.5f, 0.9f }, { 0.1f, 0.5f }, { 0.2f, 0.1f } };
          ofVec2f pt = GetPolygonPoint(pts, t);
-         nx = pt.x; ny = pt.y;
+         nx = pt.x;
+         ny = pt.y;
          break;
       }
       case kShape_Computer:
       {
-         static const std::vector<ofVec2f> pts = { {0.1f, 0.1f}, {0.9f, 0.1f}, {0.9f, 0.6f}, {0.1f, 0.6f}, {0.1f, 0.1f}, {0.4f, 0.6f}, {0.4f, 0.9f}, {0.2f, 0.9f}, {0.8f, 0.9f}, {0.6f, 0.9f}, {0.6f, 0.6f} };
+         static const std::vector<ofVec2f> pts = { { 0.1f, 0.1f }, { 0.9f, 0.1f }, { 0.9f, 0.6f }, { 0.1f, 0.6f }, { 0.1f, 0.1f }, { 0.4f, 0.6f }, { 0.4f, 0.9f }, { 0.2f, 0.9f }, { 0.8f, 0.9f }, { 0.6f, 0.9f }, { 0.6f, 0.6f } };
          ofVec2f pt = GetPolygonPoint(pts, t);
-         nx = pt.x; ny = pt.y;
+         nx = pt.x;
+         ny = pt.y;
          break;
       }
    }
@@ -608,7 +663,8 @@ ofVec2f SampleUniverse::GetShapePosition(ShapePreset shape, float t, int i, int 
 
 void SampleUniverse::RespawnDots()
 {
-   if (mSamples.empty()) return;
+   if (mSamples.empty())
+      return;
 
    int N = (int)mSamples.size();
    for (int i = 0; i < N; ++i)
@@ -618,7 +674,7 @@ void SampleUniverse::RespawnDots()
       mSamples[i].x = 10.0f + npos.x * (mArenaW - 20.0f);
       mSamples[i].y = 10.0f + npos.y * (mArenaH - 20.0f);
    }
-   
+
    // Generate a deterministic random path through all dots
    GenerateRandomPath();
 }
@@ -632,29 +688,30 @@ void SampleUniverse::Reseed()
 void SampleUniverse::GenerateRandomPath()
 {
    mRecordedPath.clear();
-   
+
    if (mSamples.empty())
       return;
-   
+
    if (mCurrentShape == kShape_Random)
    {
       std::vector<int> order;
       for (int i = 0; i < (int)mSamples.size(); ++i)
          order.push_back(i);
-      
+
       for (int i = (int)order.size() - 1; i > 0; --i)
       {
          int j = (int)(DeterministicRandomFloat01(mSeed, 1000 + i) * (i + 1));
-         if (j > i) j = i;
+         if (j > i)
+            j = i;
          std::swap(order[i], order[j]);
       }
-      
+
       int numPointsPerSegment = 20;
       for (int seg = 0; seg < (int)order.size(); ++seg)
       {
          int from = order[seg];
          int to = order[(seg + 1) % order.size()];
-         
+
          for (int p = 0; p < numPointsPerSegment; ++p)
          {
             float t = (float)p / numPointsPerSegment;
@@ -682,7 +739,8 @@ void SampleUniverse::ClearSamples()
 {
    for (auto& us : mSamples)
    {
-      if (us.sample) delete us.sample;
+      if (us.sample)
+         delete us.sample;
    }
    mSamples.clear();
    mHoveredIndex = -1;
@@ -814,7 +872,7 @@ void SampleUniverse::SaveState(FileStreamOut& out)
 {
    out << GetModuleSaveStateRev();
    out << mSeed;
-   
+
    out << (int)mCurrentShape;
 
    // save samples
@@ -827,7 +885,7 @@ void SampleUniverse::LoadState(FileStreamIn& in, int rev)
 {
    in >> mSeed;
    mSeedEntry->SetText(std::to_string(mSeed));
-   
+
    if (rev >= 2)
    {
       int shape;

@@ -24,7 +24,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   
+
    void SetRelease(float releaseMs);
 
    float mThreshold{ -0.1f };
