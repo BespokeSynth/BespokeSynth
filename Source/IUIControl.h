@@ -27,6 +27,7 @@
 
 #include "IClickable.h"
 #include "SynthGlobals.h"
+#include "UserPrefs.h"
 
 class FileStreamIn;
 class FileStreamOut;
@@ -89,8 +90,13 @@ public:
    virtual void Halve() {}
    virtual void ResetToOriginal() {}
    virtual void Increment(float amount) {}
-   void SetCableTargetable(bool targetable) { mCableTargetable = targetable; }
-   bool GetCableTargetable() const { return mCableTargetable; }
+
+   //Enable/disable cable patching on compatible cables
+   //Can be user overridden by ticking unsafe_cable_patching
+   void SetCableTargetable(bool targetable) { mCableTargetable = static_cast<int>(targetable); }
+   void SetCableTargetableBlockHard() { mCableTargetable = -1; } //Disallows cable patching, even unsafe.
+   bool GetCableTargetable() const;
+
    void SetNoHover(bool noHover) { mNoHover = noHover; }
    virtual bool GetNoHover() const { return mNoHover; }
    virtual bool AttemptTextInput() { return false; }
@@ -123,6 +129,7 @@ public:
 
    static void DestroyCablesTargetingControls(std::vector<IUIControl*> controls);
 
+   void TriggerHoverWarning(ofColor colour, float seconds);
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;
 
@@ -133,13 +140,16 @@ protected:
    ~IUIControl() override;
 
    int mRemoteControlCount{ 0 };
-   bool mCableTargetable{ true };
+   int mCableTargetable{ 1 }; //-1 = hard blocked | 0 = unsafe patching required | 1 = allowed
    bool mNoHover{ false };
    bool mShouldSaveState{ true };
    bool mSnapshotHighlight{ false };
    bool mIsDeleted{ false };
    IControlVisualizer* mControlVisualizer{ nullptr };
    bool mIsRandomizable{ true };
+
+   double mHoverWarningFlashTime{ 0 };
+   ofColor mHoverWarningColour{ ofColor(255, 0, 0, 255) };
 
    static IUIControl* sLastHoveredUIControl;
    static bool sLastUIHoverWasSetManually;
