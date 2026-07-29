@@ -170,7 +170,7 @@ private:
    ChannelBuffer mDrawBuffer{ 0 };
 
    NoteInputBuffer mNoteInputBuffer;
-   ::ADSR mAdsr{ 10, 1, 1, 10 };
+   ADSR mAdsr{ 10, 1, 1, 10 };
 
    struct SampleCuePoint
    {

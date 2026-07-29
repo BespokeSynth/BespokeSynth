@@ -259,7 +259,7 @@ private:
       ModulationChain* mPitchBend{ nullptr };
 
       bool mUseEnvelope{ false };
-      ::ADSR mEnvelope{ 1, 1, 1, 100 };
+      ADSR mEnvelope{ 1, 1, 1, 100 };
       float mEnvelopeLength{ 200 };
       float mPan{ 0 };
       int mWiden{ 0 };

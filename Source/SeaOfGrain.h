@@ -121,7 +121,7 @@ private:
 
       float mGain{ 0 };
 
-      ::ADSR mADSR{ 100, 0, 1, 100 };
+      ADSR mADSR{ 100, 0, 1, 100 };
       Granulator mGranulator;
       SeaOfGrain* mOwner{ nullptr };
    };
