@@ -63,6 +63,10 @@ void SampleBrowser::CreateUIControls()
    BUTTON(mBackButton, " < ");
    UIBLOCK_SHIFTX(80);
    BUTTON(mForwardButton, " > ");
+   UIBLOCK_SHIFTX(110);
+   BUTTON(mPlayRandomButton, "play random");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mStopButton, "stop");
    ENDUIBLOCK0();
 
    SetDirectory(mCurrentDirectory);
@@ -82,24 +86,45 @@ void SampleBrowser::DrawModule()
       textX = moduleWidth - 3 - stringWidth;
    gFont.DrawString(mCurrentDirectory.toStdString(), fontSize, textX, 15);
 
-   for (size_t i = 0; i < mButtons.size(); ++i)
-      mButtons[i]->Draw();
-   for (int i = 0; i < (int)mPlayButtons.size(); ++i)
+   assert(mButtons.size() == mPlayButtons.size());
+
+   for (int i = 0; i < (int)mButtons.size(); ++i)
    {
-      mPlayButtons[i]->SetDisplayStyle(IsSamplePlaying(i) ? ButtonDisplayStyle::kStop : ButtonDisplayStyle::kPlay);
+      int offset = mCurrentPage * (int)mButtons.size();
+      int entryIndex = offset + i;
+
+      mButtons[i]->Draw();
+
+      mPlayButtons[i]->SetDisplayStyle(IsSamplePlaying(entryIndex) ? ButtonDisplayStyle::kStop : ButtonDisplayStyle::kPlay);
       mPlayButtons[i]->Draw();
+
+      if (mButtons[i]->IsShowing() && IsMostRecentlyPlayedSample(entryIndex))
+      {
+         ofPushStyle();
+         ofNoFill();
+         ofSetColor(255, 255, 0, 100);
+         ofRect(mButtons[i]->GetRect(K(local)));
+         ofPopStyle();
+      }
    }
    mBackButton->Draw();
    mForwardButton->Draw();
+   mPlayRandomButton->Draw();
+   mStopButton->Draw();
 
    int numPages = GetNumPages();
    if (numPages > 1)
       DrawTextNormal(ofToString(mCurrentPage + 1) + "/" + ofToString(numPages), 40, mBackButton->GetPosition(true).y + 12);
 }
 
+bool SampleBrowser::IsMostRecentlyPlayedSample(int index) const
+{
+   return mDirectoryListing[index] == juce::String(mPlayingSample.GetReadPath());
+}
+
 bool SampleBrowser::IsSamplePlaying(int index) const
 {
-   return mPlayingSample.IsPlaying() && mButtons[index]->IsShowing() && mDirectoryListing[index] == juce::String(mPlayingSample.GetReadPath());
+   return mPlayingSample.IsPlaying() && IsMostRecentlyPlayedSample(index);
 }
 
 void SampleBrowser::ButtonClicked(ClickButton* button, double time)
@@ -108,6 +133,26 @@ void SampleBrowser::ButtonClicked(ClickButton* button, double time)
       ShowPage(mCurrentPage - 1);
    if (button == mForwardButton)
       ShowPage(mCurrentPage + 1);
+
+   if (button == mPlayRandomButton)
+   {
+      std::vector<int> sampleIndices;
+      for (int i = 0; i < (int)mDirectoryListing.size(); ++i)
+      {
+         if (!File(mDirectoryListing[i]).isDirectory())
+            sampleIndices.push_back(i);
+      }
+      if (sampleIndices.size() > 0)
+      {
+         int index = sampleIndices[rand() % (int)sampleIndices.size()];
+         ShowPage(index / (int)mButtons.size());
+         PlaySample(mDirectoryListing[index]);
+      }
+   }
+
+   if (button == mStopButton)
+      mPlayingSample.Reset();
+
    for (int i = 0; i < (int)mButtons.size(); ++i)
    {
       if (button == mButtons[i] || button == mPlayButtons[i])
@@ -138,24 +183,25 @@ void SampleBrowser::ButtonClicked(ClickButton* button, double time)
             }
             if (button == mPlayButtons[i])
             {
-               if (IsSamplePlaying(i))
-               {
+               if (IsSamplePlaying(entryIndex))
                   mPlayingSample.Reset();
-               }
                else
-               {
-                  if (File(clicked).existsAsFile())
-                  {
-                     mSampleMutex.lock();
-                     mPlayingSample.SetName(clicked.toStdString().c_str());
-                     mPlayingSample.Read(clicked.toStdString().c_str());
-                     mPlayingSample.Play(NextBufferTime(false), 1, 0);
-                     mSampleMutex.unlock();
-                  }
-               }
+                  PlaySample(clicked);
             }
          }
       }
+   }
+}
+
+void SampleBrowser::PlaySample(juce::String file)
+{
+   if (File(file).existsAsFile())
+   {
+      mSampleMutex.lock();
+      mPlayingSample.SetName(file.toStdString().c_str());
+      mPlayingSample.Read(file.toStdString().c_str());
+      mPlayingSample.Play(NextBufferTime(false), 1, 0);
+      mSampleMutex.unlock();
    }
 }
 
@@ -252,7 +298,7 @@ void SampleBrowser::SetDirectory(String dirPath)
             }
          }
          if (include)
-            mDirectoryListing.add(file.getFullPathName());
+            mDirectoryListing.add(file.getFullPathName().replace(GetPathSeparator(), "/"));
       }
    }
    else
