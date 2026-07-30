@@ -27,7 +27,7 @@ public:
    bool IsEnabled() const override { return mEnabled; }
 
    void PlayNote(NoteMessage note) override;
-   void SendCC(int control, int value, int voiceIdx = -1) override { }
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override

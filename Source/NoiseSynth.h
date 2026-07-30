@@ -63,13 +63,13 @@ public:
 
    // INoteReceiver
    void PlayNote(NoteMessage note) override;
-   void SendCC(int control, int value, int voiceIdx = -1) override { }
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
    const NoteHistory& GetHistory() const { return mNoteHistory; }
    void SetHistory(const NoteHistory& history) { mNoteHistory = history; }
 
    // IFloatSliderListener & IDropdownListener
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override { }
-   void DropdownUpdated(DropdownList* list, int oldVal, double time) override { }
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

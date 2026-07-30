@@ -60,7 +60,7 @@ public:
    void Poll() override;
 
    void PlayNote(NoteMessage note) override;
-   void SendCC(int control, int value, int voiceIdx = -1) override { }
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
    void OnPulse(double time, float velocity, int flags) override;
 
    //IAudioSource
@@ -157,7 +157,7 @@ private:
    std::string mYoutubeId;
    ClickButton* mDownloadYoutubeButton{ nullptr };
    TextEntry* mDownloadYoutubeSearch{ nullptr };
-   char mYoutubeSearch[MAX_TEXTENTRY_LENGTH]{ };
+   char mYoutubeSearch[MAX_TEXTENTRY_LENGTH]{};
    ClickButton* mLoadFileButton{ nullptr };
    ClickButton* mSaveFileButton{ nullptr };
    bool mIsLoadingSample{ false };
@@ -224,7 +224,7 @@ private:
    juce::ChildProcess* mRunningProcess{ nullptr };
    std::function<void()> mOnRunningProcessComplete;
    std::vector<YoutubeSearchResult> mYoutubeSearchResults;
-   std::array<ClickButton*, kMaxYoutubeSearchResults> mSearchResultButtons{ };
+   std::array<ClickButton*, kMaxYoutubeSearchResults> mSearchResultButtons{};
 
    SwitchAndRamp mSwitchAndRamp;
 

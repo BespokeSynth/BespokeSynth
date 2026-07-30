@@ -2385,7 +2385,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
       else if (mMouseMovedSignificantlySincePressed)
       {
          //dropped on empty canvas rather than onto an existing sample-accepting module - spawn a fresh sample player preloaded with this sample
-         ModuleFactory::Spawnable spawnable{ };
+         ModuleFactory::Spawnable spawnable{};
          spawnable.mLabel = "sampleplayer";
          IDrawableModule* newModule = SpawnModuleOnTheFly(spawnable, x, y);
          if (newModule != nullptr)
@@ -2580,7 +2580,7 @@ struct SourceDepInfo
 {
    SourceDepInfo(IAudioSource* me)
    : mMe(me)
-   { }
+   {}
    IAudioSource* mMe;
    std::vector<IAudioSource*> mDeps;
 };

@@ -319,7 +319,15 @@ void Maze::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)
 
 void Maze::SaveState(FileStreamOut& out)
 {
-   out << Name();
+   //NOTE: this used to write out << Name() first instead of the module rev, which broke the
+   //framework's SaveState/LoadState protocol - IDrawableModule::LoadModuleSaveStateRev() always
+   //reads an int first (expecting GetModuleSaveStateRev()), so reading a string's bytes as that
+   //int desynced the stream for the rest of this module AND every module saved after it in the
+   //same file. The module's name is already persisted separately via the JSON layout, so it never
+   //needed to be saved here at all.
+   out << GetModuleSaveStateRev();
+   IDrawableModule::SaveState(out);
+
    out << mScaledDegree;
    out << mNumChordsIndex;
    out << mGroove;
@@ -335,12 +343,10 @@ void Maze::SaveState(FileStreamOut& out)
 
 void Maze::LoadState(FileStreamIn& in, int rev)
 {
-   std::string name;
-   in >> name;
-   SetName(name.c_str());
+   IDrawableModule::LoadState(in, rev);
+
    in >> mScaledDegree;
-   // mScaledDegreeCheckbox is bound, but Checkbox doesn't have SetChecked.
-   // We just set the value directly.
+   // mScaledDegreeCheckbox is bound directly to &mScaledDegree, so setting the variable is enough.
 
    in >> mNumChordsIndex;
 
@@ -358,6 +364,9 @@ void Maze::LoadState(FileStreamIn& in, int rev)
    mLockedNotes.clear();
    int numLocked = 0;
    in >> numLocked;
+   const int kMaxLockedNotes = 128; //can't have more unique locked notes than MIDI pitches; guards
+   //against a corrupted/truncated file driving a huge or negative loop here
+   LoadStateValidate(numLocked >= 0 && numLocked <= kMaxLockedNotes);
    for (int i = 0; i < numLocked; ++i)
    {
       int pitch;

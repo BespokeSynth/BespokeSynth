@@ -75,7 +75,7 @@ public:
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
-   void SendCC(int control, int value, int voiceIdx = -1) override { }
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IControlVisualizer
    void DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* control) override;

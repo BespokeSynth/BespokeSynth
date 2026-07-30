@@ -20,7 +20,7 @@ public:
 
    void CreateUIControls() override;
    void DrawModule() override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override { }
+   void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override {}
 
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
