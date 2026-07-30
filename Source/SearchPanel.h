@@ -47,16 +47,11 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
-#ifndef _WIN32
-#include <sys/types.h>
-#include <signal.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#endif
 #include "IDrawableModule.h"
 #include "TextEntry.h"
 #include "ClickButton.h"
 #include "ModuleFactory.h"
+#include "Sample.h"
 
 class SearchPanel : public IDrawableModule, public ITextEntryListener, public IButtonListener
 {
@@ -83,10 +78,14 @@ public:
    bool IsVisible() override { return IsShowing(); }
    bool CanBeMoved() const override { return false; } //docked/pinned - never click-draggable, so it can't be dragged off its docked position
 
-   void TextEntryComplete(TextEntry* entry) override {}
+   void TextEntryComplete(TextEntry* entry) override { }
    void ButtonClicked(ClickButton* button, double time) override;
 
    void Poll() override;
+
+   //Called from the audio thread (ModularSynth::AudioOut) to mix preview audio
+   //into the global output buffers, so it follows the configured audio device.
+   void MixPreviewAudio(float** outputBuffers, int numChannels, int numSamples);
 
    //width resize via a left-edge drag handle (the panel stays docked to the right edge, so
    //dragging the handle changes the panel's width). CanBeMoved() stays false so the body can't
@@ -136,9 +135,7 @@ private:
    static std::string TruncatePathForDisplay(const std::string& path, int maxChars);
 
    static constexpr int kMaxResults = 10; //module results
-   static constexpr int kVisibleSampleRows = 60; //sample rows drawn on screen at once (virtualized window) - was 30, which
-   //left a block of dead space at the bottom of the panel on tall screens/high fitRows since the row count was capped
-   //here regardless of how much room the (full-height, docked) panel actually had
+   static constexpr int kVisibleSampleRows = 60; //sample rows drawn on screen at once (virtualized window)
    static constexpr int kMaxSampleMatches = 4000; //full match list you can scroll through
    static constexpr int kMaxLocationRows = 8;
    static constexpr int kMinWidth = 150;
@@ -146,27 +143,27 @@ private:
    static constexpr int kHandleWidth = 9; //left-edge scrollbar strip
    static constexpr int kContentX = 14; //content starts to the right of the scrollbar strip
 
-   std::string mSearchTextBound; //required by TextEntry's constructor; the live typed text is polled every frame from mSearchEntry->GetText() instead (see DrawModule), since the bound var is only updated on enter/blur
+   std::string mSearchTextBound;
    std::string mLastSearchText;
-   int mLastResultsIndexCount{ -1 }; //so the browse list refreshes when the index finishes loading
+   int mLastResultsIndexCount{ -1 };
    TextEntry* mSearchEntry{ nullptr };
 
    std::vector<ModuleFactory::Spawnable> mModuleResults;
-   std::vector<juce::String> mSampleResults; //full ranked match list (scrollable)
-   int mSampleScroll{ 0 }; //index of the first sample row shown (virtualized list)
+   std::vector<juce::String> mSampleResults;
+   int mSampleScroll{ 0 };
 
    std::array<ClickButton*, kMaxResults> mModuleButtons{ nullptr };
    std::array<ClickButton*, kVisibleSampleRows> mSampleButtons{ nullptr };
-   std::array<ClickButton*, kVisibleSampleRows> mPreviewButtons{ nullptr }; //▶ buttons beside each sample row
+   std::array<ClickButton*, kVisibleSampleRows> mPreviewButtons{ nullptr };
 
-   //Bitwig-style "Locations": user-added root folders searched in addition to the default samples path
+   //Bitwig-style "Locations"
    std::vector<std::string> mSearchLocations;
    ClickButton* mAddLocationButton{ nullptr };
    ClickButton* mRescanButton{ nullptr };
    std::array<ClickButton*, kMaxLocationRows> mRemoveLocationButtons{ nullptr };
 
-   //background audio-file index (built once off the UI thread, cached to disk, filtered per keystroke)
-   static constexpr int kMaxIndexed = 200000; //safety cap on library size
+   //background audio-file index
+   static constexpr int kMaxIndexed = 500000; //safety cap on library size
    std::vector<IndexedSample> mSampleIndex;
    std::mutex mIndexMutex;
    std::thread mIndexThread;
@@ -177,20 +174,20 @@ private:
    int mWidth{ 230 };
    int mHeight{ 260 };
 
-   int mUserWidth{ 230 }; //panel width
+   int mUserWidth{ 230 };
    bool mDraggingResize{ false };
    bool mHoveringResizeHandle{ false };
 
-   //left-edge strip repurposed as a draggable scrollbar for the results list (click/drag to scrub
-   //through all matches quickly instead of wheel-scrolling). Track geometry captured each draw.
    bool mDraggingScroll{ false };
    float mScrollTrackTop{ 0 };
    float mScrollTrackH{ 0 };
    int mScrollTotal{ 0 };
    int mScrollVisible{ 0 };
 
-   // Sample preview via afplay subprocess (macOS native, correct threading)
-   int mPreviewPid{ -1 }; //pid of the afplay preview process (-1 = none); int for MSVC portability
+   // In-process sample preview (plays through Bespoke's audio device, not afplay)
+   Sample mPreviewSample;
+   std::atomic<int> mPreviewPlayhead{ 0 };
+   std::atomic<bool> mPreviewPlaying{ false };
    int mPreviewingResultIdx{ -1 };
    void StartPreview(const std::string& path);
    void StopPreview();

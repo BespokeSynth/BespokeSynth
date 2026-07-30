@@ -97,12 +97,17 @@ void PaulStretch::FilesDropped(std::vector<std::string> files, int x, int y)
 
 void PaulStretch::SampleDropped(int x, int y, Sample* sample)
 {
-   if (TheSynth->MouseMovedSignificantlySincePressed())
-   {
-      Sample* copy = new Sample();
-      copy->CopyFrom(sample);
-      UpdateSample(copy, true);
-   }
+   //NOTE: this used to require TheSynth->MouseMovedSignificantlySincePressed() before accepting the
+   //drop. SampleDropped is only ever called from ModularSynth::MouseReleased's mHeldSample branch,
+   //which already means a sample was legitimately grabbed and released here - no extra movement
+   //gate is needed, and it was the reason dropping a second/different sample onto an already-loaded
+   //PaulStretch silently did nothing (compare to SampleUniverse::SampleDropped, which has no such gate).
+   if (sample == nullptr || sample->LengthInSamples() == 0)
+      return;
+
+   Sample* copy = new Sample();
+   copy->CopyFrom(sample);
+   UpdateSample(copy, true);
 }
 
 void PaulStretch::UpdateSample(Sample* sample, bool ownsSample)
@@ -473,9 +478,28 @@ void PaulStretch::SaveState(FileStreamOut& out)
 {
    out << GetModuleSaveStateRev();
    IDrawableModule::SaveState(out);
+
+   //rev 1 never wrote the dropped-in sample at all, which is why reopening a saved patch always
+   //came back with an empty PaulStretch - the sample data just wasn't in the file to begin with
+   bool hasSample = (mSample != nullptr && mSample->LengthInSamples() > 0);
+   out << hasSample;
+   if (hasSample)
+      mSample->SaveState(out);
 }
 
 void PaulStretch::LoadState(FileStreamIn& in, int rev)
 {
    IDrawableModule::LoadState(in, rev);
+
+   if (rev >= 2)
+   {
+      bool hasSample;
+      in >> hasSample;
+      if (hasSample)
+      {
+         Sample* loaded = new Sample();
+         loaded->LoadState(in);
+         UpdateSample(loaded, true);
+      }
+   }
 }

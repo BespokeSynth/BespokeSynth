@@ -143,19 +143,11 @@ void SearchPanel::Poll()
    mHeight = (int)MAX(ofGetHeight() / scale - topMargin - bottomMargin, 200.0f);
    SetPosition(rightEdge - mWidth, panelY);
 
-   // Poll whether afplay subprocess has finished
-#ifndef _WIN32
-   if (mPreviewPid > 0)
+   // Check whether the in-process preview has finished playing
+   if (mPreviewPlaying && mPreviewPlayhead >= mPreviewSample.LengthInSamples())
    {
-      int status;
-      if (waitpid(mPreviewPid, &status, WNOHANG) != 0)
-      {
-         // process finished or error
-         mPreviewPid = -1;
-         mPreviewingResultIdx = -1;
-      }
+      StopPreview();
    }
-#endif
 }
 
 void SearchPanel::DrawModule()
@@ -825,32 +817,45 @@ void SearchPanel::StartPreview(const std::string& path)
 {
    StopPreview();
 
-   // Spawn afplay as a child process (macOS built-in, handles all formats
-   // and sample-rate conversion natively, no threading issues)
-#ifndef _WIN32
-   pid_t pid = fork();
-   if (pid == 0)
+   if (mPreviewSample.Read(path.c_str(), false))
    {
-      // child — exec afplay then exit
-      execlp("afplay", "afplay", path.c_str(), (char*)nullptr);
-      _exit(1);
+      mPreviewPlayhead = 0;
+      mPreviewPlaying = true;
    }
-   else if (pid > 0)
-   {
-      mPreviewPid = (int)pid;
-   }
-#endif
 }
 
 void SearchPanel::StopPreview()
 {
-#ifndef _WIN32
-   if (mPreviewPid > 0)
-   {
-      kill((pid_t)mPreviewPid, SIGTERM);
-      waitpid((pid_t)mPreviewPid, nullptr, WNOHANG);
-      mPreviewPid = -1;
-   }
-#endif
+   mPreviewPlaying = false;
+   mPreviewPlayhead = 0;
    mPreviewingResultIdx = -1;
+}
+
+void SearchPanel::MixPreviewAudio(float** outputBuffers, int numChannels, int numSamples)
+{
+   if (!mPreviewPlaying)
+      return;
+
+   int playhead = mPreviewPlayhead.load();
+   int length = mPreviewSample.LengthInSamples();
+   int sampleChannels = mPreviewSample.NumChannels();
+
+   if (playhead >= length || length == 0)
+   {
+      mPreviewPlaying = false;
+      return;
+   }
+
+   int samplesToPlay = std::min(numSamples, length - playhead);
+
+   for (int i = 0; i < samplesToPlay; ++i)
+   {
+      for (int ch = 0; ch < numChannels && ch < 2; ++ch)
+      {
+         int srcCh = (ch < sampleChannels) ? ch : 0;
+         outputBuffers[ch][i] += mPreviewSample.Data()->GetChannel(srcCh)[playhead + i] * 0.7f;
+      }
+   }
+
+   mPreviewPlayhead = playhead + samplesToPlay;
 }

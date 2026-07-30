@@ -75,7 +75,7 @@ public:
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
-   void SendCC(int control, int value, int voiceIdx = -1) override {}
+   void SendCC(int control, int value, int voiceIdx = -1) override { }
 
    //IControlVisualizer
    void DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* control) override;
@@ -150,6 +150,9 @@ private:
    int mWarpType{ 0 };
    DropdownList* mWarpTypeDropdown{ nullptr };
    FloatSlider* mWarpAmountSlider{ nullptr };
+   FloatSlider* mNoiseColorSlider{ nullptr };
+   FloatSlider* mNoiseVolumeSlider{ nullptr };
+   Checkbox* mRandomPhaseCheckbox{ nullptr };
 
    //osc A's own filter + filter-envelope + amp-envelope (independent from B)
    FloatSlider* mFilterCutoffMaxSlider{ nullptr };

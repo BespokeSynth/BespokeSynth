@@ -33,7 +33,7 @@ public:
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; } //rev 2 adds saving/loading the dropped-in sample itself
 
    // Drag and drop sample support
    void FilesDropped(std::vector<std::string> files, int x, int y) override;

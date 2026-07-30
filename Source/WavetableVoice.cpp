@@ -217,6 +217,50 @@ bool WavetableVoice::Process(double time, ChannelBuffer* out, int oversampling)
          }
       }
 
+      // Add Noise (into A's path before filter)
+      if (mVoiceParams->mNoiseVolume > 0)
+      {
+
+         float noiseVal = 0;
+         if (mVoiceParams->mNoiseVolume > 0)
+         {
+            float rawNoise = ofRandom(-1.0f, 1.0f);
+            float color = mVoiceParams->mNoiseColor;
+            if (color < 0.5f)
+            {
+               // Brown noise (LPF)
+               float alpha = ofLerp(0.02f, 0.99f, color * 2.0f);
+               mNoiseState1 = mNoiseState1 + alpha * (rawNoise - mNoiseState1);
+               noiseVal = mNoiseState1 * 2.0f;
+            }
+            else if (color > 0.5f)
+            {
+               // Violet noise (HPF)
+               float alpha = ofLerp(0.99f, 0.02f, (color - 0.5f) * 2.0f);
+               float diff = rawNoise - mNoiseState1;
+               mNoiseState1 = rawNoise;
+               noiseVal = diff * alpha;
+            }
+            else
+            {
+               noiseVal = rawNoise;
+            }
+            noiseVal *= mVoiceParams->mNoiseVolume * adsrValA * (mVoiceParams->mVol * .4f);
+         }
+
+         float extraVal = noiseVal;
+         if (mono)
+         {
+            summedLeftA += extraVal;
+         }
+         else
+         {
+            float pan = GetPan();
+            summedLeftA += extraVal * GetLeftPanGain(pan);
+            summedRightA += extraVal * GetRightPanGain(pan);
+         }
+      }
+
       //osc A's own filter (driven by its own filter envelope), applied only to A's signal
       if (mUseFilter)
       {
@@ -336,6 +380,16 @@ void WavetableVoice::Start(double time, float target)
    float adsrTimeScale = GetADSRScale(target, mVoiceParams->mVelToEnvelope);
    float adsrCurve = GetADSRCurve(target, mVoiceParams->mVelToEnvelope);
    mAdsr.Start(time, volume, mVoiceParams->mAdsr, 1, adsrCurve);
+
+   if (mVoiceParams->mRandomPhase)
+   {
+      for (int i = 0; i < kMaxUnison; ++i)
+      {
+         mOscData[i].mPhase = ofRandom(0, FTWO_PI);
+         mOscData[i].mSyncPhase = ofRandom(0, FTWO_PI);
+         mOscDataB[i].mPhase = ofRandom(0, FTWO_PI);
+      }
+   }
 
    if (mVoiceParams->mFilterCutoffMax != WAVETABLE_NO_CUTOFF)
    {

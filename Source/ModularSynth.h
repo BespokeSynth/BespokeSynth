@@ -81,7 +81,7 @@ public:
    bool IsEnabled() const override { return false; }
 
 private:
-   void DrawModule() override {}
+   void DrawModule() override { }
 };
 
 class ModularSynth
@@ -315,7 +315,7 @@ public:
 
    static int sLoadingFileSaveStateRev;
    static int sLastLoadedFileSaveStateRev;
-   static constexpr int kSaveStateRev = 427;
+   static constexpr int kSaveStateRev = 428; //428 adds a per-patch palette/theme snapshot (see LoadStateHeader/CompleteQueuedSaveState)
 
 private:
    void SaveState(std::string file, bool autosave);
@@ -341,11 +341,11 @@ private:
    struct QueuedSaveStateInfo
    {
       bool mQueued{ false };
-      std::string mFile{};
+      std::string mFile{ };
       bool mAutosave{ false };
       bool mWaitingForScreenshot{ true };
    };
-   QueuedSaveStateInfo mQueuedSaveStateInfo{};
+   QueuedSaveStateInfo mQueuedSaveStateInfo{ };
 
    int mIOBufferSize{ 0 };
 
@@ -395,12 +395,12 @@ private:
 
    struct LogEventItem
    {
-      LogEventItem() {}
+      LogEventItem() { }
       LogEventItem(double _time, std::string _text, LogEventType _type)
       : time(_time)
       , text(_text)
       , type(_type)
-      {}
+      { }
       double time{ 0 };
       std::string text;
       LogEventType type{ LogEventType::kLogEventType_Verbose };
@@ -428,7 +428,7 @@ private:
    bool mLastClickWasEmptySpace{ false };
    bool mIsShiftPressed{ false };
    double mLastShiftPressTime{ -9999 };
-   ofVec2f mLastShiftPressMousePos{};
+   ofVec2f mLastShiftPressMousePos{ };
 
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout{ false };

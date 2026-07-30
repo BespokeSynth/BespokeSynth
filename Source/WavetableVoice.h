@@ -119,6 +119,13 @@ public:
    //position (0 = all voices identical). With several voices this makes them drift apart for a
    //fatter, more analog / Pigments-style stack.
    float mVoiceSpread{ 0 };
+
+   // Noise Generator
+   float mNoiseColor{ 0.5f }; // 0=Brown, 0.5=White, 1=Violet
+   float mNoiseVolume{ 0 };
+
+   // Phase Randomization
+   bool mRandomPhase{ false };
 };
 
 class WavetableVoice : public IMidiVoice
@@ -175,6 +182,9 @@ private:
    //stable per-voice random offsets (rolled fresh each note) scaled by mVoiceSpread
    float mVoiceRandCut{ 0 };
    float mVoiceRandPos{ 0 };
+
+   // Noise state (for brown/violet filtering)
+   float mNoiseState1{ 0 };
 
    IDrawableModule* mOwner;
 };

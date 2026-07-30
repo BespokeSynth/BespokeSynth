@@ -1450,8 +1450,19 @@ void ModularSynth::MouseMoved(int intX, int intY)
       if (ShouldShowGridSnap() || UserPrefs.snap_to_grid_enabled.Get())
       {
          float gridSize = UserPrefs.grid_snap_size.Get();
-         newX = round(newX / gridSize) * gridSize;
-         newY = round((newY - mMoveModule->TitleBarHeight()) / gridSize) * gridSize + mMoveModule->TitleBarHeight();
+         float w = mMoveModule->GetRect().width;
+         float h = mMoveModule->GetRect().height;
+         float tb = mMoveModule->TitleBarHeight();
+
+         float snapLeft = round(newX / gridSize) * gridSize;
+         float snapRight = round((newX + w) / gridSize) * gridSize;
+         newX = std::abs(newX - snapLeft) < std::abs((newX + w) - snapRight) ? snapLeft : snapRight - w;
+
+         float topEdge = newY - tb;
+         float bottomEdge = newY + h;
+         float snapTop = round(topEdge / gridSize) * gridSize;
+         float snapBottom = round(bottomEdge / gridSize) * gridSize;
+         newY = std::abs(topEdge - snapTop) < std::abs(bottomEdge - snapBottom) ? snapTop + tb : snapBottom - h;
          if (IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter)) // Snap to center of the module
          {
             newX -= std::fmod(mMoveModule->GetRect().width / 2, gridSize);
@@ -1770,8 +1781,19 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       if (ShouldShowGridSnap() || UserPrefs.snap_to_grid_enabled.Get())
       {
          float gridSize = UserPrefs.grid_snap_size.Get();
-         newX = round(newX / gridSize) * gridSize;
-         newY = round((newY - mLastClickedModule->TitleBarHeight()) / gridSize) * gridSize + mLastClickedModule->TitleBarHeight();
+         float w = mLastClickedModule->GetRect().width;
+         float h = mLastClickedModule->GetRect().height;
+         float tb = mLastClickedModule->TitleBarHeight();
+
+         float snapLeft = round(newX / gridSize) * gridSize;
+         float snapRight = round((newX + w) / gridSize) * gridSize;
+         newX = std::abs(newX - snapLeft) < std::abs((newX + w) - snapRight) ? snapLeft : snapRight - w;
+
+         float topEdge = newY - tb;
+         float bottomEdge = newY + h;
+         float snapTop = round(topEdge / gridSize) * gridSize;
+         float snapBottom = round(bottomEdge / gridSize) * gridSize;
+         newY = std::abs(topEdge - snapTop) < std::abs(bottomEdge - snapBottom) ? snapTop + tb : snapBottom - h;
          if (IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter)) // Snap to center of the module
          {
             newX -= std::fmod(mLastClickedModule->GetRect().width / 2, gridSize);
@@ -1796,8 +1818,19 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       if (ShouldShowGridSnap() || UserPrefs.snap_to_grid_enabled.Get())
       {
          float gridSize = UserPrefs.grid_snap_size.Get();
-         newX = round(newX / gridSize) * gridSize;
-         newY = round((newY - mMoveModule->TitleBarHeight()) / gridSize) * gridSize + mMoveModule->TitleBarHeight();
+         float w = mMoveModule->GetRect().width;
+         float h = mMoveModule->GetRect().height;
+         float tb = mMoveModule->TitleBarHeight();
+
+         float snapLeft = round(newX / gridSize) * gridSize;
+         float snapRight = round((newX + w) / gridSize) * gridSize;
+         newX = std::abs(newX - snapLeft) < std::abs((newX + w) - snapRight) ? snapLeft : snapRight - w;
+
+         float topEdge = newY - tb;
+         float bottomEdge = newY + h;
+         float snapTop = round(topEdge / gridSize) * gridSize;
+         float snapBottom = round(bottomEdge / gridSize) * gridSize;
+         newY = std::abs(topEdge - snapTop) < std::abs(bottomEdge - snapBottom) ? snapTop + tb : snapBottom - h;
          if (IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter)) // Snap to center of the module
          {
             newX -= std::fmod(mMoveModule->GetRect().width / 2, gridSize);
@@ -2352,7 +2385,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
       else if (mMouseMovedSignificantlySincePressed)
       {
          //dropped on empty canvas rather than onto an existing sample-accepting module - spawn a fresh sample player preloaded with this sample
-         ModuleFactory::Spawnable spawnable{};
+         ModuleFactory::Spawnable spawnable{ };
          spawnable.mLabel = "sampleplayer";
          IDrawableModule* newModule = SpawnModuleOnTheFly(spawnable, x, y);
          if (newModule != nullptr)
@@ -2432,6 +2465,10 @@ void ModularSynth::AudioOut(float* const* output, int bufferSize, int nChannels)
             }
          }
       }
+
+      //mix in search panel preview audio (plays through Bespoke's audio device)
+      if (TheSearchPanel != nullptr)
+         TheSearchPanel->MixPreviewAudio(mOutputBuffers.data(), nChannels, gBufferSize);
 
       //put it into speakers
       for (int ch = 0; ch < nChannels; ++ch)
@@ -2543,7 +2580,7 @@ struct SourceDepInfo
 {
    SourceDepInfo(IAudioSource* me)
    : mMe(me)
-   {}
+   { }
    IAudioSource* mMe;
    std::vector<IAudioSource*> mDeps;
 };
@@ -3338,6 +3375,28 @@ void ModularSynth::CompleteQueuedSaveState()
 
       out << GetLayout().getRawString(true);
 
+      //palette snapshot (rev 428+): the color palette/theme lives in UserPrefs, which is a global
+      //preferences file rather than part of any module's state, so patches never remembered which
+      //palette they were made with. Snapshotting the actual current values here (not just a palette
+      //preset index) means it round-trips correctly even if the user hand-tweaked something in the
+      //prefs editor rather than only ever picking from TitleBar's palette dropdown.
+      out << UserPrefs.hue_note.Get();
+      out << UserPrefs.hue_synth.Get();
+      out << UserPrefs.hue_audio.Get();
+      out << UserPrefs.hue_instrument.Get();
+      out << UserPrefs.hue_processor.Get();
+      out << UserPrefs.hue_modulator.Get();
+      out << UserPrefs.hue_pulse.Get();
+      out << UserPrefs.module_saturation.Get();
+      out << UserPrefs.module_brightness.Get();
+      out << UserPrefs.module_background_alpha.Get();
+      out << UserPrefs.background_r.Get();
+      out << UserPrefs.background_g.Get();
+      out << UserPrefs.background_b.Get();
+      out << UserPrefs.lissajous_r.Get();
+      out << UserPrefs.lissajous_g.Get();
+      out << UserPrefs.lissajous_b.Get();
+
       mModuleContainer.SaveState(out);
       mUILayerModuleContainer.SaveState(out);
    }
@@ -3474,6 +3533,55 @@ void ModularSynth::LoadStateHeader(FileStreamIn& in, unsigned char*& screenshotD
       }
 
       in >> jsonLayoutString;
+
+      if (fileRev >= 428)
+      {
+         float hueNote, hueSynth, hueAudio, hueInstrument, hueProcessor, hueModulator, huePulse;
+         float saturation, brightness, backgroundAlpha;
+         float bgR, bgG, bgB, lissR, lissG, lissB;
+         in >> hueNote;
+         in >> hueSynth;
+         in >> hueAudio;
+         in >> hueInstrument;
+         in >> hueProcessor;
+         in >> hueModulator;
+         in >> huePulse;
+         in >> saturation;
+         in >> brightness;
+         in >> backgroundAlpha;
+         in >> bgR;
+         in >> bgG;
+         in >> bgB;
+         in >> lissR;
+         in >> lissG;
+         in >> lissB;
+
+         UserPrefs.hue_note.Get() = hueNote;
+         UserPrefs.hue_synth.Get() = hueSynth;
+         UserPrefs.hue_audio.Get() = hueAudio;
+         UserPrefs.hue_instrument.Get() = hueInstrument;
+         UserPrefs.hue_processor.Get() = hueProcessor;
+         UserPrefs.hue_modulator.Get() = hueModulator;
+         UserPrefs.hue_pulse.Get() = huePulse;
+         UserPrefs.module_saturation.Get() = saturation;
+         UserPrefs.module_brightness.Get() = brightness;
+         UserPrefs.module_background_alpha.Get() = backgroundAlpha;
+         UserPrefs.background_r.Get() = bgR;
+         UserPrefs.background_g.Get() = bgG;
+         UserPrefs.background_b.Get() = bgB;
+         UserPrefs.lissajous_r.Get() = lissR;
+         UserPrefs.lissajous_g.Get() = lissG;
+         UserPrefs.lissajous_b.Get() = lissB;
+
+         ModularSynth::sBackgroundR = bgR;
+         ModularSynth::sBackgroundG = bgG;
+         ModularSynth::sBackgroundB = bgB;
+         ModularSynth::sBackgroundLissajousR = lissR;
+         ModularSynth::sBackgroundLissajousG = lissG;
+         ModularSynth::sBackgroundLissajousB = lissB;
+      }
+      //else: older patch saved before palette snapshotting existed - leave the app's current
+      //palette alone rather than forcing it to some meaningless default
    }
    else
    {

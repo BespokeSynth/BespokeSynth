@@ -105,7 +105,6 @@ namespace
    const float kOscBX = kFiltAX + kColWidthFiltEnv + kGap;
    const float kFiltBX = kOscBX + kColWidthOsc + kGap;
    const float kShapeX = kFiltBX + kColWidthFiltEnv + kGap;
-   const float kVoiceX = kShapeX + kColWidthShape + kGap;
    const float kContentTop = 15; //leaves room for the column header label drawn above each column
 
    //waveform preview geometry (shared by both oscillator columns)
@@ -180,6 +179,9 @@ void Wavetable::CreateUIControls()
    FLOATSLIDER_DIGITS(mDetuneBSlider, "detune b", &mVoiceParams.mDetuneB, -.05f, .05f, 3);
    INTSLIDER(mUnisonBSlider, "unison b", &mVoiceParams.mUnisonB, 1, WavetableVoice::kMaxUnison);
    FLOATSLIDER(mUnisonWidthBSlider, "width b", &mVoiceParams.mUnisonWidthB, 0, 1);
+   UIBLOCK_SHIFTY(10);
+   FLOATSLIDER(mNoiseColorSlider, "noise color", &mVoiceParams.mNoiseColor, 0, 1);
+   FLOATSLIDER(mNoiseVolumeSlider, "noise vol", &mVoiceParams.mNoiseVolume, 0, 1);
    ENDUIBLOCK(width, height);
    mWidth = MAX(width, mWidth);
    mHeight = MAX(height, mHeight);
@@ -204,9 +206,12 @@ void Wavetable::CreateUIControls()
    DROPDOWN(mWarpTypeDropdown, "warp", &mWarpType, kColWidthShape - 3);
    UIBLOCK_NEWLINE();
    FLOATSLIDER(mWarpAmountSlider, "warp amount", &mVoiceParams.mWarpAmount, 0, 1);
+   UIBLOCK_SHIFTY(10);
+   CHECKBOX(mRandomPhaseCheckbox, "rand phase", &mVoiceParams.mRandomPhase);
    ENDUIBLOCK(width, height);
    mWidth = MAX(width, mWidth);
    mHeight = MAX(height, mHeight);
+
 
    mHeight += 4; //small bottom margin so the last row isn't flush against the module edge
 
@@ -252,7 +257,10 @@ void Wavetable::CreateUIControls()
    mWarpTypeDropdown->AddLabel("quantize", (int)WavetableWarpType::Quantize);
    mWarpTypeDropdown->AddLabel("odd only", (int)WavetableWarpType::OddOnly);
    mWarpTypeDropdown->AddLabel("even only", (int)WavetableWarpType::EvenOnly);
+   mWarpTypeDropdown->AddLabel("rectify", (int)WavetableWarpType::Rectify);
+   mWarpTypeDropdown->AddLabel("hard sync", (int)WavetableWarpType::HardSync);
 }
+
 
 Wavetable::~Wavetable()
 {
@@ -378,6 +386,8 @@ void Wavetable::DrawModule()
    mDetuneBSlider->Draw();
    mUnisonBSlider->Draw();
    mUnisonWidthBSlider->Draw();
+   mNoiseColorSlider->Draw();
+   mNoiseVolumeSlider->Draw();
 
    //osc B filter + amp env
    mFilterADSRDisplayB->Draw();
@@ -401,6 +411,7 @@ void Wavetable::DrawModule()
    mModAmountSlider->Draw();
    mWarpTypeDropdown->Draw();
    mWarpAmountSlider->Draw();
+   mRandomPhaseCheckbox->Draw();
 
    //column header labels
    DrawTextNormal("osc a", kOscAX + 2, 12);

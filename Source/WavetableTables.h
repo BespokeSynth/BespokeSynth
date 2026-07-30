@@ -91,6 +91,8 @@ enum class WavetableWarpType
    Quantize,
    OddOnly,
    EvenOnly,
+   Rectify,
+   HardSync,
    Count
 };
 

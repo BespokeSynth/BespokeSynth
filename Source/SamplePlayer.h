@@ -60,7 +60,7 @@ public:
    void Poll() override;
 
    void PlayNote(NoteMessage note) override;
-   void SendCC(int control, int value, int voiceIdx = -1) override {}
+   void SendCC(int control, int value, int voiceIdx = -1) override { }
    void OnPulse(double time, float velocity, int flags) override;
 
    //IAudioSource
@@ -83,6 +83,14 @@ public:
    ChannelBuffer* GetCueSampleData(int cueIndex);
    float GetLengthInSeconds() const;
 
+protected:
+   void DrawModule() override;
+   void OnClicked(float x, float y, bool right) override;
+   bool MouseMoved(float x, float y) override;
+   void MouseReleased() override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+
+protected:
    void oscMessageReceived(const juce::OSCMessage& msg) override;
    void oscBundleReceived(const juce::OSCBundle& bundle) override;
 
@@ -128,12 +136,6 @@ private:
    void StopRecording();
 
    //IDrawableModule
-   void DrawModule() override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
-   void MouseReleased() override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
-
    Sample* mSample{ nullptr };
    bool mOwnsSample{ true };
 
@@ -155,7 +157,7 @@ private:
    std::string mYoutubeId;
    ClickButton* mDownloadYoutubeButton{ nullptr };
    TextEntry* mDownloadYoutubeSearch{ nullptr };
-   char mYoutubeSearch[MAX_TEXTENTRY_LENGTH]{};
+   char mYoutubeSearch[MAX_TEXTENTRY_LENGTH]{ };
    ClickButton* mLoadFileButton{ nullptr };
    ClickButton* mSaveFileButton{ nullptr };
    bool mIsLoadingSample{ false };
@@ -222,7 +224,7 @@ private:
    juce::ChildProcess* mRunningProcess{ nullptr };
    std::function<void()> mOnRunningProcessComplete;
    std::vector<YoutubeSearchResult> mYoutubeSearchResults;
-   std::array<ClickButton*, kMaxYoutubeSearchResults> mSearchResultButtons{};
+   std::array<ClickButton*, kMaxYoutubeSearchResults> mSearchResultButtons{ };
 
    SwitchAndRamp mSwitchAndRamp;
 

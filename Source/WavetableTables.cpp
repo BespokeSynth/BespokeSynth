@@ -575,6 +575,171 @@ const std::vector<std::shared_ptr<WavetableFrameSet>>& WavetableTables::GetBuilt
       sTables.push_back(table);
    }
 
+   {
+      //"supersaw": 1 detuned saw -> 7 detuned saws stacked
+      auto table = std::make_shared<WavetableFrameSet>("supersaw");
+      const int kFrames = 12;
+      for (int i = 0; i < kFrames; ++i)
+      {
+         float t = (float)i / (kFrames - 1);
+         int numSaws = 1 + (int)(t * 6); // 1 to 7
+         std::vector<float> frame(N, 0.0f);
+         for (int n = 0; n < N; ++n)
+         {
+            float phase01 = (float)n / N;
+            float value = 0;
+            for (int s = 0; s < numSaws; ++s)
+            {
+               float detune = (s == 0) ? 0.0f : ((s % 2 == 1) ? 1.0f : -1.0f) * ((s + 1) / 2) * 0.015f;
+               float sawPhase = phase01 * (1.0f + detune);
+               sawPhase -= floorf(sawPhase);
+               value += NaiveSaw(sawPhase);
+            }
+            frame[n] = value;
+         }
+         normalizeFrame(frame);
+         table->AddFrame(frame);
+      }
+      table->FinalizeHarmonicCaches();
+      sTables.push_back(table);
+   }
+
+   {
+      //"metallic": inharmonic bell partials
+      auto table = std::make_shared<WavetableFrameSet>("metallic");
+      const int kFrames = 12;
+      for (int i = 0; i < kFrames; ++i)
+      {
+         float t = (float)i / (kFrames - 1);
+         int numPartials = 3 + (int)(t * 12);
+         std::vector<float> frame(N, 0.0f);
+         for (int n = 0; n < N; ++n)
+         {
+            float phase01 = (float)n / N;
+            float value = 0;
+            for (int k = 1; k <= numPartials; ++k)
+            {
+               float ratio = k * sqrtf(1.0f + 0.15f * k * k); // inharmonic
+               value += (1.0f / k) * sinf(phase01 * FTWO_PI * ratio);
+            }
+            frame[n] = value;
+         }
+         normalizeFrame(frame);
+         table->AddFrame(frame);
+      }
+      table->FinalizeHarmonicCaches();
+      sTables.push_back(table);
+   }
+
+   {
+      //"strings": bowed string spectrum
+      auto table = std::make_shared<WavetableFrameSet>("strings");
+      const int kFrames = 12;
+      for (int i = 0; i < kFrames; ++i)
+      {
+         float t = (float)i / (kFrames - 1);
+         float formant1 = ofLerp(3.0f, 5.0f, t);
+         float formant2 = ofLerp(12.0f, 8.0f, t);
+         std::vector<float> frame(N, 0.0f);
+         for (int n = 0; n < N; ++n)
+         {
+            float phase01 = (float)n / N;
+            float value = 0;
+            for (int k = 1; k <= 40; ++k)
+            {
+               float d1 = fabsf(k - formant1);
+               float d2 = fabsf(k - formant2);
+               float weight = expf(-d1 * d1 / 4.0f) + 0.6f * expf(-d2 * d2 / 6.0f) + 0.1f;
+               value += (weight / k) * sinf(phase01 * FTWO_PI * k);
+            }
+            frame[n] = value;
+         }
+         normalizeFrame(frame);
+         table->AddFrame(frame);
+      }
+      table->FinalizeHarmonicCaches();
+      sTables.push_back(table);
+   }
+
+   {
+      //"choir": multi-formant vowel blend
+      auto table = std::make_shared<WavetableFrameSet>("choir");
+      const int kFrames = 12;
+      for (int i = 0; i < kFrames; ++i)
+      {
+         float t = (float)i / (kFrames - 1);
+         float f1 = ofLerp(3.0f, 6.0f, t);
+         float f2 = ofLerp(9.0f, 14.0f, t);
+         float f3 = ofLerp(20.0f, 25.0f, t);
+         std::vector<float> frame(N, 0.0f);
+         for (int n = 0; n < N; ++n)
+         {
+            float phase01 = (float)n / N;
+            float value = 0;
+            for (int k = 1; k <= 30; ++k)
+            {
+               float w = expf(-powf(k - f1, 2.0f) / 4.0f) + 0.6f * expf(-powf(k - f2, 2.0f) / 5.0f) + 0.3f * expf(-powf(k - f3, 2.0f) / 6.0f);
+               value += (w / k) * sinf(phase01 * FTWO_PI * k);
+            }
+            frame[n] = value;
+         }
+         normalizeFrame(frame);
+         table->AddFrame(frame);
+      }
+      table->FinalizeHarmonicCaches();
+      sTables.push_back(table);
+   }
+
+   {
+      //"noise bands": sweeping resonances
+      auto table = std::make_shared<WavetableFrameSet>("noise bands");
+      const int kFrames = 12;
+      for (int i = 0; i < kFrames; ++i)
+      {
+         float t = (float)i / (kFrames - 1);
+         float peak = ofLerp(5.0f, 40.0f, t);
+         std::vector<float> frame(N, 0.0f);
+         for (int n = 0; n < N; ++n)
+         {
+            float phase01 = (float)n / N;
+            float value = 0;
+            for (int k = 1; k <= 48; ++k)
+            {
+               float w = expf(-powf(k - peak, 2.0f) / 10.0f);
+               value += w * sinf(phase01 * FTWO_PI * k + fmodf(k * 1.234f, FTWO_PI));
+            }
+            frame[n] = value;
+         }
+         normalizeFrame(frame);
+         table->AddFrame(frame);
+      }
+      table->FinalizeHarmonicCaches();
+      sTables.push_back(table);
+   }
+
+   {
+      //"bitcrush": sine to 2-bit
+      auto table = std::make_shared<WavetableFrameSet>("bitcrush");
+      const int kFrames = 12;
+      for (int i = 0; i < kFrames; ++i)
+      {
+         float t = (float)i / (kFrames - 1);
+         float steps = ofLerp(64.0f, 2.0f, t); // 6-bit down to 1-bit
+         std::vector<float> frame(N, 0.0f);
+         for (int n = 0; n < N; ++n)
+         {
+            float phase01 = (float)n / N;
+            float val = sinf(phase01 * FTWO_PI);
+            val = floorf(val * steps) / steps;
+            frame[n] = val;
+         }
+         normalizeFrame(frame);
+         table->AddFrame(frame);
+      }
+      table->FinalizeHarmonicCaches();
+      sTables.push_back(table);
+   }
+
    return sTables;
 }
 
@@ -654,6 +819,13 @@ float WavetableTables::ReadWarped(const WavetableFrameSet* table, float position
             p = floorf(p * steps) / steps;
             break;
          }
+         case WavetableWarpType::HardSync:
+         {
+            float syncRatio = ofLerp(1.0f, 4.0f, ofClamp(warpAmount, 0, 1));
+            p = p * syncRatio;
+            p -= floorf(p);
+            break;
+         }
          default:
             break;
       }
@@ -686,6 +858,12 @@ float WavetableTables::ReadWarped(const WavetableFrameSet* table, float position
 
    if (postFlipPoint >= 0 && p > postFlipPoint)
       result = -result;
+
+   if (warp == WavetableWarpType::Rectify)
+   {
+      float rectified = fabsf(result) * 2.0f - 1.0f;
+      result = ofLerp(result, rectified, ofClamp(warpAmount, 0, 1));
+   }
 
    return result;
 }
