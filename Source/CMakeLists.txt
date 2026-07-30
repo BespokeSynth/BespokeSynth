@@ -7,7 +7,7 @@ else()
 endif()
 
 juce_add_gui_app(BespokeSynth
-    PRODUCT_NAME BespokeSynth
+    PRODUCT_NAME BeSpokeMod
     ICON_BIG ${CMAKE_SOURCE_DIR}/bespoke_icon.png
     MICROPHONE_PERMISSION_ENABLED TRUE
     CAMERA_PERMISSION_ENABLED     TRUE
@@ -15,7 +15,7 @@ juce_add_gui_app(BespokeSynth
     FILE_SHARING_ENABLED          TRUE
     DOCUMENT_BROWSER_ENABLED      TRUE
     DOCUMENT_EXTENSIONS           .bsk
-    BUNDLE_ID                     com.ryanchallinor.bespokesynth
+    BUNDLE_ID                     com.namansoni.bespokemod
     PLUGINHOST_AU                 TRUE
     )
 
