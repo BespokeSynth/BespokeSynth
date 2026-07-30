@@ -86,11 +86,13 @@ void NoiseSynthVoice::Process(float* outL, float* outR, int numSamples, double t
          float hilbertOut = 0.0f;
          for (int k = 0; k < kHilbertLen; ++k)
          {
-            int idx = (mDelayPos - k + mDelayLine.size()) % mDelayLine.size();
+            int delayLineSize = (int)mDelayLine.size();
+            int idx = (mDelayPos - k + delayLineSize) % delayLineSize;
             hilbertOut += mDelayLine[idx] * mHil[k];
          }
 
-         int delayIdx = (mDelayPos - kHilbertMid + mDelayLine.size()) % mDelayLine.size();
+         int delayLineSize = (int)mDelayLine.size();
+         int delayIdx = (mDelayPos - kHilbertMid + delayLineSize) % delayLineSize;
          float delayedIn = mDelayLine[delayIdx];
 
          mPhase += phaseInc;
@@ -102,7 +104,7 @@ void NoiseSynthVoice::Process(float* outL, float* outR, int numSamples, double t
          float shifted = delayedIn * cosf(mPhase) - hilbertOut * sinf(mPhase);
          noiseVal = shifted;
 
-         mDelayPos = (mDelayPos + 1) % mDelayLine.size();
+         mDelayPos = (mDelayPos + 1) % (int)mDelayLine.size();
       }
 
       outL[i] += noiseVal;

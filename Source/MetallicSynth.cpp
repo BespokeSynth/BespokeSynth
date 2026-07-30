@@ -263,7 +263,7 @@ void MetallicSynth::Process(double time)
                continue;
 
             // Base sine wave
-            float outVal = sinf((float)(v.modePhase[m] * 2.0 * M_PI)) * v.modeAmp[m];
+            float outVal = sinf((float)(v.modePhase[m] * 2.0 * PI)) * v.modeAmp[m];
 
             // Continuous Spread Panning
             float pan = (m % 2 == 0) ? -1.0f : 1.0f;

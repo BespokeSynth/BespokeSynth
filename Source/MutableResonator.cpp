@@ -21,7 +21,7 @@ static inline float ProcessSvfBandpass(float input, float freq, float q,
       w = 0.49f;
    if (w < 0.0001f)
       w = 0.0001f;
-   float g = tanf(M_PI * w);
+   float g = tanf(PI * w);
 
    // Damping coefficient k = 1/Q
    float k = 1.0f / q;
@@ -145,7 +145,7 @@ void MutableResonator::UpdateFilterBank()
 
       // Position-based nodal filtering: excitation at a node of mode n
       // produces zero amplitude for that mode. sin((n+1) * pos * PI)
-      float posAmp = fabsf(sinf((float)(i + 1) * mPosition * M_PI));
+      float posAmp = fabsf(sinf((float)(i + 1) * mPosition * PI));
       posAmp = posAmp * posAmp; // Square for sharper nulls
 
       // Brightness rolloff: higher modes lose amplitude
@@ -161,8 +161,8 @@ void MutableResonator::UpdateFilterBank()
 
       // Stereo spread: alternate modes L/R with increasing width
       float pan = ((i % 2 == 0) ? -1.0f : 1.0f) * mSpread * ((float)(i + 1) / (float)kNumModes);
-      mModes[i].panL = cosf((pan + 1.0f) * 0.25f * M_PI);
-      mModes[i].panR = sinf((pan + 1.0f) * 0.25f * M_PI);
+      mModes[i].panL = cosf((pan + 1.0f) * 0.25f * PI);
+      mModes[i].panR = sinf((pan + 1.0f) * 0.25f * PI);
    }
 }
 
