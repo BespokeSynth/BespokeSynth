@@ -20,7 +20,14 @@ function(bespoke_make_portable TARGET)
         string(REGEX REPLACE "\.framework/Versions/${pyMajDotMin}/.*" ".framework/Versions/${pyMajDotMin}" pyFWDirSrc "${Python_STDLIB}")
         string(REGEX REPLACE "/Versions/${pyMajDotMin}" "" pyFWName "${pyFWDirSrc}")
         string(REGEX REPLACE ".*/" "" pyFWName "${pyFWName}")
-        set(bundleContents "${pyDirDst}/${TARGET}.app/Contents")
+        #NOTE: this used to be "${pyDirDst}/${TARGET}.app/Contents", which hardcodes the .app bundle
+        #folder name to the literal CMake TARGET name ("BespokeSynth") rather than the actual bundle
+        #name derived from PRODUCT_NAME - broke as soon as PRODUCT_NAME diverged from TARGET (e.g.
+        #renaming the product to BeSpokeMod), since the real bundle is BeSpokeMod.app but this path
+        #still pointed at a nonexistent BespokeSynth.app, and the symlink step below failed with
+        #"No such file or directory". $<TARGET_BUNDLE_DIR:...> resolves to the real bundle path
+        #regardless of PRODUCT_NAME.
+        set(bundleContents "$<TARGET_BUNDLE_DIR:${TARGET}>/Contents")
         set(pyDirDst "${bundleContents}/Frameworks/${pyFWName}/Versions/${pyMajDotMin}")
     else()
         set(pyDirDst "${pyDirDst}/python")

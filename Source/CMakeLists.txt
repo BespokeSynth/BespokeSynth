@@ -937,12 +937,12 @@ if (APPLE)
         get_target_property(SIGN_HERE BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
         add_custom_command(TARGET BespokeSynthSigned POST_BUILD VERBATIM
                 WORKING_DIRECTORY ${SIGN_HERE}
-                COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" --deep BespokeSynth.app/Contents/Frameworks/Python.framework/
-                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name *.so -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
-                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name *.o -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
-                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name python3* -perm +111 -exec codesign -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --force -s "${BESPOKE_SIGN_AS}"  {} \;
-                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name Python -exec codesign -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --force -s "${BESPOKE_SIGN_AS}" {} \;
-                COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --deep BespokeSynth.app
+                COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" --deep $<TARGET_BUNDLE_DIR_NAME:BespokeSynth>/Contents/Frameworks/Python.framework/
+                COMMAND find $<TARGET_BUNDLE_DIR_NAME:BespokeSynth>/Contents/Frameworks/Python.framework/Versions/ -name *.so -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
+                COMMAND find $<TARGET_BUNDLE_DIR_NAME:BespokeSynth>/Contents/Frameworks/Python.framework/Versions/ -name *.o -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
+                COMMAND find $<TARGET_BUNDLE_DIR_NAME:BespokeSynth>/Contents/Frameworks/Python.framework/Versions/ -name python3* -perm +111 -exec codesign -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --force -s "${BESPOKE_SIGN_AS}"  {} \;
+                COMMAND find $<TARGET_BUNDLE_DIR_NAME:BespokeSynth>/Contents/Frameworks/Python.framework/Versions/ -name Python -exec codesign -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --force -s "${BESPOKE_SIGN_AS}" {} \;
+                COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --deep $<TARGET_BUNDLE_DIR_NAME:BespokeSynth>
                 )
     endif()
 elseif (WIN32)
