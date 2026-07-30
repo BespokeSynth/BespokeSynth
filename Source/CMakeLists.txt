@@ -320,6 +320,10 @@ target_sources(BespokeSynth PRIVATE
     LimiterEffect.h
     LinkwitzRileyFilter.cpp
     LinkwitzRileyFilter.h
+    MetallicSynth.cpp
+    MetallicSynth.h
+    MutableResonator.cpp
+    MutableResonator.h
     LinnstrumentControl.cpp
     LinnstrumentControl.h
     Lissajous.cpp
@@ -833,6 +837,14 @@ target_sources(BespokeSynth PRIVATE
     VisualEffectsViz.cpp
     VisualSwitcherViz.cpp
     MacroKnobs.cpp
+    MacroKnobs.h
+    MacroXY.cpp
+    MacroXY.h
+    NoiseSynth.cpp
+    NoiseSynth.h
+    MacroBars.cpp
+    Maze.cpp
+    MacroBars.h
     ScopeViz.cpp
     VideoCloud.cpp
     TextCloud.cpp

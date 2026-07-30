@@ -40,6 +40,8 @@
 #include "Arpeggiator.h"
 #include "SampleUniverse.h"
 #include "EffectMatrix.h"
+#include "MetallicSynth.h"
+#include "MutableResonator.h"
 #include "Razor.h"
 #include "Monophonify.h"
 #include "StepSequencer.h"
@@ -51,6 +53,9 @@
 #include "TransformViz.h"
 #include "LiquidifierViz.h"
 #include "MacroKnobs.h"
+#include "MacroXY.h"
+#include "MacroBars.h"
+#include "NoiseSynth.h"
 #include "VisualEffectsViz.h"
 #include "VisualSwitcherViz.h"
 #include "ScopeViz.h"
@@ -92,6 +97,7 @@
 #include "ChaosEngine.h"
 #include "SingleOscillator.h"
 #include "MolderSampler.h"
+#include "Maze.h"
 #include "Tracker.h"
 #include "Wavetable.h"
 #include "BandVocoder.h"
@@ -338,6 +344,8 @@ ModuleFactory::ModuleFactory()
    REGISTER(Arpeggiator, arpeggiator, kModuleCategory_Note);
    REGISTER(SampleUniverse, sampleuniverse, kModuleCategory_Audio);
    REGISTER(EffectMatrix, effectmatrix, kModuleCategory_Audio);
+   REGISTER(MetallicSynth, metallicsynth, kModuleCategory_Synth);
+   REGISTER(MutableResonator, mutableresonator, kModuleCategory_Synth);
    REGISTER(Monophonify, portamento, kModuleCategory_Note);
    REGISTER(StepSequencer, drumsequencer, kModuleCategory_Instrument);
    REGISTER(LaunchpadKeyboard, gridkeyboard, kModuleCategory_Instrument);
@@ -413,6 +421,8 @@ ModuleFactory::ModuleFactory()
 
    REGISTER(NoteToFreq, notetofreq, kModuleCategory_Modulator);
    REGISTER(MacroKnobs, macroknobs, kModuleCategory_Other);
+   REGISTER(MacroXY, macroxy, kModuleCategory_Other);
+   REGISTER(MacroBars, macrobars, kModuleCategory_Other);
    REGISTER(MacroSlider, macroslider, kModuleCategory_Modulator);
    REGISTER(TableModulator, tablemod, kModuleCategory_Modulator);
    REGISTER(NoteVibrato, vibrato, kModuleCategory_Note);
@@ -480,6 +490,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(DCOffset, dcoffset, kModuleCategory_Audio);
    REGISTER(SignalClamp, signalclamp, kModuleCategory_Audio);
    REGISTER(Waveshaper, waveshaper, kModuleCategory_Audio);
+   REGISTER(NoiseSynth, noisesynth, kModuleCategory_Audio);
    REGISTER(NoteHocket, notehocket, kModuleCategory_Note);
    REGISTER(NoteRangeFilter, noterangefilter, kModuleCategory_Note);
    REGISTER(NoteChance, notechance, kModuleCategory_Note);
@@ -487,6 +498,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PulseDelayer, pulsedelayer, kModuleCategory_Pulse);
    REGISTER(NotePanRandom, notepanrandom, kModuleCategory_Note);
    REGISTER(PulseGate, pulsegate, kModuleCategory_Pulse);
+   REGISTER(Maze, maze, kModuleCategory_Note);
    REGISTER(PulseHocket, pulsehocket, kModuleCategory_Pulse);
    REGISTER(Push2Control, push2control, kModuleCategory_Other);
    REGISTER(PulseTrain, pulsetrain, kModuleCategory_Pulse);
