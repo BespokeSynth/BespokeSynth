@@ -81,7 +81,7 @@ public:
    bool IsEnabled() const override { return false; }
 
 private:
-   void DrawModule() override {}
+   void DrawModule() override { }
 };
 
 class ModularSynth
@@ -327,6 +327,8 @@ private:
    void UpdateUserPrefsLayout();
    void LoadStatePopupImp();
    IDrawableModule* DuplicateModule(IDrawableModule* module);
+   void CopySelectedModules(); //Ctrl/Cmd+C - snapshots the group-selected (or hovered) module(s)
+   void PasteCopiedModules(); //Ctrl/Cmd+V - recreates the copied snapshot(s) at the mouse position
    void DeleteAllModules();
    void TriggerClapboard();
    void DoAutosave();
@@ -341,11 +343,11 @@ private:
    struct QueuedSaveStateInfo
    {
       bool mQueued{ false };
-      std::string mFile{};
+      std::string mFile{ };
       bool mAutosave{ false };
       bool mWaitingForScreenshot{ true };
    };
-   QueuedSaveStateInfo mQueuedSaveStateInfo{};
+   QueuedSaveStateInfo mQueuedSaveStateInfo{ };
 
    int mIOBufferSize{ 0 };
 
@@ -391,16 +393,16 @@ private:
    RollingBuffer* mGlobalRecordBuffer{ nullptr };
    int mRecordingLength{ 0 };
 
-   bool mIsRecordingSession{ false }; //ambient capture is on by default (matches legacy behavior); Record button lets the user explicitly stop/start a take
+   bool mIsRecordingSession{ true }; //ambient capture is on by default (matches legacy behavior); Record button lets the user explicitly stop/start a take
 
    struct LogEventItem
    {
-      LogEventItem() {}
+      LogEventItem() { }
       LogEventItem(double _time, std::string _text, LogEventType _type)
       : time(_time)
       , text(_text)
       , type(_type)
-      {}
+      { }
       double time{ 0 };
       std::string text;
       LogEventType type{ LogEventType::kLogEventType_Verbose };
@@ -428,7 +430,7 @@ private:
    bool mLastClickWasEmptySpace{ false };
    bool mIsShiftPressed{ false };
    double mLastShiftPressTime{ -9999 };
-   ofVec2f mLastShiftPressMousePos{};
+   ofVec2f mLastShiftPressMousePos{ };
 
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout{ false };
@@ -445,6 +447,15 @@ private:
    std::vector<IDrawableModule*> mGroupSelectedModules;
    ModuleContainer* mGroupSelectContext{ nullptr };
    bool mHasDuplicatedDuringDrag{ false };
+
+   //Ctrl/Cmd+C clipboard: a snapshot (not a live pointer) so paste still works even if the
+   //original module was deleted or changed after copying, and so you can paste more than once
+   struct CopiedModuleState
+   {
+      std::vector<uint8_t> stateData; //raw bytes from the module's own SaveState()
+      ofxJSONElement layoutData; //type + original name + position, from SaveLayoutBase()
+   };
+   std::vector<CopiedModuleState> mCopiedModules;
    bool mHasAutopatchedToTargetDuringDrag{ false };
 
    IDrawableModule* mResizeModule{ nullptr };

@@ -6,6 +6,7 @@
 #include "Slider.h"
 #include "DropdownList.h"
 #include <array>
+#include <cstdint>
 
 class MetallicSynth : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener
 {
@@ -57,6 +58,9 @@ private:
       float velocity{ 1.0f };
       double exciterTime{ 0 };
       float prevNoise{ 0.0f }; // State for noise hardness filter
+      uint64_t noteOnSeq{ 0 }; // monotonic note-on order, used to pick the oldest voice to steal
+      // (exciterTime freezes once the mallet-attack window ends, so it
+      // can't be used to compare voices that are well into their decay)
 
       // Simple additive synthesis — no filters at all
       double modePhase[kNumModes];
@@ -68,6 +72,7 @@ private:
    };
 
    std::array<Voice, kNumVoices> mVoices;
+   uint64_t mNoteOnCounter{ 0 };
 
    enum MaterialType
    {

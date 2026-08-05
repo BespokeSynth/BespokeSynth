@@ -51,6 +51,12 @@ ShaderViz::ShaderViz()
 ShaderViz::~ShaderViz()
 {
    VizGL::DestroyFbo(mOut);
+
+   if (mProgram != 0)
+   {
+      glDeleteProgram(mProgram);
+      mProgram = 0;
+   }
 }
 
 void ShaderViz::Process(double time)
@@ -167,8 +173,8 @@ void ShaderViz::DrawModule()
       return;
 
    //internal render resolution (stretched to the preview), capped for speed
-   int rw = MAX(1080, ((int)pw & ~1));
-   int rh = MAX(1080, ((int)ph & ~1));
+   int rw = MIN(1080, ((int)pw & ~1));
+   int rh = MIN(1080, ((int)ph & ~1));
 
    mResW = rw;
    mResH = rh;

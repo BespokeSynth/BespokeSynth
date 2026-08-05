@@ -119,6 +119,13 @@ private:
    void RebuildIndex();
    void StopIndexThread();
    void IndexWorker(std::vector<std::string> locations);
+   //re-walk just one already-added location instead of the whole library - much faster when you
+   //only dropped a few new files into one folder. Merges into the existing index rather than
+   //replacing it: removes any stale entries under that folder, then re-adds what's there now.
+   void RescanLocation(int index);
+   void RescanLocationWorker(std::string location);
+   //shared by both the full rebuild and a single-location rescan
+   void WalkLocationsIntoList(const std::vector<std::string>& locations, std::vector<IndexedSample>& outList);
    //the index is cached to disk so startup just loads it instantly instead of re-walking folders;
    //a fresh walk only happens on first run, on rescan, or when locations change
    bool LoadIndex();
@@ -161,6 +168,7 @@ private:
    ClickButton* mAddLocationButton{ nullptr };
    ClickButton* mRescanButton{ nullptr };
    std::array<ClickButton*, kMaxLocationRows> mRemoveLocationButtons{ nullptr };
+   std::array<ClickButton*, kMaxLocationRows> mRescanLocationButtons{ nullptr };
 
    //background audio-file index
    static constexpr int kMaxIndexed = 500000; //safety cap on library size

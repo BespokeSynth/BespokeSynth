@@ -22,6 +22,8 @@
 #include "GridController.h"
 #include "FileStream.h"
 #include "PatchCable.h"
+#include "PatchCableSource.h"
+#include <unordered_map>
 #include "ADSRDisplay.h"
 #include "QuickSpawnMenu.h"
 #include "SearchPanel.h"
@@ -1301,6 +1303,12 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
 
    if (key == 'l' && GetKeyModifiers() == kModifier_Command && !isRepeat)
       LoadStatePopup();
+
+   if (key == 'c' && GetKeyModifiers() == kModifier_Command && !isRepeat)
+      CopySelectedModules();
+
+   if (key == 'v' && GetKeyModifiers() == kModifier_Command && !isRepeat)
+      PasteCopiedModules();
 
    //if (key == 'c' && !isRepeat)
    //   mousePressed(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), 0);
@@ -3213,6 +3221,106 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    newModule->SetName(newName.c_str());
 
    return newModule;
+}
+
+void ModularSynth::CopySelectedModules()
+{
+   std::vector<IDrawableModule*> toCopy;
+   if (!mGroupSelectedModules.empty())
+      toCopy = mGroupSelectedModules;
+   else if (gHoveredModule != nullptr)
+      toCopy.push_back(gHoveredModule);
+
+   if (toCopy.empty())
+      return;
+
+   mCopiedModules.clear();
+   for (auto* module : toCopy)
+   {
+      juce::MemoryBlock block;
+      {
+         FileStreamOut out(block);
+         module->SaveState(out);
+      }
+
+      CopiedModuleState state;
+      state.stateData.assign((const uint8_t*)block.getData(), (const uint8_t*)block.getData() + block.getSize());
+      module->SaveLayoutBase(state.layoutData);
+      mCopiedModules.push_back(std::move(state));
+   }
+}
+
+void ModularSynth::PasteCopiedModules()
+{
+   if (mCopiedModules.empty())
+      return;
+
+   //anchor the first copied module to the mouse, and shift the rest by the same amount so a
+   //multi-module copy keeps its original relative layout
+   float mouseX = GetMouseX(&mModuleContainer);
+   float mouseY = GetMouseY(&mModuleContainer);
+   float firstOrigX = (float)mCopiedModules[0].layoutData["position"][0u].asDouble();
+   float firstOrigY = (float)mCopiedModules[0].layoutData["position"][1u].asDouble();
+   float offsetX = mouseX - firstOrigX;
+   float offsetY = mouseY - firstOrigY;
+
+   std::list<IDrawableModule*> newlyPasted;
+   std::unordered_map<std::string, IDrawableModule*> originalNameToPasted; //so cables between co-pasted modules can be repointed at their new siblings, not the still-live originals
+   for (auto& saved : mCopiedModules)
+   {
+      ofxJSONElement layoutData = saved.layoutData; //copy - this paste's edits shouldn't affect the clipboard, so it can be pasted again
+      std::string originalName = layoutData["name"].asString();
+      std::string newName = GetUniqueName(originalName, mModuleContainer.GetModules());
+
+      float origX = (float)layoutData["position"][0u].asDouble();
+      float origY = (float)layoutData["position"][1u].asDouble();
+      layoutData["position"][0u] = origX + offsetX;
+      layoutData["position"][1u] = origY + offsetY;
+      layoutData["name"] = newName;
+
+      IDrawableModule* newModule = CreateModule(layoutData);
+      mModuleContainer.AddModule(newModule);
+      SetUpModule(newModule, layoutData);
+      newModule->Init();
+
+      newModule->SetName(originalName.c_str()); //temporarily match the saved name, same as DuplicateModule, so LoadState's internal references resolve correctly
+
+      {
+         juce::MemoryBlock block(saved.stateData.data(), saved.stateData.size());
+         FileStreamIn in(block);
+         mIsLoadingModule = true;
+         mIsDuplicatingModule = true;
+         newModule->LoadState(in, newModule->LoadModuleSaveStateRev(in));
+         mIsDuplicatingModule = false;
+         mIsLoadingModule = false;
+      }
+
+      newModule->SetName(newName.c_str());
+      newlyPasted.push_back(newModule);
+      originalNameToPasted[originalName] = newModule;
+   }
+
+   //if multiple connected modules were copied together, their cables just resolved (by name) to whichever
+   //still-live module owns that original name - almost always the module they were copied from, not their
+   //newly pasted sibling. Repoint any such cable at the sibling so the pasted group stays self-contained.
+   for (auto* newModule : newlyPasted)
+   {
+      for (auto* cableSource : newModule->GetPatchCableSources())
+      {
+         for (auto* cable : cableSource->GetPatchCables())
+         {
+            IClickable* target = cable->GetTarget();
+            if (target == nullptr)
+               continue;
+            auto iter = originalNameToPasted.find(target->Name());
+            if (iter != originalNameToPasted.end() && iter->second != target)
+               cableSource->SetPatchCableTarget(cable, iter->second, false);
+         }
+      }
+   }
+
+   //select the newly pasted module(s) so they can immediately be dragged into place, deleted, or copied again
+   SetGroupSelectedModules(newlyPasted);
 }
 
 ofxJSONElement ModularSynth::GetLayout()

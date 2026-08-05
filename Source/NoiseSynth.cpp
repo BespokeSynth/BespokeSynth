@@ -178,9 +178,9 @@ void NoiseSynth::Process(double time)
       return;
 
    int bufferSize = target->GetBuffer()->BufferSize();
-   float* outL = target->GetBuffer()->GetChannel(0);
-   float* outR = target->GetBuffer()->GetChannel(1);
    bool isStereo = target->GetBuffer()->NumActiveChannels() > 1;
+   float* outL = target->GetBuffer()->GetChannel(0);
+   float* outR = isStereo ? target->GetBuffer()->GetChannel(1) : outL;
 
    Clear(outL, bufferSize);
    if (isStereo)

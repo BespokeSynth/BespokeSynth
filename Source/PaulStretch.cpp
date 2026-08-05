@@ -1,6 +1,7 @@
 #include "PaulStretch.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
+#include "IAudioReceiver.h"
 #include "Profiler.h"
 #include "Checkbox.h"
 #include <cmath>
@@ -14,10 +15,7 @@ namespace
 }
 
 PaulStretch::PaulStretch()
-: IAudioProcessor(gBufferSize)
 {
-   mInputBuffer = std::make_unique<RollingBuffer>(kWindowSizes[2] * 4);
-   mInputBuffer->SetNumChannels(2);
    UpdateFFTSize(kWindowSizes[2]); // default to 32768
 }
 
@@ -46,12 +44,6 @@ void PaulStretch::UpdateFFTSize(int newSize)
       mWindow[i] = 0.5f * (1.0f - std::cos(kTwoPi * i / (mCurrentFFTSize - 1)));
    }
 
-   if (!mInputBuffer || mInputBuffer->Size() != mCurrentFFTSize * 4)
-   {
-      mInputBuffer = std::make_unique<RollingBuffer>(mCurrentFFTSize * 4);
-      mInputBuffer->SetNumChannels(2);
-   }
-
    mOutputBuffer[0].Init(mCurrentFFTSize * 2);
    mOutputBuffer[1].Init(mCurrentFFTSize * 2);
 }
@@ -62,11 +54,11 @@ void PaulStretch::CreateUIControls()
 
    mStretchSlider = new FloatSlider(this, "stretch", 5, 20, 110, 15, &mStretch, 1.0f, 1000.0f);
    mPhaseRandSlider = new FloatSlider(this, "phase rand", 5, 40, 110, 15, &mPhaseRand, 0.0f, 1.0f);
-   mMixSlider = new FloatSlider(this, "mix", 5, 60, 110, 15, &mMix, 0.0f, 1.0f);
-   mVolumeSlider = new FloatSlider(this, "volume", 5, 80, 110, 15, &mVolume, 0.0f, 2.0f);
-   mPlayStartSlider = new FloatSlider(this, "start", 5, 100, 110, 15, &mPlayStart, 0.0f, 1.0f);
-   mPlayEndSlider = new FloatSlider(this, "end", 5, 120, 110, 15, &mPlayEnd, 0.0f, 1.0f);
-   mCurrentSlider = new FloatSlider(this, "current", 5, 140, 110, 15, &mCurrentPct, 0.0f, 1.0f);
+   mVolumeSlider = new FloatSlider(this, "volume", 5, 60, 110, 15, &mVolume, 0.0f, 2.0f);
+   mPlayStartSlider = new FloatSlider(this, "start", 5, 80, 110, 15, &mPlayStart, 0.0f, 1.0f);
+   mPlayEndSlider = new FloatSlider(this, "end", 5, 100, 110, 15, &mPlayEnd, 0.0f, 1.0f);
+   mCurrentSlider = new FloatSlider(this, "current", 5, 120, 110, 15, &mCurrentPct, 0.0f, 1.0f);
+   mDeleteSampleButton = new ClickButton(this, "delete sample", 5, 140);
 
    mWindowSizeSlider = new FloatSlider(this, "window size", 120, 20, 110, 15, &mWindowSizeIdx, 0.0f, (float)(kNumWindowSizes - 1));
    mWindowSizeSlider->SetMode(FloatSlider::kSquare); // Integer steps
@@ -82,7 +74,7 @@ void PaulStretch::CreateUIControls()
    mLoopCheckbox = new Checkbox(this, "loop", 120, 140, &mLoop);
 
    mWidth = 240;
-   mHeight = 295; // Room for waveform
+   mHeight = 275; // Room for waveform
 }
 
 void PaulStretch::FilesDropped(std::vector<std::string> files, int x, int y)
@@ -127,6 +119,15 @@ void PaulStretch::UpdateSample(Sample* sample, bool ownsSample)
 
 void PaulStretch::ButtonClicked(ClickButton* button, double time)
 {
+   if (button == mDeleteSampleButton)
+   {
+      if (mOwnsSample)
+         delete mSample;
+      mSample = nullptr;
+      mSamplePlayPosition = 0.0;
+      mCurrentPct = 0.0f;
+      mLastCurrentPct = 0.0f;
+   }
 }
 
 void PaulStretch::OnClicked(float x, float y, bool right)
@@ -134,8 +135,8 @@ void PaulStretch::OnClicked(float x, float y, bool right)
    IDrawableModule::OnClicked(x, y, right);
    if (mSample && mSample->LengthInSamples() > 0)
    {
-      // Waveform is at x=5, y=185, w=230, h=100
-      if (x >= 5 && x <= 235 && y >= 185 && y <= 285)
+      // Waveform is at x=5, y=165, w=230, h=100
+      if (x >= 5 && x <= 235 && y >= 165 && y <= 265)
       {
          float pct = (x - 5) / 230.0f;
          mSamplePlayPosition = pct * mSample->LengthInSamples();
@@ -163,7 +164,7 @@ void PaulStretch::DrawModule()
       float sampleWidth = 230;
       float sampleHeight = 100;
       ofPushMatrix();
-      ofTranslate(5, 185); // Draw below the sliders
+      ofTranslate(5, 165); // Draw below the sliders
 
       ofPushStyle();
       ofSetColor(20, 20, 20, 255);
@@ -190,7 +191,6 @@ void PaulStretch::DrawModule()
    }
    else
    {
-      // Draw live audio output
       float sampleWidth = 230;
       float sampleHeight = 100;
       ofPushMatrix();
@@ -199,13 +199,8 @@ void PaulStretch::DrawModule()
       ofPushStyle();
       ofSetColor(20, 20, 20, 255);
       ofRect(0, 0, sampleWidth, sampleHeight);
-      ofPopStyle();
-
-      GetVizBuffer()->Draw(0, 0, sampleWidth, sampleHeight, GetVizBuffer()->Size());
-
-      ofPushStyle();
-      ofSetColor(255, 255, 255, 150);
-      DrawTextNormal("live input", 5, 12);
+      ofSetColor(150, 150, 150);
+      DrawTextNormal("drop a sample here", 8, sampleHeight * 0.5f);
       ofPopStyle();
 
       ofPopMatrix();
@@ -213,11 +208,11 @@ void PaulStretch::DrawModule()
 
    mStretchSlider->Draw();
    mPhaseRandSlider->Draw();
-   mMixSlider->Draw();
    mVolumeSlider->Draw();
    mPlayStartSlider->Draw();
    mPlayEndSlider->Draw();
    mCurrentSlider->Draw();
+   mDeleteSampleButton->Draw();
    mWindowSizeSlider->Draw();
    mPitchShiftSlider->Draw();
    mFineTuneSlider->Draw();
@@ -254,25 +249,18 @@ void PaulStretch::Process(double time)
    ComputeSliders(0);
 
    IAudioReceiver* target = GetTarget();
-   if (target == nullptr)
+   if (!mEnabled || target == nullptr)
       return;
 
-   SyncBuffers();
-   int bufferSize = GetBuffer()->BufferSize();
-   int numChannels = GetBuffer()->NumActiveChannels();
+   if (!mSample || mSample->LengthInSamples() == 0)
+      return; //sampler-only - nothing to stretch until a sample is dropped in
+
+   int bufferSize = target->GetBuffer()->BufferSize();
+   int numChannels = MIN(2, target->GetBuffer()->NumActiveChannels()); //stereo, or mono if the target only has one channel - never write a channel the target doesn't have
 
    ChannelBuffer* out = target->GetBuffer();
 
-   // Step 1: Write input audio into the input rolling buffer (if no sample is loaded)
-   if (!mSample)
-   {
-      for (int ch = 0; ch < numChannels && ch < 2; ++ch)
-      {
-         mInputBuffer->WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
-      }
-   }
-
-   // Step 2: Overlap-add processing loop
+   // Overlap-add processing loop
    const int hopSize = mCurrentFFTSize / 4; // 75% overlap
    mHopAccumulator += bufferSize;
 
@@ -284,51 +272,35 @@ void PaulStretch::Process(double time)
       mHopAccumulator -= hopSize;
 
       float readStep = hopSize / std::max(1.0f, mStretch);
-      int readOffset = (int)readStep;
 
       for (int ch = 0; ch < numChannels && ch < 2; ++ch)
       {
-         if (mSample && mSample->LengthInSamples() > 0)
+         // Read from sample with loop start/end logic
+         float loopStart = mSample->LengthInSamples() * std::min(mPlayStart, mPlayEnd);
+         float loopEnd = mSample->LengthInSamples() * std::max(mPlayStart, mPlayEnd);
+         if (loopEnd <= loopStart)
+            loopEnd = loopStart + 1;
+
+         // Ensure playhead is within bounds
+         if (mSamplePlayPosition < loopStart || mSamplePlayPosition >= loopEnd)
          {
-            // Read from sample with loop start/end logic
-            float loopStart = mSample->LengthInSamples() * std::min(mPlayStart, mPlayEnd);
-            float loopEnd = mSample->LengthInSamples() * std::max(mPlayStart, mPlayEnd);
-            if (loopEnd <= loopStart)
-               loopEnd = loopStart + 1;
-
-            // Ensure playhead is within bounds
-            if (mSamplePlayPosition < loopStart || mSamplePlayPosition >= loopEnd)
-            {
-               mSamplePlayPosition = loopStart;
-            }
-
-            int intPlayPos = (int)mSamplePlayPosition;
-            for (int i = 0; i < mCurrentFFTSize; ++i)
-            {
-               int sampleIdx = intPlayPos + i;
-               if (sampleIdx >= loopEnd)
-               {
-                  if (mLoop)
-                     sampleIdx = (int)loopStart + (sampleIdx - (int)loopEnd) % (int)(loopEnd - loopStart);
-                  else
-                     sampleIdx = (int)loopEnd - 1;
-               }
-               // Get channel 0 or 1 depending on sample channel count
-               int sampleCh = (ch < mSample->NumChannels()) ? ch : 0;
-               mFftInput[i] = mSample->Data()->GetChannel(sampleCh)[sampleIdx];
-            }
+            mSamplePlayPosition = loopStart;
          }
-         else
-         {
-            // Read audio from rolling buffer with hop offset scaled by stretch factor
-            if (readOffset + mCurrentFFTSize > mInputBuffer->Size())
-            {
-               readOffset = mInputBuffer->Size() - mCurrentFFTSize;
-            }
-            if (readOffset < 0)
-               readOffset = 0;
 
-            mInputBuffer->ReadChunk(mFftInput.data(), mCurrentFFTSize, readOffset, ch);
+         int intPlayPos = (int)mSamplePlayPosition;
+         for (int i = 0; i < mCurrentFFTSize; ++i)
+         {
+            int sampleIdx = intPlayPos + i;
+            if (sampleIdx >= loopEnd)
+            {
+               if (mLoop)
+                  sampleIdx = (int)loopStart + (sampleIdx - (int)loopEnd) % (int)(loopEnd - loopStart);
+               else
+                  sampleIdx = (int)loopEnd - 1;
+            }
+            // Get channel 0 or 1 depending on sample channel count
+            int sampleCh = (ch < mSample->NumChannels()) ? ch : 0;
+            mFftInput[i] = mSample->Data()->GetChannel(sampleCh)[sampleIdx];
          }
 
          // Apply window
@@ -429,8 +401,7 @@ void PaulStretch::Process(double time)
          mOutputBuffer[ch].Add(mFftOut.data(), mCurrentFFTSize, writeOffset);
       }
 
-      // Advance playhead if sample is loaded
-      if (mSample && mSample->LengthInSamples() > 0)
+      // Advance playhead
       {
          float loopStart = mSample->LengthInSamples() * std::min(mPlayStart, mPlayEnd);
          float loopEnd = mSample->LengthInSamples() * std::max(mPlayStart, mPlayEnd);
@@ -451,24 +422,20 @@ void PaulStretch::Process(double time)
       }
    }
 
-   // Step 3: Stream from output buffer to final output channel buffer
+   // Tell the target and the visualizer buffer how many channels we actually produce. Without this
+   // the viz buffer stays flagged as 1 channel, and PatchCable then warns "target expects
+   // multichannel audio, but is only getting mono" on every cable out of this module - even though
+   // the loop below really does fill both channels.
+   SyncOutputBuffer(numChannels);
+
+   // Stream from the overlap-add output buffer to the target
    for (int ch = 0; ch < numChannels; ++ch)
    {
-      int chIdx = (ch < 2) ? ch : 0;
-      const float* inData = GetBuffer()->GetChannel(ch);
       float* outData = out->GetChannel(ch);
 
       for (int i = 0; i < bufferSize; ++i)
-      {
-         float wetSample = 0.0f;
-         if (mEnabled)
-            wetSample = mOutputBuffer[chIdx].ReadAndClear() * mVolume;
-         else
-            wetSample = inData[i];
+         gWorkBuffer[i] = mOutputBuffer[ch].ReadAndClear() * mVolume;
 
-         float drySample = inData[i];
-         gWorkBuffer[i] = drySample * (1.0f - mMix) + wetSample * mMix;
-      }
       Add(outData, gWorkBuffer, bufferSize);
       GetVizBuffer()->WriteChunk(gWorkBuffer, bufferSize, ch);
    }

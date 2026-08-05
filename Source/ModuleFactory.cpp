@@ -97,6 +97,7 @@
 #include "ChaosEngine.h"
 #include "SingleOscillator.h"
 #include "MolderSampler.h"
+#include "DiceSynth.h"
 #include "Maze.h"
 #include "Tracker.h"
 #include "Wavetable.h"
@@ -375,6 +376,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteStepSequencer, notesequencer, kModuleCategory_Instrument);
    REGISTER(SingleOscillator, oscillator, kModuleCategory_Synth);
    REGISTER(MolderSampler, molder, kModuleCategory_Synth);
+   REGISTER(DiceSynth, dicesynth, kModuleCategory_Synth);
    REGISTER(Tracker, tracker, kModuleCategory_Synth);
    REGISTER(Wavetable, wavetable, kModuleCategory_Synth);
    REGISTER(BandVocoder, vocoder, kModuleCategory_Audio);

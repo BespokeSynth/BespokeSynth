@@ -126,6 +126,44 @@ Composite::Composite()
 
 Composite::~Composite()
 {
+   if (mResultImage >= 0)
+   {
+      nvgDeleteImage(gNanoVG, mResultImage);
+      mResultImage = -1;
+   }
+
+   for (int i = 0; i < kMaxLayers; ++i)
+   {
+      if (mLayerFB[i] != nullptr)
+      {
+         nvgluDeleteFramebuffer(mLayerFB[i]);
+         mLayerFB[i] = nullptr;
+      }
+   }
+
+   if (mResultFB != nullptr)
+   {
+      nvgluDeleteFramebuffer(mResultFB);
+      mResultFB = nullptr;
+   }
+
+   if (mVAO != 0)
+   {
+      glDeleteVertexArrays(1, &mVAO);
+      mVAO = 0;
+   }
+
+   if (mVBO != 0)
+   {
+      glDeleteBuffers(1, &mVBO);
+      mVBO = 0;
+   }
+
+   if (mProgram != 0)
+   {
+      glDeleteProgram(mProgram);
+      mProgram = 0;
+   }
 }
 
 void Composite::CreateUIControls()

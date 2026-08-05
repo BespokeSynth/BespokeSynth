@@ -1018,3 +1018,47 @@ void MolderSampler::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
+
+void MolderSampler::SaveState(FileStreamOut& out)
+{
+   out << GetModuleSaveStateRev();
+
+   IDrawableModule::SaveState(out);
+
+   out << mHasSample;
+   if (mHasSample)
+      mSample.SaveState(out);
+
+   out << mRegionStart;
+   out << mRegionEnd;
+
+   out << (int)mSliceStarts.size();
+   for (size_t i = 0; i < mSliceStarts.size(); ++i)
+      out << mSliceStarts[i];
+}
+
+void MolderSampler::LoadState(FileStreamIn& in, int rev)
+{
+   IDrawableModule::LoadState(in, rev);
+
+   LoadStateValidate(rev <= GetModuleSaveStateRev());
+
+   if (rev >= 1)
+   {
+      in >> mHasSample;
+      if (mHasSample)
+         mSample.LoadState(in);
+
+      in >> mRegionStart;
+      in >> mRegionEnd;
+
+      int size;
+      in >> size;
+      //sanity-clamp before allocating - a corrupted or hand-edited save file could otherwise
+      //drive a huge or negative count here
+      LoadStateValidate(size >= 0 && size <= SourceLen() + 1);
+      mSliceStarts.resize(size);
+      for (int i = 0; i < size; ++i)
+         in >> mSliceStarts[i];
+   }
+}

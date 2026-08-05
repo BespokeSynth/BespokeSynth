@@ -421,7 +421,8 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          kModuleCategory_Processor,
          kModuleCategory_Modulator,
          kModuleCategory_Pulse,
-         kModuleCategory_Other
+         kModuleCategory_Other,
+         kModuleCategory_Visualizer
       };
       for (auto& type : moduleTypes)
       {
@@ -507,7 +508,8 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          kModuleCategory_Processor,
          kModuleCategory_Modulator,
          kModuleCategory_Pulse,
-         kModuleCategory_Other
+         kModuleCategory_Other,
+         kModuleCategory_Visualizer
       };
       for (auto& type : moduleTypes)
       {
@@ -562,7 +564,8 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          kModuleCategory_Processor,
          kModuleCategory_Modulator,
          kModuleCategory_Pulse,
-         kModuleCategory_Other
+         kModuleCategory_Other,
+         kModuleCategory_Visualizer
       };
       for (auto& category : moduleCategories)
       {

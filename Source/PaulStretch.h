@@ -1,22 +1,21 @@
 #pragma once
 
-#include "IAudioProcessor.h"
+#include "IAudioSource.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "Checkbox.h"
 #include "ClickButton.h"
 #include "Sample.h"
 #include "FFT.h"
-#include "RollingBuffer.h"
 #include <vector>
 
-class PaulStretch : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IButtonListener
+class PaulStretch : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IButtonListener
 {
 public:
    PaulStretch();
    virtual ~PaulStretch();
    static IDrawableModule* Create() { return new PaulStretch(); }
-   static bool AcceptsAudio() { return true; } //PaulStretch inherits IAudioProcessor (IAudioReceiver + IAudioSource), so this must be true - it's checked against the real dynamic_cast<IAudioReceiver*> at Init() time and asserts if mismatched
+   static bool AcceptsAudio() { return false; } //sampler-only - it reads from a dropped-in Sample, not a live input
    static bool AcceptsNotes() { return false; }
    static bool AcceptsPulses() { return false; }
 
@@ -58,9 +57,6 @@ private:
    std::vector<float> mFftImag;
    std::vector<float> mFftOut;
 
-   // Rolling input buffer for FFT analysis
-   std::unique_ptr<RollingBuffer> mInputBuffer;
-
    // Overlap-add output ring buffer for L/R channels
    struct OverlapAddBuffer
    {
@@ -98,13 +94,11 @@ private:
    float mStretch{ 8.0f };
    float mPhaseRand{ 1.0f };
    float mVolume{ 1.0f };
-   float mMix{ 1.0f };
    float mWindowSizeIdx{ 2.0f }; // default 2 -> index 2 in our size array (65536)
 
    FloatSlider* mStretchSlider{ nullptr };
    FloatSlider* mPhaseRandSlider{ nullptr };
    FloatSlider* mVolumeSlider{ nullptr };
-   FloatSlider* mMixSlider{ nullptr };
    FloatSlider* mWindowSizeSlider{ nullptr };
 
    float mHopAccumulator{ 0.0f };
@@ -135,4 +129,5 @@ private:
    bool mIsLoadingSample{ false };
    ChannelBuffer mDrawBuffer{ 0 };
    double mSamplePlayPosition{ 0.0 };
+   ClickButton* mDeleteSampleButton{ nullptr };
 };

@@ -62,6 +62,9 @@ void SearchPanel::CreateUIControls()
    {
       mRemoveLocationButtons[i] = new ClickButton(this, ("removeloc" + ofToString(i)).c_str(), -1, -1);
       mRemoveLocationButtons[i]->SetShowing(false);
+
+      mRescanLocationButtons[i] = new ClickButton(this, ("rescanloc" + ofToString(i)).c_str(), -1, -1);
+      mRescanLocationButtons[i]->SetShowing(false);
    }
 
    for (int i = 0; i < kMaxResults; ++i)
@@ -178,7 +181,7 @@ void SearchPanel::DrawModule()
    ofPopStyle();
 
    //number of chars a truncated path/label can show at the current width
-   const int labelChars = MAX(6, (mWidth - kContentX - 22) / 7);
+   const int labelChars = MAX(6, (mWidth - kContentX - 40) / 7); //leaves room for both the rescan and remove buttons
 
    //search field fills the top row and is clamped to the panel width so it never spills outside -
    //extra right-side margin (10 instead of 4) so the box visibly sits inside the panel with breathing
@@ -199,6 +202,12 @@ void SearchPanel::DrawModule()
       if (i < (int)mSearchLocations.size())
       {
          DrawTextNormal(TruncatePathForDisplay(mSearchLocations[i], labelChars), kContentX, rowY + 11);
+
+         mRescanLocationButtons[i]->SetShowing(true);
+         mRescanLocationButtons[i]->SetLabel("R"); //rescan just this folder, instead of the whole library
+         mRescanLocationButtons[i]->SetPosition(mWidth - 38, rowY);
+         mRescanLocationButtons[i]->Draw();
+
          mRemoveLocationButtons[i]->SetShowing(true);
          mRemoveLocationButtons[i]->SetLabel("x");
          mRemoveLocationButtons[i]->SetPosition(mWidth - 20, rowY);
@@ -208,6 +217,7 @@ void SearchPanel::DrawModule()
       else
       {
          mRemoveLocationButtons[i]->SetShowing(false);
+         mRescanLocationButtons[i]->SetShowing(false);
       }
    }
 
@@ -379,18 +389,17 @@ void SearchPanel::RebuildIndex()
    mIndexThread = std::thread(&SearchPanel::IndexWorker, this, locations);
 }
 
-void SearchPanel::IndexWorker(std::vector<std::string> locations)
+void SearchPanel::WalkLocationsIntoList(const std::vector<std::string>& locations, std::vector<IndexedSample>& outList)
 {
    //runs OFF the UI thread. Manual directory walk (a stack, non-recursive per dir) so we can bail
    //promptly via mStopIndex (e.g. on rescan or app quit) instead of blocking inside a big recursive
-   //findChildFiles call.
+   //findChildFiles call. Shared by the full-library rebuild and a single-location rescan.
    juce::String matcher = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
    juce::StringArray wildcards;
    wildcards.addTokens(matcher, ";,", "\"'");
    wildcards.trim();
    wildcards.removeEmptyStrings();
 
-   std::vector<IndexedSample> local;
    std::vector<juce::File> stack;
    for (auto& loc : locations)
    {
@@ -400,7 +409,7 @@ void SearchPanel::IndexWorker(std::vector<std::string> locations)
          stack.push_back(dir);
    }
 
-   while (!stack.empty() && !mStopIndex && (int)local.size() < kMaxIndexed)
+   while (!stack.empty() && !mStopIndex && (int)outList.size() < kMaxIndexed)
    {
       juce::File dir = stack.back();
       stack.pop_back();
@@ -408,7 +417,7 @@ void SearchPanel::IndexWorker(std::vector<std::string> locations)
       juce::Array<juce::File> children = dir.findChildFiles(juce::File::findFilesAndDirectories | juce::File::ignoreHiddenFiles, false);
       for (auto& child : children)
       {
-         if (mStopIndex || (int)local.size() >= kMaxIndexed)
+         if (mStopIndex || (int)outList.size() >= kMaxIndexed)
             break;
 
          if (child.isDirectory())
@@ -436,16 +445,69 @@ void SearchPanel::IndexWorker(std::vector<std::string> locations)
          IndexedSample entry;
          entry.path = child.getFullPathName().toStdString();
          entry.lowerName = name.toLowerCase().toStdString();
-         local.push_back(std::move(entry));
-         mIndexedCount = (int)local.size();
+         outList.push_back(std::move(entry));
+         mIndexedCount = (int)outList.size();
       }
    }
+}
+
+void SearchPanel::IndexWorker(std::vector<std::string> locations)
+{
+   std::vector<IndexedSample> local;
+   WalkLocationsIntoList(locations, local);
 
    if (!mStopIndex)
    {
       SaveIndex(local); //cache to disk so future launches load instantly (off the UI thread, fine)
       std::lock_guard<std::mutex> lock(mIndexMutex);
       mSampleIndex = std::move(local);
+      mIndexedCount = (int)mSampleIndex.size();
+   }
+   mIndexing = false;
+}
+
+void SearchPanel::RescanLocation(int index)
+{
+   if (index < 0 || index >= (int)mSearchLocations.size())
+      return;
+
+   StopIndexThread();
+
+   mIndexing = true;
+   mStopIndex = false;
+   mIndexThread = std::thread(&SearchPanel::RescanLocationWorker, this, mSearchLocations[index]);
+}
+
+void SearchPanel::RescanLocationWorker(std::string location)
+{
+   std::vector<IndexedSample> fresh;
+   WalkLocationsIntoList({ location }, fresh);
+
+   if (!mStopIndex)
+   {
+      //only strip entries that are actually under this folder - a plain prefix match on "/foo/bar"
+      //would also (wrongly) strip "/foo/barbaz", so compare against the path with a trailing slash
+      std::string prefix = location;
+      if (!prefix.empty() && prefix.back() != '/' && prefix.back() != '\\')
+         prefix += '/';
+
+      std::vector<IndexedSample> merged;
+      {
+         std::lock_guard<std::mutex> lock(mIndexMutex);
+         merged.reserve(mSampleIndex.size());
+         for (auto& e : mSampleIndex)
+         {
+            if (e.path.compare(0, prefix.size(), prefix) != 0)
+               merged.push_back(e);
+         }
+      }
+      for (auto& e : fresh)
+         merged.push_back(std::move(e));
+
+      SaveIndex(merged); //cache to disk, same as the full rebuild does
+
+      std::lock_guard<std::mutex> lock(mIndexMutex);
+      mSampleIndex = std::move(merged);
       mIndexedCount = (int)mSampleIndex.size();
    }
    mIndexing = false;
@@ -594,19 +656,43 @@ void SearchPanel::BrowseForLocation()
       {
          mSearchLocations.push_back(path);
          SaveLocations();
-         RebuildIndex(); //re-scan in the background to include the new folder
+         RescanLocation((int)mSearchLocations.size() - 1); //only walk the new folder, merge into the existing index - no need to re-walk everything else
       }
    }
 }
 
 void SearchPanel::RemoveLocation(int index)
 {
-   if (index >= 0 && index < (int)mSearchLocations.size())
+   if (index < 0 || index >= (int)mSearchLocations.size())
+      return;
+
+   std::string location = mSearchLocations[index];
+   mSearchLocations.erase(mSearchLocations.begin() + index);
+   SaveLocations();
+
+   //just drop this folder's entries from the existing index - no need to re-walk everything else
+   StopIndexThread();
+
+   std::string prefix = location;
+   if (!prefix.empty() && prefix.back() != '/' && prefix.back() != '\\')
+      prefix += '/';
+
+   std::vector<IndexedSample> filtered;
    {
-      mSearchLocations.erase(mSearchLocations.begin() + index);
-      SaveLocations();
-      RebuildIndex();
+      std::lock_guard<std::mutex> lock(mIndexMutex);
+      filtered.reserve(mSampleIndex.size());
+      for (auto& e : mSampleIndex)
+      {
+         if (e.path.compare(0, prefix.size(), prefix) != 0)
+            filtered.push_back(e);
+      }
    }
+
+   SaveIndex(filtered);
+
+   std::lock_guard<std::mutex> lock(mIndexMutex);
+   mSampleIndex = std::move(filtered);
+   mIndexedCount = (int)mSampleIndex.size();
 }
 
 //static
@@ -738,6 +824,11 @@ void SearchPanel::ButtonClicked(ClickButton* button, double time)
       if (button == mRemoveLocationButtons[i] && i < (int)mSearchLocations.size())
       {
          RemoveLocation(i);
+         return;
+      }
+      if (button == mRescanLocationButtons[i] && i < (int)mSearchLocations.size())
+      {
+         RescanLocation(i);
          return;
       }
    }

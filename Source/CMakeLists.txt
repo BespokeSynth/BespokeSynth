@@ -160,6 +160,8 @@ target_sources(BespokeSynth PRIVATE
     DebugAudioSource.h
     DelayEffect.cpp
     DelayEffect.h
+    DiceSynth.cpp
+    DiceSynth.h
     DistortionEffect.cpp
     DistortionEffect.h
     DJFilterEffect.cpp

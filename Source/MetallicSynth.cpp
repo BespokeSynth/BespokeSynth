@@ -99,9 +99,11 @@ void MetallicSynth::PlayNote(NoteMessage note)
    if (note.velocity <= 0)
       return; // Let bodies ring out naturally
 
-   // Find free voice or steal oldest
+   // Find free voice or steal the one whose note-on happened longest ago. exciterTime can't be
+   // used for this: it freezes once the mallet-attack window ends, so a long-decaying old voice
+   // and a brand-new voice can compare as "equally old" or even backwards.
    int voiceIdx = 0;
-   double oldestTime = -1;
+   uint64_t oldestSeq = UINT64_MAX;
    for (int i = 0; i < kNumVoices; ++i)
    {
       if (!mVoices[i].active)
@@ -109,9 +111,9 @@ void MetallicSynth::PlayNote(NoteMessage note)
          voiceIdx = i;
          break;
       }
-      if (mVoices[i].exciterTime > oldestTime)
+      if (mVoices[i].noteOnSeq < oldestSeq)
       {
-         oldestTime = mVoices[i].exciterTime;
+         oldestSeq = mVoices[i].noteOnSeq;
          voiceIdx = i;
       }
    }
@@ -121,6 +123,7 @@ void MetallicSynth::PlayNote(NoteMessage note)
    v.pitch = note.pitch;
    v.velocity = note.velocity / 127.0f;
    v.exciterTime = 0;
+   v.noteOnSeq = ++mNoteOnCounter;
    v.prevNoise = 0.0f; // Reset filter state
 
    // 12 Modes for richer synthesis
