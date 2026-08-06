@@ -67,7 +67,7 @@ public:
 
    //INoteReceiver
    void PlayNote(NoteMessage note) override;
-   void SendCC(int control, int value, int voiceIdx = -1) override { }
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IDrawableModule
    void SampleDropped(int x, int y, Sample* sample) override;
@@ -179,7 +179,7 @@ private:
       //loudest value each partial ever reaches. On polyphonic input voicing is ~0 everywhere so
       //these are all ~0 - checking them lets the render skip 48 sine oscillators that would only
       //ever output silence, which is the difference between a slow and an instant roll on a full song
-      std::array<float, kNumHarmonics> harmonicPeak{ };
+      std::array<float, kNumHarmonics> harmonicPeak{};
       //The ACTUAL leftover waveform (original minus the harmonics that were claimed), recovered by
       //inverse-FFT with the original phases intact. Keeping the real signal is what lets a click stay
       //a click: amplitude-per-band synthesis can reproduce a transient's spectrum but never its
@@ -325,8 +325,8 @@ private:
    float mReverseMaxWindowMs{ 90.0f }; //how far back the reverse smear reaches at full weight
 
    //---- live effect DSP state (stereo) ----
-   float mFilterLow[2]{ };
-   float mFilterBand[2]{ };
+   float mFilterLow[2]{};
+   float mFilterBand[2]{};
 
    //comb resonator: a short feedback delay tuned to a pitch, which rings metallically
    static const int kCombBufSize = 2048;

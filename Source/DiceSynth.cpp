@@ -370,7 +370,7 @@ void DiceSynth::RollDiceEffects()
    //chaos is a couple of gentle moves rather than a pile-up
    int effectCount = MAX(1, (int)ceilf(mLastRoll * ofLerp(0.25f, 1.0f, c)));
 
-   bool used[kNumLiveEffects] = { };
+   bool used[kNumLiveEffects] = {};
    std::vector<int> order;
    int guard = 0;
    while ((int)order.size() < effectCount && guard++ < 200)
@@ -1248,8 +1248,8 @@ void DiceSynth::RenderFromGenome()
 
    //per-partial frequency ratio and amplitude weight depend only on the genome, never on time -
    //hoist them out of the sample loop rather than paying two powf() calls per partial per sample
-   std::array<float, kNumHarmonics> partialRatio{ };
-   std::array<float, kNumHarmonics> partialWeight{ };
+   std::array<float, kNumHarmonics> partialRatio{};
+   std::array<float, kNumHarmonics> partialWeight{};
    for (int h : activeHarmonics)
    {
       float stretch = mGenome.inharmonicity * 0.12f * (float)(h * h) / (float)(kNumHarmonics * kNumHarmonics);
