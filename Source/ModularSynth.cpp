@@ -292,8 +292,6 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
       sBackgroundLissajousB = 0.0f;
    }
 
-   ResetLayout();
-
    mConsoleListener = new ConsoleListener();
    mConsoleEntry = new TextEntry(mConsoleListener, "console", 0, 20, 50, mConsoleText);
    mConsoleEntry->SetRequireEnter(true);
@@ -349,7 +347,7 @@ void ModularSynth::Poll()
    if (mQueuedSaveStateInfo.mQueued && !mQueuedSaveStateInfo.mWaitingForScreenshot)
       CompleteQueuedSaveState();
 
-   if (mFatalError == "")
+   if (!HasFatalError())
    {
       if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load
       {
@@ -544,7 +542,7 @@ void ModularSynth::Draw()
    mModuleContainer.SetDrawScale(gDrawScale);
    mDrawRect.set(-GetDrawOffset().x, -GetDrawOffset().y, ofGetWidth() / gDrawScale, ofGetHeight() / gDrawScale);
 
-   if (mFatalError != "")
+   if (HasFatalError())
    {
       ofSetColor(255, 255, 255, 255);
       DrawFallbackText(("bespoke " + GetBuildInfoString()).c_str(), 100, 50);
@@ -566,14 +564,14 @@ void ModularSynth::Draw()
    if (UserPrefs.draw_background_lissajous.Get())
       DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB, UserPrefs.background_lissajous_autocorrelate.Get());
 
-   if (gTime == 1 && mFatalError == "")
+   if (gTime == 1 && !HasFatalError())
    {
       std::string loading("Bespoke is initializing audio...");
       DrawTextNormal(loading, ofGetWidth() / 2 - GetStringWidth(loading, 28) / 2, ofGetHeight() / 2 - 6, 28);
       return;
    }
 
-   if (!mInitialized && mFatalError == "")
+   if (!mInitialized && !HasFatalError())
    {
       std::string loading("Bespoke is loading...");
       DrawTextNormal(loading, ofGetWidth() / 2 - GetStringWidth(loading, 28) / 2, ofGetHeight() / 2 - 6, 28);
@@ -2775,7 +2773,7 @@ void ModularSynth::ResetLayout()
    mUserPrefsEditor->Init();
    mUserPrefsEditor->SetShowing(false);
    mModuleContainer.AddModule(mUserPrefsEditor);
-   if (mFatalError != "")
+   if (HasFatalError())
    {
       mUserPrefsEditor->Show();
       TheTitleBar->SetShowing(false);
