@@ -275,10 +275,6 @@ public:
             int numOutputChannels = loadedSetup.outputChannels.countNumberOfSetBits();
 
             mSynth.InitIOBuffers(numInputChannels, numOutputChannels);
-
-            mGlobalManagers.mDeviceManager.addAudioCallback(this);
-
-            mAudioDeviceConnectionState = AudioDeviceConnectionState::Connected;
          }
       }
       else
@@ -289,6 +285,15 @@ public:
             audioError += juce::String("\n\nattempted to set output to: " + outputDevice + " and input to: " + inputDevice + "\n\ninitialization errors could potentially be fixed by changing buffer size, sample rate, or input/output devices in userprefs.json\nto use no input device, specify \"none\" for \"audio_input_device\"");
          mSynth.SetFatalError("error initializing audio device: " + audioError.toStdString() +
                               "\n\n\nvalid devices:\n" + GetAudioDevices());
+      }
+
+      mSynth.ResetLayout();
+
+      if (!mSynth.HasFatalError())
+      {
+         mGlobalManagers.mDeviceManager.addAudioCallback(this);
+
+         mAudioDeviceConnectionState = AudioDeviceConnectionState::Connected;
       }
 
       for (int i = 0; i < JUCEApplication::getCommandLineParameterArray().size(); ++i)
