@@ -68,7 +68,7 @@ FloatSlider::~FloatSlider()
 void FloatSlider::Init()
 {
    if (mVar)
-      mOriginalValue = *mVar;
+      mDefaultValue = *mVar;
 }
 
 FloatSliderLFOControl* FloatSlider::AcquireLFO()
@@ -724,16 +724,16 @@ void FloatSlider::Increment(float amount)
       SetValue(val, NextBufferTime(false));
 }
 
-void FloatSlider::ResetToOriginal()
+void FloatSlider::ResetToDefault()
 {
-   SetValue(mOriginalValue, NextBufferTime(false));
+   SetValue(mDefaultValue, NextBufferTime(false));
 }
 
 void FloatSlider::CopyBehaviorFrom(FloatSlider* slider)
 {
    mMode = slider->mMode;
    mDetents = slider->mDetents;
-   mOriginalValue = slider->mOriginalValue;
+   mDefaultValue = slider->mDefaultValue;
 }
 
 void FloatSlider::AddDetent(float value)
@@ -927,7 +927,7 @@ IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y,
 , mMax(max)
 , mMouseDown(false)
 , mOwner(owner)
-, mOriginalValue(0)
+, mDefaultValue(0)
 , mSliderVal(0)
 , mShowName(true)
 , mIntEntry(nullptr)
@@ -956,7 +956,7 @@ IntSlider::~IntSlider()
 void IntSlider::Init()
 {
    if (mVar)
-      mOriginalValue = *mVar;
+      mDefaultValue = *mVar;
 }
 
 void IntSlider::Poll()
@@ -1229,9 +1229,9 @@ void IntSlider::Increment(float amount)
       SetValue(val, NextBufferTime(false));
 }
 
-void IntSlider::ResetToOriginal()
+void IntSlider::ResetToDefault()
 {
-   SetValue(mOriginalValue, NextBufferTime(false));
+   SetValue(mDefaultValue, NextBufferTime(false));
 }
 
 bool IntSlider::CheckNeedsDraw()

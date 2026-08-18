@@ -1157,7 +1157,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       }
       else if (key == '\\')
       {
-         gHoveredUIControl->ResetToOriginal();
+         gHoveredUIControl->ResetToDefault();
       }
       else if ((toupper(key) == 'C' || toupper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
       {

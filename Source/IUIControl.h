@@ -87,7 +87,9 @@ public:
    virtual bool InvertScrollDirection() { return false; }
    virtual void Double() {}
    virtual void Halve() {}
-   virtual void ResetToOriginal() {}
+   virtual void ResetToDefault() {}
+   virtual void SetDefaultValue(float value) {}
+   virtual float GetDefaultValue() const { return 0; }
    virtual void Increment(float amount) {}
    void SetCableTargetable(bool targetable) { mCableTargetable = targetable; }
    bool GetCableTargetable() const { return mCableTargetable; }
