@@ -2587,7 +2587,7 @@ void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
                   mControls[controlIndex]->Halve();
                if (control.mControl == kMoveUndoButton)
                {
-                  mControls[controlIndex]->ResetToOriginal();
+                  mControls[controlIndex]->ResetToDefault();
                   mLastResetTime = gTime;
                }
             }
@@ -2668,7 +2668,7 @@ void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
             int controlIndex = mHeldKnobIndex + GetControlOffset();
             if (controlIndex < mControls.size() && mScreenDisplayMode == ScreenDisplayMode::kNormal)
             {
-               mControls[controlIndex]->ResetToOriginal();
+               mControls[controlIndex]->ResetToDefault();
                mLastResetTime = gTime;
             }
          }

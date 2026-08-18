@@ -200,6 +200,7 @@ void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserC
                control->mInfo["min"] = floatSlider->GetMin();
                control->mInfo["max"] = floatSlider->GetMax();
                control->mInfo["width"] = kDefaultSliderWidth;
+               control->mInfo["default_value"] = floatSlider->GetDefaultValue();
             }
 
             IntSlider* intSlider = dynamic_cast<IntSlider*>(targetUIControl);
@@ -209,6 +210,7 @@ void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserC
                control->mInfo["min"] = intSlider->GetMin();
                control->mInfo["max"] = intSlider->GetMax();
                control->mInfo["width"] = kDefaultSliderWidth;
+               control->mInfo["default_value"] = intSlider->GetDefaultValue();
             }
 
             Checkbox* checkbox = dynamic_cast<Checkbox*>(targetUIControl);
@@ -317,6 +319,7 @@ FloatSlider* ControlInterface::AddFloatSlider(std::string name, float defaultVal
    control->mInfo["min"] = min;
    control->mInfo["max"] = max;
    control->mInfo["width"] = kDefaultSliderWidth;
+   control->mInfo["default_value"] = defaultVal;
 
    control->SetUpControl();
 
@@ -341,6 +344,7 @@ IntSlider* ControlInterface::AddIntSlider(std::string name, int defaultVal, int 
    control->mInfo["min"] = min;
    control->mInfo["max"] = max;
    control->mInfo["width"] = kDefaultSliderWidth;
+   control->mInfo["default_value"] = defaultVal;
 
    control->SetUpControl();
 
@@ -675,12 +679,14 @@ void ControlInterface::ControlElement::ApplyInfoToControl()
    {
       mFloatSlider->SetExtents(GetInfo("min", 0), GetInfo("max", 1));
       mFloatSlider->SetDimensions(GetInfo("width", 80), 15);
+      mFloatSlider->SetDefaultValue(GetInfo("default_value", mFloatSlider->GetDefaultValue()));
    }
 
    if (mIntSlider)
    {
       mIntSlider->SetExtents((int)GetInfo("min", 0), (int)GetInfo("max", 1));
       mIntSlider->SetDimensions(GetInfo("width", 80), 15);
+      mIntSlider->SetDefaultValue(GetInfo("default_value", mIntSlider->GetDefaultValue()));
    }
 
    if (mDropdown)

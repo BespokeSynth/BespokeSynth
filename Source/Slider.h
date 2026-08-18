@@ -123,7 +123,9 @@ public:
    }
    void Double() override;
    void Halve() override;
-   void ResetToOriginal() override;
+   void ResetToDefault() override;
+   void SetDefaultValue(float value) override { mDefaultValue = value; }
+   float GetDefaultValue() const override { return mDefaultValue; }
    void Poll() override;
    void Increment(float amount) override;
 
@@ -174,7 +176,7 @@ private:
    float mRelativeOffset{ -999 };
    bool mClamped{ true };
    Mode mMode{ Mode::kNormal };
-   float mOriginalValue{ 0 };
+   float mDefaultValue{ 0 };
    std::string mMinValueDisplay{ "" };
    std::string mMaxValueDisplay{ "" };
    bool mShowName{ true };
@@ -266,7 +268,9 @@ public:
    void Double() override;
    void Halve() override;
    void Increment(float amount) override;
-   void ResetToOriginal() override;
+   void ResetToDefault() override;
+   void SetDefaultValue(float value) override { mDefaultValue = value; }
+   float GetDefaultValue() const override { return mDefaultValue; }
    void Poll() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
@@ -294,7 +298,7 @@ private:
    int mMin;
    int mMax;
    bool mMouseDown;
-   int mOriginalValue;
+   int mDefaultValue;
    IIntSliderListener* mOwner;
    int mFineRefX{ -999 };
 

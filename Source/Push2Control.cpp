@@ -2019,7 +2019,7 @@ void Push2Control::OnMidiControl_Consume(MidiControl& control)
             int controlIndex = mHeldKnobIndex + mModuleViewOffset;
             if (controlIndex < mSliderControls.size() && (mScreenDisplayMode == ScreenDisplayMode::kNormal || mScreenDisplayMode == ScreenDisplayMode::kMap))
             {
-               mSliderControls[controlIndex]->ResetToOriginal();
+               mSliderControls[controlIndex]->ResetToDefault();
                mLastResetTime = gTime;
             }
          }
