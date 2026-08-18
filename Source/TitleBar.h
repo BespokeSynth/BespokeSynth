@@ -82,6 +82,7 @@ struct SpawnListManager
    SpawnList mAudioModules;
    SpawnList mModulatorModules;
    SpawnList mPulseModules;
+   SpawnList mVisualizerModules;
    SpawnList mOtherModules;
    SpawnList mPlugins;
    SpawnList mPrefabs;
@@ -114,7 +115,7 @@ private:
    ClickButton* mCancelButton{ nullptr };
 };
 
-class MenuPopup : public IDrawableModule, public IButtonListener
+class MenuPopup : public IDrawableModule, public IButtonListener, public IDropdownListener, public IFloatSliderListener
 {
 public:
    MenuPopup();
@@ -129,6 +130,9 @@ public:
    }
 
    void ButtonClicked(ClickButton* button, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void CheckboxUpdated(Checkbox* checkbox, double time) override;
 
 private:
    ClickButton* mSaveLayoutButton{ nullptr };
@@ -138,10 +142,16 @@ private:
    ClickButton* mSaveStateAsButton{ nullptr };
    ClickButton* mLoadStateButton{ nullptr };
    ClickButton* mWriteAudioButton{ nullptr };
-   ClickButton* mHomeButton{ nullptr };
+   ClickButton* mRecordButton{ nullptr };
+   DropdownList* mPaletteDropdown{ nullptr };
+   int mPaletteIndex{ -1 };
+   FloatSlider* mGridOpacitySlider{ nullptr };
    Checkbox* mEventLookaheadCheckbox{ nullptr };
    Checkbox* mShouldAutosaveCheckbox{ nullptr };
    Checkbox* mShowTooltipsCheckbox{ nullptr };
+   Checkbox* mShowGridCheckbox{ nullptr };
+   Checkbox* mSnapToGridCheckbox{ nullptr };
+   Checkbox* mShowMinimapCheckbox{ nullptr };
 
    NewPatchConfirmPopup mNewPatchConfirmPopup;
 };
@@ -160,6 +170,7 @@ public:
 
    HelpDisplay* GetHelpDisplay() { return mHelpDisplay; }
    void ShowHelp();
+   void ApplyColorPalette(int index);
 
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
@@ -195,9 +206,14 @@ private:
    ClickButton* mPlayPauseButton{ nullptr };
    ClickButton* mMenuButton{ nullptr };
    ClickButton* mSaveLayoutButton{ nullptr };
+   ClickButton* mResetLayoutButton{ nullptr };
+   ClickButton* mWelcomeScreenButton{ nullptr };
+   ClickButton* mRecordButton{ nullptr };
    DropdownList* mLoadLayoutDropdown{ nullptr };
    ClickButton* mDisplayHelpButton{ nullptr };
    ClickButton* mDisplayUserPrefsEditorButton{ nullptr };
+   ClickButton* mHomeButton{ nullptr };
+   ClickButton* mSearchToggleButton{ nullptr };
    int mLoadLayoutIndex{ -1 };
 
    HelpDisplay* mHelpDisplay{ nullptr };

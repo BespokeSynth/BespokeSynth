@@ -421,7 +421,8 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          kModuleCategory_Processor,
          kModuleCategory_Modulator,
          kModuleCategory_Pulse,
-         kModuleCategory_Other
+         kModuleCategory_Other,
+         kModuleCategory_Visualizer
       };
       for (auto& type : moduleTypes)
       {
@@ -507,7 +508,8 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          kModuleCategory_Processor,
          kModuleCategory_Modulator,
          kModuleCategory_Pulse,
-         kModuleCategory_Other
+         kModuleCategory_Other,
+         kModuleCategory_Visualizer
       };
       for (auto& type : moduleTypes)
       {
@@ -562,7 +564,8 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
          kModuleCategory_Processor,
          kModuleCategory_Modulator,
          kModuleCategory_Pulse,
-         kModuleCategory_Other
+         kModuleCategory_Other,
+         kModuleCategory_Visualizer
       };
       for (auto& category : moduleCategories)
       {
@@ -582,6 +585,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
                case kModuleCategory_Modulator: moduleType = "modulators"; break;
                case kModuleCategory_Pulse: moduleType = "pulse"; break;
                case kModuleCategory_Other: moduleType = "other"; break;
+               case kModuleCategory_Visualizer: moduleType = "visualizers"; break;
                case kModuleCategory_Unknown: moduleType = "unknown"; break;
             }
 

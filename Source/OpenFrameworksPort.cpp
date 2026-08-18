@@ -210,8 +210,9 @@ void ofResetClipWindow()
 void ofSetColor(float r, float g, float b, float a)
 {
    sStyleStack.GetStyle().color = ofColor(r, g, b, a);
-   if (gNanoVG != gNanoVGRenderContexts[(int)NanoVGRenderContext::Main])
+   if (gNanoVG != gNanoVGRenderContexts[(int)NanoVGRenderContext::Main] || gFlatUIStyle)
    {
+      //modern flat style: solid color, no grain/noise texture overlay
       nvgStrokeColor(gNanoVG, nvgRGBA(r, g, b, a));
       nvgFillColor(gNanoVG, nvgRGBA(r, g, b, a));
       return;
