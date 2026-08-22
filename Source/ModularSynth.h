@@ -170,6 +170,8 @@ public:
 
    float GetRawMouseX() { return mMousePos.x; }
    float GetRawMouseY() { return mMousePos.y; }
+   float GetScreenSpaceMouseX(ModuleContainer* context, float rawX = FLT_MAX);
+   float GetScreenSpaceMouseY(ModuleContainer* context, float rawY = FLT_MAX);
    float GetMouseX(ModuleContainer* context, float rawX = FLT_MAX);
    float GetMouseY(ModuleContainer* context, float rawY = FLT_MAX);
    void SetMousePosition(ModuleContainer* context, float x, float y);
