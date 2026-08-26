@@ -116,7 +116,7 @@ void RollingBuffer::Draw(int x, int y, int width, int height, int length /*= -1*
       if (channel == -1)
          DrawAudioBuffer(width, height, &mBuffer, 0, Size(), -1, 1, color, -1, 0, drawBackground);
       else
-         DrawAudioBuffer(width, height, mBuffer.GetChannel(channel), 0, Size(), -1, 1, color, -1, 0, -1, drawBackground);
+         DrawAudioBuffer(width, height, mBuffer.GetChannel(channel), 0, Size(), -1, 1, color, -1, 0, Size(), drawBackground);
    }
    else //draw segment
    {

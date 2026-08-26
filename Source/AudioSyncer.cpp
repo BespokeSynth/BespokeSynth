@@ -157,7 +157,13 @@ void AudioSyncer::DrawModule()
    }
 
    for (auto& bandBuffer : mBandBuffers)
+   {
+      if (displaySamples != -1) // clamp if not in static mode
+      {
+         displaySamples = std::min(displaySamples, bandBuffer->mBuffer.Size());
+      }
       bandBuffer->mBuffer.Draw(kBufferX, kBufferY, kBufferW, kBufferH, displaySamples, 0, 0, bandBuffer->mColor, false);
+   }
 
    ofPushStyle();
 
