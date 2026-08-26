@@ -340,7 +340,32 @@ PYBIND11_EMBEDDED_MODULE(notesequencer, m)
       .def("set_pitch", [](NoteStepSequencer& seq, int step, int pitch, int velocity, float length)
       {
          seq.SetPitch(step, pitch, velocity, length);
-      }, "step"_a, "pitch"_a, "velocity"_a = 127, "length"_a = 1.0);
+      }, "step"_a, "pitch"_a, "velocity"_a = 127, "length"_a = 1.0)
+      .def("get_row", [](NoteStepSequencer& seq, int step)
+      {
+         return seq.GetRow(step);
+      })
+      .def("get_pitch", [](NoteStepSequencer& seq, int step)
+      {
+         return seq.GetPitch(step);
+      })
+      .def("get_velocity", [](NoteStepSequencer& seq, int step)
+      {
+         return seq.GetVelocity(step);
+      })
+      .def("get_length", [](NoteStepSequencer& seq, int step)
+      {
+         return seq.GetLength(step);
+      })
+      .def("get_step", [](NoteStepSequencer& seq, int step)
+      {
+          return py::make_tuple(
+              seq.GetRow(step),
+              seq.GetPitch(step),
+              seq.GetVelocity(step),
+              seq.GetLength(step)
+          );
+      });
 }
 
 PYBIND11_EMBEDDED_MODULE(drumsequencer, m)

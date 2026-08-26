@@ -92,6 +92,12 @@ import notesequencer
          optional: velocity = 127, length = 1.0
       n.set_pitch(step, pitch, velocity, length)
          optional: velocity = 127, length = 1.0
+      n.get_row(step)
+      n.get_pitch(step)
+      n.get_velocity(step)
+      n.get_length(step)
+      n.get_step(step)
+         example: row, pitch, velocity, length = n.get_step(3)
 
 
 import drumsequencer
