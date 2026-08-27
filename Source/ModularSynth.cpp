@@ -1813,8 +1813,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
 
    mZoomer.ExitVanityPanningMode();
 
-   mMousePos.x = intX;
-   mMousePos.y = intY;
+   MouseMoved(intX, intY);
    mLastClickWasEmptySpace = false;
 
    if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
