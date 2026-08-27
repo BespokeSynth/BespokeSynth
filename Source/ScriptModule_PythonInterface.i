@@ -150,6 +150,7 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
       ScriptModule::sBackgroundTextPos.set(xPos, yPos);
       ScriptModule::sBackgroundTextColor.set(red * 255, green * 255, blue * 255);
    }, "str"_a, "size"_a=50, "xPos"_a = 150, "yPos"_a = 250, "red"_a = 1, "green"_a = 1, "blue"_a = 1);
+   ///example: bespoke.set_background_text('"' + '"\n"'.join(bespoke.get_controls("transport")) + '"', 14, 0, 50, 1, 1, 1)
    m.def("random", [](int seed, int index)
    {
       return DeterministicRandom(seed, index);
@@ -179,7 +180,6 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
       }
       return paths;
    });
-   ///example: bespoke.set_background_text('"' + '"\n"'.join(bespoke.get_controls("transport")) + '"', 14, 0, 50, 1, 1, 1)
    m.def("location_recall", [](char location)
    {
       TheSynth->GetLocationZoomer()->MoveToLocation(location);
@@ -340,7 +340,33 @@ PYBIND11_EMBEDDED_MODULE(notesequencer, m)
       .def("set_pitch", [](NoteStepSequencer& seq, int step, int pitch, int velocity, float length)
       {
          seq.SetPitch(step, pitch, velocity, length);
-      }, "step"_a, "pitch"_a, "velocity"_a = 127, "length"_a = 1.0);
+      }, "step"_a, "pitch"_a, "velocity"_a = 127, "length"_a = 1.0)
+      .def("get_row", [](NoteStepSequencer& seq, int step)
+      {
+         return seq.GetRow(step);
+      })
+      .def("get_pitch", [](NoteStepSequencer& seq, int step)
+      {
+         return seq.GetPitch(step);
+      })
+      .def("get_velocity", [](NoteStepSequencer& seq, int step)
+      {
+         return seq.GetVelocity(step);
+      })
+      .def("get_length", [](NoteStepSequencer& seq, int step)
+      {
+         return seq.GetLength(step);
+      })
+      .def("get_step", [](NoteStepSequencer& seq, int step)
+      {
+          return py::make_tuple(
+              seq.GetRow(step),
+              seq.GetPitch(step),
+              seq.GetVelocity(step),
+              seq.GetLength(step)
+          );
+      });
+      ///example: row, pitch, velocity, length = n.get_step(3)
 }
 
 PYBIND11_EMBEDDED_MODULE(drumsequencer, m)
