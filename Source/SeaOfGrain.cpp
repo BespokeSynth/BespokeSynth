@@ -31,6 +31,7 @@
 #include "Profiler.h"
 #include "ModulationChain.h"
 #include "UIControlMacros.h"
+#include "UserPrefs.h"
 
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -355,8 +356,10 @@ void SeaOfGrain::LoadFile()
    auto file_pattern = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
    if (File::areFileNamesCaseSensitive())
       file_pattern += ";" + file_pattern.toUpperCase();
+   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
    FileChooser chooser("Load sample", File(ofToSamplePath("")),
-                       file_pattern, true, false, TheSynth->GetFileChooserParent());
+                       file_pattern, isNativeFileChooser, false, TheSynth->GetFileChooserParent());
+
    if (chooser.browseForFileToOpen())
    {
       auto file = chooser.getResult();

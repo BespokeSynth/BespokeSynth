@@ -29,6 +29,7 @@
 #include "ofxJSONElement.h"
 #include "Tunings.h"
 #include "libMTSClient.h"
+#include "UserPrefs.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
@@ -477,7 +478,8 @@ void Scale::Poll()
          std::string prompt = "Load ";
          prompt += (button == mLoadSCLButton) ? "SCL" : "KBM";
          std::string pat = (button == mLoadSCLButton) ? "*.scl;*.SCL" : "*.kbm;*.KBM";
-         juce::FileChooser chooser(prompt, juce::File(""), pat, true, false, TheSynth->GetFileChooserParent());
+         bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+         juce::FileChooser chooser(prompt, juce::File(""), pat, isNativeFileChooser, false, TheSynth->GetFileChooserParent());
          if (chooser.browseForFileToOpen())
          {
             auto file = chooser.getResult();

@@ -35,6 +35,7 @@
 #include "UIControlMacros.h"
 #include "PatchCableSource.h"
 #include "Prefab.h"
+#include "UserPrefs.h"
 #include "VersionInfo.h"
 #if BESPOKE_WINDOWS
 #undef ssize_t
@@ -990,7 +991,8 @@ void ScriptModule::ButtonClicked(ClickButton* button, double time)
 
    if (button == mSaveScriptButton)
    {
-      FileChooser chooser("Save script as...", File(ofToDataPath("scripts/script.py")), "*.py", true, false, TheSynth->GetFileChooserParent());
+      bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+      FileChooser chooser("Save script as...", File(ofToDataPath("scripts/script.py")), "*.py", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
          std::string path = chooser.getResult().getFullPathName().toStdString();

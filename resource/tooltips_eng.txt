@@ -2041,6 +2041,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~max_output_channels~number of output channels to allocate (requires restart)
 ~max_input_channels~number of input channels to allocate (requires restart)
 ~plugin_preference_order~semicolon-separated list of plugin formats, in preferred order. if a plugin exists with multiple formats, only the most preferred format will be shown. leave this blank to always show all plugins. (default value: "VST3;VST;AudioUnit;LV2")
+~force_juce_file_chooser~use file chooser dialog windows provided by JUCE even when a native file chooser is available
 ~draw_background_lissajous~should the background lissajous curve draw
 ~fade_cable_middle~should longer cables draw with a fadeout effect in the middle
 ~cable_quality~visual resolution of the cables
