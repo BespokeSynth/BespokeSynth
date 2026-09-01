@@ -32,6 +32,7 @@
 #include "DropdownList.h"
 #include "Transport.h"
 #include "Ramp.h"
+#include "BiquadFilter.h"
 
 #define DELAY_BUFFER_SIZE 5 * gSampleRate
 
@@ -94,4 +95,5 @@ private:
    Checkbox* mAcceptInputCheckbox{ nullptr };
    Checkbox* mInvertCheckbox{ nullptr };
    bool mFeedbackModuleMode{ false }; //special mode when this delay effect is being used in a FeedbackModule
+   BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels]{};
 };

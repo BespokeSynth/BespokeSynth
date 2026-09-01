@@ -35,6 +35,12 @@
 DelayEffect::DelayEffect()
 : mDelayBuffer(DELAY_BUFFER_SIZE)
 {
+   for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
+   {
+      mDCRemover[i].SetFilterParams(10, sqrt(2) / 2);
+      mDCRemover[i].SetFilterType(kFilterType_Highpass);
+      mDCRemover[i].UpdateFilterCoeff();
+   }
 }
 
 void DelayEffect::CreateUIControls()
@@ -118,6 +124,9 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
             mDelayBuffer.Write(buffer->GetChannel(ch)[i], ch);
 
          float delayInput = delayedSample * mFeedback * (mInvert ? -1 : 1);
+         float dcRemoved = mDCRemover[ch].Filter(delayInput);
+         if (mEcho)
+            delayInput = dcRemoved;
          JUCE_UNDENORMALISE(delayInput);
          if (!std::isnan(delayInput))
             buffer->GetChannel(ch)[i] += delayInput;

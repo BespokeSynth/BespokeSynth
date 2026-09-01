@@ -489,20 +489,52 @@ bool SortPointsByY(ofVec2f a, ofVec2f b)
    return a.y < b.y;
 }
 
+// how this function's math works: https://www.desmos.com/calculator/nnoypjy1wk
 void ModularSynth::ZoomView(float zoomAmount, bool fromMouse)
 {
+   // pick a point and scale the four corners of the screen relative to it by moving DrawOffset and scaling
    float oldDrawScale = gDrawScale;
-   gDrawScale *= 1 + zoomAmount;
-   float minZoom = .1f;
-   float maxZoom = 8;
-   gDrawScale = ofClamp(gDrawScale, minZoom, maxZoom);
-   zoomAmount = (gDrawScale - oldDrawScale) / oldDrawScale; //find actual adjusted amount
-   ofVec2f zoomCenter;
+
+   // The upper-left corner of the screen in canvas space
+   ofVec2f screenOrigin_CanvasSpace_OldScale = -GetDrawOffset();
+
+   // screen-space vector from (0,0) to the center of the zoom (in the old scale)
+   ofVec2f zoomCenter_Vec;
    if (fromMouse)
-      zoomCenter = ofVec2f(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer)) + GetDrawOffset();
+   {
+      // mouse position in canvas space
+      //
+      // mouse position (on screen)
+      // -> scaled by zoom (/ oldDrawScale)
+      ofVec2f mousePositionScreenSpace_Vec = ofVec2f(GetScreenSpaceMouseX(&mModuleContainer), GetScreenSpaceMouseY(&mModuleContainer));
+      zoomCenter_Vec = mousePositionScreenSpace_Vec / oldDrawScale;
+   }
    else
-      zoomCenter = ofVec2f(ofGetWidth() / gDrawScale * .5f, ofGetHeight() / gDrawScale * .5f);
-   GetDrawOffset() -= zoomCenter * zoomAmount;
+      // center of the screen in canvas space
+      //
+      // screenspace w/h (ofGetWidth, ofGetHeight)
+      // -> scaled by zoom (/ oldDrawScale)
+      // -> center point (* 0.5f)
+      zoomCenter_Vec = ofVec2f(ofGetWidth(), ofGetHeight()) / oldDrawScale * .5f;
+
+   // scale
+   {
+      // change to new zoom amount
+      gDrawScale *= 1 + zoomAmount;
+      float minZoom = .1f;
+      float maxZoom = 8;
+      gDrawScale = ofClamp(gDrawScale, minZoom, maxZoom);
+   }
+
+   // move draw offset by the amount the vector changed after scaling so the zoom center stays in the same place
+   { // (zc * (os/ns)) - (zc + so)
+      // convert vector from old scale to new scale
+      ofVec2f zoomCenter_Vec_NewScale = zoomCenter_Vec * (oldDrawScale / gDrawScale);
+
+      // offset the canvas by the difference between the vectors so that the point stays in the same place
+      GetDrawOffset() = zoomCenter_Vec_NewScale - (zoomCenter_Vec + screenOrigin_CanvasSpace_OldScale);
+   }
+
    mZoomer.CancelMovement();
    mHideTooltipsUntilMouseMove = true;
 }
@@ -1315,14 +1347,24 @@ void ModularSynth::KeyReleased(int key)
    mModuleContainer.KeyReleased(key);
 }
 
+float ModularSynth::GetScreenSpaceMouseX(ModuleContainer* context, float rawX /*= FLT_MAX*/)
+{
+   return ((rawX == FLT_MAX ? mMousePos.x : rawX) + UserPrefs.mouse_offset_x.Get());
+}
+
+float ModularSynth::GetScreenSpaceMouseY(ModuleContainer* context, float rawY /*= FLT_MAX*/)
+{
+   return ((rawY == FLT_MAX ? mMousePos.y : rawY) + UserPrefs.mouse_offset_y.Get());
+}
+
 float ModularSynth::GetMouseX(ModuleContainer* context, float rawX /*= FLT_MAX*/)
 {
-   return ((rawX == FLT_MAX ? mMousePos.x : rawX) + UserPrefs.mouse_offset_x.Get()) / context->GetDrawScale() - context->GetDrawOffset().x;
+   return GetScreenSpaceMouseX(context, rawX) / context->GetDrawScale() - context->GetDrawOffset().x;
 }
 
 float ModularSynth::GetMouseY(ModuleContainer* context, float rawY /*= FLT_MAX*/)
 {
-   return ((rawY == FLT_MAX ? mMousePos.y : rawY) + UserPrefs.mouse_offset_y.Get()) / context->GetDrawScale() - context->GetDrawOffset().y;
+   return GetScreenSpaceMouseY(context, rawY) / context->GetDrawScale() - context->GetDrawOffset().y;
 }
 
 void ModularSynth::SetMousePosition(ModuleContainer* context, float x, float y)
@@ -1813,8 +1855,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
 
    mZoomer.ExitVanityPanningMode();
 
-   mMousePos.x = intX;
-   mMousePos.y = intY;
+   MouseMoved(intX, intY);
    mLastClickWasEmptySpace = false;
 
    if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
@@ -3165,7 +3206,9 @@ void ModularSynth::SaveLayout(std::string jsonFile, bool makeDefaultLayout /*= t
 
 void ModularSynth::SaveLayoutAsPopup()
 {
-   FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", true, false, GetFileChooserParent());
+   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+
+   FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", isNativeFileChooser, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
       SaveLayout(chooser.getResult().getFullPathName().toStdString());
 }
@@ -3209,7 +3252,9 @@ void ModularSynth::SaveStatePopup()
       ++counter;
    } while (targetFile.existsAsFile());
 
-   FileChooser chooser("Save current state as...", targetFile, "*.bsk", true, false, GetFileChooserParent());
+   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+
+   FileChooser chooser("Save current state as...", targetFile, "*.bsk", isNativeFileChooser, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
       SaveState(chooser.getResult().getFullPathName().toStdString(), false);
 }
@@ -3227,7 +3272,9 @@ void ModularSynth::LoadStatePopupImp()
    else
       defaultDirectoryOrFile = ofToDataPath("savestate/");
 
-   FileChooser chooser("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", true, false, GetFileChooserParent());
+   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+
+   FileChooser chooser("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", isNativeFileChooser, false, GetFileChooserParent());
    if (chooser.browseForFileToOpen())
       LoadState(chooser.getResult().getFullPathName().toStdString());
 }

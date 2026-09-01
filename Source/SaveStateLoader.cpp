@@ -27,6 +27,7 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "UIControlMacros.h"
+#include "UserPrefs.h"
 
 SaveStateLoader::SaveStateLoader()
 {
@@ -69,7 +70,8 @@ void SaveStateLoader::Poll()
       {
          mLoadButtons[i].mShouldShowSelectDialog = false;
 
-         juce::FileChooser chooser("Select state file", juce::File(ofToDataPath("savestate")), "*.bsk;*.bskt", true, false, TheSynth->GetFileChooserParent());
+         bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+         juce::FileChooser chooser("Select state file", juce::File(ofToDataPath("savestate")), "*.bsk;*.bskt", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
          if (chooser.browseForFileToOpen())
          {
             mLoadButtons[i].mFilePath = chooser.getResult().getFullPathName().replace("\\", "/").toStdString();

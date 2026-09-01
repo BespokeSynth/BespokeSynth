@@ -31,6 +31,7 @@
 #include "UIControlMacros.h"
 #include "Sample.h"
 #include "Checkbox.h"
+#include "UserPrefs.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
@@ -214,7 +215,8 @@ void SampleCapturer::ButtonClicked(ClickButton* button, double time)
 
    if (button == mSaveButton)
    {
-      FileChooser chooser("Save sample as...", File(ofToSamplePath(ofGetTimestampString("%Y-%m-%d_%H-%M-%S.wav"))), "*.wav", true, false, TheSynth->GetFileChooserParent());
+      bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+      FileChooser chooser("Save sample as...", File(ofToSamplePath(ofGetTimestampString("%Y-%m-%d_%H-%M-%S.wav"))), "*.wav", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
          Sample::WriteDataToFile(chooser.getResult().getFullPathName().toStdString(), &mSamples[mCurrentSampleIndex].mBuffer, mSamples[mCurrentSampleIndex].mRecordingLength);
    }

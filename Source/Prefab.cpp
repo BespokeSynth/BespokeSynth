@@ -30,6 +30,7 @@
 #include "Checkbox.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
+#include "UserPrefs.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
@@ -236,7 +237,8 @@ void Prefab::ButtonClicked(ClickButton* button, double time)
    using namespace juce;
    if (button == mSaveButton)
    {
-      FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
+      bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+      FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
          std::string savePath = chooser.getResult().getFullPathName().toStdString();
@@ -246,7 +248,8 @@ void Prefab::ButtonClicked(ClickButton* button, double time)
 
    if (button == mLoadButton)
    {
-      FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
+      bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+      FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")), "*.pfb", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToOpen())
       {
          std::string loadPath = chooser.getResult().getFullPathName().toStdString();

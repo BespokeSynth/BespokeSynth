@@ -77,6 +77,11 @@ public:
    int PitchToRow(int pitch);
    void SetStep(int index, int step, int velocity, float length);
    void SetPitch(int index, int pitch, int velocity, float length);
+   int GetRow(int index);
+   int GetPitch(int index);
+   int GetVelocity(int index);
+   float GetLength(int index);
+
 
    //IDrawableModule
    bool IsResizable() const override { return true; }

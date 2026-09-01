@@ -742,8 +742,9 @@ void SamplePlayer::LoadFile()
    auto file_pattern = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
    if (File::areFileNamesCaseSensitive())
       file_pattern += ";" + file_pattern.toUpperCase();
+   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
    FileChooser chooser("Load sample", File(ofToSamplePath("")),
-                       file_pattern, true, false, TheSynth->GetFileChooserParent());
+                       file_pattern, isNativeFileChooser, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {
       auto file = chooser.getResult();
@@ -757,8 +758,9 @@ void SamplePlayer::LoadFile()
 
 void SamplePlayer::SaveFile()
 {
+   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
    FileChooser chooser("Save sample", File(ofToSamplePath("")),
-                       "*.wav", true, false, TheSynth->GetFileChooserParent());
+                       "*.wav", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
    {
       auto file = chooser.getResult();

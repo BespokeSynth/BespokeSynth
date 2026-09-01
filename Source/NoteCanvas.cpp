@@ -34,6 +34,7 @@
 #include "CanvasTimeline.h"
 #include "CanvasScrollbar.h"
 #include "FillSaveDropdown.h"
+#include "UserPrefs.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
@@ -1315,7 +1316,9 @@ void NoteCanvas::LoadMidi()
    String file_pattern = "*.mid;*.midi";
    if (File::areFileNamesCaseSensitive())
       file_pattern += ";" + file_pattern.toUpperCase();
-   FileChooser chooser("Load midi", File(ofToDataPath("")), file_pattern, true, false, TheSynth->GetFileChooserParent());
+
+   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+   FileChooser chooser("Load midi", File(ofToDataPath("")), file_pattern, isNativeFileChooser, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {
       bool wasPlaying = mPlay;
@@ -1365,7 +1368,8 @@ void NoteCanvas::SaveMidi()
    using namespace juce;
    constexpr static int ticksPerQuarterNote = 960;
 
-   FileChooser chooser("Save midi", File(ofToDataPath("midi")), "*.mid", true, false, TheSynth->GetFileChooserParent());
+   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+   FileChooser chooser("Save midi", File(ofToDataPath("midi")), "*.mid", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
    {
       MidiFile midifile;
