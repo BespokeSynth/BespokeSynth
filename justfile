@@ -1,53 +1,92 @@
 # This is a set of scripts for interacting with Bespoke's cmake build system.
 
-# Default value for CMAKE_BUILD_TYPE
-default_build_type := "Debug"
-# Tell cmake to use parallel execution of <number of cpu cores> minus this number
-parallel_build_ignore_cpus := "0"
+# Default values for environment variables
+export BESPOKE_BUILD_TYPE := env("BESPOKE_BUILD_TYPE", "Debug")
 
-# Compile (default)
+# Simple utility to print out what's being executed before running it, matching just's default format
+echo_do := "echo_do() {
+      [ -p /dev/stdout ] || \\
+      echo -en '\\e[1m' >&2 # style: bold
+      echo -n \"$@\"    >&2
+      [ -p /dev/stdout ] || \\
+      echo -e '\\e[0m'  >&2 # style: reset
+      \"$@\"
+   }"
+
+
+# Aliases for common commands
+alias br := build-run
+alias rel := release
+alias b := build
+alias r := run
+alias l := list
+
+
+# Equivalent to `just build run` (default)
 [positional-arguments]
-build type=default_build_type:
-   #!/bin/sh
+build-run *command_prefix:
+   #!/usr/bin/env sh
+   {{echo_do}}
+
+   echo_do just build run "$@"
+
+
+# Run subsequent `just` commands in release mode
+[no-cd]
+[positional-arguments]
+release *just_commands:
+   #!/usr/bin/env sh
+   {{echo_do}}
+
+   echo_do export BESPOKE_BUILD_TYPE=Release
+   echo_do just "$@"
+
+
+# Compile
+[positional-arguments]
+build:
+   #!/usr/bin/env sh
+   {{echo_do}}
 
    # Check if we haven't configured yet
-   if ! [ -d "./ignore/build" ]; then
-      # run configure step
-      just _echo_do just configure "$1"
+   if ! [ -d "./ignore/build/$BESPOKE_BUILD_TYPE" ]; then
+      # configure
+      echo_do just configure
    fi
 
    # build with parallelism based on the number of cpu cores
-   just _echo_do cmake --build ignore/build --parallel="$(nproc --ignore='{{parallel_build_ignore_cpus}}')"
+   echo_do cmake --build ignore/build/"$BESPOKE_BUILD_TYPE" --parallel="${PARALLEL_BUILD_CPUS:-"$(nproc)"}"
 
 
-# Configure build system (Release or Debug, default is Debug)
+# Configure the build system (Release or Debug, default is Debug)
 [positional-arguments]
-configure type=default_build_type *cmake_args:
-   #!/bin/sh
+configure *cmake_args:
+   #!/usr/bin/env sh
+   {{echo_do}}
 
    # Find the vst2 sdk in ./ignore/VST_SDK/VST2_SDK or wherever the VST2_SDK_HOME variable points
    VST2_SDK_HOME="${VST2_SDK_HOME:-"$(pwd)"/ignore/VST_SDK/VST2_SDK}"
    if [ -d "$VST2_SDK_HOME" ]; then
-      set -- "$1" -DBESPOKE_VST2_SDK_LOCATION="$VST2_SDK_HOME" "${@:2}"
+      set -- -DBESPOKE_VST2_SDK_LOCATION="$VST2_SDK_HOME" "$@"
    fi
 
-   just _echo_do cmake -B ignore/build -GNinja -DCMAKE_BUILD_TYPE="$1" "${@:2}"
+   echo_do cmake -B ignore/build/"$BESPOKE_BUILD_TYPE" -GNinja -DCMAKE_BUILD_TYPE="$BESPOKE_BUILD_TYPE" "$@"
 
 
-# Run
+# Run (with an optional command prefix, such as `gdb`)
 [positional-arguments]
-run type=default_build_type *bespoke_args:
-   #!/bin/sh
+run *command_prefix:
+   #!/usr/bin/env sh
+   {{echo_do}}
 
    # Check if we haven't compiled yet
-   bespoke_exe=./ignore/build/Source/BespokeSynth_artefacts/"$1"/BespokeSynth
+   bespoke_exe="$(just _print_binary_name)"
    if ! [ -f "$bespoke_exe" ]; then
-      just _echo_do just build "$1"
+      echo_do just build
    fi
 
    # Run the program
-   shift
-   just _echo_do "$bespoke_exe" "$@"
+   echo_do "$@" "$bespoke_exe"
 
 
 # Clean the build files
@@ -59,6 +98,13 @@ clean:
 ## Utilities
 ##
 
+
+_print_binary_name:
+   #!/usr/bin/env sh
+   bespoke_exe=./ignore/build/"$BESPOKE_BUILD_TYPE"/Source/BespokeSynth_artefacts/"$BESPOKE_BUILD_TYPE"/BespokeSynth
+   realpath "$bespoke_exe"
+
+
 # List available actions
 list:
    @just --list --unsorted
@@ -66,11 +112,5 @@ list:
    @echo "Place your VST2 SDK at ./ignore/VST_SDK/VST2_SDK or set the VST2_SDK_HOME environment variable to enable using the VST2 SDK"
 
 
-# Simple utility to print out what's being executed before running it, matching just's default format
-[positional-arguments]
-_echo_do *exec:
-   #!/bin/bash
-   echo -en '\e[1m' >&2 # style: bold
-   echo -n "$@"     >&2
-   echo -e '\e[0m'  >&2 # style: reset
-   "$@"
+# Allow extending this file locally (customizing recipes, setting environment variables, etc.)
+import? 'ignore/local.just'
