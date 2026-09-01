@@ -67,6 +67,10 @@ struct ofVec2f
       x = _x;
       y = _y;
    }
+   ofVec2f operator-()
+   {
+      return ofVec2f(-x, -y);
+   }
    ofVec2f operator-(const ofVec2f& other)
    {
       return ofVec2f(x - other.x, y - other.y);
