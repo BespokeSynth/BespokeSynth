@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <juce_core/juce_core.h>
+
 /**
  * A simple single producer & consumer lock free queue, based on Herb Sutter's code:
  * http://www.drdobbs.com/parallel/writing-lock-free-code-a-corrected-queue/

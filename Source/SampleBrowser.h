@@ -69,6 +69,8 @@ private:
    void SetDirectory(juce::String dirPath);
    int GetNumPages() const;
    void ShowPage(int page);
+   void PlaySample(juce::String file);
+   bool IsMostRecentlyPlayedSample(int index) const;
    bool IsSamplePlaying(int index) const;
 
    juce::String mCurrentDirectory;
@@ -77,6 +79,8 @@ private:
    std::array<ClickButton*, 30> mPlayButtons{ nullptr };
    ClickButton* mBackButton{ nullptr };
    ClickButton* mForwardButton{ nullptr };
+   ClickButton* mPlayRandomButton{ nullptr };
+   ClickButton* mStopButton{ nullptr };
    int mCurrentPage{ 0 };
    Sample mPlayingSample;
    ofMutex mSampleMutex;

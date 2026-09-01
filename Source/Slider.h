@@ -101,13 +101,16 @@ public:
       kSquare,
       kBezier
    };
+   void CopyBehaviorFrom(FloatSlider* slider);
    void SetMode(Mode mode) { mMode = mode; }
    Mode GetMode() const { return mMode; }
+   void AddDetent(float value);
+   void RemoveDetent(float value);
 
    bool CheckNeedsDraw() override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
+   void SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod) override;
    float GetValueForMidiCC(float slider) const override;
    void SetValue(float value, double time, bool forceUpdate = false) override;
    float GetValue() const override;
@@ -120,7 +123,9 @@ public:
    }
    void Double() override;
    void Halve() override;
-   void ResetToOriginal() override;
+   void ResetToDefault() override;
+   void SetDefaultValue(float value) override { mDefaultValue = value; }
+   float GetDefaultValue() const override { return mDefaultValue; }
    void Poll() override;
    void Increment(float amount) override;
 
@@ -171,7 +176,7 @@ private:
    float mRelativeOffset{ -999 };
    bool mClamped{ true };
    Mode mMode{ Mode::kNormal };
-   float mOriginalValue{ 0 };
+   float mDefaultValue{ 0 };
    std::string mMinValueDisplay{ "" };
    std::string mMaxValueDisplay{ "" };
    bool mShowName{ true };
@@ -185,6 +190,9 @@ private:
    int mLastComputeSamplesIn{ 0 };
    double* mLastComputeCacheTime;
    float* mLastComputeCacheValue;
+   std::vector<float> mDetents;
+   double mLastHitDetentTimeMs{ 0 };
+   int mLastAdjustdDirection{ 0 };
 
    float mLastDisplayedValue{ std::numeric_limits<float>::max() };
 
@@ -237,7 +245,7 @@ public:
    bool CheckNeedsDraw() override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
+   void SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod) override;
    float GetValueForMidiCC(float slider) const override;
    void SetValue(float value, double time, bool forceUpdate = false) override;
    float GetValue() const override;
@@ -260,7 +268,9 @@ public:
    void Double() override;
    void Halve() override;
    void Increment(float amount) override;
-   void ResetToOriginal() override;
+   void ResetToDefault() override;
+   void SetDefaultValue(float value) override { mDefaultValue = value; }
+   float GetDefaultValue() const override { return mDefaultValue; }
    void Poll() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
@@ -288,7 +298,7 @@ private:
    int mMin;
    int mMax;
    bool mMouseDown;
-   int mOriginalValue;
+   int mDefaultValue;
    IIntSliderListener* mOwner;
    int mFineRefX{ -999 };
 

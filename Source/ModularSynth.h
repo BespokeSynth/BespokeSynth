@@ -290,6 +290,7 @@ public:
    QuickSpawnMenu* GetQuickSpawn() { return mQuickSpawn; }
    std::string GetLastSavePath() { return mCurrentSaveStatePath; }
    RollingBuffer* GetGlobalRecordBuffer() const { return mGlobalRecordBuffer; }
+   void ResetLayout();
 
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
    juce::Component* GetFileChooserParent() const;
@@ -298,6 +299,7 @@ public:
    void CopyTextToClipboard(const juce::String& text);
 
    void SetFatalError(std::string error);
+   bool HasFatalError() const { return mFatalError != ""; }
 
    static bool sShouldAutosave;
    static float sBackgroundLissajousR;
@@ -315,7 +317,6 @@ public:
 private:
    void SaveState(std::string file, bool autosave);
    void CompleteQueuedSaveState();
-   void ResetLayout();
    void ReconnectMidiDevices();
    void DrawConsole();
    void CheckClick(IDrawableModule* clickedModule, float x, float y, bool rightButton);

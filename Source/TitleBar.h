@@ -114,6 +114,38 @@ private:
    ClickButton* mCancelButton{ nullptr };
 };
 
+class MenuPopup : public IDrawableModule, public IButtonListener
+{
+public:
+   MenuPopup();
+   void CreateUIControls() override;
+   void DrawModule() override;
+   bool HasTitleBar() const override { return false; }
+
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
+   void ButtonClicked(ClickButton* button, double time) override;
+
+private:
+   ClickButton* mSaveLayoutButton{ nullptr };
+   ClickButton* mResetLayoutButton{ nullptr };
+   ClickButton* mWelcomeScreenButton{ nullptr };
+   ClickButton* mSaveStateButton{ nullptr };
+   ClickButton* mSaveStateAsButton{ nullptr };
+   ClickButton* mLoadStateButton{ nullptr };
+   ClickButton* mWriteAudioButton{ nullptr };
+   ClickButton* mHomeButton{ nullptr };
+   Checkbox* mEventLookaheadCheckbox{ nullptr };
+   Checkbox* mShouldAutosaveCheckbox{ nullptr };
+   Checkbox* mShowTooltipsCheckbox{ nullptr };
+
+   NewPatchConfirmPopup mNewPatchConfirmPopup;
+};
+
 class TitleBar : public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public WindowCloseListener
 {
 public:
@@ -161,20 +193,12 @@ private:
    float GetPixelWidth() const;
 
    ClickButton* mPlayPauseButton{ nullptr };
+   ClickButton* mMenuButton{ nullptr };
    ClickButton* mSaveLayoutButton{ nullptr };
-   ClickButton* mResetLayoutButton{ nullptr };
-   ClickButton* mWelcomeScreenButton{ nullptr };
-   ClickButton* mSaveStateButton{ nullptr };
-   ClickButton* mSaveStateAsButton{ nullptr };
-   ClickButton* mLoadStateButton{ nullptr };
-   ClickButton* mWriteAudioButton{ nullptr };
    DropdownList* mLoadLayoutDropdown{ nullptr };
    ClickButton* mDisplayHelpButton{ nullptr };
    ClickButton* mDisplayUserPrefsEditorButton{ nullptr };
-   ClickButton* mHomeButton{ nullptr };
-   Checkbox* mEventLookaheadCheckbox{ nullptr };
    int mLoadLayoutIndex{ -1 };
-   Checkbox* mShouldAutosaveCheckbox{ nullptr };
 
    HelpDisplay* mHelpDisplay{ nullptr };
 
@@ -184,10 +208,12 @@ private:
 
    std::unique_ptr<PluginListWindow> mPluginListWindow;
 
-   NewPatchConfirmPopup mNewPatchConfirmPopup;
+   MenuPopup mMenuPopup;
 
    std::string mDisplayMessage;
    double mDisplayMessageTime;
+
+   int mNumDropdownRows{ 2 };
 };
 
 extern TitleBar* TheTitleBar;

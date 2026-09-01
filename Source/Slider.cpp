@@ -68,7 +68,7 @@ FloatSlider::~FloatSlider()
 void FloatSlider::Init()
 {
    if (mVar)
-      mOriginalValue = *mVar;
+      mDefaultValue = *mVar;
 }
 
 FloatSliderLFOControl* FloatSlider::AcquireLFO()
@@ -133,6 +133,18 @@ void FloatSlider::Render()
    ofSetColor(color);
    ofRect(mX, mY, mWidth, mHeight);
    ofNoFill();
+
+   for (float detent : mDetents)
+   {
+      if (detent > mMin && detent < mMax)
+      {
+         ofPushStyle();
+         ofSetColor(150, 150, 150, gModuleDrawAlpha);
+         float x = mX + 1 + (mWidth - 2) * ((detent - mMin) / float(mMax - mMin));
+         ofLine(x, mY + 1, x, mY + mHeight - 1);
+         ofPopStyle();
+      }
+   }
 
    bool showSmoothAdjustmentUI = AdjustSmooth() && (gHoveredUIControl == this || mSmooth > 0);
 
@@ -439,9 +451,35 @@ void FloatSlider::SmoothUpdated()
    }
 }
 
-void FloatSlider::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void FloatSlider::SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod)
 {
-   SetValue(GetValueForMidiCC(slider), time);
+   float currentValue = *mVar;
+   float newValue = GetValueForMidiCC(slider);
+
+   if (setValueMethod == SetValueMethod::Increment)
+   {
+      float adjustAmount = newValue - currentValue;
+      const float kDetentDelayTimeMs = 100;
+      if (time < mLastHitDetentTimeMs + kDetentDelayTimeMs &&
+          ((adjustAmount > 0 && mLastAdjustdDirection > 0) || (adjustAmount < 0 && mLastAdjustdDirection < 0)))
+      {
+         mLastHitDetentTimeMs = time;
+         return;
+      }
+
+      mLastHitDetentTimeMs = -1;
+
+      for (float detent : mDetents)
+      {
+         if ((currentValue < detent && newValue >= detent) || (currentValue > detent && newValue <= detent))
+         {
+            newValue = detent;
+            mLastHitDetentTimeMs = time;
+         }
+      }
+   }
+
+   SetValue(newValue, time);
 }
 
 float FloatSlider::GetValueForMidiCC(float slider) const
@@ -526,6 +564,13 @@ void FloatSlider::SetValue(float value, double time, bool forceUpdate /*= false*
 
    float* var = GetModifyValue();
    float oldVal = *var;
+
+   float adjustAmount = value - oldVal;
+   if (adjustAmount > 0)
+      mLastAdjustdDirection = 1;
+   else
+      mLastAdjustdDirection = -1;
+
    if (mRelative)
    {
       if (!mTouching || mRelativeOffset == -999)
@@ -679,9 +724,26 @@ void FloatSlider::Increment(float amount)
       SetValue(val, NextBufferTime(false));
 }
 
-void FloatSlider::ResetToOriginal()
+void FloatSlider::ResetToDefault()
 {
-   SetValue(mOriginalValue, NextBufferTime(false));
+   SetValue(mDefaultValue, NextBufferTime(false));
+}
+
+void FloatSlider::CopyBehaviorFrom(FloatSlider* slider)
+{
+   mMode = slider->mMode;
+   mDetents = slider->mDetents;
+   mDefaultValue = slider->mDefaultValue;
+}
+
+void FloatSlider::AddDetent(float value)
+{
+   mDetents.push_back(value);
+}
+
+void FloatSlider::RemoveDetent(float value)
+{
+   RemoveFromVector(value, mDetents);
 }
 
 bool FloatSlider::CheckNeedsDraw()
@@ -865,7 +927,7 @@ IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y,
 , mMax(max)
 , mMouseDown(false)
 , mOwner(owner)
-, mOriginalValue(0)
+, mDefaultValue(0)
 , mSliderVal(0)
 , mShowName(true)
 , mIntEntry(nullptr)
@@ -894,7 +956,7 @@ IntSlider::~IntSlider()
 void IntSlider::Init()
 {
    if (mVar)
-      mOriginalValue = *mVar;
+      mDefaultValue = *mVar;
 }
 
 void IntSlider::Poll()
@@ -1105,7 +1167,7 @@ void IntSlider::SetValueForMouse(float x, float y)
    }
 }
 
-void IntSlider::SetFromMidiCC(float slider, double time, bool setViaModulator)
+void IntSlider::SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod)
 {
    slider = ofClamp(slider, 0, 1);
    SetValue(GetValueForMidiCC(slider), time);
@@ -1167,9 +1229,9 @@ void IntSlider::Increment(float amount)
       SetValue(val, NextBufferTime(false));
 }
 
-void IntSlider::ResetToOriginal()
+void IntSlider::ResetToDefault()
 {
-   SetValue(mOriginalValue, NextBufferTime(false));
+   SetValue(mDefaultValue, NextBufferTime(false));
 }
 
 bool IntSlider::CheckNeedsDraw()

@@ -77,6 +77,11 @@ public:
    int PitchToRow(int pitch);
    void SetStep(int index, int step, int velocity, float length);
    void SetPitch(int index, int pitch, int velocity, float length);
+   int GetRow(int index);
+   int GetPitch(int index);
+   int GetVelocity(int index);
+   float GetLength(int index);
+
 
    //IDrawableModule
    bool IsResizable() const override { return true; }
@@ -89,7 +94,7 @@ public:
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
    //IAbletonGridController
-   bool OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
    void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
    bool UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass) override;
 

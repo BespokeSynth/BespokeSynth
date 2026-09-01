@@ -148,7 +148,7 @@ void ControlSequencer::Step(double time, int pulseFlags)
       for (auto* target : mTargets)
       {
          if (target != nullptr)
-            target->SetFromMidiCC(mGrid->GetVal(mStep, 0), time, true);
+            target->SetFromMidiCC(mGrid->GetVal(mStep, 0), time, SetValueMethod::Modulator);
       }
    }
 }

@@ -59,7 +59,11 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mSoften = 0;
    mVoiceParams.mLiteCPUMode = false;
 
-   mPolyMgr.Init(kVoiceType_SingleOscillator, &mVoiceParams);
+   mPolyMgr.Init([](IDrawableModule* owner)
+                 {
+                    return std::unique_ptr<IMidiVoice>(new SingleOscillatorVoice(owner));
+                 },
+                 &mVoiceParams);
 }
 
 namespace
@@ -353,9 +357,9 @@ void SingleOscillator::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUICont
       float maxVal = mFilterCutoffMaxSlider->GetMax();
       int minX = ofMap(mVoiceParams.mFilterCutoffMin, minVal, maxVal, 6, AbletonMoveLCD::kMoveDisplayWidth - 6);
       int maxX = ofMap(mVoiceParams.mFilterCutoffMax, minVal, maxVal, 6, AbletonMoveLCD::kMoveDisplayWidth - 6);
-      screen->DrawRect(minX, 27, 1, 4, false);
-      screen->DrawRect(maxX, 27, 1, 4, false);
-      screen->DrawRect(minX, 28, maxX - minX, 2, false);
+      screen->DrawRect(minX, 27, 1, 4, LCDDrawMode::Outline);
+      screen->DrawRect(maxX, 27, 1, 4, LCDDrawMode::Outline);
+      screen->DrawRect(minX, 28, maxX - minX, 2, LCDDrawMode::Outline);
    }
    else
    {
@@ -371,12 +375,12 @@ void SingleOscillator::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUICont
          if (lastY <= newY)
          {
             for (int y = lastY; y <= newY; ++y)
-               screen->TogglePixel(x, y);
+               screen->DrawPixel(x, y, LCDDrawMode::Toggle);
          }
          else
          {
             for (int y = lastY; y >= newY; --y)
-               screen->TogglePixel(x, y);
+               screen->DrawPixel(x, y, LCDDrawMode::Toggle);
          }
          lastY = newY;
       }

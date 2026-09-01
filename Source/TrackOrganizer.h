@@ -124,6 +124,7 @@ private:
    DropdownList* mColorSelector{ nullptr };
    int mColorIndex{ 0 };
    ClickButton* mSelectModulesButton{ nullptr };
+   ClickButton* mSaveTrackButton{ nullptr };
 
    std::list<IDrawableModule*> mAllModules;
 };

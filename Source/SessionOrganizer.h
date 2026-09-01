@@ -27,13 +27,15 @@
 
 #pragma once
 
+#include "ClickButton.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "RadioButton.h"
+#include "ClickButton.h"
 
 class TrackOrganizer;
 
-class SessionOrganizer : public IDrawableModule, public IFloatSliderListener, public IRadioButtonListener
+class SessionOrganizer : public IDrawableModule, public IFloatSliderListener, public IRadioButtonListener, public IButtonListener
 {
 public:
    SessionOrganizer();
@@ -48,10 +50,13 @@ public:
 
    TrackOrganizer* GetTrack(int index) const;
    int GetNumTracks() const { return (int)mTrackCables.size(); }
+   void LoadTrackPrefab(std::string loadPath);
+   void AddTrack(TrackOrganizer* track);
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -90,4 +95,9 @@ private:
 
    std::array<PatchCableSource*, 8> mTrackCables{ nullptr };
    std::array<TrackColumn, 8> mTrackColumns;
+
+   ClickButton* mLoadTrackButton{ nullptr };
+
+   PatchCableSource* mDefaultOutputTargetCable{ nullptr };
+   PatchCableSource* mDefaultSendTargetCable{ nullptr };
 };

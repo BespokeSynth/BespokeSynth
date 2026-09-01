@@ -76,7 +76,7 @@ public:
    void GetDimensions(float& width, float& height) override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
+   void SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod) override;
    float GetValueForMidiCC(float slider) const override;
    float GetMidiValue() const override;
    void GetRange(float& min, float& max) override;

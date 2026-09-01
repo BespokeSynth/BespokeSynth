@@ -167,7 +167,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
             float new_value = msg[0].isFloat32() ? msg[0].getFloat32() : msg[0].getInt32();
             DropdownList* dropdown = dynamic_cast<DropdownList*>(control);
             if (is_percentage)
-               control->SetFromMidiCC(new_value, gTime, false);
+               control->SetFromMidiCC(new_value, gTime, SetValueMethod::Direct);
             else if (dropdown)
                dropdown->SetIndex(new_value, gTime, true);
             else
@@ -351,6 +351,17 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
 
       if (mListener != nullptr)
          mListener->OnMidiControl(control);
+   }
+}
+
+void OscController::oscBundleReceived(const juce::OSCBundle& bundle)
+{
+   for (const juce::OSCBundle::Element* element = bundle.begin(); element != bundle.end(); ++element)
+   {
+      if (element->isMessage())
+         oscMessageReceived(element->getMessage());
+      else if (element->isBundle())
+         oscBundleReceived(element->getBundle());
    }
 }
 

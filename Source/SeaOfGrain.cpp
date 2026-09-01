@@ -51,7 +51,11 @@ SeaOfGrain::SeaOfGrain()
       mMPEVoices[i].mOwner = this;
 
    for (int i = 0; i < kNumManualVoices; ++i)
+   {
       mManualVoices[i].mOwner = this;
+      if (i >= 1)
+         mManualVoices[i].mGranulator.mSpawnGrains = false;
+   }
 }
 
 void SeaOfGrain::CreateUIControls()
@@ -110,6 +114,8 @@ void SeaOfGrain::CreateUIControls()
       mManualVoices[i].mOctaveCheckbox = new Checkbox(this, ("octaves " + ofToString(i + 1)).c_str(), mManualVoices[i].mSpacingRandomizeSlider, kAnchor_Below, &mManualVoices[i].mGranulator.mOctaves);
       mManualVoices[i].mWidthSlider = new FloatSlider(this, ("width " + ofToString(i + 1)).c_str(), mManualVoices[i].mOctaveCheckbox, kAnchor_Below, 120, 15, &mManualVoices[i].mGranulator.mWidth, 0, 1);
       mManualVoices[i].mPanSlider = new FloatSlider(this, ("pan " + ofToString(i + 1)).c_str(), mManualVoices[i].mWidthSlider, kAnchor_Below, 120, 15, &mManualVoices[i].mPan, -1, 1);
+
+      RefreshOptionRenderStates(i);
    }
 }
 
@@ -225,6 +231,7 @@ void SeaOfGrain::DrawModule()
          mSample->LockDataMutex(false);
       }
 
+
       ofPushStyle();
       ofFill();
       for (int i = 0; i < mKeyboardNumPitches; ++i)
@@ -235,9 +242,15 @@ void SeaOfGrain::DrawModule()
       ofPopStyle();
 
       for (int i = 0; i < kNumMPEVoices; ++i)
+      {
          mMPEVoices[i].Draw(mBufferW, mBufferH);
+      }
+
       for (int i = 0; i < kNumManualVoices; ++i)
-         mManualVoices[i].Draw(i, mBufferW, mBufferH);
+      {
+         if (mManualVoices[i].mGranulator.mSpawnGrains)
+            mManualVoices[i].Draw(i, mBufferW, mBufferH);
+      }
 
       ofPopStyle();
       ofPopMatrix();
@@ -391,8 +404,33 @@ bool SeaOfGrain::MouseMoved(float x, float y)
    return IDrawableModule::MouseMoved(x, y);
 }
 
+void SeaOfGrain::RefreshOptionRenderStates(int idx) const
+{
+   int i = idx;
+   bool doRender = mManualVoices[i].mGranulator.mSpawnGrains;
+   mManualVoices[i].mGainSlider->SetShowing(doRender);
+   mManualVoices[i].mPositionSlider->SetShowing(doRender);
+   mManualVoices[i].mOverlapSlider->SetShowing(doRender);
+   mManualVoices[i].mSpeedSlider->SetShowing(doRender);
+   mManualVoices[i].mLengthMsSlider->SetShowing(doRender);
+   mManualVoices[i].mPosRandomizeSlider->SetShowing(doRender);
+   mManualVoices[i].mSpeedRandomizeSlider->SetShowing(doRender);
+   mManualVoices[i].mSpacingRandomizeSlider->SetShowing(doRender);
+   mManualVoices[i].mOctaveCheckbox->SetShowing(doRender);
+   mManualVoices[i].mWidthSlider->SetShowing(doRender);
+   mManualVoices[i].mPanSlider->SetShowing(doRender);
+}
+
 void SeaOfGrain::CheckboxUpdated(Checkbox* checkbox, double time)
 {
+   for (int i = 0; i < kNumManualVoices; ++i)
+   {
+      if (mManualVoices[i].mEnabledCheckbox == checkbox)
+      {
+         RefreshOptionRenderStates(i);
+      }
+   }
+
    if (checkbox == mRecordInputCheckbox)
    {
       if (mRecordInput)
@@ -505,6 +543,11 @@ void SeaOfGrain::LoadState(FileStreamIn& in, int rev)
    {
       mSample->LoadState(in);
       UpdateSample();
+   }
+
+   for (int i = 0; i < kNumManualVoices; ++i)
+   {
+      RefreshOptionRenderStates(i);
    }
 }
 

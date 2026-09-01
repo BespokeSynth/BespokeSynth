@@ -107,7 +107,7 @@ void CurveLooper::OnTransportAdvanced(float amount)
       for (auto* control : mUIControls)
       {
          if (control != nullptr)
-            control->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * kAdsrTime, &adsrEvent), gTime, true);
+            control->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * kAdsrTime, &adsrEvent), gTime, SetValueMethod::Modulator);
       }
    }
 }

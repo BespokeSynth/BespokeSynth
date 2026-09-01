@@ -47,7 +47,7 @@ class Grain
 public:
    void Spawn(double time, double pos, float speedMult, float lengthInMs, float vol, float width);
    void Process(double time, ChannelBuffer* buffer, int bufferLength, float* output, const Granulator* granulator);
-   void DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain, const Granulator* granulator);
+   void DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain, const Granulator* granulator) const;
    void Clear() { mVol = 0; }
 
 private:
@@ -66,7 +66,7 @@ class Granulator
 public:
    Granulator();
    void ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float speed, float* output);
-   void Draw(float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain);
+   void Draw(float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength, float gain) const;
    void DrawWindow(float x, float y, float w, float h);
    void Reset();
    void ClearGrains();

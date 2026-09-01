@@ -408,7 +408,7 @@ void ADSRDisplay::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* 
       int screenX = point.x / mWidth * AbletonMoveLCD::kMoveDisplayWidth;
       int screenEnvelopeY = point.y / mHeight * AbletonMoveLCD::kMoveDisplayHeight;
       for (int screenY = screenEnvelopeY; screenY < AbletonMoveLCD::kMoveDisplayHeight; ++screenY)
-         screen->TogglePixel(screenX, screenY);
+         screen->DrawPixel(screenX, screenY, LCDDrawMode::Toggle);
    }
 
    float drawTime = GetDrawTime(releaseTime);
@@ -416,7 +416,7 @@ void ADSRDisplay::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* 
    if (nowX >= 0 && nowX < AbletonMoveLCD::kMoveDisplayWidth)
    {
       for (float y = 0; y < AbletonMoveLCD::kMoveDisplayHeight; ++y)
-         screen->TogglePixel(nowX, y);
+         screen->DrawPixel(nowX, y, LCDDrawMode::Toggle);
    }
 }
 

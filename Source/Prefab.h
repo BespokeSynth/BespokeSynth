@@ -48,6 +48,9 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
+   void Disband();
+   void AddModule(IDrawableModule* module);
+   void SavePrefab(std::string savePath);
 
    void Poll() override;
    bool ShouldClipContents() override { return false; }
@@ -85,7 +88,6 @@ private:
    bool IsAddableModule(IDrawableModule* module);
    bool IsMouseHovered();
 
-   void SavePrefab(std::string savePath);
    void UpdatePrefabName(std::string path);
 
    PatchCableSource* mRemoveModuleCable{ nullptr };

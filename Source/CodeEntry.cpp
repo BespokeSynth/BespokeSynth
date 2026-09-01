@@ -324,21 +324,28 @@ void CodeEntry::Render()
 
    ofPushStyle();
    const float dim = .7f;
-   DrawSyntaxHighlight(drawString, stringColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 3, -1);
-   DrawSyntaxHighlight(drawString, numberColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 2, -1);
-   DrawSyntaxHighlight(drawString, name1Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 1, -1);
-   DrawSyntaxHighlight(drawString, name2Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 90, -1);
-   DrawSyntaxHighlight(drawString, name3Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 91, -1);
-   DrawSyntaxHighlight(drawString, definedColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 92, -1);
-   DrawSyntaxHighlight(drawString, equalsColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 22, -1);
-   DrawSyntaxHighlight(drawString, parenColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 7, 8);
-   DrawSyntaxHighlight(drawString, braceColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 25, 26);
-   DrawSyntaxHighlight(drawString, bracketColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 9, 10);
-   DrawSyntaxHighlight(drawString, opColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 51, -1);
-   DrawSyntaxHighlight(drawString, commaColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 12, -1);
-   DrawSyntaxHighlight(drawString, commentColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 53, -1);
-   DrawSyntaxHighlight(drawString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 52, 59); //"error" token (like incomplete quotes)
-   DrawSyntaxHighlight(drawString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, -1, -1);
+   if (mDoSyntaxHighlighting)
+   {
+      DrawSyntaxHighlight(drawString, stringColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 3, -1);
+      DrawSyntaxHighlight(drawString, numberColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 2, -1);
+      DrawSyntaxHighlight(drawString, name1Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 1, -1);
+      DrawSyntaxHighlight(drawString, name2Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 90, -1);
+      DrawSyntaxHighlight(drawString, name3Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 91, -1);
+      DrawSyntaxHighlight(drawString, definedColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 92, -1);
+      DrawSyntaxHighlight(drawString, equalsColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 22, -1);
+      DrawSyntaxHighlight(drawString, parenColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 7, 8);
+      DrawSyntaxHighlight(drawString, braceColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 25, 26);
+      DrawSyntaxHighlight(drawString, bracketColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 9, 10);
+      DrawSyntaxHighlight(drawString, opColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 51, -1);
+      DrawSyntaxHighlight(drawString, commaColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 12, -1);
+      DrawSyntaxHighlight(drawString, commentColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 53, -1);
+      DrawSyntaxHighlight(drawString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 52, 59); //"error" token (like incomplete quotes)
+      DrawSyntaxHighlight(drawString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, -1, -1);
+   }
+   else
+   {
+      DrawSyntaxHighlight(drawString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, -1, -1);
+   }
    ofPopStyle();
 
    /*for (int i = 0; i<60; ++i)

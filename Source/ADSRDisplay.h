@@ -68,7 +68,7 @@ public:
    FloatSlider* GetRSlider() { return mRSlider; }
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override {}
+   void SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod) override {}
    void SetValue(float value, double time, bool forceUpdate = false) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override { return false; }
    void SaveState(FileStreamOut& out) override;

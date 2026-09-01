@@ -73,7 +73,7 @@ public:
    }
 
    //IUIControl
-   void SetFromMidiCC(float slider, double time, bool setViaModulator) override;
+   void SetFromMidiCC(float slider, double time, SetValueMethod setValueMethod) override;
    void SetValue(float value, double time, bool forceUpdate = false) override;
    float GetValue() const override { return GetMidiValue(); }
    float GetMidiValue() const override;
@@ -106,6 +106,7 @@ private:
    void OnClicked(float x, float y, bool right) override;
    float mWidth{ 20 };
    float mHeight{ 15 };
+   float mTextWidth{ 20 };
    double mClickTime{ -9999 };
    IButtonListener* mOwner{ nullptr };
    ButtonDisplayStyle mDisplayStyle{ ButtonDisplayStyle::kText };

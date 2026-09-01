@@ -50,7 +50,7 @@ for line in lines:
    if m:
       docLine(tab+"   "+m.group(1))
 
-   m = re.match("PYBIND11_EMBEDDED_MODULE\((.*),", line)
+   m = re.match("PYBIND11_EMBEDDED_MODULE\\((.*),", line)
    if m:
       currentModule = m.group(1)
       isBootstrapModule = currentModule == "bespoke" or currentModule == "scriptmodule"
@@ -70,7 +70,7 @@ for line in lines:
       stubLine(currentModule, "from __future__ import annotations\n")
       inStaticMethods = True
    else:
-      m = re.match(".*m.def\(\"(.*)\".*\[\]\((.*)\)", line)
+      m = re.match(".*m.def\\(\"(.*)\".*\\[\\]\\((.*)\\)", line)
       if m:
          paramString = extractParamString(m.group(2), False)
          if m.group(1) != "get_me":
@@ -81,7 +81,7 @@ for line in lines:
                stubLine(currentModule, "def "+m.group(1)+"("+paramString+"):")
             stubLine(currentModule, "   pass\n")
       else:
-         m = re.match(".*.def\(\"(.*)\".*\[\]\((.*)\)", line)
+         m = re.match(".*.def\\(\"(.*)\".*\\[\\]\\((.*)\\)", line)
          if m:
             paramString = extractParamString(m.group(2), True)
             if isBootstrapModule:
@@ -96,7 +96,7 @@ for line in lines:
             stubLine(currentModule, "   def "+m.group(1)+"("+thisPrefix+paramString+"):")
             stubLine(currentModule, "      pass\n")
          else:
-            m = re.match(" *}, (\".*)\)", line)
+            m = re.match(" *}, (\".*)\\)", line)
             if m:
                defaults = m.group(1).split(',')
                defaultList = []
@@ -111,7 +111,7 @@ for line in lines:
                if defaultList != []:
                   docLine(tab+"   optional: "+", ".join(defaultList))
             else:
-               m = re.match(".*\.value\(\"(.*)\"", line)
+               m = re.match(".*\\.value\\(\"(.*)\"", line)
                if m:
                   stubLine(currentModule, "   "+m.group(1)+": ...")
                   #   Note: ...
@@ -119,6 +119,7 @@ for line in lines:
 docFile = open("resource/scripting_reference.txt", "w+")
 docFile.writelines(docOutput)
 
+print(stubOutput.keys())
 for key in stubOutput.keys():
    dir = "resource/python_stubs/"+key+"/"
    if not os.path.exists(dir):

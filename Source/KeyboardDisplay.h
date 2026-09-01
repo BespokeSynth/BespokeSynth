@@ -63,6 +63,20 @@ public:
 
    bool IsEnabled() const override { return mEnabled; }
 
+   struct KeyboardDrawOptions
+   {
+      float mWidth{ 300 };
+      float mHeight{ 100 };
+      int mNumOctaves{ 3 };
+      int mRootOctave{ 3 };
+      bool mHideLabels{ false };
+      bool mShowScale{ false };
+      bool mEnabled{ true };
+   };
+
+   static void DrawKeyboard(int x, int y, const KeyboardDrawOptions& options, std::array<double, 128>* lastOnTimes = nullptr, std::array<double, 128>* lastOffTimes = nullptr);
+   static ofRectangle GetKeyboardKeyRect(int pitch, bool& isBlackKey, const KeyboardDrawOptions& options);
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -70,13 +84,9 @@ private:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void RefreshOctaveCount();
+   void UpdateDrawOptions();
 
-   void DrawKeyboard(int x, int y, int w, int h);
-   void SetPitchColor(int pitch);
-   ofRectangle GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const;
-
-   int RootKey() const;
-   int NumKeys() const;
+   static void SetPitchColor(int pitch, const KeyboardDrawOptions& options);
 
    int mRootOctave{ 3 };
    int mNumOctaves{ 3 };
@@ -90,4 +100,5 @@ private:
    std::array<double, 128> mLastOnTime{};
    std::array<double, 128> mLastOffTime{};
    std::unordered_map<int, int> mKeyPressRegister{};
+   KeyboardDrawOptions mDrawOptions;
 };

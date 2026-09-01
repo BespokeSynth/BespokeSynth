@@ -91,6 +91,8 @@ public:
    bool IsRecording() const override;
    void ClearRecording() override;
    void CancelRecording() override;
+   bool IsInRetroactiveRecorderMode() const override { return true; }
+   void DoRetroactiveRecord(int numBars) override;
 
    int GetLooperIndex(const Looper* looper) const;
    void SetRecording(int looperIndex, bool record);

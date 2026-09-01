@@ -31,6 +31,7 @@
 #include "Chord.h"
 #include "ChordDatabase.h"
 #include <atomic>
+#include "AbletonDeviceShared.h"
 
 class IScaleListener
 {
@@ -82,7 +83,7 @@ struct ScalePitches
 
 class MTSClient;
 
-class Scale : public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IButtonListener
+class Scale : public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IButtonListener, public IAbletonGridController
 {
 public:
    Scale();
@@ -130,8 +131,10 @@ public:
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
    void TextEntryComplete(TextEntry* entry) override;
-
    void ButtonClicked(ClickButton* button, double time) override;
+
+   bool OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue) override;
+   void UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -164,6 +167,7 @@ private:
    void UpdateTuningTable();
    float GetTuningTableRatio(int semitonesFromCenter);
    void SetRandomRootAndScale();
+   int GridToPitch(int x, int y) const;
 
    enum IntonationMode
    {

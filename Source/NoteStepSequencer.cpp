@@ -541,6 +541,42 @@ void NoteStepSequencer::SetPitch(int index, int pitch, int velocity, float lengt
    }
 }
 
+int NoteStepSequencer::GetRow(int index)
+{
+   if (index >= 0 && index < NSS_MAX_STEPS)
+   {
+      return mTones[index];
+   }
+   return -1;
+}
+
+int NoteStepSequencer::GetPitch(int index)
+{
+   if (index >= 0 && index < NSS_MAX_STEPS)
+   {
+      return NoteStepSequencer::RowToPitch(mNoteMode, mTones[index], mOctave, mRowOffset);
+   }
+   return -1;
+}
+
+int NoteStepSequencer::GetVelocity(int index)
+{
+   if (index >= 0 && index < NSS_MAX_STEPS)
+   {
+      return mVels[index];
+   }
+   return -1;
+}
+
+float NoteStepSequencer::GetLength(int index)
+{
+   if (index >= 0 && index < NSS_MAX_STEPS)
+   {
+      return mNoteLengths[index];
+   }
+   return -1;
+}
+
 void NoteStepSequencer::GetPush2Layout(AbletonDeviceType deviceType, int& sequenceRows, int& pitchCols, int& pitchRows)
 {
    if (deviceType == AbletonDeviceType::Move)
@@ -554,7 +590,7 @@ void NoteStepSequencer::GetPush2Layout(AbletonDeviceType deviceType, int& sequen
    pitchRows = (mNoteRange - 1) / pitchCols + 1;
 }
 
-bool NoteStepSequencer::OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
+bool NoteStepSequencer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
    if (mPush2GridDisplayMode == Push2GridDisplayMode::PerStep)
    {

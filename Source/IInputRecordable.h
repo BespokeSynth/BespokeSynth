@@ -34,4 +34,6 @@ public:
    virtual void ClearRecording() = 0;
    virtual void CancelRecording() = 0;
    virtual float GetRecordingLengthMeasures() const { return 0; }
+   virtual bool IsInRetroactiveRecorderMode() const { return false; }
+   virtual void DoRetroactiveRecord(int numBars) {}
 };

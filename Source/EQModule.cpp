@@ -424,7 +424,7 @@ void EQModule::KeyPressed(int key, bool isRepeat)
       auto* qSlider = mFilters[mHoveredFilterHandleIndex].mQSlider;
       if (key == '\\')
       {
-         qSlider->ResetToOriginal();
+         qSlider->ResetToDefault();
       }
       else if (key == '[')
       {

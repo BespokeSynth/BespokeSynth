@@ -259,6 +259,7 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    juce::File(ofToDataPath("scripts")).createDirectory();
    juce::File(ofToDataPath("internal")).createDirectory();
    juce::File(ofToDataPath("vst")).createDirectory();
+   juce::File(ofToDataPath("trackorganizer")).createDirectory();
 
    SynthInit();
 
@@ -290,8 +291,6 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
       sBackgroundLissajousG = 0.328f;
       sBackgroundLissajousB = 0.0f;
    }
-
-   ResetLayout();
 
    mConsoleListener = new ConsoleListener();
    mConsoleEntry = new TextEntry(mConsoleListener, "console", 0, 20, 50, mConsoleText);
@@ -348,7 +347,7 @@ void ModularSynth::Poll()
    if (mQueuedSaveStateInfo.mQueued && !mQueuedSaveStateInfo.mWaitingForScreenshot)
       CompleteQueuedSaveState();
 
-   if (mFatalError == "")
+   if (!HasFatalError())
    {
       if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load
       {
@@ -543,7 +542,7 @@ void ModularSynth::Draw()
    mModuleContainer.SetDrawScale(gDrawScale);
    mDrawRect.set(-GetDrawOffset().x, -GetDrawOffset().y, ofGetWidth() / gDrawScale, ofGetHeight() / gDrawScale);
 
-   if (mFatalError != "")
+   if (HasFatalError())
    {
       ofSetColor(255, 255, 255, 255);
       DrawFallbackText(("bespoke " + GetBuildInfoString()).c_str(), 100, 50);
@@ -565,14 +564,14 @@ void ModularSynth::Draw()
    if (UserPrefs.draw_background_lissajous.Get())
       DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB, UserPrefs.background_lissajous_autocorrelate.Get());
 
-   if (gTime == 1 && mFatalError == "")
+   if (gTime == 1 && !HasFatalError())
    {
       std::string loading("Bespoke is initializing audio...");
       DrawTextNormal(loading, ofGetWidth() / 2 - GetStringWidth(loading, 28) / 2, ofGetHeight() / 2 - 6, 28);
       return;
    }
 
-   if (!mInitialized && mFatalError == "")
+   if (!mInitialized && !HasFatalError())
    {
       std::string loading("Bespoke is loading...");
       DrawTextNormal(loading, ofGetWidth() / 2 - GetStringWidth(loading, 28) / 2, ofGetHeight() / 2 - 6, 28);
@@ -701,7 +700,7 @@ void ModularSynth::Draw()
    {
       ofSetColor(255, 255, 255, (1 - (gTime - mLastClapboardTime) / 100) * 255);
       ofFill();
-      ofRect(0, 0, ofGetWidth(), ofGetHeight());
+      ofRect(0, 0, ofGetWidth() / gDrawScale, ofGetHeight() / gDrawScale);
    }
 
    ofPopMatrix();
@@ -1158,7 +1157,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       }
       else if (key == '\\')
       {
-         gHoveredUIControl->ResetToOriginal();
+         gHoveredUIControl->ResetToDefault();
       }
       else if ((toupper(key) == 'C' || toupper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
       {
@@ -1814,8 +1813,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
 
    mZoomer.ExitVanityPanningMode();
 
-   mMousePos.x = intX;
-   mMousePos.y = intY;
+   MouseMoved(intX, intY);
    mLastClickWasEmptySpace = false;
 
    if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
@@ -2079,7 +2077,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
             increment *= -1;
          auto value = dropDownList->GetMidiValue();
          value += increment;
-         dropDownList->SetFromMidiCC(value, NextBufferTime(false), false);
+         dropDownList->SetFromMidiCC(value, NextBufferTime(false), SetValueMethod::Increment);
          return;
       }
 
@@ -2117,7 +2115,7 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
       else
          val += change;
       val = ofClamp(val, 0, 1);
-      gHoveredUIControl->SetFromMidiCC(val, NextBufferTime(false), false);
+      gHoveredUIControl->SetFromMidiCC(val, NextBufferTime(false), SetValueMethod::Increment);
 
       gHoveredUIControl->NotifyMouseScrolled(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), xScroll, yScroll, isSmoothScroll, isInvertedScroll);
    }
@@ -2406,7 +2404,7 @@ void ModularSynth::AudioOut(float* const* output, int bufferSize, int nChannels)
             for (int i = 0; i < bufferSize; ++i)
             {
                float sample = sin(GetPhaseInc(440) * i) * (1 - ((gTime - mLastClapboardTime) / 100));
-               output[ch][i] = sample;
+               mOutputBuffers[ch][i] = sample;
             }
          }
       }
@@ -2454,9 +2452,9 @@ void ModularSynth::AudioIn(const float* const* input, int bufferSize, int nChann
    int oversampling = UserPrefs.oversampling.Get();
 
    assert(bufferSize * oversampling == mIOBufferSize);
-   assert(nChannels == (int)mInputBuffers.size());
 
-   for (int i = 0; i < nChannels; ++i)
+   int channelsToProcess = MIN(nChannels, (int)mInputBuffers.size());
+   for (int i = 0; i < channelsToProcess; ++i)
    {
       if (oversampling == 1)
       {
@@ -2774,7 +2772,7 @@ void ModularSynth::ResetLayout()
    mUserPrefsEditor->Init();
    mUserPrefsEditor->SetShowing(false);
    mModuleContainer.AddModule(mUserPrefsEditor);
-   if (mFatalError != "")
+   if (HasFatalError())
    {
       mUserPrefsEditor->Show();
       TheTitleBar->SetShowing(false);
@@ -2785,11 +2783,9 @@ void ModularSynth::ResetLayout()
       mWelcomeScreen->SetName("welcome");
       mWelcomeScreen->CreateUIControls();
       mWelcomeScreen->Init();
+      mWelcomeScreen->SetOwningContainer(GetUIContainer());
       if (!mIsLoadingState && sFrameCount < 10 && UserPrefs.show_welcome_screen.Get())
          mWelcomeScreen->Show();
-      else
-         mWelcomeScreen->SetShowing(false);
-      mModuleContainer.AddModule(mWelcomeScreen);
    }
 
    GetDrawOffset().set(0, 0);
@@ -3168,8 +3164,7 @@ void ModularSynth::SaveLayout(std::string jsonFile, bool makeDefaultLayout /*= t
 
 void ModularSynth::SaveLayoutAsPopup()
 {
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-   FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", isNativeFileChooser, false, GetFileChooserParent());
+   FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", true, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
       SaveLayout(chooser.getResult().getFullPathName().toStdString());
 }
@@ -3213,8 +3208,7 @@ void ModularSynth::SaveStatePopup()
       ++counter;
    } while (targetFile.existsAsFile());
 
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-   FileChooser chooser("Save current state as...", targetFile, "*.bsk", isNativeFileChooser, false, GetFileChooserParent());
+   FileChooser chooser("Save current state as...", targetFile, "*.bsk", true, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
       SaveState(chooser.getResult().getFullPathName().toStdString(), false);
 }
@@ -3232,8 +3226,7 @@ void ModularSynth::LoadStatePopupImp()
    else
       defaultDirectoryOrFile = ofToDataPath("savestate/");
 
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-   FileChooser chooser("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", isNativeFileChooser, false, GetFileChooserParent());
+   FileChooser chooser("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", true, false, GetFileChooserParent());
    if (chooser.browseForFileToOpen())
       LoadState(chooser.getResult().getFullPathName().toStdString());
 }
@@ -3640,7 +3633,7 @@ void ModularSynth::OnConsoleInput(std::string command /* = "" */)
       }
       else if (tokens[0] == "welcomescreen")
       {
-         mWelcomeScreen->Show();
+         PushModalFocusItem(mWelcomeScreen);
       }
       else if (tokens[0] == "dump" && tokens.size() >= 2)
       {
@@ -3939,8 +3932,6 @@ void ModularSynth::SetFatalError(std::string error)
          mUserPrefsEditor->Show();
       if (TheTitleBar != nullptr)
          TheTitleBar->SetShowing(false);
-      if (mWelcomeScreen != nullptr)
-         mWelcomeScreen->SetShowing(false);
    }
 }
 

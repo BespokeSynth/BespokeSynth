@@ -384,6 +384,9 @@ bool NoteCanvas::OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGri
                   mEditCurrentPitchContext = -1;
                else
                   mEditCurrentPitchContext = pressedPitch;
+
+               if (mPitchContextInterface)
+                  mPitchContextInterface->SetPitchContext(mEditCurrentPitchContext);
             }
 
             return true;
@@ -725,6 +728,9 @@ bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contr
       return true;
    }
 
+   if (mGridKeyboardInterface->OnAbletonGridControl(abletonGrid, controlIndex, midiValue))
+      return true;
+
    return false;
 }
 
@@ -918,6 +924,17 @@ void NoteCanvas::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 
 bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, AbletonMoveLCD* lcd, LCDDrawPass drawPass)
 {
+   if (IsInAbletonGridFocusMode())
+   {
+      IAbletonGridController* pitchContextGrid = dynamic_cast<IAbletonGridController*>(mPitchContextInterface);
+      if (pitchContextGrid != nullptr)
+      {
+         bool handled = pitchContextGrid->UpdateAbletonMoveScreen(abletonGrid, lcd, drawPass);
+         if (handled)
+            return true;
+      }
+   }
+
    if (drawPass == LCDDrawPass::Overlay)
       return false;
 
@@ -951,14 +968,14 @@ bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Ableto
 
       if (abletonGrid->GetButtonState(AbletonDevice::kOctaveUpButton) ||
           abletonGrid->GetButtonState(AbletonDevice::kOctaveDownButton))
-         lcd->DrawRect(17, 6, 4, 4, !K(filled));
+         lcd->DrawRect(17, 6, 4, 4, LCDDrawMode::Outline);
       if (abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch) && abletonGrid->GetButtonState(AbletonDevice::kLoopButton))
-         lcd->DrawRect(42, 6, 4, 4, !K(filled));
+         lcd->DrawRect(42, 6, 4, 4, LCDDrawMode::Outline);
       if (abletonGrid->GetButtonState(AbletonDevice::kPageLeftButton) ||
           abletonGrid->GetButtonState(AbletonDevice::kPageRightButton))
-         lcd->DrawRect(67, 6, 4, 4, !K(filled));
+         lcd->DrawRect(67, 6, 4, 4, LCDDrawMode::Outline);
       if (abletonGrid->GetButtonState(AbletonDevice::kClickyEncoderTouch))
-         lcd->DrawRect(97, 6, 4, 4, !K(filled));
+         lcd->DrawRect(97, 6, 4, 4, LCDDrawMode::Outline);
 
       int stepsPerBeat = TheTransport->CountInStandardMeasure(mInterval) / TheTransport->GetTimeSigBottom();
 
@@ -978,10 +995,37 @@ bool NoteCanvas::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Ableto
       lcd->DrawLCDText(("num measures: " + ofToString(mNumMeasures)).c_str(), 10, 13, LCDFONT_STYLE_REGULAR);
       lcd->DrawLCDText(GetCurrentEditMeasureString().c_str(), 10, 13 + AbletonMoveLCD::kTextLineSpacing, LCDFONT_STYLE_REGULAR);
       if (abletonGrid->GetButtonState(AbletonDevice::kVolumeEncoderTouch))
-         lcd->DrawRect(10 + 20 + mEditMeasureOffsetSlider * 20, 13, 1, 5, K(filled));
+         lcd->DrawRect(10 + 20 + mEditMeasureOffsetSlider * 20, 13, 1, 5, LCDDrawMode::Fill);
       return true;
    }
    return false;
+}
+
+bool NoteCanvas::IsInAbletonGridFocusMode() const
+{
+   return mEditCurrentPitchContext != -1 && mPitchContextInterface != nullptr && mCurrentEditElements.empty();
+}
+
+bool NoteCanvas::HasPush2OverrideControls() const
+{
+   if (mEditCurrentPitchContext != -1)
+   {
+      IDrawableModule* pitchContextGrid = dynamic_cast<IDrawableModule*>(mPitchContextInterface);
+      if (pitchContextGrid != nullptr)
+         return pitchContextGrid->HasPush2OverrideControls();
+   }
+
+   return false;
+}
+
+void NoteCanvas::GetPush2OverrideControls(std::vector<IUIControl*>& controls) const
+{
+   if (mEditCurrentPitchContext != -1)
+   {
+      IDrawableModule* pitchContextGrid = dynamic_cast<IDrawableModule*>(mPitchContextInterface);
+      if (pitchContextGrid != nullptr)
+         pitchContextGrid->GetPush2OverrideControls(controls);
+   }
 }
 
 void NoteCanvas::DrawModule()
@@ -1428,6 +1472,7 @@ void NoteCanvas::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("canvaswidth", moduleInfo, 390, 390, 99999, K(isTextField));
    mModuleSaveData.LoadFloat("canvasheight", moduleInfo, 200, 40, 99999, K(isTextField));
    mModuleSaveData.LoadString("grid_keyboard_interface", moduleInfo, "", FillDropdown<LaunchpadKeyboard*>);
+   mModuleSaveData.LoadString("pitch_context_interface", moduleInfo, "", FillDropdown<IPitchContextInterface*>);
 
    SetUpFromSaveData();
 }
@@ -1438,6 +1483,8 @@ void NoteCanvas::SetUpFromSaveData()
    mCanvas->SetDimensions(mModuleSaveData.GetFloat("canvaswidth"), mModuleSaveData.GetFloat("canvasheight"));
    IDrawableModule* gridKeyboardInterface = TheSynth->FindModule(mModuleSaveData.GetString("grid_keyboard_interface"), false);
    mGridKeyboardInterface = dynamic_cast<LaunchpadKeyboard*>(gridKeyboardInterface);
+   IDrawableModule* pitchContextInterface = TheSynth->FindModule(mModuleSaveData.GetString("pitch_context_interface"), false);
+   mPitchContextInterface = dynamic_cast<IPitchContextInterface*>(pitchContextInterface);
 }
 
 void NoteCanvas::SaveLayout(ofxJSONElement& moduleInfo)
@@ -1445,6 +1492,8 @@ void NoteCanvas::SaveLayout(ofxJSONElement& moduleInfo)
    moduleInfo["canvaswidth"] = mCanvas->GetWidth();
    moduleInfo["canvasheight"] = mCanvas->GetHeight();
    moduleInfo["grid_keyboard_interface"] = mGridKeyboardInterface ? mGridKeyboardInterface->Path() : "";
+   IDrawableModule* pitchContextModule = dynamic_cast<IDrawableModule*>(mPitchContextInterface);
+   moduleInfo["pitch_context_interface"] = pitchContextModule ? pitchContextModule->Path() : "";
 }
 
 void NoteCanvas::SaveState(FileStreamOut& out)
