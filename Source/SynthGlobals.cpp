@@ -209,8 +209,9 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
                int sampleIdx = position + j;
                if (wraparoundFrom != -1 && sampleIdx > wraparoundFrom)
                   sampleIdx = sampleIdx - wraparoundFrom + wraparoundTo;
-               if (bufferSize > 0)
-                  sampleIdx %= bufferSize;
+               if (bufferSize <= 0)
+                  bufferSize = length;
+               sampleIdx %= bufferSize;
                max = std::max(max, buffer[sampleIdx]);
                min = std::min(min, buffer[sampleIdx]);
             }
