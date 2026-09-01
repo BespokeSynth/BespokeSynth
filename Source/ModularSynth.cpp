@@ -3164,7 +3164,9 @@ void ModularSynth::SaveLayout(std::string jsonFile, bool makeDefaultLayout /*= t
 
 void ModularSynth::SaveLayoutAsPopup()
 {
-   FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", true, false, GetFileChooserParent());
+   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+
+   FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", isNativeFileChooser, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
       SaveLayout(chooser.getResult().getFullPathName().toStdString());
 }
@@ -3208,7 +3210,9 @@ void ModularSynth::SaveStatePopup()
       ++counter;
    } while (targetFile.existsAsFile());
 
-   FileChooser chooser("Save current state as...", targetFile, "*.bsk", true, false, GetFileChooserParent());
+   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+
+   FileChooser chooser("Save current state as...", targetFile, "*.bsk", isNativeFileChooser, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
       SaveState(chooser.getResult().getFullPathName().toStdString(), false);
 }
@@ -3226,7 +3230,9 @@ void ModularSynth::LoadStatePopupImp()
    else
       defaultDirectoryOrFile = ofToDataPath("savestate/");
 
-   FileChooser chooser("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", true, false, GetFileChooserParent());
+   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
+
+   FileChooser chooser("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", isNativeFileChooser, false, GetFileChooserParent());
    if (chooser.browseForFileToOpen())
       LoadState(chooser.getResult().getFullPathName().toStdString());
 }
