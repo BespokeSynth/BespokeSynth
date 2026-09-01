@@ -42,6 +42,7 @@
 
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_gui_basics/juce_gui_basics.h"
+#include "nanovg/nanovg.h"
 
 #ifdef JUCE_MAC
 #import <execinfo.h>
@@ -164,6 +165,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
 
    ofSetLineWidth(1);
    ofFill();
+
    if (drawBackground)
    {
       ofSetColor(255, 255, 255, 50);
@@ -182,87 +184,81 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
    if (length < 0)
       length += bufferSize;
 
-   if (length > 0)
+   if (buffer && length > 0)
    {
-      const float kStepSize = 3;
-      float samplesPerStep = length / abs(width) * kStepSize;
-      start = start - (int(start) % MAX(1, int(samplesPerStep)));
+      const float halfH = height * 0.5f;
+      const int pixelWidth = (int)fabsf(width);
+      const float direction = (width > 0) ? 1.f : -1.f;
+      const float samplesPerPixel = length / pixelWidth;
+      const int innerStride = MAX(1, (int)(samplesPerPixel / 100));
 
-      if (buffer && length > 0)
+      // pass 1: gather per-column min/max
+      float highestMagnitude = 0;
+
+      for (int px = 0; px < pixelWidth; ++px)
       {
-         float step = width > 0 ? kStepSize : -kStepSize;
-         samplesPerStep = length / width * step;
+         float max = -999;
+         float min = 999;
+         int sampleStart = (int)(px * samplesPerPixel + start);
+         int sampleCount = MAX(1, (int)samplesPerPixel);
 
-         ofSetColor(color);
-
-         float highestMagnitude = 0;
-         for (float i = 0; abs(i) < abs(width); i += step)
+         for (int j = 0; j < sampleCount; j += innerStride)
          {
-            float max = -999;
-            float min = 999;
-            int position = i / width * length + start;
-
-            int j;
-            int inc = 1 + samplesPerStep / 100;
-            for (j = 0; j < samplesPerStep; j += inc)
-            {
-               int sampleIdx = position + j;
-               if (wraparoundFrom != -1 && sampleIdx > wraparoundFrom)
-                  sampleIdx = sampleIdx - wraparoundFrom + wraparoundTo;
-               if (bufferSize > 0)
-                  sampleIdx %= bufferSize;
-               max = std::max(max, buffer[sampleIdx]);
-               min = std::min(min, buffer[sampleIdx]);
-            }
-
-            if (max > highestMagnitude)
-               highestMagnitude = max;
-            if (min < -highestMagnitude)
-               highestMagnitude = -min;
-
-            if (i < (int)sAudioBufferMinValues.size())
-            {
-               sAudioBufferMaxValues[i] = max;
-               sAudioBufferMinValues[i] = min;
-            }
+            int sampleIdx = sampleStart + j;
+            if (wraparoundFrom != -1 && sampleIdx > wraparoundFrom)
+               sampleIdx = sampleIdx - wraparoundFrom + wraparoundTo;
+            if (bufferSize > 0)
+               sampleIdx = ((sampleIdx % bufferSize) + bufferSize) % bufferSize;
+            if (sampleIdx > length - 1)
+               sampleIdx = length - 1;
+            max = MAX(max, buffer[sampleIdx]);
+            min = MIN(min, buffer[sampleIdx]);
          }
 
-         float rescale = 1.0f;
-         if (highestMagnitude != 0.0)
-            rescale = std::clamp(1.0f / highestMagnitude, 1.0f, 10.0f);
-         for (float i = 0; abs(i) < abs(width); i += step)
+         highestMagnitude = MAX(highestMagnitude, MAX(fabsf(max), fabsf(min)));
+
+         if (px < (int)sAudioBufferMinValues.size())
          {
-            float max = sAudioBufferMaxValues[i];
-            float min = sAudioBufferMinValues[i];
+            sAudioBufferMaxValues[px] = max;
+            sAudioBufferMinValues[px] = min;
+         }
+      }
 
-            min *= height / 2 * vol * rescale;
-            max *= height / 2 * vol * rescale;
-            if (max > height / 2 || min < -(height / 2))
-            {
-               //ofSetColor(255,0,0);
-               max = std::min(max, height / 2);
-               min = std::max(min, -height / 2);
-            }
-            else
-            {
-               //ofSetColor(color);
-            }
+      float rescale = 1.0f;
+      if (highestMagnitude != 0.0)
+         rescale = std::clamp(1.0f / highestMagnitude, 1.0f, 10.0f);
 
-            if (fabsf(max - min) < .1f) //always draw something even if max == min
-            {
-               max += .05f;
-               min -= .05f;
-            }
+      // pass 2: single nanovg path for all columns
+      ofSetColor(color);
+      nvgBeginPath(gNanoVG);
 
-            ofLine(i, height / 2 - max, i, height / 2 - min);
+      for (int px = 0; px < pixelWidth; ++px)
+      {
+         int rangeIndex = std::min(px, (int)sAudioBufferMinValues.size() - 1);
+         float max = sAudioBufferMaxValues[rangeIndex] * halfH * vol * rescale;
+         float min = sAudioBufferMinValues[rangeIndex] * halfH * vol * rescale;
+
+         max = std::clamp(max, -halfH, halfH);
+         min = std::clamp(min, -halfH, halfH);
+
+         if (fabsf(max - min) < .1f)
+         {
+            max += .05f;
+            min -= .05f;
          }
 
-         if (pos != -1)
-         {
-            ofSetColor(0, 255, 0);
-            int position = ofMap(pos, start, end, 0, width, true);
-            ofLine(position, 0, position, height);
-         }
+         float x = px * direction;
+         nvgMoveTo(gNanoVG, x, halfH - max);
+         nvgLineTo(gNanoVG, x, halfH - min);
+      }
+
+      nvgStroke(gNanoVG);
+
+      if (pos != -1)
+      {
+         ofSetColor(0, 255, 0);
+         float px = ofMap(pos, start, end, 0, width, true);
+         ofLine(px, 0, px, height);
       }
    }
 
