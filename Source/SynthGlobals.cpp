@@ -234,7 +234,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
 
       for (int px = 0; px < pixelWidth; ++px)
       {
-         int rangeIndex =  std::min(px, (int)sAudioBufferMinValues.size() - 1);
+         int rangeIndex = std::min(px, (int)sAudioBufferMinValues.size() - 1);
          float max = sAudioBufferMaxValues[rangeIndex] * halfH * vol * rescale;
          float min = sAudioBufferMinValues[rangeIndex] * halfH * vol * rescale;
 
