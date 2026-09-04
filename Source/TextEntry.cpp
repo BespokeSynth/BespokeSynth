@@ -136,6 +136,12 @@ void TextEntry::Render()
    ofNoFill();
    ofRect(mX + xOffset, mY, w - xOffset, h);
 
+   //clip the text/caret/selection to this control's own box - without this, typing something longer
+   //than the box (e.g. a long search query) draws right over whatever's next to it instead of being
+   //contained, since DrawString itself doesn't know about our bounds
+   ofPushMatrix();
+   ofClipWindow(mX + xOffset, mY, w - xOffset, h, true);
+
    gFontFixedWidth.DrawString(mString, 12, mX + 2 + xOffset, mY + 12);
 
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == this)
@@ -189,6 +195,8 @@ void TextEntry::Render()
 
       ofPopStyle();
    }
+
+   ofPopMatrix();
 
    /*if (mHovered)
    {

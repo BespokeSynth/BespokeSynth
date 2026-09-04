@@ -160,6 +160,8 @@ public:
    void ReloadInitialLayout() { mWantReloadInitialLayout = true; }
    bool HasFatalError() { return mFatalError != ""; }
 
+   void SetShowMinimap(bool show); //lets the "show minimap" checkbox toggle it live, instead of only taking effect on next launch
+
    void AddLissajousDrawer(IDrawableModule* module) { mLissajousDrawers.push_back(module); }
    bool IsLissajousDrawer(IDrawableModule* module) { return VectorContains(module, mLissajousDrawers); }
 
@@ -294,6 +296,9 @@ public:
    RollingBuffer* GetGlobalRecordBuffer() const { return mGlobalRecordBuffer; }
    void ResetLayout();
 
+   void ToggleRecording();
+   bool IsRecordingSession() const { return mIsRecordingSession; }
+
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
    juce::Component* GetFileChooserParent() const;
 
@@ -314,7 +319,7 @@ public:
 
    static int sLoadingFileSaveStateRev;
    static int sLastLoadedFileSaveStateRev;
-   static constexpr int kSaveStateRev = 427;
+   static constexpr int kSaveStateRev = 428; //428 adds a per-patch palette/theme snapshot (see LoadStateHeader/CompleteQueuedSaveState)
 
 private:
    void SaveState(std::string file, bool autosave);
@@ -325,6 +330,8 @@ private:
    void UpdateUserPrefsLayout();
    void LoadStatePopupImp();
    IDrawableModule* DuplicateModule(IDrawableModule* module);
+   void CopySelectedModules(); //Ctrl/Cmd+C - snapshots the group-selected (or hovered) module(s)
+   void PasteCopiedModules(); //Ctrl/Cmd+V - recreates the copied snapshot(s) at the mouse position
    void DeleteAllModules();
    void TriggerClapboard();
    void DoAutosave();
@@ -389,6 +396,8 @@ private:
    RollingBuffer* mGlobalRecordBuffer{ nullptr };
    int mRecordingLength{ 0 };
 
+   bool mIsRecordingSession{ true }; //ambient capture is on by default (matches legacy behavior); Record button lets the user explicitly stop/start a take
+
    struct LogEventItem
    {
       LogEventItem() {}
@@ -441,6 +450,15 @@ private:
    std::vector<IDrawableModule*> mGroupSelectedModules;
    ModuleContainer* mGroupSelectContext{ nullptr };
    bool mHasDuplicatedDuringDrag{ false };
+
+   //Ctrl/Cmd+C clipboard: a snapshot (not a live pointer) so paste still works even if the
+   //original module was deleted or changed after copying, and so you can paste more than once
+   struct CopiedModuleState
+   {
+      std::vector<uint8_t> stateData; //raw bytes from the module's own SaveState()
+      ofxJSONElement layoutData; //type + original name + position, from SaveLayoutBase()
+   };
+   std::vector<CopiedModuleState> mCopiedModules;
    bool mHasAutopatchedToTargetDuringDrag{ false };
 
    IDrawableModule* mResizeModule{ nullptr };

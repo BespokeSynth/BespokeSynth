@@ -51,7 +51,8 @@ enum class ButtonDisplayStyle
    kArrowLeft,
    kPlus,
    kMinus,
-   kHamburger
+   kHamburger,
+   kRecord
 };
 
 class ClickButton : public IUIControl, public IPulseReceiver
@@ -66,6 +67,7 @@ public:
    bool MouseMoved(float x, float y) override;
    void SetDisplayText(bool display) { mDisplayStyle = ButtonDisplayStyle::kNoLabel; }
    void SetDisplayStyle(ButtonDisplayStyle style) { mDisplayStyle = style; }
+   void SetIsActive(bool active) { mIsActive = active; } //used by icon styles (e.g. kRecord) to show an on/off state distinct from the click-flash
    void SetDimensions(float width, float height)
    {
       mWidth = width;
@@ -110,4 +112,5 @@ private:
    double mClickTime{ -9999 };
    IButtonListener* mOwner{ nullptr };
    ButtonDisplayStyle mDisplayStyle{ ButtonDisplayStyle::kText };
+   bool mIsActive{ false };
 };

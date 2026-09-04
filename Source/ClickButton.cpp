@@ -172,6 +172,24 @@ void ClickButton::Render()
       ofSetLineWidth(1.5f);
       ofLine(mX + 6, mY + 7.5f, mX + 14, mY + 7.5f);
    }
+   else if (mDisplayStyle == ButtonDisplayStyle::kRecord)
+   {
+      //always a solid filled red circle - the only difference between idle and recording is that
+      //it flashes while a take is being captured
+      float cx = mX + w / 2;
+      float cy = mY + h / 2;
+      ofFill();
+      if (mIsActive)
+      {
+         float flash = ofMap(sin(gTime / 250 * PI * 2), -1, 1, 0, 1) > 0.5f ? 1.0f : 0.35f;
+         ofSetColor(255, 30, 30, 255 * flash);
+      }
+      else
+      {
+         ofSetColor(255, 30, 30, 255);
+      }
+      ofCircle(cx, cy, 5);
+   }
    else if (mDisplayStyle == ButtonDisplayStyle::kHamburger)
    {
       ofSetColor(textColor);

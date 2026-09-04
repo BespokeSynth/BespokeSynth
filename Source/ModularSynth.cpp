@@ -22,8 +22,11 @@
 #include "GridController.h"
 #include "FileStream.h"
 #include "PatchCable.h"
+#include "PatchCableSource.h"
+#include <unordered_map>
 #include "ADSRDisplay.h"
 #include "QuickSpawnMenu.h"
+#include "SearchPanel.h"
 #include "AudioToCV.h"
 #include "ScriptModule.h"
 #include "DrumPlayer.h"
@@ -283,6 +286,7 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    sBackgroundG = UserPrefs.background_g.Get();
    sBackgroundB = UserPrefs.background_b.Get();
    sCableAlpha = UserPrefs.cable_alpha.Get();
+   gFlatUIStyle = UserPrefs.flat_ui_style.Get();
 
    Time time = Time::getCurrentTime();
    if (fabsf(sBackgroundR - UserPrefs.background_r.GetDefault()) < .001f && fabsf(sBackgroundG - UserPrefs.background_g.GetDefault()) < .001f && fabsf(sBackgroundB - UserPrefs.background_b.GetDefault()) < .001f && time.getMonth() + 1 == 10 && time.getDayOfMonth() == 31)
@@ -618,11 +622,14 @@ void ModularSynth::Draw()
 
    ofTranslate(GetDrawOffset().x, GetDrawOffset().y);
 
-   if (ShouldShowGridSnap())
+   //the grid draws either while the grid-snap modifier key is held (existing behavior) or, if the
+   //user has turned on "show grid" in the menu, all the time - same grid, just a different reason
+   //to show it
+   if (ShouldShowGridSnap() || UserPrefs.show_grid.Get())
    {
       ofPushStyle();
       ofSetLineWidth(.5f);
-      ofSetColor(255, 255, 255, 40);
+      ofSetColor(255, 255, 255, 255 * UserPrefs.grid_opacity.Get());
       float gridSnapSize = UserPrefs.grid_snap_size.Get();
       int gridLinesVertical = (int)ceil((ofGetWidth() / gDrawScale) / gridSnapSize);
       for (int i = 0; i < gridLinesVertical; ++i)
@@ -1327,6 +1334,12 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    if (key == 'l' && GetKeyModifiers() == kModifier_Command && !isRepeat)
       LoadStatePopup();
 
+   if (key == 'c' && GetKeyModifiers() == kModifier_Command && !isRepeat)
+      CopySelectedModules();
+
+   if (key == 'v' && GetKeyModifiers() == kModifier_Command && !isRepeat)
+      PasteCopiedModules();
+
    //if (key == 'c' && !isRepeat)
    //   mousePressed(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), 0);
 
@@ -1386,6 +1399,7 @@ bool ModularSynth::ShouldShowGridSnap() const
 {
    return (mMoveModule || (!mGroupSelectedModules.empty() && IsMouseButtonHeld(1))) && (IsKeyModifierComboHeld(KeyModifierCombo::GridSnap) || IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter));
 }
+
 
 bool ModularSynth::IsKeyModifierComboHeld(KeyModifierCombo combo) const
 {
@@ -1478,14 +1492,29 @@ void ModularSynth::MouseMoved(int intX, int intY)
       float newX = x + mMoveModuleOffsetX;
       float newY = y + mMoveModuleOffsetY;
 
-      if (ShouldShowGridSnap())
+      //snap continuously while dragging, either because the grid-snap modifier key is held
+      //(existing behavior) or because "snap to grid" is turned on in the menu (Bitwig-style: always
+      //snaps, no modifier key needed) - snapping applies live during the drag, not just on drop
+      if (ShouldShowGridSnap() || UserPrefs.snap_to_grid_enabled.Get())
       {
-         newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
-         newY = round((newY - mMoveModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mMoveModule->TitleBarHeight();
+         float gridSize = UserPrefs.grid_snap_size.Get();
+         float w = mMoveModule->GetRect().width;
+         float h = mMoveModule->GetRect().height;
+         float tb = mMoveModule->TitleBarHeight();
+
+         float snapLeft = round(newX / gridSize) * gridSize;
+         float snapRight = round((newX + w) / gridSize) * gridSize;
+         newX = std::abs(newX - snapLeft) < std::abs((newX + w) - snapRight) ? snapLeft : snapRight - w;
+
+         float topEdge = newY - tb;
+         float bottomEdge = newY + h;
+         float snapTop = round(topEdge / gridSize) * gridSize;
+         float snapBottom = round(bottomEdge / gridSize) * gridSize;
+         newY = std::abs(topEdge - snapTop) < std::abs(bottomEdge - snapBottom) ? snapTop + tb : snapBottom - h;
          if (IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter)) // Snap to center of the module
          {
-            newX -= std::fmod(mMoveModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
-            newY -= std::fmod(mMoveModule->GetRect().height / 2, UserPrefs.grid_snap_size.Get());
+            newX -= std::fmod(mMoveModule->GetRect().width / 2, gridSize);
+            newY -= std::fmod(mMoveModule->GetRect().height / 2, gridSize);
          }
       }
 
@@ -1797,14 +1826,26 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       float newX = x + mMoveModuleOffsetX;
       float newY = y + mMoveModuleOffsetY;
 
-      if (ShouldShowGridSnap())
+      if (ShouldShowGridSnap() || UserPrefs.snap_to_grid_enabled.Get())
       {
-         newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
-         newY = round((newY - mLastClickedModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mLastClickedModule->TitleBarHeight();
+         float gridSize = UserPrefs.grid_snap_size.Get();
+         float w = mLastClickedModule->GetRect().width;
+         float h = mLastClickedModule->GetRect().height;
+         float tb = mLastClickedModule->TitleBarHeight();
+
+         float snapLeft = round(newX / gridSize) * gridSize;
+         float snapRight = round((newX + w) / gridSize) * gridSize;
+         newX = std::abs(newX - snapLeft) < std::abs((newX + w) - snapRight) ? snapLeft : snapRight - w;
+
+         float topEdge = newY - tb;
+         float bottomEdge = newY + h;
+         float snapTop = round(topEdge / gridSize) * gridSize;
+         float snapBottom = round(bottomEdge / gridSize) * gridSize;
+         newY = std::abs(topEdge - snapTop) < std::abs(bottomEdge - snapBottom) ? snapTop + tb : snapBottom - h;
          if (IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter)) // Snap to center of the module
          {
-            newX -= std::fmod(mLastClickedModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
-            newY -= std::fmod(mLastClickedModule->GetRect().height / 2, UserPrefs.grid_snap_size.Get());
+            newX -= std::fmod(mLastClickedModule->GetRect().width / 2, gridSize);
+            newY -= std::fmod(mLastClickedModule->GetRect().height / 2, gridSize);
          }
       }
 
@@ -1822,14 +1863,26 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       float newX = x + mMoveModuleOffsetX;
       float newY = y + mMoveModuleOffsetY;
 
-      if (ShouldShowGridSnap())
+      if (ShouldShowGridSnap() || UserPrefs.snap_to_grid_enabled.Get())
       {
-         newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
-         newY = round((newY - mMoveModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mMoveModule->TitleBarHeight();
+         float gridSize = UserPrefs.grid_snap_size.Get();
+         float w = mMoveModule->GetRect().width;
+         float h = mMoveModule->GetRect().height;
+         float tb = mMoveModule->TitleBarHeight();
+
+         float snapLeft = round(newX / gridSize) * gridSize;
+         float snapRight = round((newX + w) / gridSize) * gridSize;
+         newX = std::abs(newX - snapLeft) < std::abs((newX + w) - snapRight) ? snapLeft : snapRight - w;
+
+         float topEdge = newY - tb;
+         float bottomEdge = newY + h;
+         float snapTop = round(topEdge / gridSize) * gridSize;
+         float snapBottom = round(bottomEdge / gridSize) * gridSize;
+         newY = std::abs(topEdge - snapTop) < std::abs(bottomEdge - snapBottom) ? snapTop + tb : snapBottom - h;
          if (IsKeyModifierComboHeld(KeyModifierCombo::GridSnapCenter)) // Snap to center of the module
          {
-            newX -= std::fmod(mMoveModule->GetRect().width / 2, UserPrefs.grid_snap_size.Get());
-            newY -= std::fmod(mMoveModule->GetRect().height / 2, UserPrefs.grid_snap_size.Get());
+            newX -= std::fmod(mMoveModule->GetRect().width / 2, gridSize);
+            newY -= std::fmod(mMoveModule->GetRect().height / 2, gridSize);
          }
       }
 
@@ -2268,7 +2321,7 @@ void ModularSynth::CheckClick(IDrawableModule* clickedModule, float x, float y, 
    float modulePosX = x - moduleRect.x;
    float modulePosY = y - moduleRect.y;
 
-   if (modulePosY < 0 && clickedModule != TheTitleBar && (!clickedModule->HasEnabledCheckbox() || modulePosX > 20) && modulePosX < moduleRect.width - 15)
+   if (modulePosY < 0 && clickedModule != TheTitleBar && clickedModule->CanBeMoved() && (!clickedModule->HasEnabledCheckbox() || modulePosX > 20) && modulePosX < moduleRect.width - 15)
       SetMoveModule(clickedModule, moduleRect.x - x, moduleRect.y - y, false);
 
    float parentX = 0;
@@ -2376,6 +2429,15 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
          module->GetPosition(moduleX, moduleY);
          module->SampleDropped(x - moduleX, y - moduleY, GetHeldSample());
       }
+      else if (mMouseMovedSignificantlySincePressed)
+      {
+         //dropped on empty canvas rather than onto an existing sample-accepting module - spawn a fresh sample player preloaded with this sample
+         ModuleFactory::Spawnable spawnable{};
+         spawnable.mLabel = "sampleplayer";
+         IDrawableModule* newModule = SpawnModuleOnTheFly(spawnable, x, y);
+         if (newModule != nullptr)
+            newModule->SampleDropped(0, 0, GetHeldSample());
+      }
       ClearHeldSample();
    }
 
@@ -2451,6 +2513,10 @@ void ModularSynth::AudioOut(float* const* output, int bufferSize, int nChannels)
          }
       }
 
+      //mix in search panel preview audio (plays through Bespoke's audio device)
+      if (TheSearchPanel != nullptr)
+         TheSearchPanel->MixPreviewAudio(mOutputBuffers.data(), nChannels, gBufferSize);
+
       //put it into speakers
       for (int ch = 0; ch < nChannels; ++ch)
       {
@@ -2478,8 +2544,11 @@ void ModularSynth::AudioOut(float* const* output, int bufferSize, int nChannels)
    }
 
    /////////// AUDIO PROCESSING ENDS HERE /////////////
-   mRecordingLength += bufferSize * oversampling;
-   mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
+   if (mIsRecordingSession)
+   {
+      mRecordingLength += bufferSize * oversampling;
+      mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
+   }
 
    Profiler::PrintCounters();
 }
@@ -2767,6 +2836,7 @@ void ModularSynth::ResetLayout()
    delete TheTitleBar;
    delete TheSaveDataPanel;
    delete mQuickSpawn;
+   delete TheSearchPanel;
    delete mUserPrefsEditor;
    delete mNoteOutputQueue;
 
@@ -2779,19 +2849,19 @@ void ModularSynth::ResetLayout()
    titleBar->Init();
    mUILayerModuleContainer.AddModule(titleBar);
 
-   if (UserPrefs.show_minimap.Get())
-   {
-      mMinimap = std::make_unique<Minimap>();
-      mMinimap->SetName("minimap");
-      mMinimap->SetTypeName("minimap", kModuleCategory_Other);
-      mMinimap->SetShouldDrawOutline(false);
-      mMinimap->CreateUIControls();
-      mMinimap->SetShowing(true);
-      mMinimap->Init();
-      mUILayerModuleContainer.AddModule(mMinimap.get());
+   //always create the minimap (rather than only when the pref is on) so that toggling "show minimap"
+   //in the menu can show/hide it live via SetShowMinimap(), instead of only taking effect on next launch
+   mMinimap = std::make_unique<Minimap>();
+   mMinimap->SetName("minimap");
+   mMinimap->SetTypeName("minimap", kModuleCategory_Other);
+   mMinimap->SetShouldDrawOutline(false);
+   mMinimap->CreateUIControls();
+   mMinimap->SetShowing(UserPrefs.show_minimap.Get());
+   mMinimap->Init();
+   mUILayerModuleContainer.AddModule(mMinimap.get());
 
+   if (UserPrefs.show_minimap.Get())
       TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup, it collides with minimap, and a user who has customized the settings likely doesn't need it
-   }
 
    ModuleSaveDataPanel* saveDataPanel = new ModuleSaveDataPanel();
    saveDataPanel->SetPosition(-200, 50);
@@ -2806,6 +2876,14 @@ void ModularSynth::ResetLayout()
    mQuickSpawn->Init();
    mUILayerModuleContainer.AddModule(mQuickSpawn);
    mModuleContainer.AddModule(mQuickSpawn->GetMainContainerFollower());
+
+   SearchPanel* searchPanel = new SearchPanel();
+   searchPanel->SetPosition(ofGetWidth() / gDrawScale - 220, 40);
+   searchPanel->SetName("searchpanel");
+   searchPanel->SetTypeName("searchpanel", kModuleCategory_Other);
+   searchPanel->CreateUIControls();
+   searchPanel->Init();
+   mUILayerModuleContainer.AddModule(searchPanel);
 
    mUserPrefsEditor = new UserPrefsEditor();
    mUserPrefsEditor->SetName("userprefseditor");
@@ -2835,6 +2913,12 @@ void ModularSynth::ResetLayout()
    SetUIScale(UserPrefs.ui_scale.Get());
 
    mNoteOutputQueue = new NoteOutputQueue();
+}
+
+void ModularSynth::SetShowMinimap(bool show)
+{
+   if (mMinimap != nullptr)
+      mMinimap->SetShowing(show);
 }
 
 bool ModularSynth::LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayout /*= true*/)
@@ -3178,6 +3262,106 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    return newModule;
 }
 
+void ModularSynth::CopySelectedModules()
+{
+   std::vector<IDrawableModule*> toCopy;
+   if (!mGroupSelectedModules.empty())
+      toCopy = mGroupSelectedModules;
+   else if (gHoveredModule != nullptr)
+      toCopy.push_back(gHoveredModule);
+
+   if (toCopy.empty())
+      return;
+
+   mCopiedModules.clear();
+   for (auto* module : toCopy)
+   {
+      juce::MemoryBlock block;
+      {
+         FileStreamOut out(block);
+         module->SaveState(out);
+      }
+
+      CopiedModuleState state;
+      state.stateData.assign((const uint8_t*)block.getData(), (const uint8_t*)block.getData() + block.getSize());
+      module->SaveLayoutBase(state.layoutData);
+      mCopiedModules.push_back(std::move(state));
+   }
+}
+
+void ModularSynth::PasteCopiedModules()
+{
+   if (mCopiedModules.empty())
+      return;
+
+   //anchor the first copied module to the mouse, and shift the rest by the same amount so a
+   //multi-module copy keeps its original relative layout
+   float mouseX = GetMouseX(&mModuleContainer);
+   float mouseY = GetMouseY(&mModuleContainer);
+   float firstOrigX = (float)mCopiedModules[0].layoutData["position"][0u].asDouble();
+   float firstOrigY = (float)mCopiedModules[0].layoutData["position"][1u].asDouble();
+   float offsetX = mouseX - firstOrigX;
+   float offsetY = mouseY - firstOrigY;
+
+   std::list<IDrawableModule*> newlyPasted;
+   std::unordered_map<std::string, IDrawableModule*> originalNameToPasted; //so cables between co-pasted modules can be repointed at their new siblings, not the still-live originals
+   for (auto& saved : mCopiedModules)
+   {
+      ofxJSONElement layoutData = saved.layoutData; //copy - this paste's edits shouldn't affect the clipboard, so it can be pasted again
+      std::string originalName = layoutData["name"].asString();
+      std::string newName = GetUniqueName(originalName, mModuleContainer.GetModules());
+
+      float origX = (float)layoutData["position"][0u].asDouble();
+      float origY = (float)layoutData["position"][1u].asDouble();
+      layoutData["position"][0u] = origX + offsetX;
+      layoutData["position"][1u] = origY + offsetY;
+      layoutData["name"] = newName;
+
+      IDrawableModule* newModule = CreateModule(layoutData);
+      mModuleContainer.AddModule(newModule);
+      SetUpModule(newModule, layoutData);
+      newModule->Init();
+
+      newModule->SetName(originalName.c_str()); //temporarily match the saved name, same as DuplicateModule, so LoadState's internal references resolve correctly
+
+      {
+         juce::MemoryBlock block(saved.stateData.data(), saved.stateData.size());
+         FileStreamIn in(block);
+         mIsLoadingModule = true;
+         mIsDuplicatingModule = true;
+         newModule->LoadState(in, newModule->LoadModuleSaveStateRev(in));
+         mIsDuplicatingModule = false;
+         mIsLoadingModule = false;
+      }
+
+      newModule->SetName(newName.c_str());
+      newlyPasted.push_back(newModule);
+      originalNameToPasted[originalName] = newModule;
+   }
+
+   //if multiple connected modules were copied together, their cables just resolved (by name) to whichever
+   //still-live module owns that original name - almost always the module they were copied from, not their
+   //newly pasted sibling. Repoint any such cable at the sibling so the pasted group stays self-contained.
+   for (auto* newModule : newlyPasted)
+   {
+      for (auto* cableSource : newModule->GetPatchCableSources())
+      {
+         for (auto* cable : cableSource->GetPatchCables())
+         {
+            IClickable* target = cable->GetTarget();
+            if (target == nullptr)
+               continue;
+            auto iter = originalNameToPasted.find(target->Name());
+            if (iter != originalNameToPasted.end() && iter->second != target)
+               cableSource->SetPatchCableTarget(cable, iter->second, false);
+         }
+      }
+   }
+
+   //select the newly pasted module(s) so they can immediately be dragged into place, deleted, or copied again
+   SetGroupSelectedModules(newlyPasted);
+}
+
 ofxJSONElement ModularSynth::GetLayout()
 {
    ofxJSONElement root;
@@ -3344,6 +3528,28 @@ void ModularSynth::CompleteQueuedSaveState()
 
       out << GetLayout().getRawString(true);
 
+      //palette snapshot (rev 428+): the color palette/theme lives in UserPrefs, which is a global
+      //preferences file rather than part of any module's state, so patches never remembered which
+      //palette they were made with. Snapshotting the actual current values here (not just a palette
+      //preset index) means it round-trips correctly even if the user hand-tweaked something in the
+      //prefs editor rather than only ever picking from TitleBar's palette dropdown.
+      out << UserPrefs.hue_note.Get();
+      out << UserPrefs.hue_synth.Get();
+      out << UserPrefs.hue_audio.Get();
+      out << UserPrefs.hue_instrument.Get();
+      out << UserPrefs.hue_processor.Get();
+      out << UserPrefs.hue_modulator.Get();
+      out << UserPrefs.hue_pulse.Get();
+      out << UserPrefs.module_saturation.Get();
+      out << UserPrefs.module_brightness.Get();
+      out << UserPrefs.module_background_alpha.Get();
+      out << UserPrefs.background_r.Get();
+      out << UserPrefs.background_g.Get();
+      out << UserPrefs.background_b.Get();
+      out << UserPrefs.lissajous_r.Get();
+      out << UserPrefs.lissajous_g.Get();
+      out << UserPrefs.lissajous_b.Get();
+
       mModuleContainer.SaveState(out);
       mUILayerModuleContainer.SaveState(out);
    }
@@ -3480,6 +3686,55 @@ void ModularSynth::LoadStateHeader(FileStreamIn& in, unsigned char*& screenshotD
       }
 
       in >> jsonLayoutString;
+
+      if (fileRev >= 428)
+      {
+         float hueNote, hueSynth, hueAudio, hueInstrument, hueProcessor, hueModulator, huePulse;
+         float saturation, brightness, backgroundAlpha;
+         float bgR, bgG, bgB, lissR, lissG, lissB;
+         in >> hueNote;
+         in >> hueSynth;
+         in >> hueAudio;
+         in >> hueInstrument;
+         in >> hueProcessor;
+         in >> hueModulator;
+         in >> huePulse;
+         in >> saturation;
+         in >> brightness;
+         in >> backgroundAlpha;
+         in >> bgR;
+         in >> bgG;
+         in >> bgB;
+         in >> lissR;
+         in >> lissG;
+         in >> lissB;
+
+         UserPrefs.hue_note.Get() = hueNote;
+         UserPrefs.hue_synth.Get() = hueSynth;
+         UserPrefs.hue_audio.Get() = hueAudio;
+         UserPrefs.hue_instrument.Get() = hueInstrument;
+         UserPrefs.hue_processor.Get() = hueProcessor;
+         UserPrefs.hue_modulator.Get() = hueModulator;
+         UserPrefs.hue_pulse.Get() = huePulse;
+         UserPrefs.module_saturation.Get() = saturation;
+         UserPrefs.module_brightness.Get() = brightness;
+         UserPrefs.module_background_alpha.Get() = backgroundAlpha;
+         UserPrefs.background_r.Get() = bgR;
+         UserPrefs.background_g.Get() = bgG;
+         UserPrefs.background_b.Get() = bgB;
+         UserPrefs.lissajous_r.Get() = lissR;
+         UserPrefs.lissajous_g.Get() = lissG;
+         UserPrefs.lissajous_b.Get() = lissB;
+
+         ModularSynth::sBackgroundR = bgR;
+         ModularSynth::sBackgroundG = bgG;
+         ModularSynth::sBackgroundB = bgB;
+         ModularSynth::sBackgroundLissajousR = lissR;
+         ModularSynth::sBackgroundLissajousG = lissG;
+         ModularSynth::sBackgroundLissajousB = lissB;
+      }
+      //else: older patch saved before palette snapshotting existed - leave the app's current
+      //palette alone rather than forcing it to some meaningless default
    }
    else
    {
@@ -3953,6 +4208,29 @@ void ModularSynth::SaveOutput()
    mRecordingLength = 0;
 
    TheTitleBar->DisplayTemporaryMessage("wrote " + filename);
+}
+
+void ModularSynth::ToggleRecording()
+{
+   mIsRecordingSession = !mIsRecordingSession;
+   gIsRecordingSession = mIsRecordingSession;
+
+   if (mIsRecordingSession)
+   {
+      //starting a fresh take: clear the rolling buffer so "export audio"
+      //captures exactly what happens from this moment forward
+      ScopedMutex mutex(&mAudioThreadMutex, "ToggleRecording()");
+      mGlobalRecordBuffer->ClearBuffer();
+      mRecordingLength = 0;
+      TheTitleBar->DisplayTemporaryMessage("recording started");
+   }
+   else
+   {
+      //stopping: immediately export exactly what was captured during this
+      //take, before any further audio can roll the buffer forward
+      SaveOutput();
+      TheTitleBar->DisplayTemporaryMessage("recording stopped and exported");
+   }
 }
 
 const String& ModularSynth::GetTextFromClipboard() const
