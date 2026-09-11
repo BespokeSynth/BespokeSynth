@@ -262,7 +262,7 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
       maxPerColumn = 9999;
       displayColumns = 1;
       totalColumns = 1;
-      mCurrentPagedColumn = 0;
+      currentPagedColumn = 0;
    }
 
    bool paged = (displayColumns < totalColumns);
