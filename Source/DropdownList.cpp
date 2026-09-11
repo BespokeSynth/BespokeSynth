@@ -389,10 +389,22 @@ void DropdownList::OnClicked(float x, float y, bool right)
    float maxY = ofGetHeight() - 5;
 
    const int kMinPerColumn = 3;
-   mMaxPerColumn = std::max(kMinPerColumn, int((maxY - screenY) / (kItemSpacing * GetModuleParent()->GetOwningContainer()->GetDrawScale()))) - 1;
-   mTotalColumns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
+   //nothing ever moves the popup up, so this row budget is the only thing keeping it on screen.
+   //it reserves a strip under the last row: a blank row normally, the taller page bar once it pages.
+   float availableHeight = (maxY - screenY) / GetModuleParent()->GetOwningContainer()->GetDrawScale();
    int maxDisplayColumns = std::max(1, int((ofGetWidth() / GetModuleParent()->GetOwningContainer()->GetDrawScale()) / mMaxItemWidth));
+
+   mMaxPerColumn = std::max(kMinPerColumn, int((availableHeight - kItemSpacing) / kItemSpacing));
+   mTotalColumns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
    mDisplayColumns = std::min(mTotalColumns, maxDisplayColumns);
+
+   bool paged = (mDisplayColumns < mTotalColumns);
+   if (paged) //the page bar costs more than the blank row, so take that space back and re-split
+   {
+      mMaxPerColumn = std::max(kMinPerColumn, int((availableHeight - kPageBarSpacing) / kItemSpacing));
+      mTotalColumns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
+      mDisplayColumns = std::min(mTotalColumns, maxDisplayColumns);
+   }
 
    int selectedIndex = FindItemIndex(*mVar);
    if (selectedIndex >= 0 && selectedIndex < (int)mElements.size() && mMaxPerColumn > 0)
@@ -405,9 +417,7 @@ void DropdownList::OnClicked(float x, float y, bool right)
       mCurrentPagedColumn = 0;
    }
 
-   bool paged = (mDisplayColumns < mTotalColumns);
-
-   ofVec2f modalDimensions(mMaxItemWidth * mDisplayColumns, kItemSpacing * std::min((int)mElements.size(), mMaxPerColumn + (paged ? 1 : 0)));
+   ofVec2f modalDimensions(mMaxItemWidth * mDisplayColumns, kItemSpacing * std::min((int)mElements.size(), mMaxPerColumn) + (paged ? kPageBarSpacing : 0));
    modalPos.x = std::max(FromScreenPosX(5.0f, GetModuleParent()), std::min(modalPos.x, FromScreenPosX(maxX - modalDimensions.x * GetModuleParent()->GetOwningContainer()->GetDrawScale(), GetModuleParent())));
    mModalList.SetPosition(modalPos.x, modalPos.y);
    mModalList.SetDimensions(modalDimensions.x, modalDimensions.y);
@@ -417,6 +427,9 @@ void DropdownList::OnClicked(float x, float y, bool right)
 
 int DropdownList::GetItemIndexAt(int x, int y)
 {
+   if (x < 0 || y < 0)
+      return -1;
+
    bool paged = (mDisplayColumns < mTotalColumns);
    int indexOffset = 0;
    if (paged)
@@ -426,7 +439,13 @@ int DropdownList::GetItemIndexAt(int x, int y)
          return -1;
       indexOffset = mCurrentPagedColumn * mMaxPerColumn;
    }
-   return y / kItemSpacing + x / mMaxItemWidth * mMaxPerColumn + indexOffset;
+
+   int row = y / kItemSpacing;
+   int column = x / mMaxItemWidth;
+   if (row >= mMaxPerColumn || column >= mDisplayColumns) //the rect is inclusive at its edges, don't wrap into the next column or page
+      return -1;
+
+   return row + column * mMaxPerColumn + indexOffset;
 }
 
 ofVec2f DropdownList::GetModalListPosition() const
