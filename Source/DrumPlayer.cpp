@@ -1142,7 +1142,13 @@ void DrumPlayer::DropdownUpdated(DropdownList* list, int oldVal, double time)
    for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
       if (list == mDrumHits[i].mHitCategoryDropdown)
+      {
+         std::string prevCategory = mDrumHits[i].mHitCategory;
          mDrumHits[i].mHitCategory = mDrumHits[i].mHitCategoryDropdown->GetLabel(mDrumHits[i].mHitCategoryIndex);
+         //only on an actual change; clicking the dropdown sends an update even when you re-pick the current entry
+         if (mDrumHits[i].mHitCategory != prevCategory)
+            mDrumHits[i].LoadFirstSample();
+      }
    }
 
    if (list == mQuantizeIntervalSelector)
@@ -1217,37 +1223,47 @@ void DrumPlayer::DrumHit::LoadSample(std::string path)
       mPlayheads[i].mStartTime = -1;
 }
 
+namespace
+{
+   Array<File> GetSampleFilesForCategory(const std::string& hitCategory)
+   {
+      Array<File> files;
+      File dir(ofToDataPath("drums/" + hitCategory));
+      auto dirContents = dir.findChildFiles(File::findFiles, false);
+      dirContents.sort();
+      for (auto& file : dirContents)
+      {
+         if (file.getFileName()[0] != '.')
+            files.add(file);
+      }
+      return files;
+   }
+}
+
 void DrumPlayer::DrumHit::LoadRandomSample()
 {
-   File dir(ofToDataPath("drums/" + mHitCategory));
-   Array<File> files;
-   for (auto& file : dir.findChildFiles(File::findFiles, false))
-   {
-      if (file.getFileName()[0] != '.')
-         files.add(file);
-   }
+   Array<File> files = GetSampleFilesForCategory(mHitCategory);
 
    if (files.size() > 0)
       LoadSample(files[gRandom() % files.size()].getFullPathName().toStdString());
 }
 
+void DrumPlayer::DrumHit::LoadFirstSample()
+{
+   Array<File> files = GetSampleFilesForCategory(mHitCategory);
+
+   if (files.size() > 0)
+      LoadSample(files[0].getFullPathName().toStdString());
+}
+
 void DrumPlayer::DrumHit::LoadNextSample(int direction)
 {
-   File dir(ofToDataPath("drums/" + mHitCategory));
-   Array<File> files;
+   Array<File> files = GetSampleFilesForCategory(mHitCategory);
    int currentIndex = -1;
-   int i = 0;
-   auto dirContents = dir.findChildFiles(File::findFiles, false);
-   dirContents.sort();
-   for (auto& file : dirContents)
+   for (int i = 0; i < files.size(); ++i)
    {
-      if (file.getFileName()[0] != '.')
-      {
-         files.add(file);
-         if (mSample.GetReadPath() == file.getFullPathName().replace(GetPathSeparator(), "/"))
-            currentIndex = i;
-         ++i;
-      }
+      if (mSample.GetReadPath() == files[i].getFullPathName().replace(GetPathSeparator(), "/"))
+         currentIndex = i;
    }
 
    if (files.size() > 0)
