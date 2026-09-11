@@ -693,24 +693,8 @@ bool DropdownListModal::MouseScrolled(float x, float y, float scrollX, float scr
    //paging is column-based, so a horizontal push pages too; follow whichever axis was pushed hardest
    float scroll = (fabsf(scrollX) > fabsf(scrollY)) ? -scrollX : scrollY;
 
-   int steps;
-   if (isSmoothScroll)
-   {
-      //trackpads deliver a stream of tiny deltas, so accumulate distance and let the page count track the swipe
-      const float kScrollPerPage = 5;
-      if (mScrollAccumulator * scroll < 0) //reversed direction, drop the old momentum
-         mScrollAccumulator = 0;
-      mScrollAccumulator += scroll;
-      steps = (int)(mScrollAccumulator / kScrollPerPage);
-      mScrollAccumulator -= steps * kScrollPerPage;
-   }
-   else
-   {
-      //a notched wheel is already discrete: one detent, one page
-      steps = (scroll > 0) ? 1 : (scroll < 0 ? -1 : 0);
-   }
-
-   steps = std::clamp(steps, -4, 4); //one event shouldn't fly through the whole list
+   //one event shouldn't fly through the whole list
+   int steps = std::clamp(GetScrollSteps(scroll, isSmoothScroll, mScrollAccumulator), -4, 4);
 
    //scrolling up goes to earlier entries, matching how the closed dropdown scrolls its value.
    //ChangePage clamps itself, and is a no-op when the list fits on one page.

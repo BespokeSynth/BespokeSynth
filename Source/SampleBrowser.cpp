@@ -127,6 +127,19 @@ bool SampleBrowser::IsSamplePlaying(int index) const
    return mPlayingSample.IsPlaying() && IsMostRecentlyPlayedSample(index);
 }
 
+bool SampleBrowser::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+{
+   //one event shouldn't fly through the whole listing
+   int steps = std::clamp(GetScrollSteps(scrollY, isSmoothScroll, mScrollAccumulator), -4, 4);
+
+   //scrolling up goes to earlier entries, matching the < and > buttons. ShowPage clamps to what exists,
+   //so this is a no-op past either end and when the listing fits on one page.
+   if (steps != 0)
+      ShowPage(mCurrentPage - steps);
+
+   return true;
+}
+
 void SampleBrowser::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mBackButton)
