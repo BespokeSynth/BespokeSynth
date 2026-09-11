@@ -644,6 +644,7 @@ void DropdownListModal::SetUpModal()
 {
    if (mPagePrevButton == nullptr)
       CreateUIControls();
+   mScrollAccumulator = 0;
 }
 
 void DropdownListModal::CreateUIControls()
@@ -685,6 +686,40 @@ bool DropdownListModal::MouseMoved(float x, float y)
    mMouseX = x;
    mMouseY = y;
    return false;
+}
+
+bool DropdownListModal::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+{
+   //paging is column-based, so a horizontal push pages too; follow whichever axis was pushed hardest
+   float scroll = (fabsf(scrollX) > fabsf(scrollY)) ? -scrollX : scrollY;
+
+   int steps;
+   if (isSmoothScroll)
+   {
+      //trackpads deliver a stream of tiny deltas, so accumulate distance and let the page count track the swipe
+      const float kScrollPerPage = 5;
+      if (mScrollAccumulator * scroll < 0) //reversed direction, drop the old momentum
+         mScrollAccumulator = 0;
+      mScrollAccumulator += scroll;
+      steps = (int)(mScrollAccumulator / kScrollPerPage);
+      mScrollAccumulator -= steps * kScrollPerPage;
+   }
+   else
+   {
+      //a notched wheel is already discrete: one detent, one page
+      steps = (scroll > 0) ? 1 : (scroll < 0 ? -1 : 0);
+   }
+
+   steps = std::clamp(steps, -4, 4); //one event shouldn't fly through the whole list
+
+   //scrolling up goes to earlier entries, matching how the closed dropdown scrolls its value.
+   //ChangePage clamps itself, and is a no-op when the list fits on one page.
+   const int pageCount = (steps > 0) ? steps : -steps;
+   const int direction = (steps > 0) ? -1 : 1;
+   for (int i = 0; i < pageCount; ++i)
+      mOwner->ChangePage(direction);
+
+   return true; //while the popup is up it owns the wheel, so never let the event fall through to the value
 }
 
 void DropdownListModal::OnClicked(float x, float y, bool right)

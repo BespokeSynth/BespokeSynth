@@ -2077,6 +2077,19 @@ void ModularSynth::MouseScrolled(float xScroll, float yScroll, bool isSmoothScro
    }
    else if (gHoveredUIControl && dynamic_cast<ClickButton*>(gHoveredUIControl) == nullptr)
    {
+      //if the hovered dropdown's popup is open, the popup gets the scroll and pages; the value stays put.
+      //(the hover-break check in MouseMoved only runs when the mouse moves, so click-to-open then
+      // scroll-without-moving leaves this dropdown hovered.)
+      if (auto* hoveredDropdown = dynamic_cast<DropdownList*>(gHoveredUIControl))
+      {
+         IDrawableModule* popup = hoveredDropdown->GetModalDropdown();
+         if (GetTopModalFocusItem() == popup)
+         {
+            popup->NotifyMouseScrolled(GetMouseX(popup->GetOwningContainer()), GetMouseY(popup->GetOwningContainer()), xScroll, yScroll, isSmoothScroll, isInvertedScroll);
+            return;
+         }
+      }
+
 #if JUCE_WINDOWS
       yScroll += xScroll / 4; //taking advantage of logitech horizontal scroll wheel
 #endif
