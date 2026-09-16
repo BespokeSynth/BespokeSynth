@@ -29,6 +29,7 @@
 #include "ModularSynth.h"
 #include "PatchCable.h"
 #include "Push2Control.h"
+#include "UserPrefs.h"
 
 //static
 IUIControl* IUIControl::sLastHoveredUIControl = nullptr;
@@ -117,9 +118,28 @@ void IUIControl::DrawHover(float x, float y, float w, float h)
    }
    else if (gHoveredUIControl == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr && TheSynth->GetGroupSelectedModules().empty())
    {
+      double time = gTime / 1000.0f;
       ofPushStyle();
       ofNoFill();
-      ofSetColor(0, 255, 255, 255);
+      if (mHoverWarningFlashTime < time)
+      {
+         if (mCableTargetable == 1)
+            ofSetColor(0, 255, 255, 255);
+         else
+         {
+            ofSetColor(255, 255, 255, 255);
+         }
+      }
+      else
+      {
+         int iTime = static_cast<int>(time * 4);
+
+         iTime = iTime % 2;
+         if (iTime == 0)
+            ofSetColor(255, 255, 255, 0);
+         else
+            ofSetColor(mHoverWarningColour);
+      }
       ofRect(x, y, w, h, 4);
       ofPopStyle();
    }
@@ -161,7 +181,10 @@ void IUIControl::DrawPatchCableHover()
       ofPushStyle();
       ofNoFill();
       ofSetLineWidth(1.5f);
-      ofSetColor(255, 0, 255, 200);
+      if (mCableTargetable == 1)
+         ofSetColor(255, 0, 255, 200);
+      else
+         ofSetColor(255, 115, 0, 235);
       ofRect(mX, mY, w, h);
       ofPopStyle();
    }
@@ -169,9 +192,7 @@ void IUIControl::DrawPatchCableHover()
 
 bool IUIControl::CanBeTargetedBy(PatchCableSource* source) const
 {
-   if (!mCableTargetable)
-      return false;
-   if (GetNoHover())
+   if (!GetCableTargetable())
       return false;
    return source->GetConnectionType() == kConnectionType_Modulator || source->GetConnectionType() == kConnectionType_ValueSetter || source->GetConnectionType() == kConnectionType_UIControl;
 }
@@ -184,6 +205,20 @@ void IUIControl::StartBeacon()
       moduleParent->StartBeacon();
 }
 
+bool IUIControl::GetCableTargetable() const
+{
+   if (!UserPrefs.unsafe_cable_connections.Get())
+   {
+      if (!mCableTargetable || GetNoHover())
+         return false;
+   }
+   else
+   {
+      if (mCableTargetable == -1)
+         return false;
+   }
+   return true;
+}
 void IUIControl::PositionTo(IUIControl* anchor, AnchorDirection direction)
 {
    ofRectangle rect = anchor->GetRect(true);
@@ -407,4 +442,9 @@ void IUIControl::DestroyCablesTargetingControls(std::vector<IUIControl*> control
    }
    for (const auto cable : cablesToDestroy)
       cable->Destroy(false);
+}
+void IUIControl::TriggerHoverWarning(ofColor colour, float seconds)
+{
+   mHoverWarningColour = colour;
+   mHoverWarningFlashTime = gTime / 1000.0 + static_cast<double>(seconds);
 }
