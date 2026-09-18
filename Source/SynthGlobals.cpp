@@ -599,6 +599,24 @@ void StringCopy(char* dest, const char* source, int destLength)
    dest[destLength - 1] = 0;
 }
 
+int GetScrollSteps(float scroll, bool isSmoothScroll, float& accumulator, float scrollPerStep /*= 5*/)
+{
+   if (!isSmoothScroll) //a notched wheel is already discrete: one detent, one step
+   {
+      accumulator = 0;
+      return (scroll > 0) ? 1 : (scroll < 0 ? -1 : 0);
+   }
+
+   //trackpads deliver a stream of tiny deltas, so accumulate distance and let the step count track
+   //how far the user swiped rather than how long they took to do it
+   if (accumulator * scroll < 0) //reversed direction, drop the old momentum
+      accumulator = 0;
+   accumulator += scroll;
+   int steps = (int)(accumulator / scrollPerStep);
+   accumulator -= steps * scrollPerStep;
+   return steps;
+}
+
 int GetKeyModifiers()
 {
    int ret = 0;

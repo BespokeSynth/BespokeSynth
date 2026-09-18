@@ -664,6 +664,7 @@ void DropdownListModal::SetUpModal()
 {
    if (mPagePrevButton == nullptr)
       CreateUIControls();
+   mScrollAccumulator = 0;
 }
 
 void DropdownListModal::CreateUIControls()
@@ -705,6 +706,24 @@ bool DropdownListModal::MouseMoved(float x, float y)
    mMouseX = x;
    mMouseY = y;
    return false;
+}
+
+bool DropdownListModal::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+{
+   //paging is column-based, so a horizontal push pages too; follow whichever axis was pushed hardest
+   float scroll = (fabsf(scrollX) > fabsf(scrollY)) ? -scrollX : scrollY;
+
+   //one event shouldn't fly through the whole list
+   int steps = std::clamp(GetScrollSteps(scroll, isSmoothScroll, mScrollAccumulator), -4, 4);
+
+   //scrolling up goes to earlier entries, matching how the closed dropdown scrolls its value.
+   //ChangePage clamps itself, and is a no-op when the list fits on one page.
+   const int pageCount = (steps > 0) ? steps : -steps;
+   const int direction = (steps > 0) ? -1 : 1;
+   for (int i = 0; i < pageCount; ++i)
+      mOwner->ChangePage(direction);
+
+   return true; //while the popup is up it owns the wheel, so never let the event fall through to the value
 }
 
 void DropdownListModal::OnClicked(float x, float y, bool right)

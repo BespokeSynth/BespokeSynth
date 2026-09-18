@@ -71,6 +71,7 @@ public:
    bool ShouldClipContents() override { return false; }
    DropdownList* GetOwner() const { return mOwner; }
    bool MouseMoved(float x, float y) override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    std::string GetHoveredLabel();
    float GetMouseX() { return mMouseX; }
    float GetMouseY() { return mMouseY; }
@@ -90,6 +91,7 @@ private:
    ClickButton* mPagePrevButton{ nullptr };
    ClickButton* mPageNextButton{ nullptr };
    bool mIsScrolling{ false };
+   float mScrollAccumulator{ 0 };
 };
 
 enum class DropdownDisplayStyle

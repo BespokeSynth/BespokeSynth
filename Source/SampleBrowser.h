@@ -60,6 +60,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
    void GetModuleDimensions(float& width, float& height) override
    {
       width = 300;
@@ -82,6 +83,7 @@ private:
    ClickButton* mPlayRandomButton{ nullptr };
    ClickButton* mStopButton{ nullptr };
    int mCurrentPage{ 0 };
+   float mScrollAccumulator{ 0 };
    Sample mPlayingSample;
    ofMutex mSampleMutex;
 };
