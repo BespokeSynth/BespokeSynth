@@ -7,7 +7,7 @@ else()
 endif()
 
 juce_add_gui_app(BespokeSynth
-    PRODUCT_NAME BespokeSynth
+    PRODUCT_NAME BeSpokeMod
     ICON_BIG ${CMAKE_SOURCE_DIR}/bespoke_icon.png
     MICROPHONE_PERMISSION_ENABLED TRUE
     CAMERA_PERMISSION_ENABLED     TRUE
@@ -15,7 +15,7 @@ juce_add_gui_app(BespokeSynth
     FILE_SHARING_ENABLED          TRUE
     DOCUMENT_BROWSER_ENABLED      TRUE
     DOCUMENT_EXTENSIONS           .bsk
-    BUNDLE_ID                     com.ryanchallinor.bespokesynth
+    BUNDLE_ID                     com.namansoni.bespokemod
     PLUGINHOST_AU                 TRUE
     )
 
@@ -160,6 +160,8 @@ target_sources(BespokeSynth PRIVATE
     DebugAudioSource.h
     DelayEffect.cpp
     DelayEffect.h
+    DiceSynth.cpp
+    DiceSynth.h
     DistortionEffect.cpp
     DistortionEffect.h
     DJFilterEffect.cpp
@@ -169,7 +171,15 @@ target_sources(BespokeSynth PRIVATE
     DotGrid.cpp
     DotGrid.h
     DotSequencer.cpp
+    BouncingBalls.cpp
+    Radar.cpp
+    SampleUniverse.cpp
+    EffectMatrix.cpp
     DotSequencer.h
+    BouncingBalls.h
+    Radar.h
+    SampleUniverse.h
+    EffectMatrix.h
     DropdownList.cpp
     DropdownList.h
     DrumPlayer.cpp
@@ -220,6 +230,8 @@ target_sources(BespokeSynth PRIVATE
     FourOnTheFloor.cpp
     FourOnTheFloor.h
     FreeverbEffect.cpp
+    StereoWidthEffect.cpp
+    StereoWidthEffect.h
     FreeverbEffect.h
     FreqDelay.cpp
     FreqDelay.h
@@ -306,12 +318,27 @@ target_sources(BespokeSynth PRIVATE
     LaunchpadNoteDisplayer.h
     LevelMeterDisplay.cpp
     LevelMeterDisplay.h
+    LimiterEffect.cpp
+    LimiterEffect.h
     LinkwitzRileyFilter.cpp
     LinkwitzRileyFilter.h
+    MetallicSynth.cpp
+    MetallicSynth.h
+    MutableResonator.cpp
+    MutableResonator.h
     LinnstrumentControl.cpp
     LinnstrumentControl.h
     Lissajous.cpp
     Lissajous.h
+    CubeViz.cpp
+    VizRecorder.cpp
+    MovieOut.cpp
+    Composite.cpp
+    VizGL.cpp
+    ShaderViz.cpp
+    CubeViz.h
+    BlobViz.cpp
+    BlobViz.h
     LiveGranulator.cpp
     LiveGranulator.h
     LocationZoomer.cpp
@@ -368,6 +395,8 @@ target_sources(BespokeSynth PRIVATE
     ModulationVisualizer.cpp
     ModulationVisualizer.h
     ModulatorAccum.cpp
+    TableModulator.cpp
+    TableModulator.h
     ModulatorAccum.h
     ModulatorAdd.cpp
     ModulatorAdd.h
@@ -636,6 +665,8 @@ target_sources(BespokeSynth PRIVATE
     Sample.h
     SampleBrowser.cpp
     SampleBrowser.h
+    SearchPanel.cpp
+    SearchPanel.h
     SampleCanvas.cpp
     SampleCanvas.h
     SampleCapturer.cpp
@@ -680,8 +711,18 @@ target_sources(BespokeSynth PRIVATE
     SimplexFont.h
     SingleOscillator.cpp
     SingleOscillator.h
+    MolderSampler.cpp
+    MolderSampler.h
     SingleOscillatorVoice.cpp
     SingleOscillatorVoice.h
+    Wavetable.cpp
+    Wavetable.h
+    WavetableVoice.cpp
+    WavetableVoice.h
+    WavetableTables.cpp
+    WavetableTables.h
+    Tracker.cpp
+    Tracker.h
     Slider.cpp
     Slider.h
     SliderSequencer.cpp
@@ -741,6 +782,8 @@ target_sources(BespokeSynth PRIVATE
     UIGrid.h
     UnstableModWheel.cpp
     UnstableModWheel.h
+    PaulStretch.cpp
+    PaulStretch.h
     UnstablePitch.cpp
     UnstablePitch.h
     UnstablePressure.cpp
@@ -789,6 +832,24 @@ target_sources(BespokeSynth PRIVATE
     VoiceSetter.h
     VolcaBeatsControl.cpp
     VolcaBeatsControl.h
+    PixelCloud.cpp
+    CheckerBox.cpp
+    TransformViz.cpp
+    LiquidifierViz.cpp
+    VisualEffectsViz.cpp
+    VisualSwitcherViz.cpp
+    MacroKnobs.cpp
+    MacroKnobs.h
+    MacroXY.cpp
+    MacroXY.h
+    NoiseSynth.cpp
+    NoiseSynth.h
+    MacroBars.cpp
+    Maze.cpp
+    MacroBars.h
+    ScopeViz.cpp
+    VideoCloud.cpp
+    TextCloud.cpp
     WaveformViewer.cpp
     WaveformViewer.h
     Waveshaper.cpp
@@ -878,12 +939,12 @@ if (APPLE)
         get_target_property(SIGN_HERE BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
         add_custom_command(TARGET BespokeSynthSigned POST_BUILD VERBATIM
                 WORKING_DIRECTORY ${SIGN_HERE}
-                COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" --deep BespokeSynth.app/Contents/Frameworks/Python.framework/
-                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name *.so -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
-                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name *.o -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
-                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name python3* -perm +111 -exec codesign -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --force -s "${BESPOKE_SIGN_AS}"  {} \;
-                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name Python -exec codesign -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --force -s "${BESPOKE_SIGN_AS}" {} \;
-                COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --deep BespokeSynth.app
+                COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" --deep $<TARGET_BUNDLE_DIR_NAME:BespokeSynth>/Contents/Frameworks/Python.framework/
+                COMMAND find $<TARGET_BUNDLE_DIR_NAME:BespokeSynth>/Contents/Frameworks/Python.framework/Versions/ -name *.so -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
+                COMMAND find $<TARGET_BUNDLE_DIR_NAME:BespokeSynth>/Contents/Frameworks/Python.framework/Versions/ -name *.o -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
+                COMMAND find $<TARGET_BUNDLE_DIR_NAME:BespokeSynth>/Contents/Frameworks/Python.framework/Versions/ -name python3* -perm +111 -exec codesign -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --force -s "${BESPOKE_SIGN_AS}"  {} \;
+                COMMAND find $<TARGET_BUNDLE_DIR_NAME:BespokeSynth>/Contents/Frameworks/Python.framework/Versions/ -name Python -exec codesign -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --force -s "${BESPOKE_SIGN_AS}" {} \;
+                COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --deep $<TARGET_BUNDLE_DIR_NAME:BespokeSynth>
                 )
     endif()
 elseif (WIN32)

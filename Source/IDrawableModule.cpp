@@ -253,7 +253,8 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    }
 
    ofFill();
-   float backgroundAlpha = IsEnabled() ? 180 : 120;
+   float moduleCornerRadius = UserPrefs.module_corner_radius.Get();
+   float backgroundAlpha = IsEnabled() ? UserPrefs.module_background_alpha.Get() : UserPrefs.module_background_alpha.Get() * .65f;
    if (dynamic_cast<Prefab*>(this) != nullptr)
       backgroundAlpha = 60;
    if (IsEnabled())
@@ -263,7 +264,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    //gModuleShader.begin();
    const float kHighlightGrowAmount = 40;
    ofRect(0 - highlight * kHighlightGrowAmount, -titleBarHeight - highlight * kHighlightGrowAmount,
-          w + highlight * kHighlightGrowAmount * 2, h + titleBarHeight + highlight * kHighlightGrowAmount * 2, 3 + highlight * kHighlightGrowAmount);
+          w + highlight * kHighlightGrowAmount * 2, h + titleBarHeight + highlight * kHighlightGrowAmount * 2, moduleCornerRadius + highlight * kHighlightGrowAmount);
    //gModuleShader.end();
    ofNoFill();
 
@@ -337,7 +338,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofPopStyle();
    }
 
-   const bool kDrawInnerFade = true;
+   const bool kDrawInnerFade = !gFlatUIStyle; //classic style adds a soft inner vignette per-module; flat/modern style skips it for a cleaner look
    if (kDrawInnerFade && gNanoVG == gNanoVGRenderContexts[(int)NanoVGRenderContext::Main])
    {
       float fadeRoundness = 100;
@@ -390,7 +391,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
          ofSetColor(color.r * (.5f + highlight), color.g * (.5f + highlight), color.b * (.5f + highlight), 200);
          ofSetLineWidth(.5f);
       }
-      ofRect(-.5f, -titleBarHeight - .5f, w + 1, h + titleBarHeight + 1, 4);
+      ofRect(-.5f, -titleBarHeight - .5f, w + 1, h + titleBarHeight + 1, moduleCornerRadius + 1);
       ofPopStyle();
    }
 
@@ -570,22 +571,30 @@ void IDrawableModule::DrawPatchCables(bool parentMinimized, bool inFront)
 //static
 ofColor IDrawableModule::GetColor(ModuleCategory type)
 {
+   //Palette is read live from UserPrefs (Settings > graphics), so dragging the
+   //sliders in the in-app settings panel updates module colors immediately -
+   //no restart needed. This is the single source of truth for the module
+   //color palette used throughout the UI (module frames, sliders, checkboxes,
+   //buttons, etc. all derive their color from this function via GetColor()).
+   float saturation = UserPrefs.module_saturation.Get();
+   float brightness = UserPrefs.module_brightness.Get();
+
    ofColor color;
-   color.setHsb(0, 0, sBrightness);
+   color.setHsb(0, 0, brightness);
    if (type == kModuleCategory_Note)
-      color.setHsb(sHueNote, sSaturation, sBrightness);
+      color.setHsb(UserPrefs.hue_note.Get(), saturation, brightness);
    if (type == kModuleCategory_Synth)
-      color.setHsb(sHueInstrument, sSaturation, sBrightness);
+      color.setHsb(UserPrefs.hue_synth.Get(), saturation, brightness);
    if (type == kModuleCategory_Audio)
-      color.setHsb(sHueAudio, sSaturation, sBrightness);
+      color.setHsb(UserPrefs.hue_audio.Get(), saturation, brightness);
    if (type == kModuleCategory_Instrument)
-      color.setHsb(sHueNoteSource, sSaturation, sBrightness);
+      color.setHsb(UserPrefs.hue_instrument.Get(), saturation, brightness);
    if (type == kModuleCategory_Processor)
-      color.setHsb(170, 100, 255);
+      color.setHsb(UserPrefs.hue_processor.Get(), saturation, brightness);
    if (type == kModuleCategory_Modulator)
-      color.setHsb(200, 100, 255);
+      color.setHsb(UserPrefs.hue_modulator.Get(), saturation, brightness);
    if (type == kModuleCategory_Pulse)
-      color.setHsb(43, sSaturation, sBrightness);
+      color.setHsb(UserPrefs.hue_pulse.Get(), saturation, brightness);
    return color;
 }
 

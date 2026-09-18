@@ -83,6 +83,14 @@ public:
    ChannelBuffer* GetCueSampleData(int cueIndex);
    float GetLengthInSeconds() const;
 
+protected:
+   void DrawModule() override;
+   void OnClicked(float x, float y, bool right) override;
+   bool MouseMoved(float x, float y) override;
+   void MouseReleased() override;
+   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
+
+protected:
    void oscMessageReceived(const juce::OSCMessage& msg) override;
    void oscBundleReceived(const juce::OSCBundle& bundle) override;
 
@@ -128,12 +136,6 @@ private:
    void StopRecording();
 
    //IDrawableModule
-   void DrawModule() override;
-   void OnClicked(float x, float y, bool right) override;
-   bool MouseMoved(float x, float y) override;
-   void MouseReleased() override;
-   bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
-
    Sample* mSample{ nullptr };
    bool mOwnsSample{ true };
 

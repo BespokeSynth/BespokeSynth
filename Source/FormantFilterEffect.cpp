@@ -33,8 +33,9 @@ FormantFilterEffect::FormantFilterEffect()
 {
    mOutputBuffer = new float[gBufferSize];
 
-   for (int i = 0; i < NUM_FORMANT_BANDS; ++i)
-      mBiquads[i].SetFilterType(kFilterType_Bandpass);
+   for (int ch = 0; ch < ChannelBuffer::kMaxNumChannels; ++ch)
+      for (int i = 0; i < NUM_FORMANT_BANDS; ++i)
+         mBiquads[ch][i].SetFilterType(kFilterType_Bandpass);
 
    mFormants.push_back(Formants(400, 1, 1700, .35f, 2300, .4f)); //EE
    mFormants.push_back(Formants(360, 1, 750, .25f, 2400, .035f)); //OO
@@ -80,22 +81,28 @@ void FormantFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
 
-   float bufferSize = buffer->BufferSize();
+   int bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
    assert(gBufferSize == bufferSize);
-   Clear(mOutputBuffer, bufferSize);
 
-   //TODO(Ryan)
-   /*for (int i=0; i<NUM_FORMANT_BANDS; ++i)
+   UpdateFilters();
+
+   for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
    {
-      BufferCopy(gWorkBuffer, audio, bufferSize);
-      mBiquads[i].Filter(gWorkBuffer, bufferSize);
-      Add(mOutputBuffer, gWorkBuffer, bufferSize);
+      float* channelData = buffer->GetChannel(ch);
+      Clear(mOutputBuffer, bufferSize);
+
+      for (int i = 0; i < NUM_FORMANT_BANDS; ++i)
+      {
+         BufferCopy(gWorkBuffer, channelData, bufferSize);
+         mBiquads[ch][i].Filter(gWorkBuffer, bufferSize);
+         Add(mOutputBuffer, gWorkBuffer, bufferSize);
+      }
+
+      BufferCopy(channelData, mOutputBuffer, bufferSize);
    }
-   
-   BufferCopy(audio, gWorkBuffer, bufferSize);*/
 }
 
 void FormantFilterEffect::DrawModule()
@@ -117,8 +124,9 @@ float FormantFilterEffect::GetEffectAmount()
 
 void FormantFilterEffect::ResetFilters()
 {
-   for (int i = 0; i < NUM_FORMANT_BANDS; ++i)
-      mBiquads[i].Clear();
+   for (int ch = 0; ch < ChannelBuffer::kMaxNumChannels; ++ch)
+      for (int i = 0; i < NUM_FORMANT_BANDS; ++i)
+         mBiquads[ch][i].Clear();
 }
 
 void FormantFilterEffect::UpdateFilters()
@@ -146,7 +154,11 @@ void FormantFilterEffect::UpdateFilters()
 
    const float bandwidth = 100;
    for (int i = 0; i < NUM_FORMANT_BANDS; ++i)
-      mBiquads[i].SetFilterParams(formant[i], formant[i] / (bandwidth / 2));
+   {
+      mBiquads[0][i].SetFilterParams(formant[i], formant[i] / (bandwidth / 2));
+      for (int ch = 1; ch < ChannelBuffer::kMaxNumChannels; ++ch)
+         mBiquads[ch][i].CopyCoeffFrom(mBiquads[0][i]);
+   }
 }
 
 void FormantFilterEffect::DropdownUpdated(DropdownList* list, int oldVal, double time)

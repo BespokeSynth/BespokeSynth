@@ -2,6 +2,7 @@
 
 trigger:
   - main
+  - my-modules-and-visualizers
 
 variables:
   - group: mac-signing
@@ -9,6 +10,7 @@ variables:
 
 pr:
   - main
+  - my-modules-and-visualizers
 
 jobs:
   - job: Build

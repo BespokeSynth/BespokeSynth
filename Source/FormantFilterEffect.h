@@ -70,7 +70,7 @@ private:
    void UpdateFilters();
 
 #define NUM_FORMANT_BANDS 3
-   BiquadFilter mBiquads[NUM_FORMANT_BANDS];
+   BiquadFilter mBiquads[ChannelBuffer::kMaxNumChannels][NUM_FORMANT_BANDS];
    float* mDryBuffer{ nullptr };
    float mEE{ 1 };
    float mOO{ 0 };

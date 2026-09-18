@@ -146,8 +146,8 @@ public:
       // the other instance's command-line arguments were.
 
       // This is also called when opening the app with a file.
-      if (commandLine.isNotEmpty() && commandLine.endsWith(".bsk"))
-         SetStartupSaveStateFile(commandLine, mainWindow->getContentComponent());
+      if (commandLine.isNotEmpty() && (commandLine.endsWithIgnoreCase(".bsk") || commandLine.endsWithIgnoreCase(".bskt")))
+         SetStartupSaveStateFile(commandLine.unquoted(), mainWindow->getContentComponent());
    }
 
    //==============================================================================
