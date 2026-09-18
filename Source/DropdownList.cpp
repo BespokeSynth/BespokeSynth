@@ -308,7 +308,8 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
 
    if (paged)
    {
-      DrawTextNormal("page " + ofToString(mCurrentPagedColumn / displayColumns + 1) + "/" + ofToString(totalColumns / displayColumns + 1), 30, 14);
+      int pageCount = (totalColumns + displayColumns - 1) / displayColumns; //round up, matching ChangePage's own clamp
+      DrawTextNormal("page " + ofToString(mCurrentPagedColumn / displayColumns + 1) + "/" + ofToString(pageCount), 30, 14);
    }
 
    ofSetLineWidth(.5f);
