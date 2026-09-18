@@ -32,11 +32,19 @@ WhiteKeys::WhiteKeys()
 {
 }
 
+void WhiteKeys::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+
+   mContinuousCheckbox = new Checkbox(this, "continuous", 4, 3, &mContinuous);
+}
+
 void WhiteKeys::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
+
+   mContinuousCheckbox->Draw();
 }
 
 void WhiteKeys::CheckboxUpdated(Checkbox* checkbox, double time)
@@ -69,8 +77,14 @@ void WhiteKeys::PlayNote(NoteMessage note)
 
    if (degree != -1)
    {
-      note.pitch = TheScale->GetPitchFromTone(degree);
-      note.pitch += octave * TheScale->GetPitchesPerOctave();
+      if (mContinuous)
+      {
+         note.pitch = TheScale->GetPitchFromTone(degree + octave * 7);
+      }
+      else
+      {
+         note.pitch = TheScale->GetPitchFromTone(degree) + octave * TheScale->GetPitchesPerOctave();
+      }
       PlayNoteOutput(note);
    }
 }
