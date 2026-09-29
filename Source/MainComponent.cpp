@@ -10,10 +10,15 @@ using namespace juce;
 #define NANOVG_GLES2_IMPLEMENTATION
 #include "nanovg/nanovg_gl.h"
 #include "ModularSynth.h"
+#include "AudioDeviceSettings.h"
+#include "AudioIOBridge.h"
 #include "SynthGlobals.h"
 #include "Push2Control.h" //TODO(Ryan) remove
 #include "SpaceMouseControl.h"
 #include "UserPrefs.h"
+#include <atomic>
+#include <cmath>
+#include <limits>
 
 #ifdef JUCE_WINDOWS
 #include <windows.h>
@@ -33,12 +38,58 @@ public:
    static constexpr const char* kAutoDevice = "auto";
    static constexpr const char* kNoneDevice = "none";
 
+   class SeparateInputCallback : public AudioIODeviceCallback
+   {
+   public:
+      explicit SeparateInputCallback(MainContentComponent& owner)
+      : mOwner(owner)
+      {}
+      void audioDeviceAboutToStart(AudioIODevice* device) override
+      {
+         if (!mOwner.mAudioSwitchInProgress && mOwner.mSeparateInputActive && device != nullptr &&
+             (device->getCurrentSampleRate() != mOwner.mConfiguredInputRate ||
+              device->getCurrentBufferSizeSamples() != mOwner.mConfiguredInputBlockSize))
+         {
+            mOwner.mAudioFormatPending = true;
+            mOwner.mAudioDeviceStopped = true;
+         }
+      }
+      void audioDeviceStopped() override
+      {
+         if (!mOwner.mAudioSwitchInProgress)
+         {
+            mOwner.mAudioFormatPending = true;
+            mOwner.mAudioDeviceStopped = true;
+         }
+      }
+      void audioDeviceIOCallbackWithContext(const float* const* input, int inputChannels, float* const* output,
+                                            int outputChannels, int frames, const AudioIODeviceCallbackContext&) override
+      {
+         if (!mOwner.mAudioSwitchInProgress && !mOwner.mAudioFormatPending &&
+             inputChannels == mOwner.mSynth.GetNumInputChannels() && mOwner.mAudioIOBridge)
+            mOwner.mAudioIOBridge->PushSeparateInput(input, inputChannels, frames);
+         else if (!mOwner.mAudioSwitchInProgress && !mOwner.mAudioFormatPending &&
+                  inputChannels != mOwner.mSynth.GetNumInputChannels())
+         {
+            mOwner.mAudioFormatPending = true;
+            mOwner.mAudioDeviceStopped = true;
+         }
+         for (int ch = 0; ch < outputChannels; ++ch)
+            if (output != nullptr && output[ch] != nullptr)
+               juce::FloatVectorOperations::clear(output[ch], frames);
+      }
+
+   private:
+      MainContentComponent& mOwner;
+   };
+
    //==============================================================================
    MainContentComponent()
-   : mSpaceMouseReader(mSynth)
-   , mLastFpsUpdateTime(0)
+   : mLastFpsUpdateTime(0)
    , mFrameCountAccum(0)
    , mPixelRatio(1)
+   , mSpaceMouseReader(mSynth)
+   , mSeparateInputCallback(*this)
    {
       ofLog() << "bespoke synth " << GetBuildInfoString();
 
@@ -101,6 +152,8 @@ public:
       setWantsKeyboardFocus(true);
       Desktop::setScreenSaverEnabled(false);
       mGlobalManagers.mDeviceManager.getAvailableDeviceTypes(); //scans for device types ("Windows Audio", "DirectSound", etc)
+      if (auto* type = mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject())
+         mDefaultAudioDeviceType = type->getTypeName();
    }
 
    ~MainContentComponent()
@@ -147,20 +200,17 @@ public:
 
       mSpaceMouseReader.Poll();
 
-      if (mAudioDeviceConnectionState == AudioDeviceConnectionState::CheckForDisconnection)
+      if (mAudioDeviceStopped.exchange(false) && !mAudioSwitchInProgress)
       {
-         if (!HasDesiredAudioDevice())
-            mAudioDeviceConnectionState = AudioDeviceConnectionState::Disconnected;
+         ofLog() << "audio device stopped or changed format; reconnecting";
+         mAudioDeviceConnectionState = AudioDeviceConnectionState::Disconnected;
       }
 
-      if (mAudioDeviceConnectionState == AudioDeviceConnectionState::Disconnected)
+      if (mAudioDeviceConnectionState == AudioDeviceConnectionState::Disconnected &&
+          Time::getMillisecondCounter() - mLastAudioReconnectAttempt >= 1000)
       {
-         if (HasDesiredAudioDevice())
-         {
-            String audioError = InitializeAudioDevice();
-            if (audioError.isEmpty())
-               mAudioDeviceConnectionState = AudioDeviceConnectionState::Connected;
-         }
+         mLastAudioReconnectAttempt = Time::getMillisecondCounter();
+         ApplyAudioDeviceSelection(mActiveAudioSelection);
       }
    }
 
@@ -173,7 +223,13 @@ public:
       // You can use this function to initialise any resources you might need,
       // but be careful - it will be called on the audio thread, not the GUI thread.
 
-      ofLog() << "audioDeviceAboutToStart()";
+      if (!mAudioSwitchInProgress && device != nullptr && mConfiguredOutputRate > 0 &&
+          (device->getCurrentSampleRate() != mConfiguredOutputRate ||
+           device->getCurrentBufferSizeSamples() != mConfiguredOutputBlockSize))
+      {
+         mAudioFormatPending = true;
+         mAudioDeviceStopped = true;
+      }
    }
 
    void audioDeviceIOCallbackWithContext(const float* const* inputChannelData,
@@ -184,20 +240,52 @@ public:
                                          const AudioIODeviceCallbackContext& context) override
    {
       ignoreUnused(context);
-      mSynth.AudioIn(inputChannelData, numSamples, numInputChannels);
-      mSynth.AudioOut(outputChannelData, numSamples, numOutputChannels);
+      const auto clearOutput = [&]() {
+         for (int ch = 0; ch < numOutputChannels; ++ch)
+            if (outputChannelData != nullptr && outputChannelData[ch] != nullptr)
+               juce::FloatVectorOperations::clear(outputChannelData[ch], numSamples);
+      };
+      if (mAudioSwitchInProgress || mAudioFormatPending)
+      {
+         clearOutput();
+         return;
+      }
+      const int expectedInputChannels = mSeparateInputActive ? 0 : mSynth.GetNumInputChannels();
+      const bool unexpectedChannels = numInputChannels != expectedInputChannels ||
+                                      numOutputChannels != mSynth.GetNumOutputChannels();
+      const bool unexpectedDirectBlock = mAudioIOBridge == nullptr && numSamples != mActiveBufferSize;
+      if (unexpectedChannels || unexpectedDirectBlock)
+      {
+         mAudioFormatPending = true;
+         mAudioDeviceStopped = true;
+         clearOutput();
+         return;
+      }
+      if (mAudioIOBridge)
+         mAudioIOBridge->Process(inputChannelData, numInputChannels, outputChannelData, numOutputChannels, numSamples);
+      else
+      {
+         mSynth.AudioIn(inputChannelData, numSamples, numInputChannels);
+         mSynth.AudioOut(outputChannelData, numSamples, numOutputChannels);
+      }
    }
 
    void audioDeviceStopped() override
    {
-      ofLog() << "audioDeviceStopped()";
-      mAudioDeviceConnectionState = AudioDeviceConnectionState::CheckForDisconnection;
+      if (!mAudioSwitchInProgress)
+      {
+         mAudioFormatPending = true;
+         mAudioDeviceStopped = true;
+      }
    }
 
    void shutdownAudio()
    {
       mGlobalManagers.mDeviceManager.removeAudioCallback(this);
       mGlobalManagers.mDeviceManager.closeAudioDevice();
+      mInputDeviceManager.removeAudioCallback(&mSeparateInputCallback);
+      mInputDeviceManager.closeAudioDevice();
+      mAudioIOBridge.reset();
    }
 
    void initialise() override
@@ -227,24 +315,36 @@ public:
             ofLog() << output.toStdString();
       }*/
 
+      mActiveAudioSelection = { UserPrefs.devicetype.Get(), UserPrefs.audio_input_device.Get(), UserPrefs.audio_output_device.Get() };
+      mActiveSampleRate = UserPrefs.samplerate.Get();
+      mActiveBufferSize = UserPrefs.buffersize.Get();
+      mActiveOversampling = UserPrefs.oversampling.Get();
+      mActiveMaxInputChannels = UserPrefs.max_input_channels.Get();
+      mActiveMaxOutputChannels = UserPrefs.max_output_channels.Get();
+
       if (UserPrefs.devicetype.Get() != kAutoDevice)
          mGlobalManagers.mDeviceManager.setCurrentAudioDeviceType(UserPrefs.devicetype.Get(), true);
 
       SetGlobalSampleRateAndBufferSize(UserPrefs.samplerate.Get(), UserPrefs.buffersize.Get());
 
       mSynth.Setup(&mGlobalManagers.mDeviceManager, &mGlobalManagers.mAudioFormatManager, this, &openGLContext);
+      mAudioSwitchInProgress = true;
 
 #ifdef JUCE_WINDOWS
       CoInitializeEx(0, COINIT_MULTITHREADED);
 #endif
 
-      std::string inputDevice = GetInputDeviceName();
-      std::string outputDevice = GetOutputDeviceName();
-      String audioError = InitializeAudioDevice();
+      std::string inputDevice = GetInputDeviceName(mActiveAudioSelection);
+      std::string outputDevice = mActiveAudioSelection.output;
+      DeviceFormatPlan plan;
+      String audioError = ChooseDeviceSettings(mActiveAudioSelection, plan);
+      if (audioError.isEmpty())
+         audioError = InitializeAudioDevice(mActiveAudioSelection, plan);
 
       if (audioError.isEmpty())
       {
          auto loadedSetup = mGlobalManagers.mDeviceManager.getAudioDeviceSetup();
+         auto loadedInputSetup = plan.separateInput ? mInputDeviceManager.getAudioDeviceSetup() : loadedSetup;
          if (outputDevice != kAutoDevice && outputDevice != kNoneDevice &&
              loadedSetup.outputDeviceName.toStdString() != outputDevice)
          {
@@ -252,29 +352,42 @@ public:
                                  "\n\n\nvalid devices:\n" + GetAudioDevices());
          }
          else if (inputDevice != kAutoDevice && inputDevice != kNoneDevice &&
-                  loadedSetup.inputDeviceName.toStdString() != inputDevice)
+                  loadedInputSetup.inputDeviceName.toStdString() != inputDevice)
          {
             mSynth.SetFatalError("error setting input device to '" + inputDevice + "', fix this in userprefs.json (use \"auto\" for default device, or \"none\" for no device)" +
                                  "\n\n\nvalid devices:\n" + GetAudioDevices());
          }
-         else if (loadedSetup.bufferSize != gBufferSize / UserPrefs.oversampling.Get())
+         else if (plan.separateInput && (mInputDeviceManager.getCurrentAudioDeviceType().toStdString() != GetAudioDeviceTypeName(mActiveAudioSelection) ||
+                                         mInputDeviceManager.getCurrentAudioDevice() == nullptr ||
+                                         !mInputDeviceManager.getCurrentAudioDevice()->isOpen() ||
+                                         loadedInputSetup.inputChannels.countNumberOfSetBits() == 0 ||
+                                         loadedSetup.inputChannels.countNumberOfSetBits() != 0 ||
+                                         loadedInputSetup.outputChannels.countNumberOfSetBits() != 0))
          {
-            mSynth.SetFatalError("error setting buffer size to " + ofToString(gBufferSize / UserPrefs.oversampling.Get()) + " on device '" + loadedSetup.outputDeviceName.toStdString() + "', fix this in userprefs.json" +
-                                 "\n\n(a valid buffer size might be: " + ofToString(loadedSetup.bufferSize) + ")");
+            mSynth.SetFatalError("the separate audio input did not open with usable channels");
          }
-         else if (loadedSetup.sampleRate != gSampleRate / UserPrefs.oversampling.Get())
+         else if (mGlobalManagers.mDeviceManager.getCurrentAudioDevice() != nullptr &&
+                  (loadedSetup.sampleRate <= 0 || loadedSetup.bufferSize <= 0))
          {
-            mSynth.SetFatalError("error setting sample rate to " + ofToString(gSampleRate / UserPrefs.oversampling.Get()) + " on device '" + loadedSetup.outputDeviceName.toStdString() + "', fix this in userprefs.json" +
-                                 "\n\n(a valid sample rate might be: " + ofToString(loadedSetup.sampleRate) + ")");
+            mSynth.SetFatalError("audio device opened without a valid sample rate or buffer size");
          }
          else
          {
             ofLog() << "output: " << loadedSetup.outputDeviceName << "   input: " << loadedSetup.inputDeviceName;
 
-            int numInputChannels = loadedSetup.inputChannels.countNumberOfSetBits();
+            int numInputChannels = loadedInputSetup.inputChannels.countNumberOfSetBits();
             int numOutputChannels = loadedSetup.outputChannels.countNumberOfSetBits();
 
             mSynth.InitIOBuffers(numInputChannels, numOutputChannels);
+            mAudioIOBridge = CreateAudioIOBridge(loadedSetup, plan.separateInput);
+            mSeparateInputActive = plan.separateInput;
+            mConfiguredOutputRate = loadedSetup.sampleRate;
+            mConfiguredOutputBlockSize = loadedSetup.bufferSize;
+            mConfiguredInputRate = loadedInputSetup.sampleRate;
+            mConfiguredInputBlockSize = loadedInputSetup.bufferSize;
+            ofLog() << "audio format: device " << loadedSetup.sampleRate << " Hz / " << loadedSetup.bufferSize
+                    << " samples; input " << loadedInputSetup.sampleRate << " Hz / " << loadedInputSetup.bufferSize
+                    << " samples; engine " << mActiveSampleRate << " Hz / " << mActiveBufferSize << " samples";
          }
       }
       else
@@ -292,9 +405,17 @@ public:
       if (!mSynth.HasFatalError())
       {
          mGlobalManagers.mDeviceManager.addAudioCallback(this);
+         mAudioCallbackRegistered = true;
+         if (mSeparateInputActive)
+         {
+            mInputDeviceManager.addAudioCallback(&mSeparateInputCallback);
+            mInputCallbackRegistered = true;
+         }
 
          mAudioDeviceConnectionState = AudioDeviceConnectionState::Connected;
       }
+      mAudioDeviceStopped = false;
+      mAudioSwitchInProgress = false;
 
       for (int i = 0; i < JUCEApplication::getCommandLineParameterArray().size(); ++i)
       {
@@ -311,26 +432,138 @@ public:
       startTimerHz(UserPrefs.target_framerate.Get());
    }
 
-   std::string GetInputDeviceName() const
+   std::string GetAudioDeviceTypeName(const AudioDeviceSelection& selection) const
    {
-      std::string inputDevice = UserPrefs.audio_input_device.Get();
-      if (!mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
-         inputDevice = GetOutputDeviceName(); //asio must have identical input and output
+      return selection.type == kAutoDevice ? mDefaultAudioDeviceType.toStdString() : selection.type;
+   }
+
+   std::string GetInputDeviceName(const AudioDeviceSelection& selection)
+   {
+      std::string inputDevice = selection.input;
+      for (auto* type : mGlobalManagers.mDeviceManager.getAvailableDeviceTypes())
+         if (type->getTypeName().toStdString() == GetAudioDeviceTypeName(selection))
+            if (!type->hasSeparateInputsAndOutputs())
+               inputDevice = selection.output; //asio must have identical input and output
       return inputDevice;
    }
 
-   std::string GetOutputDeviceName() const
+   struct DeviceFormatPlan
    {
-      return UserPrefs.audio_output_device.Get();
+      int outputRate{ 0 };
+      int outputBlockSize{ 0 };
+      int inputRate{ 0 };
+      int inputBlockSize{ 0 };
+      bool separateInput{ false };
+   };
+
+   String ChooseDeviceSettings(const AudioDeviceSelection& selection, DeviceFormatPlan& plan)
+   {
+      plan = { mActiveSampleRate, mActiveBufferSize, mActiveSampleRate, mActiveBufferSize, false };
+
+      auto requestedType = GetAudioDeviceTypeName(selection);
+      AudioIODeviceType* type = nullptr;
+      for (auto* availableType : mGlobalManagers.mDeviceManager.getAvailableDeviceTypes())
+         if (availableType->getTypeName().toStdString() == requestedType)
+            type = availableType;
+      if (type == nullptr)
+         return "audio device type is not available: " + requestedType;
+
+      type->scanForDevices();
+      auto inputName = GetInputDeviceName(selection);
+      auto outputName = selection.output;
+      if (outputName != kAutoDevice && outputName != kNoneDevice && !type->getDeviceNames(false).contains(outputName))
+         return "audio output device is not available: " + outputName;
+      if (inputName != kAutoDevice && inputName != kNoneDevice && !type->getDeviceNames(true).contains(inputName))
+         return "audio input device is not available: " + inputName;
+
+      auto resolveName = [type](const std::string& requested, bool isInput) -> String
+      {
+         if (requested == kNoneDevice)
+            return {};
+         if (requested != kAutoDevice)
+            return requested;
+         auto names = type->getDeviceNames(isInput);
+         int index = type->getDefaultDeviceIndex(isInput);
+         return index >= 0 && index < names.size() ? names[index] : String();
+      };
+      String resolvedOutput = resolveName(outputName, false);
+      String resolvedInput = type->hasSeparateInputsAndOutputs() ? resolveName(inputName, true) : resolvedOutput;
+      if (outputName != kNoneDevice && resolvedOutput.isEmpty())
+         return "no audio output device is available";
+      if (inputName != kNoneDevice && resolvedInput.isEmpty())
+         return "no audio input device is available";
+      if (inputName == kNoneDevice && outputName == kNoneDevice)
+         return {};
+
+      std::unique_ptr<AudioIODevice> candidate(type->createDevice(resolvedOutput, resolvedInput));
+      if (candidate == nullptr)
+         return "could not create the selected audio device";
+      auto chooseRate = [this](const juce::Array<double>& rates) -> int
+      {
+         int selected = 0;
+         double bestDistance = std::numeric_limits<double>::max();
+         for (double rate : rates)
+         {
+            double distance = std::abs(rate - mActiveSampleRate);
+            if (rate > 0 && distance < bestDistance)
+            {
+               selected = (int)rate;
+               bestDistance = distance;
+            }
+         }
+         return selected;
+      };
+      auto chooseBlock = [this](const juce::Array<int>& sizes) -> int
+      {
+         int selected = 0;
+         int bestDistance = INT_MAX;
+         for (int size : sizes)
+         {
+            int distance = std::abs(size - mActiveBufferSize);
+            if (size > 0 && distance < bestDistance)
+            {
+               selected = size;
+               bestDistance = distance;
+            }
+         }
+         return selected;
+      };
+
+      auto rates = candidate->getAvailableSampleRates();
+      auto blockSizes = candidate->getAvailableBufferSizes();
+      if (!rates.isEmpty() && !blockSizes.isEmpty())
+      {
+         plan.outputRate = plan.inputRate = chooseRate(rates);
+         plan.outputBlockSize = plan.inputBlockSize = chooseBlock(blockSizes);
+         return {};
+      }
+
+      if (!type->hasSeparateInputsAndOutputs() || resolvedInput.isEmpty() || resolvedOutput.isEmpty() || resolvedInput == resolvedOutput)
+         return "the selected input and output devices have no common hardware sample rate or buffer size";
+
+      // JUCE's combined CoreAudio device requires one shared format. Open two
+      // streams when distinct devices have no common format.
+      std::unique_ptr<AudioIODevice> outputOnly(type->createDevice(resolvedOutput, {}));
+      std::unique_ptr<AudioIODevice> inputOnly(type->createDevice({}, resolvedInput));
+      if (outputOnly == nullptr || inputOnly == nullptr)
+         return "could not create separate audio input and output devices";
+      plan.outputRate = chooseRate(outputOnly->getAvailableSampleRates());
+      plan.outputBlockSize = chooseBlock(outputOnly->getAvailableBufferSizes());
+      plan.inputRate = chooseRate(inputOnly->getAvailableSampleRates());
+      plan.inputBlockSize = chooseBlock(inputOnly->getAvailableBufferSizes());
+      if (plan.outputRate <= 0 || plan.outputBlockSize <= 0 || plan.inputRate <= 0 || plan.inputBlockSize <= 0)
+         return "one of the selected devices has no usable audio format";
+      plan.separateInput = true;
+      return {};
    }
 
-   AudioDeviceManager::AudioDeviceSetup GetPreferredSetupOptions() const
+   AudioDeviceManager::AudioDeviceSetup GetPreferredSetupOptions(const AudioDeviceSelection& selection, int deviceRate, int deviceBlockSize)
    {
-      std::string inputDevice = GetInputDeviceName();
-      std::string outputDevice = GetOutputDeviceName();
+      std::string inputDevice = GetInputDeviceName(selection);
+      std::string outputDevice = selection.output;
       AudioDeviceManager::AudioDeviceSetup preferredSetupOptions;
-      preferredSetupOptions.sampleRate = gSampleRate / UserPrefs.oversampling.Get();
-      preferredSetupOptions.bufferSize = gBufferSize / UserPrefs.oversampling.Get();
+      preferredSetupOptions.sampleRate = deviceRate;
+      preferredSetupOptions.bufferSize = deviceBlockSize;
       if (outputDevice != kAutoDevice && outputDevice != kNoneDevice)
          preferredSetupOptions.outputDeviceName = outputDevice;
       if (inputDevice != kAutoDevice && inputDevice != kNoneDevice)
@@ -338,49 +571,248 @@ public:
       return preferredSetupOptions;
    }
 
-   String InitializeAudioDevice()
+   std::unique_ptr<AudioIOBridge> CreateAudioIOBridge(const AudioDeviceManager::AudioDeviceSetup& setup, bool separateInput)
    {
-      std::string inputDevice = GetInputDeviceName();
-      std::string outputDevice = GetOutputDeviceName();
-      AudioDeviceManager::AudioDeviceSetup preferredSetupOptions = GetPreferredSetupOptions();
+      if (mGlobalManagers.mDeviceManager.getCurrentAudioDevice() == nullptr ||
+          (!separateInput && setup.sampleRate == mActiveSampleRate && setup.bufferSize == mActiveBufferSize))
+         return {};
+      auto inputSetup = separateInput ? mInputDeviceManager.getAudioDeviceSetup() : setup;
+      return std::make_unique<AudioIOBridge>(mSynth, mActiveSampleRate, mActiveBufferSize, (int)setup.sampleRate, setup.bufferSize,
+                                             inputSetup.inputChannels.countNumberOfSetBits(), setup.outputChannels.countNumberOfSetBits(),
+                                             separateInput ? (int)inputSetup.sampleRate : 0, separateInput ? inputSetup.bufferSize : 0);
+   }
 
-      int inputChannels = UserPrefs.max_input_channels.Get();
-      int outputChannels = UserPrefs.max_output_channels.Get();
+   String InitializeAudioDevice(const AudioDeviceSelection& selection, const DeviceFormatPlan& plan)
+   {
+      AudioDeviceSelection outputSelection = selection;
+      if (plan.separateInput)
+         outputSelection.input = kNoneDevice;
+      std::string inputDevice = GetInputDeviceName(outputSelection);
+      std::string outputDevice = selection.output;
+      AudioDeviceManager::AudioDeviceSetup preferredSetupOptions = GetPreferredSetupOptions(outputSelection, plan.outputRate, plan.outputBlockSize);
+
+      int inputChannels = mActiveMaxInputChannels;
+      int outputChannels = mActiveMaxOutputChannels;
 
       if (inputDevice == kNoneDevice)
          inputChannels = 0;
       if (outputDevice == kNoneDevice)
          outputChannels = 0;
 
+      mGlobalManagers.mDeviceManager.setCurrentAudioDeviceType(GetAudioDeviceTypeName(selection), false);
+
       String audioError = mGlobalManagers.mDeviceManager.initialise(inputChannels,
                                                                     outputChannels,
                                                                     nullptr,
-                                                                    true,
+                                                                    false,
                                                                     "",
                                                                     &preferredSetupOptions);
 
-      return audioError;
+      if (audioError.isNotEmpty() || !plan.separateInput)
+         return audioError;
+
+      mInputDeviceManager.getAvailableDeviceTypes();
+      mInputDeviceManager.setCurrentAudioDeviceType(GetAudioDeviceTypeName(selection), false);
+      AudioDeviceManager::AudioDeviceSetup inputSetup;
+      inputSetup.sampleRate = plan.inputRate;
+      inputSetup.bufferSize = plan.inputBlockSize;
+      if (selection.input != kAutoDevice)
+         inputSetup.inputDeviceName = selection.input;
+      return mInputDeviceManager.initialise(mActiveMaxInputChannels, 0, nullptr, false, "", &inputSetup);
    }
 
-   bool HasDesiredAudioDevice()
+   AudioDeviceSelection GetActiveAudioDeviceSelection() const { return mActiveAudioSelection; }
+
+   AudioEngineSettings GetActiveAudioEngineSettings() const
    {
-      String inputName = GetInputDeviceName();
-      String outputName = GetOutputDeviceName();
-      bool foundInputDevice = false;
-      bool foundOutputDevice = false;
-      for (auto& deviceType : mGlobalManagers.mDeviceManager.getAvailableDeviceTypes())
+      return { mActiveSampleRate, mActiveBufferSize, mActiveOversampling, mActiveMaxInputChannels, mActiveMaxOutputChannels };
+   }
+
+   AudioHardwareSettings GetActiveAudioHardwareSettings() const
+   {
+      return { mSynth.GetNumOutputChannels() > 0 ? (int)mConfiguredOutputRate.load() : 0,
+               mSynth.GetNumOutputChannels() > 0 ? mConfiguredOutputBlockSize.load() : 0,
+               mSynth.GetNumInputChannels() > 0 ? (int)mConfiguredInputRate.load() : 0,
+               mSynth.GetNumInputChannels() > 0 ? mConfiguredInputBlockSize.load() : 0 };
+   }
+
+   AudioDeviceApplyResult ApplyAudioDeviceSelection(const AudioDeviceSelection& selection)
+   {
+      jassert(MessageManager::getInstance()->isThisTheMessageThread());
+
+      auto& manager = mGlobalManagers.mDeviceManager;
+      auto requestedType = GetAudioDeviceTypeName(selection);
+      auto inputName = GetInputDeviceName(selection);
+      auto outputName = selection.output;
+      DeviceFormatPlan plan;
+      String error = ChooseDeviceSettings(selection, plan);
+      if (error.isNotEmpty())
+         return { false, error.toStdString() };
+
+      auto previousType = manager.getCurrentAudioDeviceType();
+      auto previousSetup = manager.getAudioDeviceSetup();
+      bool previousDeviceWasOpen = manager.getCurrentAudioDevice() != nullptr && manager.getCurrentAudioDevice()->isOpen();
+      const bool previousSeparateInput = mSeparateInputActive;
+      auto previousInputType = mInputDeviceManager.getCurrentAudioDeviceType();
+      auto previousInputSetup = mInputDeviceManager.getAudioDeviceSetup();
+
+      mAudioFormatPending = true;
+      mAudioSwitchInProgress = true;
+      if (mAudioCallbackRegistered)
       {
-         for (auto& deviceName : deviceType->getDeviceNames(K(isInput)))
-            if (deviceName.trim().equalsIgnoreCase(inputName.trim()))
-               foundInputDevice = true;
-         for (auto& deviceName : deviceType->getDeviceNames(!K(isInput)))
-            if (deviceName.trim().equalsIgnoreCase(outputName.trim()))
-               foundOutputDevice = true;
+         manager.removeAudioCallback(this);
+         mAudioCallbackRegistered = false;
       }
-      if (foundInputDevice && foundOutputDevice)
-         return true;
+      if (mInputCallbackRegistered)
+      {
+         mInputDeviceManager.removeAudioCallback(&mSeparateInputCallback);
+         mInputCallbackRegistered = false;
+      }
+      manager.closeAudioDevice();
+      mInputDeviceManager.closeAudioDevice();
+
+      error = InitializeAudioDevice(selection, plan);
+      auto openedSetup = manager.getAudioDeviceSetup();
+      auto openedInputSetup = plan.separateInput ? mInputDeviceManager.getAudioDeviceSetup() : openedSetup;
+      auto* openedDevice = manager.getCurrentAudioDevice();
+      auto* openedInputDevice = plan.separateInput ? mInputDeviceManager.getCurrentAudioDevice() : openedDevice;
+      if (error.isEmpty())
+      {
+         if (manager.getCurrentAudioDeviceType().toStdString() != requestedType)
+            error = "the requested audio device type was not opened";
+         else if (outputName != kAutoDevice && outputName != kNoneDevice && openedSetup.outputDeviceName.toStdString() != outputName)
+            error = "the requested audio output device was not opened";
+         else if (inputName != kAutoDevice && inputName != kNoneDevice && openedInputSetup.inputDeviceName.toStdString() != inputName)
+            error = "the requested audio input device was not opened";
+         else if ((inputName != kNoneDevice || outputName != kNoneDevice) && openedDevice == nullptr)
+            error = "no audio device was opened";
+         else if (plan.separateInput && (openedSetup.inputChannels.countNumberOfSetBits() != 0 ||
+                                         openedInputSetup.outputChannels.countNumberOfSetBits() != 0 ||
+                                         openedInputSetup.inputChannels.countNumberOfSetBits() == 0))
+            error = "the separate input or output opened with unexpected channels";
+         else if (plan.separateInput && (mInputDeviceManager.getCurrentAudioDeviceType().toStdString() != requestedType ||
+                                         openedInputDevice == nullptr || !openedInputDevice->isOpen() ||
+                                         openedInputSetup.sampleRate <= 0 || openedInputSetup.bufferSize <= 0 ||
+                                         openedInputDevice->getCurrentSampleRate() != openedInputSetup.sampleRate ||
+                                         openedInputDevice->getCurrentBufferSizeSamples() != openedInputSetup.bufferSize ||
+                                         openedInputSetup.inputChannels.countNumberOfSetBits() != openedInputDevice->getActiveInputChannels().countNumberOfSetBits()))
+            error = "the separate audio input did not open with a valid format";
+         else if (openedDevice != nullptr && (!openedDevice->isOpen() || openedSetup.sampleRate <= 0 || openedSetup.bufferSize <= 0 ||
+                                              openedDevice->getCurrentSampleRate() != openedSetup.sampleRate ||
+                                              openedDevice->getCurrentBufferSizeSamples() != openedSetup.bufferSize))
+            error = "the selected device did not open with a valid audio format";
+         else if (openedDevice != nullptr &&
+                  (openedSetup.inputChannels.countNumberOfSetBits() != openedDevice->getActiveInputChannels().countNumberOfSetBits() ||
+                   openedSetup.outputChannels.countNumberOfSetBits() != openedDevice->getActiveOutputChannels().countNumberOfSetBits()))
+            error = "the selected device opened with an unexpected channel count";
+      }
+
+      if (error.isEmpty())
+      {
+         mSynth.InitIOBuffers(openedInputSetup.inputChannels.countNumberOfSetBits(), openedSetup.outputChannels.countNumberOfSetBits());
+         mAudioIOBridge = CreateAudioIOBridge(openedSetup, plan.separateInput);
+         ofLog() << "audio format: device " << openedSetup.sampleRate << " Hz / " << openedSetup.bufferSize
+                 << " samples; input " << openedInputSetup.sampleRate << " Hz / " << openedInputSetup.bufferSize
+                 << " samples; engine " << mActiveSampleRate << " Hz / " << mActiveBufferSize << " samples";
+         if (openedDevice != nullptr)
+         {
+            manager.addAudioCallback(this);
+            mAudioCallbackRegistered = true;
+         }
+         if (plan.separateInput)
+         {
+            mInputDeviceManager.addAudioCallback(&mSeparateInputCallback);
+            mInputCallbackRegistered = true;
+         }
+         mSeparateInputActive = plan.separateInput;
+         mConfiguredOutputRate = openedSetup.sampleRate;
+         mConfiguredOutputBlockSize = openedSetup.bufferSize;
+         mConfiguredInputRate = openedInputSetup.sampleRate;
+         mConfiguredInputBlockSize = openedInputSetup.bufferSize;
+         mActiveAudioSelection = selection;
+         mAudioDeviceConnectionState = AudioDeviceConnectionState::Connected;
+      }
       else
-         return false;
+      {
+         manager.closeAudioDevice();
+         mInputDeviceManager.closeAudioDevice();
+         if (previousDeviceWasOpen)
+         {
+            manager.setCurrentAudioDeviceType(previousType, false);
+            int previousInputChannels = previousSeparateInput || GetInputDeviceName(mActiveAudioSelection) == kNoneDevice ? 0 : mActiveMaxInputChannels;
+            int previousOutputChannels = mActiveAudioSelection.output == kNoneDevice ? 0 : mActiveMaxOutputChannels;
+            String rollbackError = manager.initialise(previousInputChannels,
+                                                      previousOutputChannels,
+                                                      nullptr,
+                                                      false,
+                                                      "",
+                                                      &previousSetup);
+            if (rollbackError.isEmpty() && previousSeparateInput)
+            {
+               mInputDeviceManager.setCurrentAudioDeviceType(previousInputType, false);
+               rollbackError = mInputDeviceManager.initialise(mActiveMaxInputChannels, 0, nullptr, false, "", &previousInputSetup);
+            }
+            auto restoredSetup = manager.getAudioDeviceSetup();
+            auto restoredInputSetup = mInputDeviceManager.getAudioDeviceSetup();
+            if (rollbackError.isEmpty() && manager.getCurrentAudioDevice() != nullptr && manager.getCurrentAudioDevice()->isOpen() &&
+                manager.getCurrentAudioDeviceType() == previousType &&
+                restoredSetup.inputDeviceName == previousSetup.inputDeviceName && restoredSetup.outputDeviceName == previousSetup.outputDeviceName &&
+                restoredSetup.inputChannels == previousSetup.inputChannels && restoredSetup.outputChannels == previousSetup.outputChannels &&
+                restoredSetup.sampleRate == previousSetup.sampleRate && restoredSetup.bufferSize == previousSetup.bufferSize &&
+                (!previousSeparateInput || (mInputDeviceManager.getCurrentAudioDevice() != nullptr && mInputDeviceManager.getCurrentAudioDevice()->isOpen() &&
+                                            restoredInputSetup.inputDeviceName == previousInputSetup.inputDeviceName &&
+                                            restoredInputSetup.inputChannels == previousInputSetup.inputChannels &&
+                                            restoredInputSetup.sampleRate == previousInputSetup.sampleRate &&
+                                            restoredInputSetup.bufferSize == previousInputSetup.bufferSize)))
+            {
+               mSynth.InitIOBuffers(previousSeparateInput ? restoredInputSetup.inputChannels.countNumberOfSetBits() : restoredSetup.inputChannels.countNumberOfSetBits(),
+                                    restoredSetup.outputChannels.countNumberOfSetBits());
+               mAudioIOBridge = CreateAudioIOBridge(restoredSetup, previousSeparateInput);
+               manager.addAudioCallback(this);
+               mAudioCallbackRegistered = true;
+               if (previousSeparateInput)
+               {
+                  mInputDeviceManager.addAudioCallback(&mSeparateInputCallback);
+                  mInputCallbackRegistered = true;
+               }
+               mSeparateInputActive = previousSeparateInput;
+               mConfiguredOutputRate = restoredSetup.sampleRate;
+               mConfiguredOutputBlockSize = restoredSetup.bufferSize;
+               mConfiguredInputRate = previousSeparateInput ? restoredInputSetup.sampleRate : restoredSetup.sampleRate;
+               mConfiguredInputBlockSize = previousSeparateInput ? restoredInputSetup.bufferSize : restoredSetup.bufferSize;
+               mAudioDeviceConnectionState = AudioDeviceConnectionState::Connected;
+            }
+            else
+            {
+               manager.closeAudioDevice();
+               mInputDeviceManager.closeAudioDevice();
+               mAudioIOBridge.reset();
+               mSeparateInputActive = false;
+               mConfiguredOutputRate = mConfiguredInputRate = 0;
+               mConfiguredOutputBlockSize = mConfiguredInputBlockSize = 0;
+               mAudioDeviceConnectionState = AudioDeviceConnectionState::Disconnected;
+               if (rollbackError.isEmpty())
+                  rollbackError = "the previous audio setup could not be restored exactly";
+               error += "; the previous device could not be restored: " + rollbackError;
+            }
+         }
+         else
+         {
+            manager.setCurrentAudioDeviceType(previousType, false);
+            mAudioIOBridge.reset();
+            mSeparateInputActive = false;
+            mConfiguredOutputRate = mConfiguredInputRate = 0;
+            mConfiguredOutputBlockSize = mConfiguredInputBlockSize = 0;
+            mAudioDeviceConnectionState = GetInputDeviceName(mActiveAudioSelection) == kNoneDevice && mActiveAudioSelection.output == kNoneDevice
+                                          ? AudioDeviceConnectionState::Connected
+                                          : AudioDeviceConnectionState::Disconnected;
+         }
+      }
+
+      mAudioDeviceStopped = false;
+      mAudioFormatPending = mAudioDeviceConnectionState != AudioDeviceConnectionState::Connected;
+      mAudioSwitchInProgress = false;
+      return { error.isEmpty(), error.toStdString() };
    }
 
    void shutdown() override
@@ -633,6 +1065,7 @@ private:
       juce::AudioDeviceManager mDeviceManager;
       juce::AudioFormatManager mAudioFormatManager;
    } mGlobalManagers;
+   juce::AudioDeviceManager mInputDeviceManager;
 
    ModularSynth mSynth;
 
@@ -643,15 +1076,34 @@ private:
    juce::Point<int> mScreenPosition;
    juce::Point<int> mDesiredInitialPosition;
    SpaceMouseMessageWindow mSpaceMouseReader;
+   SeparateInputCallback mSeparateInputCallback;
 
    enum class AudioDeviceConnectionState
    {
       None,
       Connected,
-      CheckForDisconnection,
       Disconnected
    };
    AudioDeviceConnectionState mAudioDeviceConnectionState{ AudioDeviceConnectionState::None };
+   AudioDeviceSelection mActiveAudioSelection;
+   String mDefaultAudioDeviceType;
+   int mActiveSampleRate{ 0 };
+   int mActiveBufferSize{ 0 };
+   int mActiveOversampling{ 0 };
+   int mActiveMaxInputChannels{ 0 };
+   int mActiveMaxOutputChannels{ 0 };
+   std::unique_ptr<AudioIOBridge> mAudioIOBridge;
+   std::atomic<bool> mSeparateInputActive{ false };
+   std::atomic<double> mConfiguredOutputRate{ 0 };
+   std::atomic<double> mConfiguredInputRate{ 0 };
+   std::atomic<int> mConfiguredOutputBlockSize{ 0 };
+   std::atomic<int> mConfiguredInputBlockSize{ 0 };
+   bool mAudioCallbackRegistered{ false };
+   bool mInputCallbackRegistered{ false };
+   std::atomic<bool> mAudioSwitchInProgress{ false };
+   std::atomic<bool> mAudioDeviceStopped{ false };
+   std::atomic<bool> mAudioFormatPending{ false };
+   uint32 mLastAudioReconnectAttempt{ 0 };
 
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 };
@@ -668,4 +1120,32 @@ void SetStartupSaveStateFile(const juce::String& bskFilePath, Component* compone
       ofLog() << "Non main component sent to SetStartupSaveStateFile";
    else
       mainComponent->SetStartupSaveStateFile(bskFilePath);
+}
+
+AudioDeviceSelection GetActiveAudioDeviceSelection(juce::Component* component)
+{
+   if (auto* mainComponent = dynamic_cast<MainContentComponent*>(component))
+      return mainComponent->GetActiveAudioDeviceSelection();
+   return {};
+}
+
+AudioEngineSettings GetActiveAudioEngineSettings(juce::Component* component)
+{
+   if (auto* mainComponent = dynamic_cast<MainContentComponent*>(component))
+      return mainComponent->GetActiveAudioEngineSettings();
+   return {};
+}
+
+AudioHardwareSettings GetActiveAudioHardwareSettings(juce::Component* component)
+{
+   if (auto* mainComponent = dynamic_cast<MainContentComponent*>(component))
+      return mainComponent->GetActiveAudioHardwareSettings();
+   return {};
+}
+
+AudioDeviceApplyResult ApplyAudioDeviceSelection(juce::Component* component, const AudioDeviceSelection& selection)
+{
+   if (auto* mainComponent = dynamic_cast<MainContentComponent*>(component))
+      return mainComponent->ApplyAudioDeviceSelection(selection);
+   return { false, "could not find Bespoke's main component" };
 }

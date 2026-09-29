@@ -75,10 +75,12 @@ private:
    void DrawRightLabel(IUIControl* control, std::string text, ofColor color, float offsetX = 12);
    void CleanUpSave(std::string& json);
    bool PrefRequiresRestart(UserPref* pref) const;
-   void Save();
+   bool Save();
 
    UserPrefCategory mCategory{ UserPrefCategory::General };
    RadioButton* mCategorySelector{ nullptr };
    ClickButton* mSaveButton{ nullptr };
    ClickButton* mCancelButton{ nullptr };
+   std::string mAudioApplyError;
+   bool mAudioSettingsPendingRestart{ false };
 };

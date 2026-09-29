@@ -39,6 +39,11 @@ target_sources(BespokeSynth PRIVATE
     ADSR.h
     ADSRDisplay.cpp
     ADSRDisplay.h
+    AudioDeviceSettings.h
+    AudioIOBridge.cpp
+    AudioIOBridge.h
+    StreamingAudioResampler.cpp
+    StreamingAudioResampler.h
     AbletonDeviceShared.h
     AbletonLink.cpp
     AbletonLink.h
@@ -926,6 +931,7 @@ else ()
 endif ()
 
 target_link_libraries(BespokeSynth PRIVATE
+    SampleRate::samplerate
     exprtk::exprtk
     bespoke::abletonmove
     bespoke::freeverb
