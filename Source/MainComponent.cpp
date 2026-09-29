@@ -489,12 +489,10 @@ public:
       };
       String resolvedOutput = resolveName(outputName, false);
       String resolvedInput = type->hasSeparateInputsAndOutputs() ? resolveName(inputName, true) : resolvedOutput;
-      if (outputName != kNoneDevice && resolvedOutput.isEmpty())
-         return "no audio output device is available";
-      if (inputName != kNoneDevice && resolvedInput.isEmpty())
-         return "no audio input device is available";
       if (inputName == kNoneDevice && outputName == kNoneDevice)
          return {};
+      if (resolvedOutput.isEmpty() && resolvedInput.isEmpty())
+         return "no audio input or output device is available";
 
       std::unique_ptr<AudioIODevice> candidate(type->createDevice(resolvedOutput, resolvedInput));
       if (candidate == nullptr)
@@ -1128,6 +1126,13 @@ AudioDeviceSelection GetActiveAudioDeviceSelection(juce::Component* component)
    if (auto* mainComponent = dynamic_cast<MainContentComponent*>(component))
       return mainComponent->GetActiveAudioDeviceSelection();
    return {};
+}
+
+std::string GetResolvedAudioDeviceTypeName(juce::Component* component, const AudioDeviceSelection& selection)
+{
+   if (auto* mainComponent = dynamic_cast<MainContentComponent*>(component))
+      return mainComponent->GetAudioDeviceTypeName(selection);
+   return selection.type;
 }
 
 AudioEngineSettings GetActiveAudioEngineSettings(juce::Component* component)

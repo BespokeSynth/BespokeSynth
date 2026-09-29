@@ -34,6 +34,11 @@
 #include "RadioButton.h"
 #include "UserPrefs.h"
 
+namespace juce
+{
+   class AudioIODeviceType;
+}
+
 class UserPrefsEditor : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IDropdownListener, public IButtonListener, public IRadioButtonListener
 {
 public:
@@ -72,6 +77,7 @@ private:
    void DrawModule() override;
 
    void UpdateDropdowns(std::vector<DropdownList*> toUpdate);
+   juce::AudioIODeviceType* GetSelectedAudioDeviceType() const;
    void DrawRightLabel(IUIControl* control, std::string text, ofColor color, float offsetX = 12);
    void CleanUpSave(std::string& json);
    bool PrefRequiresRestart(UserPref* pref) const;

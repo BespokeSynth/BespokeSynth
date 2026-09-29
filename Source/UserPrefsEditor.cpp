@@ -136,6 +136,17 @@ void UserPrefsEditor::CreatePrefsFileIfNonexistent()
       Save();
 }
 
+juce::AudioIODeviceType* UserPrefsEditor::GetSelectedAudioDeviceType() const
+{
+   AudioDeviceSelection selection;
+   selection.type = UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex());
+   const auto selectedTypeName = GetResolvedAudioDeviceTypeName(TheSynth->GetMainComponent(), selection);
+   for (auto* deviceType : TheSynth->GetAudioDeviceManager().getAvailableDeviceTypes())
+      if (deviceType->getTypeName().toStdString() == selectedTypeName)
+         return deviceType;
+   return nullptr;
+}
+
 void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
 {
    auto& deviceManager = TheSynth->GetAudioDeviceManager();
@@ -157,7 +168,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       }
    }
 
-   auto* selectedDeviceType = UserPrefs.devicetype.GetIndex() != -1 ? deviceManager.getAvailableDeviceTypes()[UserPrefs.devicetype.GetIndex()] : deviceManager.getCurrentDeviceTypeObject();
+   auto* selectedDeviceType = GetSelectedAudioDeviceType();
    if (selectedDeviceType == nullptr)
       return;
    selectedDeviceType->scanForDevices();
@@ -297,8 +308,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
 
 void UserPrefsEditor::DrawModule()
 {
-   auto& deviceManager = TheSynth->GetAudioDeviceManager();
-   auto* selectedDeviceType = UserPrefs.devicetype.GetIndex() != -1 ? deviceManager.getAvailableDeviceTypes()[UserPrefs.devicetype.GetIndex()] : deviceManager.getCurrentDeviceTypeObject();
+   auto* selectedDeviceType = GetSelectedAudioDeviceType();
 
    mCategorySelector->Draw();
 

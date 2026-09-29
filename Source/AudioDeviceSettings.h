@@ -71,6 +71,7 @@ struct AudioHardwareSettings
 };
 
 AudioDeviceSelection GetActiveAudioDeviceSelection(juce::Component* component);
+std::string GetResolvedAudioDeviceTypeName(juce::Component* component, const AudioDeviceSelection& selection);
 AudioEngineSettings GetActiveAudioEngineSettings(juce::Component* component);
 AudioHardwareSettings GetActiveAudioHardwareSettings(juce::Component* component);
 AudioDeviceApplyResult ApplyAudioDeviceSelection(juce::Component* component, const AudioDeviceSelection& selection);
