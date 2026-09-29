@@ -240,7 +240,8 @@ public:
                                          const AudioIODeviceCallbackContext& context) override
    {
       ignoreUnused(context);
-      const auto clearOutput = [&]() {
+      const auto clearOutput = [&]()
+      {
          for (int ch = 0; ch < numOutputChannels; ++ch)
             if (outputChannelData != nullptr && outputChannelData[ch] != nullptr)
                juce::FloatVectorOperations::clear(outputChannelData[ch], numSamples);
