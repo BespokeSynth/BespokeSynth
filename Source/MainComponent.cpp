@@ -500,7 +500,7 @@ public:
       auto chooseRate = [this](const juce::Array<double>& rates) -> int
       {
          int selected = 0;
-         double bestDistance = std::numeric_limits<double>::max();
+         double bestDistance = (std::numeric_limits<double>::max)();
          for (double rate : rates)
          {
             double distance = std::abs(rate - mActiveSampleRate);
