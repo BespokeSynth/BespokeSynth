@@ -193,13 +193,9 @@ bool IDrawableModule::IsVisible()
 
 void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleBarHeight, float& highlight)
 {
-   if (mPinned)
-      ForcePosition();
    titleBarHeight = mTitleBarHeight;
    if (!HasTitleBar())
       titleBarHeight = 0;
-
-   ofTranslate(mX, mY, 0);
 
    ofColor color = GetColor(mModuleCategory);
 
@@ -431,6 +427,11 @@ void IDrawableModule::Render()
 
    ofPushMatrix();
    ofPushStyle();
+
+   if (mPinned)
+      ForcePosition();
+
+   ofTranslate(mX, mY, 0);
 
    float titleBarHeight;
    float highlight;
