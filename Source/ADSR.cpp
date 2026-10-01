@@ -29,7 +29,7 @@
 #include "FileStream.h"
 #include "SynthGlobals.h"
 
-void ::ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
+void ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
 {
    mStages[0].target = 1;
    mStages[0].time = MAX(a, 1);
@@ -46,7 +46,7 @@ void ::ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
    mHasSustainStage = true;
 }
 
-void ::ADSR::Set(const ADSR& other)
+void ADSR::Set(const ADSR& other)
 {
    for (int i = 0; i < other.mNumStages; ++i)
       mStages[i] = other.mStages[i];
@@ -57,19 +57,19 @@ void ::ADSR::Set(const ADSR& other)
    mFreeReleaseLevel = other.mFreeReleaseLevel;
 }
 
-void ::ADSR::Start(double time, float target, float a, float d, float s, float r, float timeScale /*=1*/, float curve /*=0*/)
+void ADSR::Start(double time, float target, float a, float d, float s, float r, float timeScale /*=1*/, float curve /*=0*/)
 {
    Set(a, d, s, r);
    Start(time, target, timeScale, curve);
 }
 
-void ::ADSR::Start(double time, float target, const ADSR& adsr, float timeScale /*=1*/, float curve /*=0*/)
+void ADSR::Start(double time, float target, const ADSR& adsr, float timeScale /*=1*/, float curve /*=0*/)
 {
    Set(adsr);
    Start(time, target, timeScale, curve);
 }
 
-void ::ADSR::Start(double time, float target, float timeScale /*=1*/, float curve /*=0*/)
+void ADSR::Start(double time, float target, float timeScale /*=1*/, float curve /*=0*/)
 {
    mEvents[mNextEventPointer].Reset();
    mEvents[mNextEventPointer].mStartBlendFromValue = Value(time);
@@ -93,7 +93,7 @@ void ::ADSR::Start(double time, float target, float timeScale /*=1*/, float curv
    }
 }
 
-void ::ADSR::Stop(double time, bool warn /*= true*/)
+void ADSR::Stop(double time, bool warn /*= true*/)
 {
    EventInfo* e = GetEvent(time);
 
@@ -108,7 +108,7 @@ void ::ADSR::Stop(double time, bool warn /*= true*/)
    e->mStopTime = time;
 }
 
-::ADSR::EventInfo* ::ADSR::GetEvent(double time)
+ADSR::EventInfo* ADSR::GetEvent(double time)
 {
    int ret = 0;
    double latestTime = -1;
@@ -123,7 +123,7 @@ void ::ADSR::Stop(double time, bool warn /*= true*/)
    return &(mEvents[ret]);
 }
 
-const ::ADSR::EventInfo* ::ADSR::GetEventConst(double time) const
+const ADSR::EventInfo* ADSR::GetEventConst(double time) const
 {
    int ret = 0;
    double latestTime = -1;
@@ -138,13 +138,13 @@ const ::ADSR::EventInfo* ::ADSR::GetEventConst(double time) const
    return &(mEvents[ret]);
 }
 
-float ::ADSR::Value(double time) const
+float ADSR::Value(double time) const
 {
    const EventInfo* e = GetEventConst(time);
    return Value(time, e);
 }
 
-float ::ADSR::Value(double time, const EventInfo* e) const
+float ADSR::Value(double time, const EventInfo* e) const
 {
    float stageStartValue;
    double stageStartTime;
@@ -175,20 +175,20 @@ float ::ADSR::Value(double time, const EventInfo* e) const
    return ofLerp(stageStartValue, mStages[stage].target * e->mMult, lerp);
 }
 
-float ::ADSR::GetStageTimeScale(int stage) const
+float ADSR::GetStageTimeScale(int stage) const
 {
    if (stage >= mNumStages - 1)
       return 1;
    return mTimeScale;
 }
 
-int ::ADSR::GetStage(double time, double& stageStartTimeOut) const
+int ADSR::GetStage(double time, double& stageStartTimeOut) const
 {
    const EventInfo* e = GetEventConst(time);
    return GetStage(time, stageStartTimeOut, e);
 }
 
-int ::ADSR::GetStage(double time, double& stageStartTimeOut, const EventInfo* e) const
+int ADSR::GetStage(double time, double& stageStartTimeOut, const EventInfo* e) const
 {
    if (e->mStartTime < 0)
       return mNumStages;
@@ -216,7 +216,7 @@ int ::ADSR::GetStage(double time, double& stageStartTimeOut, const EventInfo* e)
    return stage;
 }
 
-bool ::ADSR::IsDone(double time) const
+bool ADSR::IsDone(double time) const
 {
    double dummy;
    return GetStage(time, dummy) == mNumStages;
@@ -227,7 +227,7 @@ namespace
    const int kSaveStateRev = 1;
 }
 
-void ::ADSR::SaveState(FileStreamOut& out)
+void ADSR::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
 
@@ -248,7 +248,7 @@ void ::ADSR::SaveState(FileStreamOut& out)
    out << mTimeScale;
 }
 
-void ::ADSR::LoadState(FileStreamIn& in)
+void ADSR::LoadState(FileStreamIn& in)
 {
    int rev;
    in >> rev;
