@@ -239,6 +239,7 @@ private:
       double time{ 0 };
       int pitch{ 0 };
       int velocity{ 0 };
+      float pan{ 0 };
    };
    std::array<PendingNoteInput, 50> mPendingNoteInput;
 
