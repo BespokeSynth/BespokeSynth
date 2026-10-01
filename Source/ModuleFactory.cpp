@@ -284,6 +284,7 @@
 #include "AudioSyncer.h"
 #include "ChordKeyboard.h"
 #include "TapeLooper.h"
+#include "DiscontinuitySmoother.h"
 
 #include <juce_core/juce_core.h>
 
@@ -523,6 +524,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(AudioSyncer, audiosyncer, kModuleCategory_Audio);
    REGISTER(ChordKeyboard, chordkeyboard, kModuleCategory_Note);
    REGISTER(TapeLooper, tapelooper, kModuleCategory_Audio);
+   REGISTER(DiscontinuitySmoother, discontinuitysmoother, kModuleCategory_Audio)
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
