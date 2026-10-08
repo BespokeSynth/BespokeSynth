@@ -782,13 +782,14 @@ ofColor ofColor::operator+(const ofColor& other)
 void RetinaTrueTypeFont::LoadFont(std::string path)
 {
    mFontPath = ofToDataPath(path);
-   mFontName = path;
+   mContextFontHandles.clear();
    File file(mFontPath.c_str());
    if (file.existsAsFile())
    {
       for (int i = 0; i < (int)NanoVGRenderContext::Num; ++i) // load font in each render context
       {
          int fontHandle = nvgCreateFont(gNanoVGRenderContexts[i], path.c_str(), path.c_str());
+         mContextFontHandles.push_back(fontHandle);
          if (i == (int)NanoVGRenderContext::Main)
             mFontHandle = fontHandle;
          if (i == (int)NanoVGRenderContext::FontBounds)
@@ -809,10 +810,7 @@ void RetinaTrueTypeFont::AddFallbackFont(const RetinaTrueTypeFont& fallback)
       return;
 
    for (int i = 0; i < (int)NanoVGRenderContext::Num; ++i) // font handles are per render context
-   {
-      NVGcontext* context = gNanoVGRenderContexts[i];
-      nvgAddFallbackFontId(context, nvgFindFont(context, mFontName.c_str()), nvgFindFont(context, fallback.mFontName.c_str()));
-   }
+      nvgAddFallbackFontId(gNanoVGRenderContexts[i], mContextFontHandles[i], fallback.mContextFontHandles[i]);
 }
 
 void RetinaTrueTypeFont::DrawString(std::string str, float size, float x, float y)

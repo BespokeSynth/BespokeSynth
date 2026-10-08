@@ -235,7 +235,7 @@ private:
    int mFontBoundsHandle{};
    bool mLoaded{ false };
    std::string mFontPath;
-   std::string mFontName;
+   std::vector<int> mContextFontHandles; //font handle in each NanoVGRenderContext
 };
 
 typedef ofVec2f ofPoint;
