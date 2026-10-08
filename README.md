@@ -24,6 +24,8 @@ Join the [Bespoke Discord](https://discord.gg/YdTMkvvpZZ) for support and to dis
 
 사용 방법: **settings** 메뉴에서 `tooltips` 항목을 `tooltips_kor.txt`로 바꾸거나, `userprefs.json`에 `"tooltips": "tooltips_kor.txt"`를 설정한 뒤 bespoke를 다시 시작하세요. 툴팁은 F1 키로 켜고 끌 수 있습니다.
 
+**이미 BespokeSynth를 설치했다면** 다시 빌드하거나 설치할 필요 없이 한국어 패치만 설치할 수 있습니다: [korean_patch/README.md](korean_patch/README.md) (Windows / macOS / Linux 설치 스크립트 포함)
+
 
 ## Screenshot
 
