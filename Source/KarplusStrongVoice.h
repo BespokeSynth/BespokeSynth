@@ -90,7 +90,7 @@ private:
 
    float mOscPhase{ 0 };
    EnvOscillator mOsc{ OscillatorType::kOsc_Sin };
-   ::ADSR mEnv;
+   ADSR mEnv;
    KarplusStrongVoiceParams* mVoiceParams{ nullptr };
    RollingBuffer mBuffer;
    float mFilteredSample{ 0 };

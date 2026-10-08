@@ -120,7 +120,7 @@ private:
       ModulationChain* mPressure{ nullptr };
       ModulationChain* mModWheel{ nullptr };
 
-      ::ADSR mADSR{ 100, 0, 1, 100 };
+      ADSR mADSR{ 100, 0, 1, 100 };
 
       MultitapDelay* mOwner{ nullptr };
    };

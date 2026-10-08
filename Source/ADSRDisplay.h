@@ -36,7 +36,7 @@ class EnvelopeEditor;
 class ADSRDisplay : public IUIControl, public IControlVisualizer
 {
 public:
-   ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y, int w, int h, ::ADSR* adsr);
+   ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y, int w, int h, ADSR* adsr);
    void Render() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
@@ -46,8 +46,8 @@ public:
    float GetMaxTime() const { return mMaxTime; }
    float& GetMaxTime() { return mMaxTime; }
    void SetMaxTime(float maxTime);
-   void SetADSR(::ADSR* adsr);
-   ::ADSR* GetADSR() { return mAdsr; }
+   void SetADSR(ADSR* adsr);
+   ADSR* GetADSR() { return mAdsr; }
    void SpawnEnvelopeEditor();
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
@@ -118,9 +118,9 @@ private:
    float mVol{ 1 };
    float mMaxTime{ 1000 };
    bool mClick{ false };
-   ::ADSR* mAdsr;
+   ADSR* mAdsr;
    ofVec2f mClickStart;
-   ::ADSR mClickAdsr;
+   ADSR mClickAdsr;
    float mClickLength{ 1000 };
    bool mHighlighted{ false };
    FloatSlider* mASlider{ nullptr };

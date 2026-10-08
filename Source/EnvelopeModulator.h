@@ -50,7 +50,7 @@ public:
    bool ShouldSuppressAutomaticOutputCable() override { return true; }
    void DrawModule() override;
 
-   void Start(double time, const ::ADSR& adsr);
+   void Start(double time, const ADSR& adsr);
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsEnabled() const override { return mEnabled; }
 
@@ -93,7 +93,7 @@ private:
    float mHeight{ 122 };
 
    ADSRDisplay* mAdsrDisplay{ nullptr };
-   ::ADSR mAdsr{ 10, 100, .5, 100 };
+   ADSR mAdsr{ 10, 100, .5, 100 };
 
    bool mUseVelocity{ false };
    Checkbox* mUseVelocityCheckbox{ nullptr };
