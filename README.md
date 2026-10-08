@@ -18,6 +18,12 @@ Join the [Bespoke Discord](https://discord.gg/YdTMkvvpZZ) for support and to dis
 * [Official documentation](https://www.bespokesynth.com/docs/)
 * [Searchable, community-written documentation](https://github.com/BespokeSynth/BespokeSynthDocs/wiki)
 
+### 한국어 (Korean)
+
+모듈/컨트롤 툴팁의 한국어 번역(`resource/tooltips_kor.txt`)이 포함되어 있습니다. 한글은 번들된 나눔고딕 폰트(SIL OFL, `resource/NanumGothic_OFL.txt`)를 폴백으로 사용해 표시됩니다.
+
+사용 방법: **settings** 메뉴에서 `tooltips` 항목을 `tooltips_kor.txt`로 바꾸거나, `userprefs.json`에 `"tooltips": "tooltips_kor.txt"`를 설정한 뒤 bespoke를 다시 시작하세요. 툴팁은 F1 키로 켜고 끌 수 있습니다.
+
 
 ## Screenshot
 

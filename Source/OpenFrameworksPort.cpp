@@ -782,6 +782,7 @@ ofColor ofColor::operator+(const ofColor& other)
 void RetinaTrueTypeFont::LoadFont(std::string path)
 {
    mFontPath = ofToDataPath(path);
+   mFontName = path;
    File file(mFontPath.c_str());
    if (file.existsAsFile())
    {
@@ -799,6 +800,18 @@ void RetinaTrueTypeFont::LoadFont(std::string path)
    else
    {
       mLoaded = false;
+   }
+}
+
+void RetinaTrueTypeFont::AddFallbackFont(const RetinaTrueTypeFont& fallback)
+{
+   if (!mLoaded || !fallback.mLoaded)
+      return;
+
+   for (int i = 0; i < (int)NanoVGRenderContext::Num; ++i) // font handles are per render context
+   {
+      NVGcontext* context = gNanoVGRenderContexts[i];
+      nvgAddFallbackFontId(context, nvgFindFont(context, mFontName.c_str()), nvgFindFont(context, fallback.mFontName.c_str()));
    }
 }
 

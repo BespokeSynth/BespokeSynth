@@ -221,6 +221,7 @@ class RetinaTrueTypeFont
 public:
    RetinaTrueTypeFont() {}
    void LoadFont(std::string path);
+   void AddFallbackFont(const RetinaTrueTypeFont& fallback);
    void DrawString(std::string str, float size, float x, float y);
    ofRectangle DrawStringWrap(std::string str, float size, float x, float y, float width);
    float GetStringWidth(std::string str, float size);
@@ -234,6 +235,7 @@ private:
    int mFontBoundsHandle{};
    bool mLoaded{ false };
    std::string mFontPath;
+   std::string mFontName;
 };
 
 typedef ofVec2f ofPoint;

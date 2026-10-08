@@ -1,0 +1,2203 @@
+
+
+
+valuestream~컨트롤의 값이 시간에 따라 변하는 모습을 표시합니다. 케이블을 UI 컨트롤에 연결하면 값이 어떻게 변하는지 볼 수 있습니다.
+~speed~표시가 스크롤되는 속도
+
+
+
+timerdisplay~패치가 얼마나 오래 실행되었는지 보여주는 타이머를 표시합니다
+~reset~타이머를 0으로 초기화
+
+
+
+timelinecontrol~글로벌 트랜스포트 위치를 제어합니다
+~measure~현재 위치. 클릭하여 이동합니다.
+~loop~루프 구간을 사용할까요?
+~loop start~루프 시작 마디
+~loop end~루프 끝 마디
+~reset~처음으로 되돌리기
+~length~타임라인 표시 길이 (마디 단위)
+~dock~이 모듈을 UI 레이어에 고정할까요?
+
+
+
+buffershuffler~노트를 사용해 계속 녹음되는 라이브 입력 버퍼의 슬라이스를 재생합니다. 입력 노트가 슬라이스를 트리거하며, 음높이가 슬라이스 번호에 대응합니다. 마우스로 클릭하여 슬라이스를 트리거할 수도 있습니다.
+~num bars~캡처할 마디 수
+~interval~슬라이스 크기
+~playback style~클릭한 슬라이스를 재생하는 방식. 입력 노트를 사용할 때는 벨로시티 범위가 재생 방식을 결정합니다.
+~freeze input~새 입력을 기록하지 않고 현재 버퍼를 유지
+~fourtet~언젠가 영상에서 four tet이 보여준 텍스처 기법을 사용합니다: 오디오를 조각으로 자른 뒤, 각 조각을 두 배속으로 재생하고 이어서 두 배속으로 역재생합니다. 이 슬라이더는 원본 오디오와 이 "fourtet화된" 오디오의 믹스 비율을 조절합니다.
+~fourtetslices~"fourtet" 효과에 사용할 조각 크기
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+
+
+
+selector~한 번에 하나의 값만 활성화하는 라디오 버튼 컨트롤입니다. 여러 모듈의 "enabled" 체크박스에 패치하면 한 번에 하나의 모듈만 활성화할 수 있습니다. "groupcontrol" 모듈과 함께 쓰면 좋습니다.
+~selector~1로 설정할 값
+
+
+
+scriptstatus~디버깅을 위해 현재 파이썬 스코프의 모든 것을 보여줍니다
+~reset all~스코프 변수 초기화
+
+
+
+script~노트 라이브코딩과 모듈 제어를 위한 파이썬 스크립팅
+~loadscript~여기서 스크립트를 선택한 뒤 "load"를 누르세요
+~load~선택한 스크립트 불러오기
+~save as~현재 스크립트 저장
+~?~스크립팅 레퍼런스 보기
+~code~여기에 코드를 작성하세요. ctrl-R로 코드를 실행하거나, ctrl-shift-R로 현재 블록만 실행합니다.
+~run~클릭하여 코드를 실행합니다 (또는 ctrl-R)
+~stop~이 스크립트가 예약한 모든 이벤트 취소
+~a~스크립트에서 사용할 변수. 다른 소스로 모듈레이션할 수 있습니다. me.get("a")로 접근
+~b~스크립트에서 사용할 변수. 다른 소스로 모듈레이션할 수 있습니다. me.get("b")로 접근
+~c~스크립트에서 사용할 변수. 다른 소스로 모듈레이션할 수 있습니다. me.get("c")로 접근
+~d~스크립트에서 사용할 변수. 다른 소스로 모듈레이션할 수 있습니다. me.get("d")로 접근
+~style~script_styles.json에서 텍스트 테마 선택
+
+
+
+radiosequencer~한 번에 하나의 값만 활성화하는 시퀀스입니다. 여러 모듈의 "enabled" 체크박스에 패치하면 한 번에 하나의 모듈만 활성화할 수 있습니다. "groupcontrol" 모듈과 함께 쓰면 좋습니다.
+~interval~진행 속도
+~length~시퀀스 길이
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+
+
+
+snapshots~값 세트를 저장하고 복원합니다. 회색 원을 모듈에 연결하면 해당 모듈의 모든 컨트롤에 적용되고, 보라색 원을 컨트롤에 연결하면 그 컨트롤에만 적용됩니다. 그리드를 shift-클릭하면 해당 칸에 스냅샷을 저장하고, 그리드 칸을 클릭하면 그 스냅샷을 불러옵니다. alt/option-클릭으로 스냅샷을 삭제하고, ctrl/command-클릭으로 이름을 바꿉니다.
+~blend~스냅샷 값을 블렌딩하는 시간 (밀리초)
+~snapshot~스냅샷으로 이동
+~random~연결된 컨트롤 무작위화
+~add~현재 연결된 컨트롤을 다음 빈 스냅샷 슬롯에 저장
+~store~스냅샷을 클릭/선택할 때 해당 슬롯에 저장 (또는 shift 키를 누른 채로)
+~delete~스냅샷을 클릭/선택할 때 해당 슬롯 삭제 (또는 alt/option 키를 누른 채로)
+~snapshot label~이 스냅샷에 라벨 지정
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+~x offset~연결된 그리드 컨트롤러의 x 오프셋
+~y offset~연결된 그리드 컨트롤러의 y 오프셋
+
+
+
+prefab~"prefabs" 메뉴에서 불러올 수 있는 모듈 모음을 만듭니다. 모듈을 여기로 드래그 앤 드롭하면 프리팹에 추가됩니다. 프리팹에서 제거하려는 모듈에 회색 케이블을 드래그하세요.
+~save~.pfb 파일로 저장
+~load~.pfb 불러오기
+~disband~이 프리팹에서 모든 모듈 해제
+
+
+
+oscoutput~슬라이더 값이 바뀌거나 노트를 받으면 OSC 메시지를 보냅니다
+~osc out address~OSC 메시지를 보낼 대상
+~osc out port~OSC 메시지를 보낼 포트
+~label*~슬라이더 값을 보낼 라벨. 메시지는 /bespoke/[label] [value] 형식으로 전송됩니다
+~slider*~주소로 값을 보냅니다. 오디오 레벨을 보내려면 leveltocv 모듈 같은 모듈레이터를 여기에 패치해 보세요.
+~note out address~입력 노트를 보낼 라벨. 메시지는 /bespoke/[label] [pitch] [velocity] 형식으로 전송됩니다
+
+
+
+loopstorer~[중단된 모듈, 아마 동작하지 않음] 루퍼의 루프를 저장해 교체할 수 있게 합니다
+~rewrite~[todo]
+~quantization~[todo]
+~clear~[todo]
+~select *~[todo]
+
+
+
+loopergranulator~"looper" 모듈과 함께 사용해 내용을 그래뉼러 합성으로 재생합니다
+~on~루퍼 재생에 그래뉼러 합성 사용
+~overlap~겹치는 그레인 수
+~speed~그레인 재생 속도
+~len ms~각 그레인의 길이 (밀리초)
+~loop pos~루프 내 재생 위치
+~freeze~루퍼 시간 진행 멈춤
+~pos rand~그레인 시작 지점 무작위화
+~speed rand~그레인 속도 무작위화
+~spacing rand~그레인 사이 간격 무작위화
+~octaves~옥타브와 5도를 추가할까요?
+~width~그레인 배치의 스테레오 폭
+
+
+
+groupcontrol~여러 체크박스에 연결해 하나의 체크박스로 모두 제어합니다
+~group enabled~연결된 체크박스들을 제어
+
+
+
+grid~"script" 모듈에서 사용할 범용 그리드로, 그리드 기반 미디 컨트롤러를 쓰는 스크립트 작성을 돕습니다
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+~momentary~클릭을 순간(momentary) 입력으로 처리할까요?
+
+
+
+globalcontrols~미디 컨트롤러로 캔버스를 탐색할 수 있게 하는 인터페이스 컨트롤입니다. 이 슬라이더를 마우스로 직접 조작하는 것은 권장하지 않습니다.
+~zoom~확대 수준
+~x pos~가로 이동 위치
+~y pos~세로 이동 위치
+~scroll x~가로 마우스 스크롤 흉내
+~scroll y~세로 마우스 스크롤 흉내
+~lissajous r~배경 리사주 곡선의 빨강 양
+~lissajous g~배경 리사주 곡선의 초록 양
+~lissajous b~배경 리사주 곡선의 파랑 양
+~background r~배경색의 빨강 양
+~background g~배경색의 초록 양
+~background b~배경색의 파랑 양
+~corner radius~bespoke 사각형의 모서리 둥글기
+~cable alpha~케이블 불투명도
+
+
+
+eventcanvas~시간에 따라 설정할 값을 예약합니다
+~quantize~이벤트를 그리드에 퀀타이즈
+~measures~루프 길이
+~interval~이벤트를 맞출 그리드
+~record~연결된 값이 바뀌는 대로 녹음
+~canvas~이벤트 캔버스. 캔버스 조작법:\n-shift-클릭으로 이벤트 추가\n-shift를 누른 채 이벤트를 드래그하면 복제\n-alt를 누른 채 드래그하면 스냅 없이 이동\n-ctrl을 누른 채 드래그하면 간격에 맞춰 스냅\n-shift를 누른 채 스크롤하면 확대/축소\n-alt를 누른 채 빈 공간을 잡으면 캔버스 뷰 이동\n-ctrl을 누른 채 빈 공간을 잡으면 캔버스 뷰 확대/축소
+~timeline~루프 지점 제어
+~delete~강조된 요소 삭제
+~view rows~보이는 행 수
+~clear~모든 요소 삭제
+~drag mode~요소를 드래그할 수 있는 방향
+~scrollh~가로 스크롤바
+
+
+
+comment~패치의 한 부분을 설명하기 위한 텍스트 상자입니다
+~comment~여기에 텍스트를 입력하세요
+
+
+
+label~라벨을 표시하는 모듈로, 큰 패치에서 무엇이 어디 있는지 표시할 때 유용합니다
+~showcontrols~라벨 수정 컨트롤 숨기기/보이기
+~label~표시할 라벨
+~size~라벨 글꼴 크기
+~font~라벨 글꼴
+~color~라벨 색상
+
+
+
+clockout~외부 미디 장치를 동기화하기 위한 클럭 펄스를 보냅니다
+~device~대상 장치
+~send start~장비의 시퀀스를 처음으로 리셋하는 신호 보내기
+~multiplier~장비가 신호에 반응하는 템포 배율
+
+
+
+clockin~외부 미디 장치의 클럭 펄스를 읽어 bespoke의 트랜스포트를 제어합니다
+~device~수신할 장치
+~rounding~들어오는 템포 데이터의 반올림 정밀도
+~start offset ms~bespoke와 장비 간 동기화를 미세 조정하는 오프셋 (밀리초)
+~smoothing~들어오는 템포를 얼마나 부드럽게 할지
+
+
+
+abletonlink~ableton link를 지원하는 소프트웨어 및 장치와 트랜스포트를 동기화합니다
+~offset ms~동기화를 미세 조정하는 오프셋 (밀리초)
+~reset next downbeat~다음 다운비트에서 마디 수를 리셋해, 세션 내 원하는 위상에 맞추도록 돕습니다
+
+
+
+pulsetrain~펄스를 받으면 실행할 펄스 목록을 정의합니다
+~length~시퀀스 길이
+~interval~시퀀스 내 각 스텝의 길이
+
+
+
+pulsesequence~반복되는 펄스 시퀀스를 정의합니다
+~length~시퀀스 길이
+~interval~시퀀스 내 각 스텝의 길이
+~ - ~시퀀스를 뒤로 진행
+~+~시퀀스를 앞으로 진행
+~pulse~활성화하면 버튼으로 진행할 때 시퀀스에 따라 펄스를 보냅니다
+~<~시퀀스를 왼쪽으로 이동
+~>~시퀀스를 오른쪽으로 이동
+
+
+
+pulser~일정한 간격으로 펄스 메시지를 보냅니다
+~interval~펄스를 보내는 빈도
+~timemode~다운비트 펄스를 보낼 시점. 트랜스포트에 고정되지 않는 펄스를 원하면 "free"로 설정하세요
+~t~펄스 간격 (밀리초)
+~offset~펄스 시간 오프셋 (간격의 비율)
+~random~펄스를 받는 모듈에 위치를 무작위화하라고 알림
+~reset~리셋 펄스를 보내기 전까지의 시퀀스 길이
+~div~간격으로 "div"를 사용할 때의 마디 분할
+~restart~"free" 카운터의 타이머 재시작
+
+
+
+pulsehocket~무작위로 정해진 목적지로 펄스를 보냅니다
+~weight *~펄스가 이 목적지로 갈 확률
+~seed~무작위 시퀀스를 결정하는 숫자. 리셋 펄스를 보내면 결정적 무작위 시퀀스가 다시 시작됩니다.
+~<~이전 시드로 이동
+~*~새 무작위 시드 생성
+~>~다음 시드로 이동
+
+
+
+pulsegate~펄스 통과 여부를 제어합니다
+~allow~펄스가 통과할 수 있나요?
+
+
+
+pulsedelayer~펄스를 지연시킵니다
+~delay~지연 시간 (마디의 비율)
+
+
+
+pulseflag~펄스에 속성을 설정합니다
+~flag~추가할 속성
+~replace~비활성화하면 위 플래그가 펄스의 플래그에 추가됩니다. 활성화하면 펄스의 플래그가 위 플래그로 대체됩니다.
+
+
+
+pulsedisplayer~펄스에 어떤 플래그가 있는지 확인합니다
+
+
+
+pulsechance~확률에 따라 펄스를 무작위로 통과시킵니다
+~chance~펄스가 통과할 확률
+~deterministic~일정 구간마다 무작위 결과가 반복되도록 허용
+~seed~무작위 시퀀스를 결정하는 숫자. 리셋 펄스를 보내면 결정적 무작위 시퀀스가 다시 시작됩니다.
+~<~이전 시드로 이동
+~*~새 무작위 시드 생성
+~>~다음 시드로 이동
+
+
+pulsebutton~버튼을 눌러 펄스를 트리거합니다
+~pulse~펄스 트리거
+
+
+
+notetopulse~노트를 받을 때마다 펄스를 트리거합니다
+
+
+
+audiotopulse~오디오 레벨이 지정한 임계값을 넘으면 펄스를 보냅니다
+~threshold~신호가 이 임계값에 도달하면 펄스를 보냅니다
+~release~펄스를 다시 트리거할 수 있을 때까지의 오디오 신호 대기 시간
+
+
+
+boundstopulse~입력 슬라이더가 최댓값이나 최솟값에 도달하면 펄스를 보냅니다
+~input~범위를 확인할 슬라이더
+
+
+
+vinylcontrol~컨트롤 바이닐 입력 오디오를 바탕으로 속도 값을 출력하는 모듈레이터입니다. "input" 모듈로 컨트롤 바이닐(serato 제어에 쓰는 것과 같은)의 스테레오 신호를 패치해 주세요.
+~control~트랜스포트 제어 켜기/끄기. 활성화하면 현재 속도를 기준 속도로 사용합니다 (즉, 바이닐 속도를 바꾸기 전까지 출력값은 1입니다)
+
+
+
+velocitytocv~노트의 벨로시티를 모듈레이션 값으로 변환합니다
+~min~벨로시티 0일 때의 출력
+~max~벨로시티 127일 때의 출력
+~0 at note off~노트를 놓으면 0을 출력
+
+
+
+valuesetter~대상 컨트롤에 지정한 값을 설정합니다
+~value~설정할 값
+~set~클릭하여 값을 보냅니다 (또는 이 모듈에 펄스를 보내도 같은 결과)
+~slider~설정할 값
+
+
+
+subtract~value 1에서 value 2를 뺀 결과를 출력합니다. value 1과 value 2는 모듈레이터의 패치 대상으로 사용하도록 만들어졌습니다.
+~value 1~
+~value 2~
+
+
+
+smoother~입력값을 부드럽게 다듬어 출력합니다
+~input~부드럽게 할 값. 여기에 모듈레이터를 패치하세요
+~smooth~적용할 스무딩 양
+
+
+
+ramper~지정한 시간 동안 컨트롤을 지정한 값으로 서서히 변화시킵니다
+~length~변화에 걸리는 시간
+~start~변화 시작 (또는 이 모듈에 펄스를 보내도 같은 결과)
+~target~램프가 끝났을 때 도달할 값
+
+
+
+pressuretocv~노트의 프레셔를 모듈레이션 값으로 변환합니다
+~min~프레셔 0일 때의 출력
+~max~프레셔 127일 때의 출력
+
+
+
+pitchtospeed~입력 음높이를 속도 비율로 변환합니다. 샘플의 재생 속도를 제어해 키보드로 연주할 수 있게 만들 때 쓸 수 있습니다.
+~ref freq~출력은 입력 주파수를 이 값으로 나눈 값입니다
+
+
+
+pitchtocv~노트의 음높이를 모듈레이션 값으로 변환합니다
+~min~음높이 0일 때의 출력
+~max~음높이 127일 때의 출력
+
+
+
+notetoms~입력 노트를 받아 그 노트 주파수의 주기를 밀리초로 출력합니다. 딜레이 라인으로 특정 음높이를 만들 때 유용합니다.
+
+
+
+notetofreq~입력 노트를 받아 그 노트의 주파수를 헤르츠로 출력합니다
+
+
+
+mult~value 1에 value 2를 곱한 결과를 출력합니다. value 1과 value 2는 모듈레이터의 패치 대상으로 사용하도록 만들어졌습니다.
+~value 1~
+~value 2~
+
+
+
+modwheeltocv~노트의 모드휠 값을 모듈레이션 값으로 변환합니다
+~min~모드휠 값 0일 때의 출력
+~max~모드휠 값 127일 때의 출력
+
+
+
+macroslider~하나의 값을 받아 스케일된 값을 여러 목적지로 보냅니다
+~input~입력값. 모듈레이션 패치 대상으로 쓰도록 만들어졌습니다.
+~start*~입력 범위 최하단에서의 출력값
+~end*~입력 범위 최상단에서의 출력값
+
+
+
+leveltocv~들어오는 오디오의 레벨에 따라 모듈레이션 값을 출력합니다
+~gain~입력 오디오에 이 값을 곱합니다
+~attack~입력 레벨로 상승하는 속도
+~release~입력 레벨에서 감쇠하는 속도
+~min~레벨이 0일 때의 출력
+~max~레벨이 1일 때의 출력
+
+
+
+gridsliders~그리드 컨트롤러로 여러 슬라이더를 제어합니다
+~direction~그리드에 슬라이더를 세로로 표시할까요, 가로로 표시할까요?
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+
+
+
+gravity~물리 법칙에 따라 모듈레이션 값이 오르내리게 합니다
+~gravity~아래로 작용하는 중력
+~kick amt~킥할 때 위로 가하는 힘의 양
+~drag~속도 반대 방향으로 작용하는 저항력
+~kick~클릭하여 킥 힘을 가합니다 (또는 이 모듈에 펄스를 보내도 같은 결과)
+
+
+
+fubble~X/Y 패드에 그림을 그리고 그 그림을 재생해 값을 모듈레이션합니다. olivia jack이 제안한 개념을 바탕으로 합니다
+~quantize~재생을 지정한 리듬 간격으로 퀀타이즈할까요?
+~length~퀀타이즈할 간격
+~speed~재생 속도 올리기/내리기
+~clear~그림 지우기
+~mutate amount~펄린 노이즈 필드가 그림에 영향을 주는 양
+~mutate warp~펄린 노이즈 필드의 스케일
+~mutate noise~펄린 노이즈 필드를 이동하는 속도
+~reseed~펄린 노이즈 필드의 다른 위치로 이동
+
+
+
+expression~텍스트 기반 수식으로 모듈레이션의 모양을 만듭니다
+~y=~입력을 변형할 수식. "x+sin(x*pi*a)" 같은 식을 써 보세요. 사용 가능한 변수: a,b,c,d,e = 아래 슬라이더. t = 시간.
+~input~x 변수로 쓸 입력
+~a~수식에 쓸 변수
+~b~수식에 쓸 변수
+~c~수식에 쓸 변수
+~d~수식에 쓸 변수
+~e~수식에 쓸 변수
+
+
+
+envelope~트리거되는 엔벨로프로 값을 모듈레이션합니다
+~advanced~고급 엔벨로프 편집기로 전환합니다 (단순한 ADSR보다 복잡한 엔벨로프 가능). 고급 엔벨로프 선을 더블클릭하면 단계가 추가되고, 점을 우클릭하면 제거되며, 선을 드래그하면 휘어집니다.
+~adsr~엔벨로프 보기
+~adsrA~엔벨로프 어택
+~adsrD~엔벨로프 디케이
+~adsrS~엔벨로프 서스테인
+~adsrR~엔벨로프 릴리즈
+~low~출력 최저값
+~high~출력 최고값
+~length~엔벨로프 표시 길이
+~use velocity~엔벨로프 출력을 입력 벨로시티로 스케일할까요?
+~has sustain~이 엔벨로프에 서스테인 단계를 둘까요?
+~sustain stage~엔벨로프의 몇 번째 단계에 서스테인을 둘까요?
+~max sustain~서스테인의 최대 길이 (밀리초). -1은 최대값 없음을 뜻합니다
+
+
+
+curvelooper~반복되는 커브로 시간에 따라 값을 모듈레이션합니다
+~length~루프 길이
+~randomize~무작위 커브 생성
+
+
+
+curve~입력을 범위 전체에 걸쳐 커브로 리매핑합니다. 커브를 더블클릭하면 점이 추가되고, 점을 우클릭하면 제거되며, 선을 드래그하면 휘어집니다.
+~input~입력값 (모듈레이션 대상으로 사용)
+
+
+
+controlrecorder~컨트롤에 가한 변화를 녹음하고 재생합니다
+~record~입력을 녹음할까요? 녹음이 끝나면 재생이 시작됩니다
+~quantize~재생을 지정한 리듬 간격으로 퀀타이즈할까요?
+~length~퀀타이즈할 간격
+~speed~재생 속도 올리기/내리기
+~clear~녹음 지우기
+
+
+
+controlsequencer~일정한 간격으로 컨트롤을 단계적으로 모듈레이션합니다
+~interval~진행 속도
+~length~시퀀스 길이
+~random~시퀀스 값 무작위화
+~step *~이 스텝의 값
+~record~대상 값을 스텝에 녹음
+
+
+
+audiotocv~오디오 신호로 컨트롤을 모듈레이션합니다. 오디오 레이트 모듈레이션이 가능해 FM 같은 효과를 낼 수 있습니다.
+~gain~들어오는 오디오에 곱할 값
+~min~최소 출력값
+~max~최대 출력값
+
+
+
+addcentered~value 1과 value 2에 range 2를 곱한 값의 합을 출력합니다. value 1을 range 2만큼 특정 주파수로 모듈레이션하는 데 최적화되어 있습니다. value 1이나 value 2는 모듈레이터의 패치 대상으로 사용하도록 만들어졌습니다.
+~value 1~중심값
+~value 2~모듈레이션 값
+~range 2~모듈레이션 양
+
+
+
+add~value 1과 value 2를 더한 결과를 출력합니다. value 1과 value 2는 모듈레이터의 패치 대상으로 사용하도록 만들어졌습니다.
+~value 1~더할 값
+~value 2~더할 값
+
+
+
+accum~시간에 따라 값을 누적합니다
+~value~출력값
+~velocity~누적할 양
+
+
+
+slidersequencer~연속된 타임라인을 따라 노트를 트리거합니다
+~division~진행 속도
+~time*~이 요소를 트리거할 시간
+~vel*~이 요소의 벨로시티
+~note*~이 요소의 음높이
+~playing*~이 요소가 재생 중인가요?
+
+
+
+randomnote~주어진 간격마다 무작위 확률로 노트를 연주합니다
+~interval~노트 길이
+~probability~각 간격마다 노트가 연주될 확률
+~pitch~사용할 음높이
+~velocity~사용할 벨로시티
+~offset~간격 안에서 재생을 오프셋할 시간
+~skip~노트가 연주된 뒤, 연주되었을 다음 n-1번은 노트를 연주하지 않음
+
+
+
+push2control~ableton push 2로 bespoke의 인터페이스를 제어합니다
+
+
+
+polyrhythms~서로 다른 분할의 라인으로 구성된 반복 시퀀스
+~length*~이 라인의 스텝 수
+~note*~이 라인에 쓸 음높이
+
+
+
+playsequencer~pulsar-23 드럼 머신에서 영감을 받은, 펀치 인으로 스텝을 녹음하고 오버더빙할 수 있는 드럼 시퀀서입니다
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+~interval~스텝 크기
+~measures~루프 길이
+~write~현재 입력을 시퀀스에 기록할지 여부. 이 행에 mute/delete가 활성화되어 있으면 스텝을 삭제하기도 합니다
+~note repeat~누르고 있는 노트를 매 스텝 반복할지 여부
+~link columns~mute/delete 컨트롤을 열 전체에서 공유할지 여부
+~store*~현재 시퀀스를 이 슬롯에 저장
+~load*~이 슬롯에 저장된 시퀀스 불러오기
+~mute/delete*~write가 꺼져 있으면 이 행을 뮤트합니다. write가 켜져 있으면 플레이헤드가 지나가는 스텝을 지웁니다
+
+
+
+notesinger~감지된 음높이를 바탕으로 노트를 출력합니다
+~oct~출력 음높이를 조정할 옥타브
+
+
+
+notesequencer~일정 간격으로 반복되는 노트 시퀀스입니다. 더 흥미로운 스텝 제어를 위해 "pulser" 모듈과 함께 써 보세요. "shift"를 누르고 있으면 스텝 길이를 조정합니다.
+~interval~노트 길이
+~random~모든 스텝의 음높이, 길이, 벨로시티를 무작위화
+~pitch~시퀀스의 음높이를 무작위화합니다. shift를 누르고 있으면 근음과 5도만 고르도록 제한합니다.
+~len~각 스텝 노트의 길이 무작위화
+~vel~각 스텝 노트의 벨로시티 무작위화
+~length~아래 시퀀스를 재생할 길이. 전체 그리드 길이는 삼각형 메뉴의 "gridsteps"로 바꿀 수 있습니다.
+~<~시퀀스를 왼쪽으로 이동
+~>~시퀀스를 오른쪽으로 이동
+~clear~모든 스텝 지우기
+~octave~이 시퀀스의 가장 낮은 음의 옥타브
+~notemode~행이 나타낼 음높이 세트
+~loop reset~시퀀스가 반복될 때 대신 이 위치로 리셋합니다. pulser에서 "downbeat" 형식의 메시지를 보내면 첫 스텝부터 다시 시작합니다.
+~tone*~이 열의 음높이
+~vel*~이 열의 벨로시티
+~len*~이 열의 길이
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+~x offset~연결된 그리드 컨트롤러의 x 오프셋
+~y offset~연결된 그리드 컨트롤러의 y 오프셋
+~rand pitch chance~무작위 음높이 버튼을 누를 때 각 스텝이 바뀔 확률
+~rand pitch variety~생성할 서로 다른 무작위 음높이의 수
+~rand len chance~무작위 길이 버튼을 누를 때 각 스텝이 바뀔 확률
+~rand len range~무작위 길이 버튼을 누를 때 길이가 바뀌는 정도
+~rand vel chance~무작위 벨로시티 버튼을 누를 때 각 스텝이 바뀔 확률
+~rand vel density~무작위 벨로시티 버튼을 누를 때 스텝에 노트가 있을 확률
+
+
+
+notetable~음높이(0부터 시작)를 스케일 음높이에 매핑합니다
+~random pitch~시퀀스의 음높이를 무작위화합니다. shift를 누르고 있으면 근음과 5도만 고르도록 제한합니다.
+~length~음높이 개수
+~octave~이 시퀀스의 가장 낮은 음의 옥타브
+~notemode~행이 나타낼 음높이 세트
+~tone*~이 열의 음높이
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+~x offset~연결된 그리드 컨트롤러의 x 오프셋
+~y offset~연결된 그리드 컨트롤러의 y 오프셋
+~rand pitch chance~무작위 음높이 버튼을 누를 때 각 스텝이 바뀔 확률
+~rand pitch range~무작위 음높이 버튼을 누를 때 음높이가 바뀌는 폭
+~clear~그리드 지우기
+
+
+
+notelooper~오버더빙과 교체 기능을 갖춘 노트 루프 레코더
+~write~입력을 녹음할까요?
+~del/mute~"write"가 켜져 있으면 플레이헤드가 지나가는 노트를 지웁니다. 아니면 뮤트만 합니다.
+~num bars~루프 길이 (마디 단위)
+~clear~패턴 지우기
+~store*~패턴 저장
+~load*~패턴 복원
+~canvas~녹음된 노트의 캔버스
+
+
+
+notecreator~일회성 노트를 만듭니다
+~pitch~출력 노트 음높이
+~trigger~눌러서 지정한 길이만큼 노트를 트리거
+~on~켜면 노트 시작, 끄면 노트 종료
+~velocity~노트 벨로시티
+~duration~"trigger" 버튼을 쓸 때의 노트 길이
+
+
+
+notecounter~음높이를 순서대로 진행합니다. "notesequencer"나 "drumsequencer" 모듈을 구동할 때 유용합니다.
+~interval~진행 속도
+~sync~출력 음높이를 글로벌 트랜스포트에 동기화할지 여부
+~start~시퀀스 시작 음높이
+~length~시퀀스 길이
+~random~순서대로가 아니라 범위 내에서 무작위 음높이 출력
+~div~간격으로 "div"를 사용할 때의 마디 분할
+~beat length~무작위 시퀀스가 결정적으로 반복될 길이
+~seed~무작위 시퀀스를 결정하는 숫자
+~<~이전 시드로 이동
+~*~새 무작위 시드 생성
+~>~다음 시드로 이동
+
+
+
+notechain~노트를 트리거한 뒤, 지연 후에 다른 노트를 트리거할 펄스를 보냅니다
+~pitch~연주할 음높이
+~trigger~이 체인 노드의 노트 연주
+~velocity~노트 벨로시티
+~duration~노트 길이 (마디 단위)
+~next~펄스를 보내기까지의 간격
+
+
+
+notecanvas~반복 재생되는 노트 롤
+~quantize~선택한 노트를 간격에 퀀타이즈
+~save midi~캔버스 내용을 미디 파일로 내보내기
+~load midi~미디 파일에서 캔버스 내용 가져오기
+~loadtrack~"load midi"를 쓸 때 가져올 트랙 번호
+~play~캔버스의 노트 재생
+~rec~입력 노트를 캔버스에 녹음
+~free rec~녹음 모드를 켜고, 끝에 도달하면 캔버스를 늘림
+~measures~루프 길이
+~show chord intervals~코드 관계를 나타내는 괄호 표시
+~interval~퀀타이즈할 간격
+~canvas~노트 캔버스. 캔버스 조작법:\n-shift-클릭으로 노트 추가\n-shift를 누른 채 노트를 드래그하면 복제\n-alt를 누른 채 드래그하면 스냅 없이 이동\n-ctrl을 누른 채 드래그하면 간격에 맞춰 스냅\n-shift를 누른 채 스크롤하면 확대/축소\n-alt를 누른 채 빈 공간을 잡으면 캔버스 뷰 이동\n-ctrl을 누른 채 빈 공간을 잡으면 캔버스 뷰 확대/축소
+~timeline~루프 지점 제어
+~delete~강조된 요소 삭제
+~view rows~보이는 행 수
+~clear~모든 요소 삭제
+~drag mode~요소를 드래그할 수 있는 방향
+~scrollh~가로 스크롤바
+~scrollv~세로 스크롤바
+
+
+
+midicontroller~외부 장치에서 미디 입력을 받습니다. "layout" 뷰에서 보기 좋게 표시하려면 컨트롤러와 같은 이름의 .json 파일을 만들어 레이아웃을 기술하고 "data/controllers" 디렉터리에 넣으세요. 예시는 그 디렉터리의 다른 파일을 참고하세요.
+~controller~사용할 미디 장치
+~mappingdisplay~볼 매핑 뷰
+~bind (hold shift)~이 옵션을 켜면 UI 컨트롤 위에 마우스를 올리고 shift를 누른 채 원하는 미디 입력을 사용해 미디 입력을 UI 컨트롤에 매핑할 수 있습니다
+~page~사용할 미디 컨트롤 페이지 선택. 각 페이지는 독립적인 미디 컨트롤러처럼 동작하므로, 하나의 미디 컨트롤러로 여러 대상을 전환하며 제어할 수 있습니다
+~add~매핑을 직접 추가
+~osc input port~osccontroller 입력에 쓸 포트
+~messagetype~미디 메시지 종류
+~control~참조할 음높이 또는 컨트롤
+~channel~주목할 채널
+~path~영향을 받을 컨트롤의 경로. "hover"를 입력하면 마우스가 올라가 있는 컨트롤에 적용됩니다.
+~controltype~이 컨트롤이 대상을 바꾸는 방식.\n -slider: "midi off"와 "midi on" 사이를 보간한 값을 슬라이더 값으로 설정\n -set: 버튼을 누르면 지정한 값을 바로 설정\n -release: 버튼을 놓으면 지정한 값을 바로 설정\n -toggle: 버튼을 누르면 컨트롤 값을 켜기/끄기로 전환\n -direct: 미디 입력값을 그대로 컨트롤에 설정
+~value~설정할 값
+~midi off~미디 범위의 하단. 대상 컨트롤이 꺼지면 이 값을 보냅니다. "scale"이 켜져 있으면 슬라이더 범위의 하단도 제어하며, midi off를 midi on보다 높게 설정해 슬라이더 방향을 뒤집을 수 있습니다.
+~midi on~미디 범위의 상단. 대상 컨트롤이 켜지면 이 값을 보냅니다. "scale"이 켜져 있으면 슬라이더 범위의 상단도 제어하며, midi off를 midi on보다 높게 설정해 슬라이더 방향을 뒤집을 수 있습니다.
+~scale~이 미디 슬라이더의 출력을 "midi off"와 "midi on" 사이로 스케일할까요?
+~blink~대상 컨트롤이 켜져 있으면 켜기/끄기 메시지를 번갈아 보내 해당 LED를 깜박이게 합니다
+~increment~"controltype"이 "set"이나 "release"이면 대상 컨트롤이 이 양만큼 증가합니다 ("value" 필드는 무시됨). "controltype"이 "slider"이면 컨트롤이 바뀐 방향으로 이 양만큼 변경됩니다 ("무한 엔코더"에 유용한 설정)
+~twoway~컨트롤러에 피드백을 보낼까요? (버튼/노브에 연결된 LED 제어용)
+~feedback~피드백을 보낼 cc 또는 노트
+~pageless~이 연결이 midicontroller의 모든 페이지에서 동작할까요?
+~14bit~이 컨트롤을 LSB로, 이보다 32 작은 컨트롤을 MSB로 쓰는 14비트 미디 컨트롤인가요?
+~fbvals~컨트롤 값별 피드백 미디 값을 쉼표로 구분 (예: "53,21,9,0"). 증가량이 0이 아닌 "set"/"release" 연결에서만 사용됩니다. 컨트롤의 현재 값을 인덱스로 써서 보낼 미디 피드백 값을 찾습니다. 값마다 다른 색으로 컨트롤러 LED를 켤 때 유용합니다.
+~ x ~이 연결 삭제
+~copy~이 연결 복제
+~layout~이 컨트롤러에 쓸 레이아웃 파일. Documents/BespokeSynth/controllers 폴더에 만들 수 있습니다.
+~monome~사용할 monome
+
+
+
+keyboarddisplay~입력 노트를 건반에 표시하고, 건반을 클릭해 노트를 만들 수 있게 합니다
+
+
+
+gridkeyboard~그리드 기반 키보드로, 주로 64패드 그리드 컨트롤러용입니다
+~layout~키보드 스타일
+~octave~기본 옥타브
+~latch~키 입력을 래치합니다. 한 번 누르면 노트가 연주되고, 다시 누르면 노트가 해제됩니다
+~arrangement~사용할 레이아웃 스타일
+~ch.latch~코드 버튼 입력 래치
+~p.root~chorder 사용 시 근음이 항상 연주되게 함
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+
+
+
+fouronthefloor~킥 드럼을 트리거하도록 매 박마다 노트 0을 보냅니다
+~two~두 박마다 한 번만 노트를 보냄
+
+
+
+drumsequencer~드럼용 스텝 시퀀서입니다. 그리드에서 shift를 누른 채 드래그하면 스텝 벨로시티를 조정하고, 스텝 위에 마우스를 올린 채 위/아래 화살표 키로도 벨로시티를 조정할 수 있습니다.
+~vel~스텝을 설정할 때 쓸 벨로시티
+~measures~시퀀스 길이 (마디 단위)
+~clear~시퀀스 지우기
+~yoff~그리드 컨트롤러에서 보는 패턴의 세로 오프셋
+~velocitytype~스텝을 설정할 때 쓸 벨로시티
+~offsets~"offsets" 슬라이더 표시
+~repeat~입력 노트를 이 빈도로 반복
+~step~각 스텝의 길이
+~column~현재 열. 미디 컨트롤러에서 스텝을 시각화할 때 사용
+~<~패턴 전체를 한 스텝 앞당김
+~>~패턴 전체를 한 스텝 늦춤
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+~velocity~벨로시티를 제어하려면 "midicontroller" 모듈의 그리드를 여기에 패치하세요
+~metastep~"meta step"을 제어하려면 "midicontroller" 모듈의 그리드를 여기에 패치하세요. 이게 뭘 하는지 잊어버렸어요. 이런.
+~rowpitch*~이 행의 출력 음높이
+~offset*~행을 시간상 앞뒤로 이동합니다. 스네어는 살짝 앞당기고, 하이햇은 살짝 늦춰 보세요.
+~randomize~시퀀스 무작위화
+~r den~무작위화 출력의 밀도. 높을수록 무작위 출력이 더 빽빽해집니다.
+~r amt~무작위화할 때 각 스텝이 바뀔 확률. 낮으면 시퀀스의 일부만, 높으면 더 많은 부분이 바뀝니다.
+~r lock*~이 행이 무작위화되지 않도록 잠금
+~random*~이 행 무작위화
+
+
+
+helpdisplay~도움말 정보를 표시합니다
+~show tooltips~이 툴팁을 표시합니다. F1 키로 켜고 끌 수 있으며, "settings" 메뉴에서 기본값을 설정할 수 있습니다.
+~copy build info~도움 요청을 위해 이 빌드의 정보를 클립보드에 복사
+~help page~표시할 도움말 페이지
+
+
+
+multitrackrecorder~동기화된 여러 오디오 트랙을 녹음해, 외부 DAW에서 믹싱할 수 있도록 디스크에 저장합니다
+~record~입력을 트랙에 녹음
+~bounce~트랙을 녹음 디렉터리에 저장
+~add track~트랙 추가
+~clear~트랙의 오디오 지우기
+
+
+
+multitrackrecordertrack~멀티트랙 레코더의 트랙
+~ X ~이 트랙 삭제
+
+
+
+circlesequencer~루프를 원으로 표시하는 폴리리듬 시퀀서
+~length*~이 링의 스텝 수
+~note*~이 링에 쓸 음높이
+~offset*~이 링의 타이밍 오프셋
+~<~이 링을 왼쪽으로 회전
+~>~이 링을 오른쪽으로 회전
+
+
+
+waveshaper~수식을 이용한 웨이브셰이핑
+~y=~웨이브셰이핑 수식. "x+sin(x*pi*a)" 같은 식을 써 보세요. 사용 가능한 변수: a,b,c,d,e = 아래 슬라이더. t = 시간. x1,x2,y1,y2 = 바이쿼드 상태 저장소.
+~rescale~수식에 넣기 전에 입력을 리스케일
+~a~수식에 쓸 변수
+~b~수식에 쓸 변수
+~c~수식에 쓸 변수
+~d~수식에 쓸 변수
+~e~수식에 쓸 변수
+
+
+
+waveformviewer~파형 표시
+~freq~표시를 동기화할 주파수. 이 모듈에 노트 입력을 패치하면 자동으로 설정됩니다
+~length~캡처할 샘플 수
+~draw gain~파형 표시 배율 조정
+
+
+
+vocodercarrier~"vocoder"나 "fftvocoder" 모듈에 연결합니다. 신스 오디오는 이 모듈로, 목소리 오디오는 vocoder 모듈로 보내세요.
+
+
+
+vocoder~주파수 대역 기반 보코더입니다. 반드시 "vocodercarrier" 모듈과 함께 써야 합니다. 목소리는 이 모듈로 라우팅하고, 신스는 vocodercarrier에 패치하세요.
+~input~입력 신호 게인
+~carrier~캐리어 신호 게인
+~volume~출력 게인
+~mix~원본 입력과 보코딩된 신호의 출력 비율
+~max band~각 주파수 대역의 볼륨 한계
+~spacing~주파수 대역 간격 방식
+~bands~사용할 주파수 대역 수
+~f base~가장 낮은 대역의 주파수
+~f range~가장 높은 대역까지의 주파수 범위
+~q~대역의 레조넌스
+~ring~대역이 "식는" 데 걸리는 시간
+
+
+voicemanager~들어오는 노트를 보이스에 분배, 필터링 또는 리매핑합니다
+~voice distribution mode~분배 모드. Rotate: 노트마다 다음 미사용 보이스를 선택. Reuse: rotate와 같지만 같은 음높이였던 보이스를 재사용하려고 시도. Reset: 항상 첫 번째 미사용 보이스를 사용하려고 시도. Random: 미사용 보이스를 무작위로 선택
+~voices~이 모듈이 분배할 보이스 수
+~voice action *~선택한 보이스에 수행할 동작. 분배가 먼저 이루어지고, 이어서 보이스 제한, 필터링, 마지막으로 리매핑이 적용됩니다.
+~voice dest *~이 보이스의 리매핑 목적지
+
+
+voicesetter~노트에 특정 보이스 채널 인덱스를 설정합니다
+~voice index~현재 설정된 보이스 채널 인덱스
+
+
+
+takerecorder~[중단된 모듈, 동작하지 않을 수 있음]
+~start~[todo]
+
+
+
+stutter~입력을 캡처해 스터터 효과를 줍니다
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+~half note~2분음표 스터터
+~quarter~4분음표 스터터
+~8th~8분음표 스터터
+~16th~16분음표 스터터
+~32nd~32분음표 스터터
+~64th~64분음표 스터터
+~reverse~역방향 2분음표 스터터
+~ramp in~속도가 0에서 1로 올라가는 스터터
+~ramp out~속도가 빠르게 0으로 떨어지는 스터터
+~tumble up~가속하는 스터터
+~tumble down~감속하는 스터터
+~half speed~절반 속도의 낮은 음높이 스터터
+~double speed~두 배 속도의 높은 음높이 스터터
+~triplets~셋잇단 간격 스터터
+~dotted eighth~점8분음표 간격 스터터
+~free~아래 슬라이더로 지정한 설정의 스터터
+~free length~"free" 스터터 모드의 길이 (초)
+~free speed~"free" 스터터 모드의 속도
+
+
+
+splitter~스테레오 신호를 두 개의 모노 신호로 나누거나, 모노 신호를 복제합니다
+
+
+
+spectrum~오디오 신호의 스펙트럼 데이터를 표시합니다
+
+
+
+signalclamp~오디오 신호의 값을 범위 내로 제한합니다
+~min~최소 출력값
+~max~최대 출력값
+
+
+
+send~신호를 복제해 두 번째 목적지로 보냅니다
+~amount~오른쪽 케이블로 보낼 양
+~crossfade~켜면 "amount"가 커질수록 왼쪽 케이블 출력이 줄어듭니다
+
+
+
+samplergrid~입력을 패드에 녹음하고 패드를 재생합니다. 64패드 그리드 컨트롤러용입니다.
+~passthrough~들어오는 오디오를 출력으로 통과시킬까요?
+~vol~출력 볼륨
+~clear~켜면 누른 그리드 칸을 지웁니다
+~edit~마지막으로 누른 그리드 칸의 녹음된 샘플을 조정하는 컨트롤 활성화
+~duplicate~켜면 마지막으로 누른 샘플을 누른 그리드 칸에 복제합니다
+~start~샘플 시작
+~end~샘플 끝
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+
+
+
+samplecapturer~[작업 중] 오디오를 짧은 클립으로 녹음합니다. 오디오가 임계값을 넘으면 녹음이 시작됩니다.
+~record~녹음할까요?
+~play~이 클립 재생
+~save~이 클립을 파일로 저장
+~delete~이 클립 지우기
+
+
+
+ringmodulator~신호의 진폭을 특정 주파수로 모듈레이션합니다
+~freq~사용할 주파수. 이 모듈에 노트 입력을 패치해 설정할 수도 있습니다.
+~dry/wet~원본 오디오와 모듈레이션된 오디오의 비율
+~volume~출력 볼륨
+~glide~입력 노트가 원하는 주파수로 글라이드하는 데 걸리는 시간
+
+
+
+pitchchorus~입력 미디 노트에 따라 입력 오디오를 피치 시프트한 버전을 출력합니다. 기준 음높이는 60입니다.
+~passthrough~원본 오디오를 통과시킬까요?
+
+
+
+panner~오디오를 좌우로 패닝합니다. 모노 입력을 스테레오 출력으로 변환하기도 합니다.
+~pan~신호를 왼쪽/오른쪽 채널로 보내는 양. 0은 중앙입니다.
+~widen~한 채널을 이 샘플 수만큼 지연시킵니다. 소리가 특정 방향에서 들리는 듯한 패닝 효과가 납니다.
+
+
+
+output~오디오를 여기로 라우팅하면 출력 채널(스피커나 오디오 인터페이스)로 보냅니다
+~ch~오디오를 보낼 채널 (스테레오를 원하면 채널들)
+
+
+
+multitapdelay~여러 탭 지점을 가진 딜레이
+~dry~통과시킬 드라이 신호의 양
+~display length~버퍼 표시 길이 (초)
+~delay *~탭 딜레이 시간 (밀리초)
+~gain *~탭 딜레이 양
+~feedback *~이 탭의 지연된 오디오가 입력으로 되돌아가는 양
+~pan *~이 탭의 스테레오 팬
+
+
+
+looperrewriter~받은 입력으로 루퍼의 내용을 다시 써서, 자신의 루프를 리샘플링할 수 있게 합니다. 회색 점을 "looper" 모듈에 연결하세요.\n\n이상적인 사용법은 "looper"를 "send"에 직접 연결하고, "send"의 가장 왼쪽 출력을 이펙트 처리("effectchain" 등)에 연결한 뒤, 이펙트 처리를 이 "rewriter"에 연결하고, "send"의 가장 오른쪽 출력도 이 "rewriter"에 연결하는 것입니다
+~go~연결된 루퍼를 다시 쓰고, 그 루퍼가 send에 연결되어 있다면 send가 오른쪽 출력으로만 내보내도록 설정
+~new loop~가변 길이 루프 녹음을 시작합니다. 루퍼에 다시 쓰고 싶을 때 "go"를 누르세요. bespoke의 글로벌 템포도 이 새 루프에 맞게 바뀌므로 아주 강력하고 무섭습니다! 다시 클릭하면 취소됩니다.
+
+
+
+looperrecorder~여러 루퍼로의 녹음을 관리하고, 소급 루프 캡처(즉, 상시 녹음)를 가능하게 하는 커맨드 센터
+~1~마지막 1마디를 현재 대상 루퍼에 캡처
+~2~마지막 2마디를 현재 대상 루퍼에 캡처
+~4~마지막 4마디를 현재 대상 루퍼에 캡처
+~8~마지막 8마디를 현재 대상 루퍼에 캡처
+~16~마지막 16마디를 현재 대상 루퍼에 캡처
+~length~연결된 루퍼가 "commit" 버튼을 쓸 때 사용할 길이 (마디)
+~2xtempo~연결된 루퍼의 소리는 그대로 유지하면서 글로벌 트랜스포트 템포를 두 배로
+~.5tempo~연결된 루퍼의 소리는 그대로 유지하면서 글로벌 트랜스포트 템포를 절반으로
+~target~왼쪽의 버퍼 캡처 버튼을 쓸 때 오디오를 커밋할 루퍼
+~auto-advance~커밋할 때 자동으로 다음 루퍼로 이동
+~mode~레코더 모드: "record"는 입력을 녹음해 루프할 준비가 되면 버퍼에 커밋할 수 있게 하고, "overdub"는 입력을 녹음하면서 지정한 길이로 루프를 재생하며, "loop"는 입력을 더하지 않고 현재 루프를 재생합니다
+~clear~녹음된 버퍼 지우기
+~free rec~켜면 길이를 정하지 않은 루프 녹음을 시작합니다. 끄면 녹음을 끝내고, 글로벌 트랜스포트를 루프 길이에 맞추고, 레코더 모드를 "loop"로 전환합니다
+~cancel free rec~"free rec"가 켜져 있으면 루프 길이를 설정하지 않고 녹음을 취소
+~orig speed~루퍼를 루프가 녹음된 템포로 리셋
+~snap to pitch~템포를 조성에 맞는 가장 가까운 값으로 스냅
+~resample~연결된 모든 루퍼를 새 템포로 리샘플링
+~resample & set key~템포를 (현재 조성과 템포 변화를 바탕으로) 조성에 맞는 가장 가까운 값으로 스냅하고, 연결된 모든 루퍼를 그 템포로 리샘플링한 뒤, 글로벌 스케일을 새 조성으로 변경
+~write*~이 체크박스가 켜져 있던 시간에 가장 가까운 2의 거듭제곱(1, 2, 4, 8 등) 길이의 루프로 이 루퍼에 기록
+
+
+
+looper~입력 오디오를 루프합니다. 모든 기능을 쓰려면 "looperrecorder"와 함께 사용하세요.
+~num bars~루프 길이 (마디 단위)
+~clear~루프 오디오 지우기
+~volume~출력 볼륨
+~b~현재 볼륨을 파형에 적용(bake)
+~ m ~이 루퍼의 내용을 다른 루퍼에 병합합니다. 병합할 원본에서 이 버튼을 누른 뒤, 병합 대상에서 누르세요.
+~decay~루프마다 볼륨을 낮추는 양
+~save~이 루프를 wav 파일로 저장
+~mute~이 루퍼 음소거
+~passthrough~입력 오디오가 이 루퍼를 통과하도록 허용
+~commit~현재 looperrecorder 버퍼를 이 루프에 커밋
+~capture~다음 루프가 시작되면 루프 길이만큼 입력을 녹음
+~write~입력 오디오를 루프 버퍼에 기록
+~swap~이 루퍼와 다른 루퍼의 내용을 맞바꿉니다. 두 루퍼에서 이 버튼을 누르면 교환됩니다.
+~copy~이 루퍼의 내용을 다른 루퍼로 복사합니다. 복사할 원본에서 이 버튼을 누른 뒤, 복사 대상에서 누르세요.
+~2x~루프를 두 배 속도로 재생
+~.5x~루프를 절반 속도로 재생
+~extend~루프를 두 배 길이로 늘림
+~undo~마지막 루프 커밋 되돌리기
+~offset~트랜스포트 위치로부터 루퍼 플레이헤드를 오프셋할 양
+~apply~현재 오프셋이 버퍼의 시작이 되도록 루퍼 내용을 이동
+~scrspd~"scr"가 켜져 있을 때 쓰는 재생 속도. 빠르게 모듈레이션하면 바이닐 스크래치 같은 효과가 납니다.
+~scr~"scrspd"를 조정해 루프를 스크래치할 수 있게 함
+~fourtet~언젠가 영상에서 four tet이 보여준 텍스처 기법을 사용합니다: 오디오를 조각으로 자른 뒤, 각 조각을 두 배속으로 재생하고 이어서 두 배속으로 역재생합니다. 이 슬라이더는 원본 오디오와 이 "fourtet화된" 오디오의 믹스 비율을 조절합니다.
+~fourtetslices~"fourtet" 효과에 사용할 조각 크기
+~beatwheel on~[none]
+~beatwheel pos right~[none]
+~beatwheel depth right~[none]
+~beatwheel pos left~[none]
+~beatwheel depth left~[none]
+~beatwheel single measure~[none]
+~pitch~루퍼 출력의 피치 시프트 양
+~auto~트랜스포트 템포가 바뀔 때 피치 시프트를 자동으로 조정할까요?
+~resample for tempo~현재 글로벌 템포가 버퍼를 녹음한 템포와 더 이상 맞지 않을 때 나타나는 버튼입니다. 클릭하면 버퍼를 새 템포에 맞게 리샘플링합니다.
+~passthrough~들어오는 오디오를 출력으로 통과시킬까요? 끄면 들어오는 오디오가 음소거됩니다.
+
+
+
+lissajous~입력 오디오를 리사주 곡선으로 그립니다. 모듈의 삼각형 메뉴에서 "autocorrelation"을 끄면 스테레오 채널로 스테레오 폭을 볼 수 있습니다.
+~scale~리사주 이미지의 표시 배율
+
+
+
+inverter~신호에 -1을 곱합니다. send와 함께 쓰면 다시 합칠 때 신호의 일부를 빼내는 등 꽤 흥미로운 효과를 낼 수 있습니다.
+
+
+
+input~마이크 같은 입력 소스에서 오디오를 받습니다
+~ch~사용할 채널 (스테레오를 원하면 채널들)
+
+
+
+freqdelay~입력 노트에 따라 딜레이 길이가 정해지는 딜레이 이펙트
+~dry/wet~이펙트 적용 정도
+
+
+
+fftvocoder~FFT 기반 보코더
+~input~입력 신호 게인
+~carrier~캐리어 신호 게인
+~volume~출력 게인
+~dry/wet~원본 입력과 보코딩된 신호의 출력 비율
+~fric thresh~마찰음 감지 감도. 보코딩에 캐리어 신호와 화이트 노이즈 중 무엇을 쓸지 전환하는 데 쓰입니다
+~whisper~캐리어 신호 배음의 위상을 무작위화하는 정도. 출력이 얼마나 속삭이는 듯한 소리가 될지에 영향을 줍니다
+~phase off~캐리어 신호 배음의 위상을 오프셋하는 정도
+~cut~제거할 저역 배음 수
+
+
+
+feedback~지연된 오디오를 신호 체인의 앞부분으로 되돌립니다. "feedback out" 커넥터로 오디오를 체인 위쪽으로 보내고, 기본 출력 커넥터로 결과 오디오를 앞으로 보내세요. 피드백은 종종 극단적이고 제어하기 어려운 결과를 낳습니다!
+~limit~피드백이 너무 세게 폭주하지 않도록 피드백 오디오를 이 범위로 클리핑합니다.
+
+
+
+eq~주파수 대역별로 출력 레벨을 조정하는 멀티밴드 이퀄라이저
+~enabled*~이 대역을 활성화할까요?
+~type*~이 대역에 쓸 필터 종류
+~f*~이 대역의 컷오프 주파수
+~g*~이 대역의 게인
+~q*~이 대역의 레조넌스
+
+
+
+effectchain~직렬로 적용되는 이펙트 목록을 담는 컨테이너입니다. < 와 > 버튼으로 이펙트 순서를 쉽게 바꾸고, x 버튼으로 삭제할 수 있습니다. shift를 누르면 모든 이펙트의 x 버튼이 나타납니다.
+~volume~출력 게인
+~effect~추가할 이펙트 선택
+~spawn~현재 강조된 이펙트 생성
+~exit effect~push2에서 이펙트 컨트롤을 빠져나가 메인 effectchain 컨트롤로 돌아감
+~<~이 이펙트를 체인 앞쪽으로 이동
+~>~이 이펙트를 체인 뒤쪽으로 이동
+~x~이 이펙트 삭제
+~mix*~이 이펙트의 wet/dry 슬라이더
+
+
+
+basiceq~간단한 멀티밴드 EQ
+~even~EQ 초기화
+
+
+
+biquad~바이쿼드 공식을 사용하는 필터
+~type~필터 종류
+~F~컷오프 주파수
+~Q~레조넌스
+~G~게인
+
+
+
+bitcrush~로파이 효과를 위해 샘플 해상도와 샘플레이트를 낮춥니다
+~crush~샘플 해상도 감소
+~downsamp~샘플레이트 감소
+
+
+
+butterworth~버터워스 공식을 사용하는 필터
+~F~컷오프 주파수
+~Q~레조넌스
+
+
+
+compressor~볼륨을 일정한 레벨로 유지하려 합니다
+~mix~컴프레션 양. "패러렐 컴프레션" 효과를 원하면 이 값을 낮추세요. 룩어헤드를 보정하려면 effectchain의 mix 슬라이더 대신 이 mix 슬라이더를 쓰세요.
+~drive~컴프레션이 얼마나 걸릴지에 영향을 주도록 입력을 리스케일
+~threshold~게인 감소가 시작되는 임계값
+~ratio~신호가 임계값을 넘었을 때 적용할 게인 감소량
+~attack~게인 감소를 적용하는 속도
+~release~게인 감소를 해제하는 속도
+~lookahead~컴프레션 엔벨로프를 조정하기 위해 "미리 볼" 시간. 출력에 지연이 생기므로, 시퀀서를 살짝 일찍 실행해 보정할 수 있습니다.
+~output~볼륨을 높이는 메이크업 게인
+
+
+
+dcremover~10hz 컷오프의 하이패스 필터로 DC 오프셋을 제거해, 신호가 0에서 벗어나지 않게 합니다
+
+
+
+delay~메아리 딜레이
+~delay~딜레이 (밀리초)
+~amount~되돌아오는 딜레이 양
+~interval~딜레이 길이를 음악적 길이로 설정
+~short~딜레이 슬라이더의 범위를 줄이는 단축 옵션. 가청 주파수 대역의 딜레이와 콤 필터 사운드를 낼 수 있습니다
+~dry~드라이 신호를 통과시킬까요, 아니면 지연된 신호만 낼까요?
+~feedback~출력 오디오를 딜레이로 되돌릴까요?
+~input~딜레이에 입력을 받을까요?
+~invert~지연된 오디오의 신호를 반전할까요? 다른 소리를 낼 수 있고, DC 오프셋이 피드백으로 누적되는 것도 막아 줍니다.
+
+
+
+distortion~웨이브셰이핑 디스토션
+~type~적용할 디스토션 스타일
+~clip~디스토션의 컷오프 지점. 값이 낮을수록 더 극단적인 디스토션이 됩니다
+~preamp~디스토션에 넣기 전의 신호 게인
+~fuzz~입력 신호를 중심에서 밀어내 비대칭으로 왜곡
+~center input~입력 신호의 dc 오프셋을 제거해 더 제어된 방식으로 왜곡
+
+
+
+formant~[미완성, 동작하지 않음] 포먼트 제어에 초점을 맞춘 필터
+~ee~[todo]
+~oo~[todo]
+~i~[todo]
+~e~[todo]
+~u~[todo]
+~a~[todo]
+
+
+
+freeverb~"freeverb" 알고리즘을 사용하는 리버브
+~room size~리버브 길이를 조절합니다. 값이 클수록 리버브가 길어집니다
+~damp~고역 감쇠. 0이면 모든 주파수가 같은 속도로 감쇠하고, 값이 클수록 고역이 더 빨리 감쇠합니다
+~wet~리버브 신호의 양
+~dry~원본 신호의 양
+~width~리버브의 스테레오 폭
+
+
+
+gainstage~effectchain 안에서 볼륨을 조절합니다
+~gain~볼륨 배율
+
+
+
+gate~신호가 일정 임계값을 넘을 때만 통과시킵니다. 라인 노이즈를 없애거나 그냥 이펙트로 쓸 때 유용합니다.
+~threshold~게이트를 여는 볼륨 임계값
+~attack~게이트가 열리는 속도
+~release~게이트가 닫히는 속도
+
+
+
+granulator~라이브 입력을 그래뉼레이트합니다
+~overlap~겹치는 그레인 수
+~speed~그레인 재생 속도
+~len ms~각 그레인의 길이 (밀리초)
+~dry~통과시킬 드라이 신호의 양
+~autocapture~이 간격마다 입력을 프리즈
+~pos r~그레인 시작 지점 무작위화
+~spd r~그레인 속도 무작위화
+~spa r~그레인 사이 간격 무작위화
+~frz~현재 녹음된 버퍼 프리즈
+~g oct~옥타브와 5도를 추가할까요?
+~width~그레인 배치의 스테레오 폭
+~pos~버퍼 내 재생 위치
+
+
+
+muter~들어오는 신호를 음소거합니다
+~pass~켜면 신호를 통과시킵니다
+~ms~신호 음소거/해제의 램프 시간
+
+
+
+noisify~입력 신호에 화이트 노이즈를 곱합니다
+~amount~적용할 노이즈 양
+~width~새 노이즈 샘플을 고르는 빈도
+
+
+
+pitchshift~신호의 음높이를 바꿉니다
+~ratio~주파수 비율 (1 = 변화 없음)\n위로: ratio = 2^(반음/12)\n아래로: ratio = 2^(-반음/12)\n예: 1.26 = 장3도 위, 1.5 = 완전5도 위, 0.5 = 한 옥타브 아래
+~ratioselector~유용한 피치 비율 단축키
+
+
+
+pumper~신호의 볼륨을 리드미컬하게 낮춰 "펌핑 사이드체인" 효과를 흉내냅니다
+~amount~볼륨을 낮추는 양
+~length~펌프 길이
+~curve~볼륨이 돌아오는 방식
+~attack~볼륨이 떨어지는 날카로움
+~interval~펌프 빈도
+
+
+
+tremolo~신호의 볼륨을 리드미컬하게 모듈레이션합니다
+~amount~볼륨을 낮추는 양
+~offset~LFO 위상 오프셋
+~duty~LFO 펄스 폭
+~interval~LFO 속도
+~osc~LFO 오실레이터 종류
+
+
+
+dcoffset~오디오 신호에 일정한 오프셋을 더합니다
+~offset~더할 오프셋 양
+
+
+
+autotalent~[중단된 모듈, 동작하지 않을 수 있음] "autotalent" 코드를 사용한 오토튠
+~A~[todo]
+~Bb~[todo]
+~B~[todo]
+~C~[todo]
+~Db~[todo]
+~D~[todo]
+~Eb~[todo]
+~E~[todo]
+~F~[todo]
+~Gb~[todo]
+~G~[todo]
+~Ab~[todo]
+~amount~[todo]
+~smooth~[todo]
+~shift~[todo]
+~scwarp~[todo]
+~lfoamp~[todo]
+~lforate~[todo]
+~lfoshape~[todo]
+~lfosymm~[todo]
+~lfoquant~[todo]
+~formant correct~[todo]
+~fwarp~[todo]
+~mix~[todo]
+~set from scale~[todo]
+
+
+
+audiorouter~오디오가 라우팅될 곳을 전환하는 선택기입니다. 대상에 연결하면 목록에 추가됩니다.
+~route~오디오 목적지
+
+
+
+audiometer~오디오 레벨의 볼륨을 슬라이더에 설정합니다. 미디 디스플레이 값에 매핑할 때 유용합니다.
+~level~입력 오디오 레벨. LED 디스플레이 미디 컨트롤에 연결하면 컨트롤러에서 값을 볼 수 있습니다.
+
+
+
+signalgenerator~기본 오실레이터 신호입니다. 노트를 보내면 주파수가 설정되고, 펄스를 보내면 위상이 리셋됩니다.
+~freq~신호 주파수
+~freq mode~입력 노트에 쓸 모드. "instant"는 입력 노트의 주파수로 즉시 바꾸고, "ramp"는 시간에 걸쳐 주파수로 이동하며, "slider"는 슬라이더로 마지막 두 입력 노트 사이를 보간합니다
+~osc~오실레이터 종류
+~pw~펄스 폭 (사각파가 아닌 파형에서는 모양)
+~slider~마지막 두 입력 음높이 사이를 보간하는 슬라이더
+~ramp~입력 주파수로 이동하는 데 걸리는 시간
+~syncmode~지정한 주파수로 위상을 리셋하는 싱크 모드 켜기
+~syncratio~"syncmode"가 "ratio"일 때 위상을 리셋하는 오실레이터 주파수 비율
+~syncf~"syncmode"가 "freq"일 때 위상을 리셋하는 주파수
+~soften~사각파와 톱니파의 모서리를 부드럽게
+~shuffle~파형의 한 사이클 걸러 늘이고 줄임
+~mult~주파수 배율
+~phase~위상 오프셋
+~vol~출력 볼륨
+~detune~지정한 주파수에서 디튠할 양
+
+
+
+seaofgrain~슬라이더나 MPE 입력으로 연주할 수 있는 그래뉼러 신스
+~load~샘플 파일 불러오기
+~record~입력을 그래뉼러 버퍼로 녹음해, seaofgrain을 라이브 그래뉼러 딜레이로 사용
+~volume~출력 볼륨
+~offset~샘플 보기의 시작 위치
+~display length~볼 샘플의 양
+~keyboard base pitch~샘플의 시작을 나타내는 미디 음높이
+~keyboard num pitches~샘플 전체에 걸쳐 할당할 음높이 수
+~gain *~이 보이스의 볼륨
+~pos *~샘플 내 이 보이스의 위치
+~overlap *~겹치는 그레인 수
+~speed *~그레인 재생 속도
+~len ms *~각 그레인의 길이 (밀리초)
+~pos r *~그레인 시작 지점 무작위화
+~speed r *~그레인 속도 무작위화
+~spacing r*~그레인 사이 간격 무작위화
+~octaves *~옥타브와 5도를 추가할까요?
+~width *~그레인 배치의 스테레오 폭
+~pan *~그레인 배치의 스테레오 파노라마
+
+
+
+sampler~아주 기본적인 폴리포닉 피치 샘플 플레이어 겸 레코더입니다. 오디오를 보내고, 노트 입력으로 녹음된 오디오를 연주하세요.
+~vol~출력 볼륨
+~env~볼륨 엔벨로프
+~envA~볼륨 엔벨로프 어택
+~envD~볼륨 엔벨로프 디케이
+~envS~볼륨 엔벨로프 서스테인
+~envR~볼륨 엔벨로프 릴리즈
+~rec~켜면 현재 녹음을 지우고, 입력이 임계값에 도달하면 새 오디오를 녹음합니다
+~thresh~녹음이 켜져 있을 때 입력 오디오가 이 임계값을 넘으면 녹음을 시작합니다
+~pitch~오디오의 음정 보정을 시도할까요?
+~passthrough~녹음하는 동안 입력 오디오를 통과시킬까요?
+
+
+
+sampleplayer~트리거 가능한 큐 포인트, 클립 추출, 유튜브 검색/다운로드 기능을 갖춘 샘플 재생기입니다. 모듈 크기를 키우면 추가 기능을 쓸 수 있습니다. 클립보드에 유튜브 URL이 있으면 오디오를 다운로드하는 버튼이 나타납니다.
+~volume~출력 게인
+~speed~현재 재생 속도
+~yt:~이 문자열로 유튜브 검색
+~play~현재 플레이헤드에서 재생 시작
+~pause~재생을 일시정지하고 플레이헤드를 그 자리에 둠
+~stop~재생을 멈추고 플레이헤드 리셋
+~loop~끝에 도달하면 플레이헤드를 처음으로 되돌림
+~load~파일 선택 창을 띄워 샘플 불러오기
+~save~이 샘플을 파일로 저장
+~record~오디오 입력을 샘플 버퍼에 녹음합니다. 현재 샘플은 지워집니다.
+~trim~현재 확대 범위 밖의 오디오를 모두 버림
+~youtube~현재 클립보드에 있는 유튜브 URL의 오디오 다운로드
+~cue start~현재 큐의 시작 지점 (초)
+~cue len~현재 큐의 길이 (초). 0이면 샘플 끝까지 재생합니다.
+~cue speed~현재 큐의 재생 속도
+~cue stop~노트 오프를 받으면 이 큐 재생을 멈춤
+~cuepoint~편집할 현재 큐 설정
+~click sets cue~켜면 파형을 클릭할 때 현재 큐의 시작 위치가 설정됩니다
+~select played~켜면 들어오는 노트로 재생된 큐 포인트가 현재 큐가 됩니다
+~play cue~현재 큐 재생
+~show grid~4분음표 그리드 표시 (충분히 확대했을 때)
+~4~4개 조각으로 자동 슬라이스
+~8~8개 조각으로 자동 슬라이스
+~16~16개 조각으로 자동 슬라이스
+~32~32개 조각으로 자동 슬라이스
+~searchresult*~클릭하면 이 유튜브 검색 결과를 다운로드합니다. 긴 영상은 시간이 걸릴 수 있습니다.
+~append to rec~녹음할 때 샘플을 먼저 지우지 않고 이전 녹음 뒤에 이어 붙임
+~record as clips~녹음할 때 게이트를 열 만큼 입력이 충분할 때만 녹음하고, 녹음된 각 구간에 큐 포인트를 표시
+~threshold~녹음을 위해 게이트를 여는 볼륨 임계값
+~attack~게이트가 열리는 속도
+~release~게이트가 닫히는 속도
+~playhovered~이 큐 재생
+~grabhovered~이 큐의 샘플을 잡아 다른 모듈에 놓기
+
+
+
+samplecanvas~샘플 배치 뷰
+~measures~캔버스 길이 (마디 단위)
+~interval~그리드 분할 간격
+~canvas~샘플 캔버스. 샘플을 여기로 드래그 앤 드롭하세요. 캔버스 조작법:\n-shift를 누른 채 샘플을 드래그하면 복제\n-alt를 누른 채 드래그하면 스냅 없이 이동\n-ctrl을 누른 채 드래그하면 간격에 맞춰 스냅\n-shift를 누른 채 스크롤하면 확대/축소\n-alt를 누른 채 빈 공간을 잡으면 캔버스 뷰 이동\n-ctrl을 누른 채 빈 공간을 잡으면 캔버스 뷰 확대/축소
+~timeline~루프 지점 제어
+~scrollh~가로 스크롤바
+~scrollv~세로 스크롤바
+~delete~강조된 요소 삭제
+~view rows~보이는 행 수
+~clear~모든 요소 삭제
+~drag mode~요소를 드래그할 수 있는 방향
+
+
+
+oscillator~엔벨로프가 있는 폴리포닉 오실레이터입니다. 모듈레이션 (MPE 지원): 모드휠은 필터를 더 닫고 (필터가 켜져 있을 때), 프레셔는 디튠 양을 줄입니다
+~osc~오실레이터 종류
+~mult~들어오는 음높이의 주파수 배율
+~pw~펄스 폭 (사각파가 아닌 파형에서는 모양)
+~shuffle~파형의 한 사이클 걸러 늘이고 줄임
+~soften~사각파와 톱니파의 모서리를 부드럽게
+~phase~오실레이터의 위상 오프셋, 그리고 유니즌 보이스 간 위상 오프셋. 아주 빠른 모듈레이터를 패치하면 위상 모듈레이션을 할 수 있습니다.
+~syncmode~지정한 주파수로 위상을 리셋하는 싱크 모드 켜기
+~syncratio~"syncmode"가 "ratio"일 때 위상을 리셋하는 오실레이터 주파수 비율
+~syncf~"syncmode"가 "freq"일 때 위상을 리셋하는 주파수
+~env~[none]
+~envA~볼륨 엔벨로프 어택
+~envD~볼륨 엔벨로프 디케이
+~envS~볼륨 엔벨로프 서스테인
+~envR~볼륨 엔벨로프 릴리즈
+~vol~이 오실레이터의 볼륨
+~detune~unison이 1이면 오실레이터를 이 양만큼 디튠합니다. 2이면 한 오실레이터는 정상 튜닝되고 다른 하나가 이 양만큼 디튠됩니다. 2보다 크면 오실레이터들이 이 범위 내에서 무작위로 디튠됩니다.
+~unison~한 노트에 연주할 오실레이터 수
+~width~unison이 1보다 클 때 보이스가 패닝되는 방식
+~adsr len~ADSR 컨트롤의 표시 길이
+~envfilter~[none]
+~envfilterA~필터 엔벨로프 어택
+~envfilterD~필터 엔벨로프 디케이
+~envfilterS~필터 엔벨로프 서스테인
+~envfilterR~필터 엔벨로프 릴리즈
+~fmax~엔벨로프 최대점에서의 로우패스 필터 컷오프 주파수. 이 슬라이더를 최대로 하면 필터가 꺼집니다
+~fmin~엔벨로프 최소점에서의 로우패스 필터 컷오프 주파수
+~q~로우패스 필터의 레조넌스
+~vel2vol~입력 벨로시티가 출력 볼륨에 미치는 영향
+~vel2env~입력 벨로시티가 볼륨 및 필터 엔벨로프의 속도에 미치는 영향
+~lite cpu~CPU 부하를 줄이기 위해 일부 파라미터를 버퍼당 한 번만 다시 계산합니다. 경우에 따라 피치 벤드와 빠른 모듈레이션의 소리가 나빠질 수 있습니다.
+
+
+
+metronome~박자에 맞춰 삐 소리를 냅니다
+~vol~메트로놈 볼륨
+
+
+
+karplusstrong~폴리포닉 뜯는 현 물리 모델링 신스
+~vol~출력 볼륨
+~invert~피드백을 반전할까요?
+~filter~레조넌스를 필터링하는 양
+~feedback~레조넌스를 위한 피드백 양
+~source type~여기(excitation)에 사용할 오디오
+~x freq~여기 오디오의 주파수
+~x att~여기 오디오의 페이드 인 시간
+~x dec~여기 오디오의 페이드 아웃 시간
+~vel2vol~벨로시티가 보이스 볼륨에 미치는 영향
+~vel2env~벨로시티가 여기 어택 시간에 미치는 영향
+~pitchtone~음높이가 필터 양에 영향을 주는 방식을 조정합니다. 0이면 전체 음역에 고르게 필터링하고, 값이 높으면 높은 음을 덜, 낮으면 낮은 음을 덜 필터링합니다.
+~lite cpu~CPU 부하를 줄이기 위해 일부 파라미터를 버퍼당 한 번만 다시 계산합니다. 경우에 따라 피치 벤드와 빠른 모듈레이션의 소리가 나빠질 수 있습니다.
+
+
+
+lfo~저주파 오실레이터로 슬라이더를 모듈레이션합니다
+~enable~모듈레이션 켜기/끄기
+~pin~LFO 창이 계속 보이게 함
+~interval~진동 주기의 길이
+~osc~진동 파형 종류
+~offset~위상 오프셋. 진동을 앞당기거나 늦춤
+~free rate~클럭 동기화하지 않을 때의 오실레이터 속도
+~low~파형 최저점에서의 출력값
+~high~파형 최고점에서의 출력값
+~spread~파형을 펼쳐 최저점과 최고점에 더 가깝게 함
+~bias~파형을 최저점 또는 최고점 쪽으로 치우치게 함
+~length~파형 사이클에 쓰는 시간의 비율
+~shuffle~파형에 빠른 사이클과 느린 사이클이 생기도록 조정
+~soften~사각파와 톱니파의 날카로운 모서리를 부드럽게
+~lite cpu~CPU 부하를 줄이기 위해 일부 파라미터를 버퍼당 한 번만 다시 계산합니다. 경우에 따라, 특히 빠른 모듈레이션에서 소리가 나빠질 수 있습니다.
+
+
+
+fmsynth~폴리포닉 FM 합성
+~adsrosc~
+~adsroscA~
+~adsroscD~
+~adsroscS~
+~adsroscR~
+~adsrharm~
+~adsrharmA~
+~adsrharmD~
+~adsrharmS~
+~adsrharmR~
+~adsrmod~
+~adsrmodA~
+~adsrmodD~
+~adsrmodS~
+~adsrmodR~
+~adsrharm2~
+~adsrharm2A~
+~adsrharm2D~
+~adsrharm2S~
+~adsrharm2R~
+~adsrmod2~
+~adsrmod2A~
+~adsrmod2D~
+~adsrmod2S~
+~adsrmod2R~
+~harmratio~입력 음높이에 대한 1차 모듈레이터의 배음 비율
+~harmratio2~입력 음높이에 대한 2차 모듈레이터의 배음 비율
+~tweak~1차 모듈레이터 배음 비율의 배율
+~mod~1차 모듈레이터의 모듈레이션 양
+~tweak2~2차 모듈레이터 배음 비율의 배율
+~mod2~2차 모듈레이터의 모듈레이션 양
+~vol~출력 볼륨
+~phase0~기본 오실레이터의 위상 오프셋
+~phase1~1차 모듈레이터의 위상 오프셋
+~phase2~2차 모듈레이터의 위상 오프셋
+
+
+
+notetoggle~입력 노트가 있는지에 따라 컨트롤을 켜거나 끕니다
+
+
+
+drumsynth~오실레이터+노이즈 드럼 신스
+~vol~출력 볼륨
+~edit~각 히트의 파라미터 표시
+~adsrtone*~
+~adsrtone*A~
+~adsrtone*D~
+~adsrtone*S~
+~adsrtone*R~
+~vol*~오실레이터 볼륨
+~adsrnoise*~
+~adsrnoise*A~
+~adsrnoise*D~
+~adsrnoise*S~
+~adsrnoise*R~
+~noise*~노이즈 볼륨
+~type*~오실레이터 종류
+~adsrfreq*~
+~adsrfreq*A~
+~adsrfreq*D~
+~adsrfreq*S~
+~adsrfreq*R~
+~freqmax*~오실레이터 시작 주파수
+~freqmin*~오실레이터 끝 주파수
+~adsrfilter*~
+~adsrfilter*A~
+~adsrfilter*D~
+~adsrfilter*S~
+~adsrfilter*R~
+~cutoffmax*~필터 시작 컷오프 주파수
+~cutoffmin*~필터 끝 컷오프 주파수
+~q*~필터 레조넌스
+~oversampling~오버샘플링 양. 음질이 좋아지지만 CPU 사용량도 늘어납니다.
+
+
+
+drumplayer~드럼 재생용 샘플 플레이어
+~vol~출력 볼륨
+~speed~글로벌 샘플 속도 배율
+~speed rnd~글로벌 샘플 속도 무작위화 양
+~kit~[none]
+~edit~편집용 패드 표시
+~aud~스크롤하여 현재 패드의 헤드 카테고리, 또는 마지막으로 패드에 놓은 디렉터리의 샘플을 미리 들어봅니다
+~mono~출력을 모노로 강제
+~shuffle~샘플, 속도, 팬 무작위화
+~grid~"midicontroller" 모듈의 그리드를 여기에 패치하세요
+~quantize~입력을 이 간격으로 퀀타이즈
+~repeat~퀀타이즈할 때 누르고 있는 노트를 그 간격으로 반복할까요?
+~full vel~드럼 히트를 항상 최대 벨로시티로 연주
+~single voice~한 번에 하나의 드럼 히트만 연주하고 나머지는 모두 끊음 (모두 같은 linkid를 공유하는 것처럼)
+~vol *~샘플 볼륨
+~speed *~샘플 속도
+~pan *~샘플의 스테레오 팬 위치
+~widen *~폭을 만들기 위한 샘플의 스테레오 딜레이
+~start *~샘플 시작 오프셋 (퍼센트)
+~single out *~샘플에 개별 출력을 둘까요?
+~linkid *~linkid가 -1이 아니면 같은 linkid를 가진 다른 샘플을 무음화합니다 (오픈 햇과 클로즈 햇을 연결할 때 유용)
+~envelope *~샘플에 볼륨 엔벨로프를 적용할까요?
+~view ms *~엔벨로프 표시 길이 (밀리초)
+~hitcategory*~"random" 버튼을 누를 때 고를 폴더. 이 폴더들은 data/drums/hits/ 디렉터리에 있습니다
+~envelopedisplay *~[none]
+~envelopedisplay *A~엔벨로프 어택
+~envelopedisplay *D~엔벨로프 디케이
+~envelopedisplay *S~엔벨로프 서스테인
+~envelopedisplay *R~엔벨로프 릴리즈
+~test *~이 샘플 재생
+~random *~선택한 hitcategory에서 무작위 샘플 선택
+~grab *~이 샘플 잡기
+~prev *~선택한 hitcategory에서 이전 샘플 선택
+~next *~선택한 hitcategory에서 다음 샘플 선택
+
+
+
+beats~샘플 레이어를 함께 믹싱하는 멀티 루프 플레이어
+~volume*~레이어 볼륨
+~filter*~레이어 필터. 음수 값은 로우패스, 양수 값은 하이패스를 적용합니다.
+~pan*~레이어 파노라마
+~double*~켜면 두 배 속도로 재생
+~bars*~이 슬롯의 샘플이 몇 마디 길이인가요?
+~selector*~이 슬롯에서 재생할 샘플. 샘플을 여기로 드래그하면 이 슬롯에 추가됩니다.
+~delete *~목록에서 현재 샘플 제거
+
+
+
+whitekeys~C 장조 스케일에 해당하는 흰 건반을 현재 글로벌 스케일로 연주되도록 리매핑합니다
+
+
+
+volcabeatscontrol~KORG volca beats 드럼 머신의 여러 요소를 제어하는 MIDI 데이터를 출력합니다
+~clap speed~
+~clave speed~
+~agogo speed~
+~crash speed~
+~stutter time~
+~stutter depth~
+~tom decay~
+~closed hat decay~
+~open hat decay~
+~hat grain~
+~level *~
+
+
+
+vibrato~노트에 리드미컬하게 진동하는 피치 벤드를 더합니다
+~vibrato~더할 피치 벤드 양
+~vibinterval~피치 벤드 진동 속도
+
+
+
+velocitytochance~노트의 벨로시티로 그 노트가 연주될 확률을 정합니다
+~full velocity~통과하는 노트의 벨로시티를 최대로 설정
+~beat length~이 간격마다 결정적 무작위 시퀀스를 다시 시작
+~seed~무작위 시퀀스를 결정하는 숫자
+~<~이전 시드로 이동
+~*~새 무작위 시드 생성
+~>~다음 시드로 이동
+
+
+
+velocitystepsequencer~시퀀스에 따라 들어오는 노트의 벨로시티를 조정합니다
+~interval~시퀀스 진행 속도
+~len~시퀀스 길이
+~downbeat~다운비트마다 시퀀스를 리셋할까요?
+~vel*~이 스텝의 벨로시티
+
+
+
+velocitysetter~노트의 벨로시티를 이 값으로 설정합니다
+~vel~사용할 벨로시티
+~rand~출력 벨로시티를 줄일 무작위 정도
+
+
+
+velocityscaler~노트의 벨로시티를 높이거나 낮추도록 스케일합니다
+~scale~벨로시티에 곱할 양
+
+
+
+velocitycurve~커브 매핑에 따라 벨로시티를 조정합니다
+
+
+
+unstablepressure~펄린 노이즈로 MPE 프레셔를 변형합니다
+~amount~변형 양
+~warble~느린 레이어의 변형 속도
+~noise~빠른 레이어의 변형 속도
+
+
+
+unstablepitch~펄린 노이즈로 MPE 피치벤드를 변형합니다
+~amount~변형 양
+~warble~느린 레이어의 변형 속도
+~noise~빠른 레이어의 변형 속도
+
+
+
+unstablemodwheel~펄린 노이즈로 MPE 슬라이드를 변형합니다
+~amount~변형 양
+~warble~느린 레이어의 변형 속도
+~noise~빠른 레이어의 변형 속도
+
+
+
+sustainpedal~입력 노트를 계속 서스테인합니다
+~sustain~입력 노트를 유지할까요?
+
+
+
+scaledetect~입력한 노트 모음에 맞는 스케일을 찾아냅니다. 마지막으로 연주한 음이 근음으로 쓰입니다.
+~reset~입력된 노트 모음 초기화
+~matches~이 근음에 맞는 스케일
+
+
+
+scaledegree~현재 스케일을 기준으로 입력을 조옮김합니다
+~degree~조옮김할 양
+~retrigger~조옮김 양을 바꿀 때 현재 노트를 즉시 다시 연주
+~diatonic~조옮김한 노트를 스케일 안에 유지할까요?
+
+
+
+quantizer~다음 퀀타이즈 간격까지 입력을 지연시킵니다
+~quantize~퀀타이즈 간격
+~repeat~노트를 누르고 있을 때 매 간격마다 반복할까요?
+
+
+
+previousnote~노트 온을 받으면 직전에 받은 노트 온을 출력합니다
+
+
+
+pressuretovibrato~미디 프레셔 모듈레이션 입력을 받아 피치 벤드를 이용한 비브라토로 바꿉니다
+~vibrato~비브라토 양
+~vibinterval~비브라토 속도
+
+
+
+pressuretomodwheel~미디 프레셔 모듈레이션 입력을 받아 모드휠 모듈레이션으로 바꿉니다
+
+
+
+pressure~노트에 프레셔 모듈레이션을 더합니다
+~pressure~프레셔 양
+
+
+
+portamento~한 번에 하나의 노트만 연주되게 하고, 피치 벤드로 노트 사이를 글라이드합니다
+~mode~always: 새 노트로 항상 글라이드\nretrigger held: 이전 노트를 누르고 있으면 노트로 벤드하고 다시 트리거\nbend held: 이전 노트를 누르고 있으면 다시 트리거하지 않고 노트로 벤드
+~glide~글라이드 시간 (밀리초)
+
+
+
+pitchsetter~들어오는 노트가 지정한 음높이를 쓰도록 설정합니다
+~pitch~사용할 음높이
+
+
+
+pitchremap~입력 음높이를 다른 출력 음높이로 리매핑합니다
+~from*~바꿀 음높이
+~to*~원하는 음높이
+
+
+
+pitchpanner~입력 음높이에 따라 노트에 팬 모듈레이션을 더해, 낮은 음은 한쪽으로, 높은 음은 다른 쪽으로 패닝합니다
+~left~완전히 왼쪽 팬을 나타내는 음높이
+~right~완전히 오른쪽 팬을 나타내는 음높이
+
+
+
+pitchdive~피치벤드를 이용해 시작 오프셋에서 입력 음높이로 안착합니다
+~start~시작할 반음 오프셋
+~time~음높이 오프셋에서 입력 음높이로 이동하는 시간 (밀리초)
+
+
+
+pitchbender~노트에 피치 벤드를 더합니다
+~bend~벤드 양 (반음)
+
+pulserouter~UI 컨트롤로 펄스가 라우팅될 곳을 제어할 수 있습니다. 목록에 목적지를 추가하려면 대상으로 패치하세요
+~route~pulserouter의 목적지 모듈
+
+notewrap~입력 음높이가 원하는 범위 안에 머물도록 감쌉니다
+~min~음높이 범위의 하단
+~range~최저 음높이로 다시 돌아가기 전까지의 반음 수
+
+
+
+notestrummer~여기로 코드를 보내고 슬라이더를 움직여 코드의 각 노트를 스트럼합니다
+~strum~슬라이더를 각 노트 너머로 움직여 스트럼
+
+
+
+notestream~연주되는 노트의 흐름을 봅니다
+~reset~음높이 범위 초기화
+
+
+
+notesorter~음높이별로 노트를 나눕니다. 매핑되지 않은 음높이는 기본 출력으로 나갑니다.
+~pitch *~이 출력에 쓸 음높이
+
+
+
+noterouter~UI 컨트롤로 노트가 라우팅될 곳을 제어할 수 있습니다. 목록에 목적지를 추가하려면 대상으로 패치하세요
+~route~noterouter의 목적지 모듈
+
+
+
+noteexpression~평가된 수식에 따라 노트가 라우팅될 곳을 제어합니다. 변수 "p"는 음높이, "v"는 벨로시티를 나타냅니다
+~expression*~이 케이블에 대해 평가할 수식. 음높이가 80보다 크고 벨로시티가 60보다 작은 노트를 라우팅하는 수식 예:\n"p > 80 && v < 60"
+
+
+
+noteecho~들어오는 노트를 지정한 지연 시간에 출력합니다
+~delay *~이 출력을 지연시킬 시간 (마디 단위)
+
+
+
+noteratchet~입력 노트를 일정 시간 동안 빠르게 반복합니다
+~duration~반복이 지속될 전체 시간
+~subdivision~각 반복의 길이
+~skip first~입력 노트를 다시 연주하지 않습니다. 첫 노트와 래칫 노트를 더 쉽게 분리할 수 있습니다.
+
+
+
+noterangefilter~특정 음높이 범위 안의 노트만 통과시킵니다
+~min~허용되는 최저 음높이
+~max~허용되는 최고 음높이
+~wrap~범위 밖의 노트를 거부하는 대신, 범위 안으로 감쌀까요?
+
+
+
+notepanrandom~팬이 적용되는 노트를 지원하는 내장 신스를 위해 노트의 팬을 무작위 값으로 설정합니다
+~spread~무작위 정도
+~center~중앙 팬 위치
+
+
+
+notepanner~팬이 적용되는 노트를 지원하는 내장 신스를 위해 노트의 팬을 설정합니다
+~pan~팬 위치. .5가 중앙입니다
+
+
+
+notepanalternator~팬이 적용되는 노트를 지원하는 내장 신스를 위해, 두 값을 번갈아 가며 노트의 팬을 설정합니다
+~one~팬 위치. .5가 중앙입니다
+~two~팬 위치. .5가 중앙입니다
+
+
+
+noteoctaver~노트를 옥타브 단위로 조옮김합니다
+~octave~올리거나 내릴 옥타브 수
+~retrigger~조옮김 양을 바꿀 때 현재 노트를 즉시 다시 연주
+
+
+
+notelatch~노트 온 메시지로 노트를 켜고 끄기를 전환합니다
+
+
+
+notehumanizer~타이밍과 벨로시티에 무작위성을 더합니다
+~time ms~타이밍 무작위 정도 (밀리초)
+~strum ms~이전 노트가 연주된 뒤 기다릴 시간 (밀리초)
+~velocity~벨로시티 무작위 정도
+
+
+
+notehocket~노트를 무작위 목적지로 보냅니다
+~weight *~노트가 이 목적지로 갈 확률
+~beat length~이 간격마다 결정적 무작위 시퀀스를 다시 시작
+~seed~무작위 시퀀스를 결정하는 숫자
+~<~이전 시드로 이동
+~*~새 무작위 시드 생성
+~>~다음 시드로 이동
+
+
+
+notegate~노트 통과를 허용하거나 막습니다
+~open~노트 통과 허용 여부
+
+
+
+noteflusher~모든 노트에 노트 오프를 보냅니다
+~flush~클릭하여 노트 비우기
+
+
+
+notefilter~특정 음높이만 통과시킵니다
+~C-2 (0)~
+~C#-2 (1)~
+~D-2 (2)~
+~D#-2 (3)~
+~E-2 (4)~
+~F-2 (5)~
+~F#-2 (6)~
+~G-2 (7)~
+
+
+
+noteduration~노트 오프 메시지를 무시하고 노트가 연주될 길이를 설정합니다
+~duration~노트 길이 (마디 단위)
+
+
+
+notedisplayer~입력 노트 정보를 보여줍니다
+
+
+
+notedelayer~입력 노트를 지정한 만큼 지연시킵니다
+~delay~지연 시간 (마디 단위)
+
+
+
+notechance~노트를 무작위로 통과시킵니다
+~chance~노트가 통과할 확률
+~deterministic~일정 구간마다 무작위 결과가 반복되도록 허용
+~beat length~이 간격마다 결정적 무작위 시퀀스를 다시 시작
+~seed~무작위 시퀀스를 결정하는 숫자
+~<~이전 시드로 이동
+~*~새 무작위 시드 생성
+~>~다음 시드로 이동
+
+
+
+mpetweaker~들어오는 MPE 모듈레이션 값을 조정합니다
+~pitchbend mult~들어오는 피치벤드에 곱할 양
+~pitchbend offset~들어오는 피치벤드에 더할 오프셋
+~pressure mult~들어오는 프레셔에 곱할 양
+~pressure offset~들어오는 프레셔에 더할 오프셋
+~modwheel mult~들어오는 모드휠에 곱할 양
+~modwheel offset~들어오는 모드휠에 더할 오프셋
+
+
+
+mpesmoother~MPE 파라미터를 부드럽게 합니다
+~pitch~들어오는 피치벤드를 부드럽게 할 양
+~pressure~들어오는 프레셔를 부드럽게 할 양
+~modwheel~들어오는 모드휠을 부드럽게 할 양
+
+
+
+modwheeltovibrato~노트의 모드휠 입력을 리드미컬한 피치 벤드로 변환합니다
+~vibrato~피치 벤드 양
+~vibinterval~비브라토 속도
+
+
+
+modwheeltopressure~익스프레션 입력을 출력의 미디 프레셔로 바꿉니다
+
+
+
+modwheel~노트에 익스프레션 값을 더합니다
+~modwheel~익스프레션 레벨
+
+
+
+modulationvizualizer~노트의 MPE 모듈레이션 값을 표시합니다
+
+
+
+midioutput~하드웨어나 다른 소프트웨어 같은 외부 목적지로 미디를 보냅니다
+~controller~미디를 보낼 곳
+
+
+
+midicc~"midioutput" 모듈로 라우팅할 미디 컨트롤 체인지 메시지를 출력합니다
+~control~CC 컨트롤 번호
+~value~이 값이 바뀌면 CC 값을 출력
+
+
+
+samplebrowser~시스템에서 샘플을 찾아봅니다. 여기서 원하는 대상(sampleplayer, drumplayer, seaofgrain 등)으로 샘플을 드래그하세요
+~ < ~이전 페이지
+~ > ~다음 페이지
+
+
+
+linnstrumentcontrol~[작업 중] linnstrument 컨트롤러의 조명을 여러 방식으로 제어합니다
+~controller~linnstrument가 연결된 midicontroller
+~decay~켜진 키가 꺼지는 데 걸리는 시간
+~blackout~모든 조명 끄기
+~octaves~키를 누를 때 모든 옥타브의 해당 키를 켤까요?
+~guitar lines~"guitar lines" 조명 레이아웃을 사용할까요?
+
+
+
+gridnotedisplayer~gridkeyboard와 함께 써서 현재 연주 중인 노트를 표시하고, 코드나 아르페지오 등을 시각화합니다.
+
+
+
+chordholder~동시에 누른 노트를 새 노트가 눌릴 때까지 계속 서스테인합니다
+~stop~노트 연주 멈추기
+~pulse to play~켜면 입력 노트가 바로 연주되지 않고, 입력 펄스를 기다린 뒤 연주됩니다
+
+
+
+chorder~들어오는 음높이를 받아 추가 노트를 연주해 코드를 만듭니다
+~diatonic~그리드를 반음계로 할까요, 스케일에만 고정할까요?
+~chord~코드 프리셋
+~inversion~전위 프리셋
+
+
+
+chorddisplayer~현재 스케일을 기준으로 어떤 코드가 연주되는지 표시합니다
+
+
+
+capo~들어오는 노트를 반음 단위로 이동합니다
+~capo~이동할 반음 수
+~retrigger~카포 양을 바꿀 때 현재 노트를 즉시 다시 연주
+~diatonic~조옮김한 노트를 스케일 안에 유지할까요?
+
+
+
+arpeggiator~누르고 있는 노트를 아르페지오합니다. 이 모듈에는 정리해야 할 흔적 기능이 몇 가지 남아 있습니다.
+~interval~아르페지오 속도
+~step~아르페지오를 진행할 방향과 거리. 0은 "pingpong"입니다.
+~octaves~진행할 옥타브 수
+
+
+
+titlebar~
+~menu~메인 메뉴 표시
+~save layout~[none]
+~ ? ~도움말 표시
+~settings~환경설정 조정 (userprefs.json으로 저장됨)
+~load layout~[none]
+~play/pause~모든 오디오 처리 중지 (shift-p)
+
+
+
+newpatchconfirm~
+~confirm~모두 지우고 새로 시작
+~cancel~닫기
+
+
+
+menupopup~
+~recents~최근 사용한 파일이 있는 환영 패널 표시
+~load~저장된 .bsk 파일을 불러와 상태 복원
+~save~나중에 복원할 수 있도록 현재 상태를 .bsk 파일로 저장
+~save as~현재 상태를 새 .bsk 파일로 저장
+~new~userprefs.json의 "layout"에 지정된 레이아웃으로 리셋
+~write audio~최근 30분간의 오디오를 지정한 recordings_path에 저장
+~move canvas home~뷰포트를 "home" 위치로 이동합니다. 저장 상태에서 현재 위치를 잃었을 때 유용합니다
+~lookahead (exp.)~scriptmodule에 필요한 룩어헤드 스케줄링을 사용합니다. scriptmodule을 쓰면 자동으로 켜집니다. 지금까지 룩어헤드 스케줄링이 문제를 일으키지 않는 것 같지만, 만일을 위해 이 체크박스를 남겨 둡니다.
+~autosave~새 모듈이 추가될 때마다 data/savestate/autosave/에 저장해, 충돌이 났을 때 상태를 다시 불러올 수 있게 합니다. 큰 샘플을 쓰는 모듈이 있으면 꽤 느릴 수 있습니다.
+~show tooltips~이 툴팁을 표시합니다. F1 키로 켜고 끌 수 있으며, "settings" 메뉴에서 기본값을 설정할 수 있습니다.
+
+
+
+plugin~VST 같은 호스팅된 플러그인 인스턴스
+~vol~출력 볼륨 조정
+~program change~플러그인 인스턴스에 프로그램 체인지 메시지 보내기
+~open~플러그인 창 표시
+~show parameter~파라미터를 선택해 표시하면 bespoke 인터페이스 안에서 조정할 수 있습니다. 플러그인의 파라미터가 100개를 넘으면 이 목록은 처음에 비어 있습니다. 그럴 때는 플러그인 인터페이스에서 파라미터를 움직이거나 바꾸면 이 목록에 나타납니다.
+~load parameter~플러그인이 노출하는 파라미터 수를 보여줍니다. 여기를 클릭하면 최대 100개의 파라미터를 파라미터 드롭다운 목록에 추가하려고 시도합니다. `shift`를 누른 채 클릭하면 파라미터 슬라이더도 함께 추가됩니다. `control`을 누르고 있으면 플러그인을 새로 생성한 것처럼 파라미터 목록을 초기화하고 다시 만듭니다.
+~preset~저장된 플러그인 프리셋 중에서 선택
+~save as~현재 플러그인 설정을 나중에 다시 불러올 프리셋으로 저장
+~reset~현재 선택된 프리셋을 디스크에서 다시 불러와, 모든 파라미터를 원래 저장된 값으로 리셋
+~panic~이 플러그인에 "all notes off"와 "all sounds off"를 보내 즉시 소리를 멈춤
+~ + ~플러그인에서 새 스테레오 출력을 직접 추가
+~  -  ~플러그인에서 마지막으로 직접 추가한 스테레오 출력 제거
+~ X ~파라미터와 거기에 연결된 모든 모듈레이션 제거
+
+
+transport~템포와 현재 시간 위치를 제어합니다
+~tempo~글로벌 템포 (분당 비트 수)
+~ + ~템포를 1 올림
+~ - ~템포를 1 내림
+~swing~스윙 간격 안에서 음악적 시간의 중간 지점이 어디에 올지 정합니다. .5는 스윙 없음을 뜻합니다.
+~swing interval~스윙을 적용할 간격
+~timesigtop~박자표 윗숫자
+~timesigbottom~박자표 아랫숫자
+~reset~타임라인을 0으로 리셋
+~ < ~현재 시간을 조금 뒤로 이동
+~ > ~현재 시간을 조금 앞으로 이동
+~set tempo~
+~play/pause~모든 오디오 처리 중지 (shift-p)
+
+
+
+transposefrom~지정한 근음에서 현재 스케일의 근음으로 입력을 조옮김합니다. 주된 용도는 키보드를 C로 연주해도 현재 스케일로 조옮김되게 하는 것입니다.
+~root~조옮김의 기준이 될 근음
+~retrigger~조옮김 근음이나 스케일을 바꿀 때 현재 노트를 즉시 다시 연주
+
+
+
+m185sequencer~m185 또는 intellijel metropolis의 독특한 방식을 사용하는 시퀀서
+~interval~스텝당 간격
+~reset step~카운터를 첫 스텝으로 리셋
+~pitch*~이 행에 쓸 음높이
+~pulses*~이 행이 지속될 스텝 수
+~gate*~각 행의 동작: "repeat"는 매 스텝 연주, "once"는 첫 스텝만 연주, "hold"는 모든 스텝에 걸쳐 유지, "rest"는 연주하지 않음
+
+
+
+
+
+notestepper~패치 케이블들을 돌아가며 노트를 출력해 순차적인 변화를 만듭니다
+~length~시퀀스 길이
+~reset~처음으로 리셋
+
+
+
+
+splitter~스테레오 신호를 두 개의 모노 신호로 나누거나, 모노 신호를 복제합니다
+
+
+
+scale~여러 모듈이 사용하는 글로벌 스케일을 제어합니다
+~root~스케일의 근음
+~scale~사용할 음 세트
+~degree~
+~intonation~스케일을 튜닝하는 방식
+~PPO~옥타브당 음 수
+~tuning~"note"에 정의된 음높이가 나타내는 주파수
+~note~"tuning"에 정의된 주파수에 대응하는 음높이
+~load SCL~스케일을 정할 SCL 파일 불러오기
+~load KBM~키보드 매핑을 정할 KBM 파일 불러오기
+
+
+
+output~오디오를 여기로 라우팅하면 출력 채널(스피커나 오디오 인터페이스)로 보냅니다
+~ch~오디오를 보낼 채널 (스테레오를 원하면 채널들)
+
+
+
+gain~오디오 신호의 볼륨을 조정합니다
+~gain~신호를 조정할 양. 1이면 신호가 바뀌지 않습니다.
+
+
+
+userprefseditor~bespoke 설정입니다. 일부 설정은 bespoke를 다시 시작해야 적용됩니다.
+~devicetype~bespoke가 사용할 오디오 장치 종류 (재시작 필요)
+~audio_output_device~오디오 출력에 사용할 장치 (재시작 필요)
+~audio_input_device~오디오 입력에 사용할 장치 (재시작 필요)
+~samplerate~오디오 장치에 사용할 샘플레이트 (재시작 필요)
+~buffersize~오디오 장치에 사용할 버퍼 크기. 값이 낮을수록 CPU를 더 쓰고, 높을수록 지연이 늘어납니다. (재시작 필요)
+~oversampling~글로벌 오버샘플링 배율. 더 높은 해상도의 오디오 처리를 위해 CPU를 추가로 사용합니다. (재시작 필요)
+~output_wav_bit_depth~오디오를 WAV 파일로 내보낼 때 쓸 비트 깊이
+~width~시작 시 bespoke 창의 너비
+~height~시작 시 bespoke 창의 높이
+~set_manual_window_position~시작 시 bespoke 창을 특정 위치에 강제로 둘까요?
+~position_x~왼쪽 위 모서리의 원하는 x 위치
+~position_y~왼쪽 위 모서리의 원하는 y 위치
+~zoom~시작 시 원하는 캔버스 확대 수준
+~ui_scale~UI 레이어(타이틀 바, 빠른 생성 메뉴 등)의 크기
+~cable_drop_behavior~케이블을 드래그해 빈 공간에 놓았을 때의 동작
+~qwerty_to_pitch_mode~일부 모듈은 컴퓨터 키보드 입력을 받아 자동으로 MIDI 노트로 변환할 수 있습니다. 이 설정은 비슷한 기능을 가진 다른 DAW를 기준으로 키보드를 해석하는 방식을 정합니다. \nAbleton:\n옥타브#1: A->L\n옥타브 내림: Z\n옥타브 올림: X\n\nFruity:\n옥타브#1: Z->M\n옥타브#2: Q->I\n옥타브 내림: ,\n옥타브 올림: .
+~grid_snap_size~모듈 위치를 스냅할 때 쓸 그리드 크기 (모듈을 드래그하는 동안 mac에서는 command, 그 외에는 control을 누르세요)
+~scroll_multiplier_vertical~마우스/트랙패드 세로 스크롤 속도 조정
+~scroll_multiplier_horizontal~마우스/트랙패드 가로 스크롤 속도 조정
+~autosave~시작 시 자동 저장을 켤까요?
+~show_tooltips_on_load~시작 시 툴팁을 켤까요?
+~show_minimap~미니맵을 표시할까요? (재시작 필요)
+~show_welcome_screen~bespoke를 처음 열 때 환영 화면을 표시할까요?
+~immediate_paste~켜면 UI 컨트롤에 값을 붙여넣을 때 enter를 누를 필요 없이 바로 적용됩니다
+~record_buffer_length_minutes~타이틀 바의 "write audio" 버튼에 쓰이는 상시 녹음 버퍼의 길이 (재시작 필요)
+~vst_always_on_top~플러그인 창을 열었을 때 항상 bespoke 위에 표시할까요?
+~max_output_channels~할당할 출력 채널 수 (재시작 필요)
+~max_input_channels~할당할 입력 채널 수 (재시작 필요)
+~plugin_preference_order~선호 순서대로 나열한 플러그인 포맷 목록 (세미콜론으로 구분). 플러그인이 여러 포맷으로 있으면 가장 선호하는 포맷만 표시됩니다. 비워 두면 모든 플러그인을 항상 표시합니다. (기본값: "VST3;VST;AudioUnit;LV2")
+~force_juce_file_chooser~네이티브 파일 선택 창이 있어도 JUCE가 제공하는 파일 선택 창을 사용
+~draw_background_lissajous~배경 리사주 곡선을 그릴까요?
+~fade_cable_middle~긴 케이블의 가운데를 흐려지게 그릴까요?
+~cable_quality~케이블의 시각적 해상도
+~lissajous_r~리사주 곡선의 빨강 RGB 값
+~lissajous_g~리사주 곡선의 초록 RGB 값
+~lissajous_b~리사주 곡선의 파랑 RGB 값
+~background_r~캔버스 배경의 빨강 RGB 값
+~background_g~캔버스 배경의 초록 RGB 값
+~background_b~캔버스 배경의 파랑 RGB 값
+~motion_trails~사용할 모션 블러 양 (이전 프레임의 "잔상"을 늘리거나 줄임)
+~draw_module_highlights~활동에 반응해 모듈이 반짝이게 할까요?
+~mouse_offset_x~시스템 마우스 위치와 bespoke 커서 위치 사이의 x 오프셋
+~mouse_offset_y~시스템 마우스 위치와 bespoke 커서 위치 사이의 y 오프셋
+~recordings_path~"write audio"와 multitrackrecorder의 wav 파일이 저장되는 곳
+~tooltips~툴팁 파일로 사용할 경로 (바꾸면 다른 언어의 툴팁을 쓸 수 있습니다. 한국어: tooltips_kor.txt)
+~layout~시작 시 bespoke가 사용할 템플릿
+~youtube_dl_path~youtube-dl 설치 경로 (sampleplayer 모듈의 유튜브 다운로드에 사용)
+~ffmpeg_path~ffmpeg 설치 경로 (sampleplayer 모듈의 유튜브 다운로드에 사용)
+~cable_alpha~케이블 불투명도
+~wrap_mouse_on_pan~캔버스를 이동할 때 마우스가 화면 밖으로 나가면 반대편으로 감싸, 끝없이 이동할 수 있게 함
+
+
+songbuilder~설정을 씬으로 정리하고 시퀀싱하는 대규모 구성 도구입니다. bespoke의 "송 모드"입니다
+~use sequencer~씬 시퀀서 표시
+~activate first scene on stop~정지하면 첫 번째 씬을 활성화합니다. 첫 번째 씬을 모든 곡 요소를 끄는 "off" 씬으로 쓰는 것을 권장합니다.
+~play~시퀀스 재생
+~stop~시퀀스 정지
+~pause~현재 씬에서 시퀀스 멈춤
+~loop~시퀀스 안에서 루프 사용
+~loop start~루프를 시작할 스텝 인덱스
+~loop end~루프가 끝나는 스텝 인덱스
+~scene*~이 스텝의 씬 이름
+~bars*~이 씬을 재생할 길이 (마디)
+~play from*~이 스텝부터 시퀀스 재생
+~contextmenu*~이 스텝의 옵션
+~change quantize~씬의 재생 버튼을 누른 뒤 변경이 일어날 시점. "switch"는 즉시 바꾸고, "jump"는 즉시 바꾸면서 글로벌 트랜스포트도 리셋합니다.
+~add target~씬이 영향을 줄 대상 컨트롤 추가
+~go*~이 씬 재생
+~name*~이 씬의 이름
+~context*~이 씬의 옵션
+~value*~이 씬에서 대상에 쓸 값
+~checkbox*~이 씬에서 대상에 쓸 값
+~dropdown*~이 씬에서 대상에 쓸 값
+~move left~이 대상을 씬에서 왼쪽으로 이동
+~move right~이 대상을 씬에서 오른쪽으로 이동
+~type~이 대상의 컨트롤 표시 방식 변경
+~color*~이 대상의 테마 색상
+
+
+pitchtovalue~미디 음높이 값을 출력합니다
+
+
+rhythmsequencer~누르고 있는 입력 노트를 반복해, 지속음을 리듬으로 바꿉니다
+~interval~노트를 연주할 빈도
+~length~시퀀스 길이
+~link lengths~전체 길이 하나를 쓸까요, 열마다 길이를 따로 둘까요?
+~len act~action 열의 길이
+~len vel~velocity 열의 길이
+~len oct~옥타브 오프셋 열의 길이
+~len deg~스케일 음도 오프셋 열의 길이
+~action *~이 스텝의 동작. on = 노트 연주, hold = 노트 유지, off = 노트 없음
+~vel *~이 스텝의 벨로시티
+~octave *~이 스텝의 옥타브 오프셋
+~degree *~이 스텝의 스케일 음도 오프셋
+
+
+dotsequencer~노트 길이와 벨로시티를 조정할 수 있는 폴리포닉 노트 시퀀서입니다. 가로로 클릭-드래그하면 길이를, 세로로 클릭-드래그하면 벨로시티를 조정합니다. 마우스를 올리고 화살표 키로 점을 옮기거나, 마우스 휠로 점 길이를 조정하세요.
+~interval~노트를 연주할 빈도
+~cols~열 수
+~rows~행 수
+~notemode~행이 나타낼 음높이 세트
+~octave~이 시퀀스의 가장 낮은 음의 옥타브
+~row offset~행과 음높이 매핑을 오프셋할 양
+~clear~점 그리드 내용 지우기
+~double~이 시퀀스의 길이를 두 배로
+~dotgrid~점 그리드
+
+
+euclideansequencer~루프를 원으로 표시하는 유클리드 시퀀서입니다. 노트는 유클리드 리듬 알고리즘으로 계산됩니다.
+~random~모든 링의 스텝, 온셋, 회전을 무작위화
+~random*~이 링의 스텝, 온셋, 회전을 무작위화
+~steps~모든 링의 스텝 무작위화
+~step chance~스텝이 바뀔 확률
+~stp*~스텝이 생성되는 범위
+~onset chance~온셋이 바뀔 확률
+~ons *~온셋이 생성되는 범위
+~rot chance~회전이 바뀔 확률
+~rot lo~회전이 생성되는 범위
+~rot hi~회전이 생성되는 범위
+~offset chance~오프셋이 바뀔 확률
+~o *~오프셋이 생성되는 범위
+~note chance~노트가 바뀔 확률
+~oct*~노트가 생성되는 옥타브 범위
+~steps*~이 링의 스텝 수
+~onsets~모든 링의 온셋 무작위화
+~onsets*~이 링의 온셋 수
+~rotation~모든 링의 회전 무작위화
+~rotation*~이 링의 회전
+~offset~모든 링의 오프셋 무작위화
+~offset*~이 링의 타이밍 오프셋
+~note~모든 링의 노트 무작위화
+~note*~이 링에 쓸 음높이
+~clear~모든 링의 스텝, 온셋, 회전, 오프셋 지우기
+
+
+savestateloader~다른 저장 상태 파일을 불러옵니다 (현재 저장 상태는 해제됨). 버튼 수는 삼각형 메뉴에서 조정할 수 있습니다.
+~load *~지정한 저장 상태 파일을 불러옵니다. shift-클릭하면 새 파일을 선택합니다.
+
+
+dataprovider~보통은 쉽게 접근할 수 없는 모듈레이션 값을 제공합니다.
+~type~제공할 값의 종류
+~interval~측정할 간격
+~realtime~켜면 이 모듈이 오디오 스레드에서 동작해 더 정확하지만 자원도 더 많이 씁니다
+~set~클릭하여 값을 보냅니다 (또는 이 모듈에 펄스를 보내도 같은 결과)
+
+
+pulselimit~통과할 수 있는 펄스 수를 제한합니다
+~reset~지나간 펄스 카운터 리셋
+~limit~통과시킬 펄스 수 제한
+
+audiosplitter~오디오 신호를 여러 목적지로 보냅니다
+
+acciaccatura~입력 음높이를 연주하기 전에 짧은 꾸밈음을 더합니다
+~offset~처음 피치 벤드의 오프셋 정도
+~notemode~오프셋을 스케일 음 단위로 할까요, 반음 단위로 할까요?
+~hold ms~입력 음높이로 넘어가기 전에 오프셋 음높이를 유지하는 시간
+~glide ms~hold ms 이후 오프셋 음높이에서 입력 음높이로 벤드하는 시간
+
+dopplershift~수신자와 음원의 속도에 따라 피치 시프트 값을 출력합니다
+~receiver speed~음원을 향하는 수신자의 속도 (m/s)
+~source speed~수신자를 향하는 음원의 속도 (m/s)
+~reverse~수신자와 음원의 이동 방향을 반대로
+
+stereorotation~입력 오디오의 위상을 회전시킵니다
+~phase~위상 오프셋
+
+latencycalculator~latencycalculatorreceiver와 함께 써서 시스템의 지연을 측정합니다 (bespoke 내부, 또는 마이크를 이용한 외부 I/O 지연)
+~test~수신기가 감지할 테스트 펄스 발사
+
+latencycalculatorreceiver~latencycalculator가 생성한 신호의 수신 쪽에 두세요 (bespoke 내부에서 직접, 또는 마이크 입력을 통해 간접적으로)
+
+interface~다른 컨트롤을 참조하는 사용자 정의 컨트롤 모음을 만듭니다. 만든 컨트롤을 자세히 편집하려면 그 컨트롤 위에 마우스를 올리고 shift-enter를 눌러 편집기 뷰를 여세요.
+
+binaryvalue~모듈레이션 값을 이진수로 변환해 각 비트를 별도의 모듈레이션 케이블로 보냅니다
+~input~입력값
+~code~이진 표현으로 변환할 때 쓸 코드
+
+velocitytoduration~노트의 벨로시티로 그 길이를 정합니다
+~max duration~최대 벨로시티 값에 해당하는 길이 (마디 단위)
+
+zerocrossrate~입력 오디오의 영교차율을 측정합니다
