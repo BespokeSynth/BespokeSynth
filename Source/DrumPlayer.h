@@ -241,6 +241,7 @@ private:
       void DrawUIControls();
       void UpdateHitDirectoryDropdown();
       void LoadRandomSample();
+      void LoadFirstSample();
       void LoadNextSample(int direction);
       void LoadSample(std::string path);
       void GrabSample();

@@ -284,7 +284,7 @@ void UserPrefsEditor::DrawModule()
 
    mCategorySelector->Draw();
 
-   int controlX = 175;
+   int controlX = 205;
    int controlY = 50;
    bool hasPrefThatRequiresRestart = false;
    for (auto* pref : UserPrefs.mUserPrefs)

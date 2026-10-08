@@ -226,6 +226,7 @@ void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, fl
 void StringCopy(char* dest, const char* source, int destLength);
 int GetKeyModifiers();
 bool IsKeyHeld(int key, int modifiers = kModifier_None);
+int GetScrollSteps(float scroll, bool isSmoothScroll, float& accumulator, float scrollPerStep = 5);
 int KeyToLower(int key);
 float EaseIn(float start, float end, float a);
 float EaseOut(float start, float end, float a);

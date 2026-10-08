@@ -33,6 +33,7 @@ public:
    SwitchAndRamp();
    void StartSwitch();
    float Process(int channel, float input, float rampSpeed = .005f);
+   float GetOffset(int channel) const { return mOffset[channel]; }
 
 private:
    std::array<bool, ChannelBuffer::kMaxNumChannels> mSwitching{ false };

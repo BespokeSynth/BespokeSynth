@@ -262,7 +262,7 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
       maxPerColumn = 9999;
       displayColumns = 1;
       totalColumns = 1;
-      mCurrentPagedColumn = 0;
+      currentPagedColumn = 0;
    }
 
    bool paged = (displayColumns < totalColumns);
@@ -308,7 +308,8 @@ void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
 
    if (paged)
    {
-      DrawTextNormal("page " + ofToString(mCurrentPagedColumn / displayColumns + 1) + "/" + ofToString(totalColumns / displayColumns + 1), 30, 14);
+      int pageCount = (totalColumns + displayColumns - 1) / displayColumns; //round up, matching ChangePage's own clamp
+      DrawTextNormal("page " + ofToString(mCurrentPagedColumn / displayColumns + 1) + "/" + ofToString(pageCount), 30, 14);
    }
 
    ofSetLineWidth(.5f);
@@ -389,10 +390,22 @@ void DropdownList::OnClicked(float x, float y, bool right)
    float maxY = ofGetHeight() - 5;
 
    const int kMinPerColumn = 3;
-   mMaxPerColumn = std::max(kMinPerColumn, int((maxY - screenY) / (kItemSpacing * GetModuleParent()->GetOwningContainer()->GetDrawScale()))) - 1;
-   mTotalColumns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
+   //nothing ever moves the popup up, so this row budget is the only thing keeping it on screen.
+   //it reserves a strip under the last row: a blank row normally, the taller page bar once it pages.
+   float availableHeight = (maxY - screenY) / GetModuleParent()->GetOwningContainer()->GetDrawScale();
    int maxDisplayColumns = std::max(1, int((ofGetWidth() / GetModuleParent()->GetOwningContainer()->GetDrawScale()) / mMaxItemWidth));
+
+   mMaxPerColumn = std::max(kMinPerColumn, int((availableHeight - kItemSpacing) / kItemSpacing));
+   mTotalColumns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
    mDisplayColumns = std::min(mTotalColumns, maxDisplayColumns);
+
+   bool paged = (mDisplayColumns < mTotalColumns);
+   if (paged) //the page bar costs more than the blank row, so take that space back and re-split
+   {
+      mMaxPerColumn = std::max(kMinPerColumn, int((availableHeight - kPageBarSpacing) / kItemSpacing));
+      mTotalColumns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
+      mDisplayColumns = std::min(mTotalColumns, maxDisplayColumns);
+   }
 
    int selectedIndex = FindItemIndex(*mVar);
    if (selectedIndex >= 0 && selectedIndex < (int)mElements.size() && mMaxPerColumn > 0)
@@ -405,9 +418,7 @@ void DropdownList::OnClicked(float x, float y, bool right)
       mCurrentPagedColumn = 0;
    }
 
-   bool paged = (mDisplayColumns < mTotalColumns);
-
-   ofVec2f modalDimensions(mMaxItemWidth * mDisplayColumns, kItemSpacing * std::min((int)mElements.size(), mMaxPerColumn + (paged ? 1 : 0)));
+   ofVec2f modalDimensions(mMaxItemWidth * mDisplayColumns, kItemSpacing * std::min((int)mElements.size(), mMaxPerColumn) + (paged ? kPageBarSpacing : 0));
    modalPos.x = std::max(FromScreenPosX(5.0f, GetModuleParent()), std::min(modalPos.x, FromScreenPosX(maxX - modalDimensions.x * GetModuleParent()->GetOwningContainer()->GetDrawScale(), GetModuleParent())));
    mModalList.SetPosition(modalPos.x, modalPos.y);
    mModalList.SetDimensions(modalDimensions.x, modalDimensions.y);
@@ -417,6 +428,9 @@ void DropdownList::OnClicked(float x, float y, bool right)
 
 int DropdownList::GetItemIndexAt(int x, int y)
 {
+   if (x < 0 || y < 0)
+      return -1;
+
    bool paged = (mDisplayColumns < mTotalColumns);
    int indexOffset = 0;
    if (paged)
@@ -426,7 +440,13 @@ int DropdownList::GetItemIndexAt(int x, int y)
          return -1;
       indexOffset = mCurrentPagedColumn * mMaxPerColumn;
    }
-   return y / kItemSpacing + x / mMaxItemWidth * mMaxPerColumn + indexOffset;
+
+   int row = y / kItemSpacing;
+   int column = x / mMaxItemWidth;
+   if (row >= mMaxPerColumn || column >= mDisplayColumns) //the rect is inclusive at its edges, don't wrap into the next column or page
+      return -1;
+
+   return row + column * mMaxPerColumn + indexOffset;
 }
 
 ofVec2f DropdownList::GetModalListPosition() const
@@ -644,6 +664,7 @@ void DropdownListModal::SetUpModal()
 {
    if (mPagePrevButton == nullptr)
       CreateUIControls();
+   mScrollAccumulator = 0;
 }
 
 void DropdownListModal::CreateUIControls()
@@ -685,6 +706,24 @@ bool DropdownListModal::MouseMoved(float x, float y)
    mMouseX = x;
    mMouseY = y;
    return false;
+}
+
+bool DropdownListModal::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
+{
+   //paging is column-based, so a horizontal push pages too; follow whichever axis was pushed hardest
+   float scroll = (fabsf(scrollX) > fabsf(scrollY)) ? -scrollX : scrollY;
+
+   //one event shouldn't fly through the whole list
+   int steps = std::clamp(GetScrollSteps(scroll, isSmoothScroll, mScrollAccumulator), -4, 4);
+
+   //scrolling up goes to earlier entries, matching how the closed dropdown scrolls its value.
+   //ChangePage clamps itself, and is a no-op when the list fits on one page.
+   const int pageCount = (steps > 0) ? steps : -steps;
+   const int direction = (steps > 0) ? -1 : 1;
+   for (int i = 0; i < pageCount; ++i)
+      mOwner->ChangePage(direction);
+
+   return true; //while the popup is up it owns the wheel, so never let the event fall through to the value
 }
 
 void DropdownListModal::OnClicked(float x, float y, bool right)
