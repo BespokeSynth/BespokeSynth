@@ -196,19 +196,21 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
    if (buffer && length > 0)
    {
       const float halfH = height * 0.5f;
-      const int pixelWidth = (int)fabsf(width);
-      const float direction = (width > 0) ? 1.f : -1.f;
+      const int pixelWidth = (int)width;
       const float samplesPerPixel = length / pixelWidth;
-      const int innerStride = MAX(1, (int)(samplesPerPixel / 100));
+      const int innerStride = 1; //MAX(1, (int)(samplesPerPixel / 100));
+
+      // fix "crawling" effect by quantizing displayed start sample
+      start -= int(start) % int(samplesPerPixel);
 
       // pass 1: gather per-column min/max
       float highestMagnitude = 0;
 
-      for (int px = 0; px < pixelWidth; ++px)
+      for (int x = 0; x < pixelWidth; ++x)
       {
          float max = -999;
          float min = 999;
-         int sampleStart = (int)(px * samplesPerPixel + start);
+         int sampleStart = (int)(x * samplesPerPixel + start);
          int sampleCount = MAX(1, (int)samplesPerPixel);
 
          for (int j = 0; j < sampleCount; j += innerStride)
@@ -218,16 +220,18 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
                sampleIdx = sampleIdx - wraparoundFrom + wraparoundTo;
             if (bufferSize > 0)
                sampleIdx = ((sampleIdx % bufferSize) + bufferSize) % bufferSize;
+            else if (sampleIdx > end - 1)
+               sampleIdx = end - 1;
             max = MAX(max, buffer[sampleIdx]);
             min = MIN(min, buffer[sampleIdx]);
          }
 
          highestMagnitude = MAX(highestMagnitude, MAX(fabsf(max), fabsf(min)));
 
-         if (px < (int)sAudioBufferMinValues.size())
+         if (x < (int)sAudioBufferMinValues.size())
          {
-            sAudioBufferMaxValues[px] = max;
-            sAudioBufferMinValues[px] = min;
+            sAudioBufferMaxValues[x] = max;
+            sAudioBufferMinValues[x] = min;
          }
       }
 
@@ -239,9 +243,9 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
       ofSetColor(color);
       nvgBeginPath(gNanoVG);
 
-      for (int px = 0; px < pixelWidth; ++px)
+      for (int x = 0; x < pixelWidth; ++x)
       {
-         int rangeIndex = std::min(px, (int)sAudioBufferMinValues.size() - 1);
+         int rangeIndex = std::min(x, (int)sAudioBufferMinValues.size() - 1);
          float max = sAudioBufferMaxValues[rangeIndex] * halfH * vol * rescale;
          float min = sAudioBufferMinValues[rangeIndex] * halfH * vol * rescale;
 
@@ -254,7 +258,6 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
             min -= .05f;
          }
 
-         float x = px * direction;
          nvgMoveTo(gNanoVG, x, halfH - max);
          nvgLineTo(gNanoVG, x, halfH - min);
       }
@@ -264,8 +267,8 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
       if (pos != -1)
       {
          ofSetColor(0, 255, 0);
-         float px = ofMap(pos, start, end, 0, width, true);
-         ofLine(px, 0, px, height);
+         float x = ofMap(pos, start, end, 0, width, true);
+         ofLine(x, 0, x, height);
       }
    }
 
