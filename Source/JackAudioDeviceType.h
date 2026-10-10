@@ -108,7 +108,7 @@ public:
       if (mLastError.isNotEmpty())
          return;
 
-      jack_status_t status{ };
+      jack_status_t status{};
       mClient = mApi->clientOpen("BespokeSynth", JackNoStartServer, &status);
       if (mClient == nullptr)
       {
@@ -191,7 +191,7 @@ public:
             return mLastError;
          }
       }
-      return { };
+      return {};
    }
 
    void close() override
@@ -232,7 +232,7 @@ private:
    juce::String ConnectPorts(const std::vector<jack_port_t*>& ports, const juce::String& clientName, bool inputs)
    {
       if (ports.empty())
-         return { };
+         return {};
 
       const auto freePorts = [this](const char** names)
       {
@@ -260,7 +260,7 @@ private:
       }
       if (channel == 0)
          return "No audio ports available on JACK device " + clientName;
-      return { };
+      return {};
    }
 
    static juce::StringArray GetChannelNames(const char* prefix, size_t count)
@@ -294,7 +294,7 @@ private:
       jack_nframes_t latency = 0;
       for (auto* port : ports)
       {
-         jack_latency_range_t range{ };
+         jack_latency_range_t range{};
          mApi->portGetLatencyRange(port, mode, &range);
          latency = juce::jmax(latency, range.max);
       }
@@ -337,7 +337,7 @@ private:
       if (device.mCallback != nullptr && !device.mConfigurationChanged && !device.mBufferUnavailable)
          device.mCallback->audioDeviceIOCallbackWithContext(device.mInputPointers.data(), static_cast<int>(device.mInputPointers.size()),
                                                             device.mOutputPointers.data(), static_cast<int>(device.mOutputPointers.size()),
-                                                            static_cast<int>(samples), { });
+                                                            static_cast<int>(samples), {});
       return 0;
    }
 
