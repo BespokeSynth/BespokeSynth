@@ -33,5 +33,6 @@ ReflowComments: false
 SortIncludes: false
 SpaceBeforeCpp11BracedList: false
 SpaceInEmptyBlock: false
+SpaceInEmptyBraces: Never
 Standard: Auto
 ...
