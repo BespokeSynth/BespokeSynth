@@ -33,7 +33,7 @@ jobs:
           cmakeArguments: ""
           cmakeTarget: "code-quality-pipeline-checks"
         linux-x64:
-          imageName: 'ubuntu-22.04'
+          imageName: 'ubuntu-26.04'
           isLinux: True
           cmakeArguments: "-GNinja"
           cmakeTarget: "BespokeSynth"
