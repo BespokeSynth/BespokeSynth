@@ -23,3 +23,6 @@
 	path = libs/exprtk
 	url = https://github.com/ArashPartow/exprtk.git
 	branch = cmake
+[submodule "libs/libsamplerate"]
+	path = libs/libsamplerate
+	url = https://github.com/libsndfile/libsamplerate.git

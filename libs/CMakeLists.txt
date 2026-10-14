@@ -39,3 +39,10 @@ else()
   message(STATUS "Using system provided tuning-library")
 endif()
 add_subdirectory(xwax EXCLUDE_FROM_ALL)
+
+# The pinned release predates current CMake policies. Scope these settings to
+# this directory so libsamplerate's bundled tests stay out of Bespoke builds.
+set(BUILD_TESTING OFF)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.10)
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+add_subdirectory(libsamplerate EXCLUDE_FROM_ALL)

@@ -41,14 +41,53 @@ void InputChannel::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    mChannelSelector = new DropdownList(this, "ch", 3, 3, &mChannelSelectionIndex);
-
-   for (int i = 0; i < TheSynth->GetNumInputChannels(); ++i)
-      mChannelSelector->AddLabel(ofToString(i + 1), i);
-   mStereoSelectionOffset = mChannelSelector->GetNumValues(); //after this, the stereo pairs
-   for (int i = 0; i < TheSynth->GetNumInputChannels() - 1; ++i)
-      mChannelSelector->AddLabel(ofToString(i + 1) + "&" + ofToString(i + 2), mChannelSelector->GetNumValues());
    mChannelSelector->DrawLabel(true);
    mChannelSelector->SetWidth(43);
+   RefreshChannels();
+}
+
+void InputChannel::RefreshChannels()
+{
+   if (mChannelSelector == nullptr)
+      return;
+
+   int count = TheSynth->GetNumInputChannels();
+   mChannelSelector->Clear();
+   for (int i = 0; i < count; ++i)
+      mChannelSelector->AddLabel(ofToString(i + 1), i);
+   mStereoSelectionOffset = count;
+   for (int i = 0; i < count - 1; ++i)
+      mChannelSelector->AddLabel(ofToString(i + 1) + "&" + ofToString(i + 2), count + i);
+
+   mChannelSelectionIndex = mSelectedChannel + (mSelectedStereo ? mStereoSelectionOffset : 0);
+   mUnavailableSelectionIndex = -1;
+   if (mSelectedChannel + (mSelectedStereo ? 1 : 0) >= count)
+   {
+      mUnavailableSelectionIndex = count * 2 + mSelectedChannel + 1;
+      mChannelSelectionIndex = mUnavailableSelectionIndex;
+      std::string label = ofToString(mSelectedChannel + 1);
+      if (mSelectedStereo)
+         label += "&" + ofToString(mSelectedChannel + 2);
+      mChannelSelector->AddLabel(label + " (unavailable)", mChannelSelectionIndex);
+   }
+   if (mModuleSaveData.HasProperty("channels"))
+   {
+      mModuleSaveData.SetEnumMapFromList("channels", mChannelSelector);
+      mModuleSaveData.SetEnum("channels", mChannelSelectionIndex);
+   }
+}
+
+void InputChannel::DropdownUpdated(DropdownList* list, int oldVal, double time)
+{
+   if (list == mChannelSelector)
+   {
+      if (mChannelSelectionIndex != mUnavailableSelectionIndex)
+      {
+         mSelectedStereo = mStereoSelectionOffset > 0 && mChannelSelectionIndex >= mStereoSelectionOffset;
+         mSelectedChannel = mChannelSelectionIndex - (mSelectedStereo ? mStereoSelectionOffset : 0);
+      }
+      RefreshChannels();
+   }
 }
 
 void InputChannel::Process(double time)
@@ -58,20 +97,16 @@ void InputChannel::Process(double time)
    if (!mEnabled)
       return;
 
-   int channelSelectionIndex = mChannelSelectionIndex;
-
-   int numChannels = 1;
-   if (mChannelSelectionIndex >= mStereoSelectionOffset)
-      numChannels = 2;
+   int numChannels = mSelectedStereo ? 2 : 1;
 
    SyncBuffers(numChannels);
 
    IAudioReceiver* target = GetTarget();
 
-   if (mChannelSelectionIndex < mStereoSelectionOffset) //mono
+   if (!mSelectedStereo) //mono
    {
       float* buffer = gZeroBuffer;
-      int channel = mChannelSelectionIndex;
+      int channel = mSelectedChannel;
       if (channel >= 0 && channel < TheSynth->GetNumInputChannels())
          buffer = TheSynth->GetInputBuffer(channel);
 
@@ -85,7 +120,7 @@ void InputChannel::Process(double time)
       float* buffer1 = gZeroBuffer;
       float* buffer2 = gZeroBuffer;
 
-      int channel1 = channelSelectionIndex - mStereoSelectionOffset;
+      int channel1 = mSelectedChannel;
       if (channel1 >= 0 && channel1 < TheSynth->GetNumInputChannels())
          buffer1 = TheSynth->GetInputBuffer(channel1);
       int channel2 = channel1 + 1;
@@ -123,10 +158,25 @@ void InputChannel::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
 
    SetUpFromSaveData();
+   if (!moduleInfo["channel_index"].isNull() && !moduleInfo["stereo"].isNull())
+   {
+      mSelectedChannel = MAX(0, moduleInfo["channel_index"].asInt());
+      mSelectedStereo = moduleInfo["stereo"].asBool();
+      RefreshChannels();
+   }
+}
+
+void InputChannel::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   moduleInfo["channel_index"] = mSelectedChannel;
+   moduleInfo["stereo"] = mSelectedStereo;
 }
 
 void InputChannel::SetUpFromSaveData()
 {
    mChannelSelectionIndex = mModuleSaveData.GetEnum<int>("channels");
+   mSelectedStereo = mStereoSelectionOffset > 0 && mChannelSelectionIndex >= mStereoSelectionOffset;
+   mSelectedChannel = MAX(0, mChannelSelectionIndex - (mSelectedStereo ? mStereoSelectionOffset : 0));
+   RefreshChannels();
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }

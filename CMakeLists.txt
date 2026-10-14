@@ -111,3 +111,9 @@ endif()
 
 add_subdirectory(libs)
 add_subdirectory(Source)
+
+option(BESPOKE_BUILD_AUDIO_TESTS "Build focused audio bridge tests" OFF)
+if(BESPOKE_BUILD_AUDIO_TESTS)
+  enable_testing()
+  add_subdirectory(Tests)
+endif()
