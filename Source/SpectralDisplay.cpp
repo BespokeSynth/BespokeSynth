@@ -31,7 +31,7 @@
 
 namespace
 {
-   const int kNumFFTBins = 1024;
+   const int kNumFFTBins = 1024 * 8;
    const int kBinIgnore = 2;
 };
 
