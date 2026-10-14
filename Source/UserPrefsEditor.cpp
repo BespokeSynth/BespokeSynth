@@ -293,6 +293,10 @@ void UserPrefsEditor::DrawModule()
       bool hide = false;
       if (pref == &UserPrefs.audio_input_device)
          hide = !selectedDeviceType->hasSeparateInputsAndOutputs();
+#if BESPOKE_LINUX
+      if (pref == &UserPrefs.jack_autoconnect)
+         hide = selectedDeviceType->getTypeName() != "JACK";
+#endif
       if (pref == &UserPrefs.position_x || pref == &UserPrefs.position_y)
          hide = !UserPrefs.set_manual_window_position.Get();
 
@@ -395,6 +399,9 @@ bool UserPrefsEditor::PrefRequiresRestart(UserPref* pref) const
    return pref == &UserPrefs.devicetype ||
           pref == &UserPrefs.audio_output_device ||
           pref == &UserPrefs.audio_input_device ||
+#if BESPOKE_LINUX
+          pref == &UserPrefs.jack_autoconnect ||
+#endif
           pref == &UserPrefs.samplerate ||
           pref == &UserPrefs.buffersize ||
           pref == &UserPrefs.oversampling ||
