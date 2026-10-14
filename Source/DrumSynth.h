@@ -90,8 +90,8 @@ private:
 
       EnvOscillator mTone{ OscillatorType::kOsc_Sin };
       EnvOscillator mNoise{ OscillatorType::kOsc_Random };
-      ::ADSR mFreqAdsr;
-      ::ADSR mFilterAdsr;
+      ADSR mFreqAdsr;
+      ADSR mFilterAdsr;
       float mFreqMax{ 150 };
       float mFreqMin{ 10 };
       float mVol{ 0 };
