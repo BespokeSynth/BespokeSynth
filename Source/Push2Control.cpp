@@ -777,14 +777,10 @@ void Push2Control::DrawDisplayModuleControls()
 
       //nvgFontSize(mVG, 16);
       //nvgText(mVG, 10, 10, mDisplayModule->Name(), nullptr);
-      float x;
-      float y;
-      mDisplayModule->GetPosition(x, y, true);
-      mDisplayModule->SetPosition(5 - kColumnSpacing * mModuleViewOffsetSmoothed, 15);
+      ofTranslate(5 - kColumnSpacing * mModuleViewOffsetSmoothed, 15);
       float titleBarHeight;
       float highlight;
       mDisplayModule->DrawFrame(kColumnSpacing * MAX(1, MAX(mSliderControls.size(), mButtonControls.size())) - 14, 80, false, titleBarHeight, highlight);
-      mDisplayModule->SetPosition(x, y);
 
       ofSetColor(IDrawableModule::GetColor(mDisplayModule->GetModuleCategory()));
       ofNoFill();
@@ -846,16 +842,12 @@ void Push2Control::DrawLowerModuleSelector()
 
       ofClipWindow(kColumnSpacing * (i - mModuleListOffsetSmoothed), 0, kColumnSpacing, ableton::Push2DisplayBitmap::kHeight * kPixelRatio, true);
 
-      float x;
-      float y;
-      mModules[i]->GetPosition(x, y, true);
-      mModules[i]->SetPosition(3 + kColumnSpacing * (i - mModuleListOffsetSmoothed), 120);
+      ofTranslate(3 + kColumnSpacing * (i - mModuleListOffsetSmoothed), 120);
       float titleBarHeight;
       float highlight;
       mModules[i]->DrawFrame(kColumnSpacing - 14, 80, true, titleBarHeight, highlight);
       if (mModules[i] == mDisplayModule)
          DrawDisplayModuleRect(ofRectangle(0, 0, kColumnSpacing - 14, 80), 3);
-      mModules[i]->SetPosition(x, y);
 
       if (i - round(mModuleListOffset) >= 0 && i - round(mModuleListOffset) < 8)
          bottomRowLedColors[i - (int)round(mModuleListOffset)] = GetPadColorForType(mModules[i]->GetModuleCategory(), true);
@@ -882,14 +874,10 @@ void Push2Control::DrawRoutingDisplay()
 
       ofClipWindow(kColumnSpacing * i, 0, kColumnSpacing, ableton::Push2DisplayBitmap::kHeight * kPixelRatio, true);
 
-      float x;
-      float y;
-      mRoutingInputModules[i].mModule->GetPosition(x, y, true);
-      mRoutingInputModules[i].mModule->SetPosition(3 + kColumnSpacing * i, 12);
+      ofTranslate(3 + kColumnSpacing * i, 12);
       float titleBarHeight;
       float highlight;
       mRoutingInputModules[i].mModule->DrawFrame(kColumnSpacing - 14, 25, true, titleBarHeight, highlight);
-      mRoutingInputModules[i].mModule->SetPosition(x, y);
 
       if (i >= 0 && i < 8)
          topRowLedColors[i] = GetPadColorForType(mRoutingInputModules[i].mModule->GetModuleCategory(), true);
@@ -908,14 +896,10 @@ void Push2Control::DrawRoutingDisplay()
 
       ofClipWindow(kColumnSpacing * i, 0, kColumnSpacing, ableton::Push2DisplayBitmap::kHeight * kPixelRatio, true);
 
-      float x;
-      float y;
-      mRoutingOutputModules[i].mModule->GetPosition(x, y, true);
-      mRoutingOutputModules[i].mModule->SetPosition(3 + kColumnSpacing * i, 132);
+      ofTranslate(3 + kColumnSpacing * i, 132);
       float titleBarHeight;
       float highlight;
       mRoutingOutputModules[i].mModule->DrawFrame(kColumnSpacing - 14, 25, true, titleBarHeight, highlight);
-      mRoutingOutputModules[i].mModule->SetPosition(x, y);
 
       if (i >= 0 && i < 8)
          bottomRowLedColors[i] = GetPadColorForType(mRoutingOutputModules[i].mModule->GetModuleCategory(), true);
@@ -930,14 +914,10 @@ void Push2Control::DrawRoutingDisplay()
 
       ofClipWindow(0, 0, kColumnSpacing, ableton::Push2DisplayBitmap::kHeight * kPixelRatio, true);
 
-      float x;
-      float y;
-      mDisplayModule->GetPosition(x, y, true);
-      mDisplayModule->SetPosition(3, 72);
+      ofTranslate(3, 72);
       float titleBarHeight;
       float highlight;
       mDisplayModule->DrawFrame(kColumnSpacing - 14, 25, true, titleBarHeight, highlight);
-      mDisplayModule->SetPosition(x, y);
 
       ofPopMatrix();
       ofPopStyle();
