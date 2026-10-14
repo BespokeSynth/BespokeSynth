@@ -111,6 +111,15 @@ void LoadGlobalResources()
    gFont.LoadFont(ofToResourcePath("frabk.ttf"));
    gFontBold.LoadFont(ofToResourcePath("frabk_m.ttf"));
    gFontFixedWidth.LoadFont(ofToResourcePath("iosevka-type-light.ttf"));
+
+   //fallback fonts for glyphs the main fonts lack (e.g. Korean hangul)
+   static RetinaTrueTypeFont sFallbackFont;
+   static RetinaTrueTypeFont sFallbackFontBold;
+   sFallbackFont.LoadFont(ofToResourcePath("NanumGothic-Regular.ttf"));
+   sFallbackFontBold.LoadFont(ofToResourcePath("NanumGothic-Bold.ttf"));
+   gFont.AddFallbackFont(sFallbackFont);
+   gFontBold.AddFallbackFont(sFallbackFontBold);
+   gFontFixedWidth.AddFallbackFont(sFallbackFont);
    //gModuleShader.load(ofToResourcePath("shaders/module.vert"), ofToResourcePath("shaders/module.frag"));
 }
 
