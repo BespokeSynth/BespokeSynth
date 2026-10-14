@@ -105,6 +105,9 @@ public:
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
+   bool ShouldSerializeForSnapshot() const override { return true; }
+   void SaveSnapshotData(FileStreamOut& out, int snapshotIndex) override;
+   void LoadSnapshotData(FileStreamIn& in, int snapshotIndex) override;
    int GetModuleSaveStateRev() const override { return 1; }
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
