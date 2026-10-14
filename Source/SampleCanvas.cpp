@@ -100,9 +100,23 @@ void SampleCanvas::Process(double time)
    int bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
+   const std::vector<CanvasElement*>& elements = mCanvas->GetElements();
+
+   int numChannels = 1;
+   for (auto* elem : elements)
+   {
+      Sample* clip = static_cast<SampleCanvasElement*>(elem)->GetSample();
+      if (clip != nullptr && clip->NumChannels() > 1)
+      {
+         numChannels = 2;
+         break;
+      }
+   }
+
+   SyncOutputBuffer(numChannels);
+   gWorkChannelBuffer.SetNumActiveChannels(numChannels);
    gWorkChannelBuffer.Clear();
 
-   const std::vector<CanvasElement*>& elements = mCanvas->GetElements();
    for (int elemIdx = 0; elemIdx < elements.size(); ++elemIdx)
    {
       SampleCanvasElement* element = static_cast<SampleCanvasElement*>(elements[elemIdx]);
@@ -121,18 +135,18 @@ void SampleCanvas::Process(double time)
 
          if (sampleIndex >= 0 && sampleIndex < clip->LengthInSamples())
          {
-            for (int ch = 0; ch < target->GetBuffer()->NumActiveChannels(); ++ch)
+            for (int ch = 0; ch < numChannels; ++ch)
             {
-               int sampleChannel = MAX(ch, clip->NumChannels() - 1);
+               int sampleChannel = MIN(ch, clip->NumChannels() - 1);
                gWorkChannelBuffer.GetChannel(ch)[i] += GetInterpolatedSample(sampleIndex, clip->Data()->GetChannel(sampleChannel), clip->LengthInSamples()) * vol;
             }
          }
       }
    }
 
-   for (int ch = 0; ch < target->GetBuffer()->NumActiveChannels(); ++ch)
+   for (int ch = 0; ch < numChannels; ++ch)
    {
-      ChannelBuffer* out = GetTarget()->GetBuffer();
+      ChannelBuffer* out = target->GetBuffer();
       Add(out->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), gBufferSize);
       GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), gBufferSize, ch);
    }
