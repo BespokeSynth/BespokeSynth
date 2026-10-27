@@ -53,8 +53,6 @@ WelcomeScreen::~WelcomeScreen()
 
 namespace
 {
-   const float kSaveStateButtonWidth = 200;
-   const float kSaveStateButtonHeight = 180;
    const float kSaveStateButtonStartX = 20;
    const float kSaveStateButtonStartY = 110;
    const float kSaveStateButtonPadX = 10;
@@ -89,8 +87,11 @@ void WelcomeScreen::CreateUIControls()
    float uiScreenWidth = ofGetWidth() / TheSynth->GetUIScale();
    float uiScreenHeight = ofGetHeight() / TheSynth->GetUIScale();
    mWidth = uiScreenWidth - 100;
-   mHeight = uiScreenHeight - 200;
+   mHeight = uiScreenHeight - 150;
    SetPosition(uiScreenWidth / 2 - mWidth / 2, uiScreenHeight / 2 - mHeight / 2);
+
+   float saveStateButtonWidth = (mWidth - (kSaveStateButtonStartX * 2)) / 5 - kSaveStateButtonPadX;
+   float saveStateButtonHeight = saveStateButtonWidth * .9f;
 
    const int kMaxDesiredFiles = 10;
 
@@ -167,24 +168,24 @@ void WelcomeScreen::CreateUIControls()
    int i = 1;
    for (auto& recentFile : mRecentFiles)
    {
-      if (y + kSaveStateButtonHeight + 20 > mHeight)
+      if (y + saveStateButtonHeight + kSaveStateButtonPadY > mHeight)
          break;
 
       recentFile.mButton = new ClickButton(this, ("recentfile" + ofToString(i)).c_str(), x, y);
       recentFile.mButton->SetOverrideDisplayName("");
-      recentFile.mButton->SetDimensions(kSaveStateButtonWidth, kSaveStateButtonHeight);
+      recentFile.mButton->SetDimensions(saveStateButtonWidth, saveStateButtonHeight);
 
-      x += kSaveStateButtonWidth + kSaveStateButtonPadX;
-      if (x + kSaveStateButtonWidth + kSaveStateButtonPadX > mWidth)
+      x += saveStateButtonWidth + kSaveStateButtonPadX;
+      if (x + saveStateButtonWidth + kSaveStateButtonPadX > mWidth)
       {
          x = kSaveStateButtonStartX;
-         y += kSaveStateButtonHeight + kSaveStateButtonPadY;
+         y += saveStateButtonHeight + kSaveStateButtonPadY;
       }
 
       ++i;
    }
 
-   mCloseButton = new ClickButton(this, "close", 10, mHeight - 20);
+   mCloseButton = new ClickButton(this, "close", mWidth - 40, 10);
 }
 
 void WelcomeScreen::Show()

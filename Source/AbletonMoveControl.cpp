@@ -1039,6 +1039,8 @@ void AbletonMoveControl::UpdateLeds()
       SetLed(i + kStepButtonLedSection, 0);
    }
 
+   SetLed(kMoveMuteButton, ShouldDisplayMixer() ? 127 : 0);
+
    bool soundSelectorAvailable = false;
    TrackOrganizer* trackRow = GetActiveTrackRow();
    IUIControl* soundSelector = trackRow ? trackRow->GetSoundSelector() : nullptr;
@@ -1165,42 +1167,58 @@ void AbletonMoveControl::UpdateLeds()
 
    if (ShouldDisplaySnapshotView() && mSessionOrganizer != nullptr)
    {
-      for (int i = 0; i < kNumTrackButtons; ++i)
+      if (GetButtonState(kMoveMuteButton))
       {
-         const int kNumCols = 8;
-         int colors[kNumCols]{ 0, 0, 0, 0, 0, 0, 0, 0 };
-         int colors2[kNumCols]{ -1, -1, -1, -1, -1, -1, -1, -1 };
-         TrackOrganizer* trackRow = mSessionOrganizer->GetTrack(i + mTrackRowOffset);
-         if (trackRow != nullptr)
+         for (int i = kMovePadsSection; i < kMovePadsSection + kNumMovePads; ++i)
          {
-            Snapshots* snapshots = trackRow->GetSnapshots();
-            if (snapshots != nullptr)
+            int col = (i - kMovePadsSection) % GetGridNumCols();
+            int row = GetGridNumRows() - 1 - (i - kMovePadsSection) / GetGridNumCols();
+            int trackIndex = col + row * GetGridNumCols();
+            if (TrackOrganizer* track = mSessionOrganizer->GetTrack(trackIndex))
+               SetLed(i, track->GetColorIndex(), track->IsTrackEnabled() ? -1 : 127);
+            else
+               SetLed(i, kColorOff);
+         }
+      }
+      else
+      {
+         for (int i = 0; i < kNumTrackButtons; ++i)
+         {
+            const int kNumCols = 8;
+            int colors[kNumCols]{ 0, 0, 0, 0, 0, 0, 0, 0 };
+            int colors2[kNumCols]{ -1, -1, -1, -1, -1, -1, -1, -1 };
+            TrackOrganizer* trackRow = mSessionOrganizer->GetTrack(i + mTrackRowOffset);
+            if (trackRow != nullptr)
             {
-               for (int col = 0; col < kNumCols; ++col)
+               Snapshots* snapshots = trackRow->GetSnapshots();
+               if (snapshots != nullptr)
                {
-                  int snapshotIdx = col + mSnapshotOffset;
-                  if (snapshots->GetCurrentSnapshot() == snapshotIdx)
+                  for (int col = 0; col < kNumCols; ++col)
                   {
-                     colors[col] = GetButtonState(kDotButton) ? kColorRed : kColorWhite;
-                     if (IUIControl::IsInactiveValue(snapshots->GetLabel(snapshotIdx)))
-                        colors2[col] = kColorDarkGrey;
-                     else
-                        colors2[col] = trackRow->GetColorIndex();
-                  }
-                  else if (snapshots->HasSnapshot(snapshotIdx))
-                  {
-                     if (IUIControl::IsInactiveValue(snapshots->GetLabel(snapshotIdx)))
-                        colors[col] = kColorDarkGrey;
-                     else
-                        colors[col] = trackRow->GetColorIndex();
+                     int snapshotIdx = col + mSnapshotOffset;
+                     if (snapshots->GetCurrentSnapshot() == snapshotIdx)
+                     {
+                        colors[col] = GetButtonState(kDotButton) ? kColorRed : kColorWhite;
+                        if (IUIControl::IsInactiveValue(snapshots->GetLabel(snapshotIdx)))
+                           colors2[col] = kColorDarkGrey;
+                        else
+                           colors2[col] = trackRow->GetColorIndex();
+                     }
+                     else if (snapshots->HasSnapshot(snapshotIdx))
+                     {
+                        if (IUIControl::IsInactiveValue(snapshots->GetLabel(snapshotIdx)))
+                           colors[col] = kColorDarkGrey;
+                        else
+                           colors[col] = trackRow->GetColorIndex();
+                     }
                   }
                }
             }
-         }
 
-         for (int col = 0; col < kNumCols; ++col)
-         {
-            SetLed(kMovePadsSection + (kNumTrackButtons - 1 - i) * 8 + col, colors[col], colors2[col]);
+            for (int col = 0; col < kNumCols; ++col)
+            {
+               SetLed(kMovePadsSection + (kNumTrackButtons - 1 - i) * 8 + col, colors[col], colors2[col]);
+            }
          }
       }
    }
@@ -1447,6 +1465,7 @@ void AbletonMoveControl::Poll()
    if (currentControlModule != nullptr && currentControlModule->HasPush2OverrideControls() != mDisplayModuleIsShowingOverrideControls)
    {
       controlsChanged = true;
+      SetModuleViewOffset(0);
       mDisplayModuleIsShowingOverrideControls = currentControlModule->HasPush2OverrideControls();
    }
 
@@ -1890,29 +1909,44 @@ void AbletonMoveControl::OnMidiNote_Consume(MidiNote& note)
       }
       else if (note.mPitch >= kMovePadsSection && note.mPitch < kMovePadsSection + kNumMovePads && ShouldDisplaySnapshotView()) //pads
       {
-         int gridIndex = note.mPitch - kMovePadsSection;
-         int row = (3 - gridIndex / 8) + mTrackRowOffset;
-         int col = gridIndex % 8 + mSnapshotOffset;
-         if (mSessionOrganizer != nullptr)
+         if (note.mVelocity > 0)
          {
-            TrackOrganizer* trackRow = mSessionOrganizer->GetTrack(row);
-            if (trackRow != nullptr)
+            if (GetButtonState(kMoveMuteButton))
             {
-               Snapshots* snapshots = trackRow->GetSnapshots();
-               if (snapshots != nullptr)
+               int gridIndex = note.mPitch - kMovePadsSection;
+               int row = GetGridNumRows() - 1 - gridIndex / GetGridNumCols();
+               int col = gridIndex % GetGridNumCols();
+               int trackIndex = col + row * GetGridNumCols();
+               if (TrackOrganizer* track = mSessionOrganizer->GetTrack(trackIndex))
+                  track->SetTrackEnabled(!track->IsTrackEnabled());
+            }
+            else
+            {
+               int gridIndex = note.mPitch - kMovePadsSection;
+               int row = (GetGridNumRows() - 1 - gridIndex / GetGridNumCols()) + mTrackRowOffset;
+               int col = gridIndex % GetGridNumCols() + mSnapshotOffset;
+               if (mSessionOrganizer != nullptr)
                {
-                  if (GetButtonState(kShiftButton))
+                  TrackOrganizer* trackRow = mSessionOrganizer->GetTrack(row);
+                  if (trackRow != nullptr)
                   {
-                     DisplayScreenMessage(snapshots->GetLabel(col));
-                  }
-                  else if (GetButtonState(kDotButton))
-                  {
-                     snapshots->StoreSnapshot(col, true);
-                  }
-                  else if (snapshots->HasSnapshot(col))
-                  {
-                     snapshots->SetSnapshot(col, gTime);
-                     DisplayScreenMessage(snapshots->GetLabel(col));
+                     Snapshots* snapshots = trackRow->GetSnapshots();
+                     if (snapshots != nullptr)
+                     {
+                        if (GetButtonState(kShiftButton))
+                        {
+                           DisplayScreenMessage(snapshots->GetLabel(col));
+                        }
+                        else if (GetButtonState(kDotButton))
+                        {
+                           snapshots->StoreSnapshot(col, true);
+                        }
+                        else if (snapshots->HasSnapshot(col))
+                        {
+                           snapshots->SetSnapshot(col, gTime);
+                           DisplayScreenMessage(snapshots->GetLabel(col));
+                        }
+                     }
                   }
                }
             }
@@ -2116,6 +2150,16 @@ void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
          float increment = control.mValue < 64 ? control.mValue : control.mValue - 128;
          increment *= mShiftHeld ? .0005f : .005f;
          TheSynth->ZoomView(increment, false);
+         return;
+      }
+
+      if (control.mControl == kPageLeftButton ||
+            control.mControl == kPageRightButton ||
+            control.mControl == kOctaveUpButton ||
+            control.mControl == kOctaveDownButton)
+      {
+         //view panning happening in Poll()
+         return;
       }
    }
 
@@ -2566,11 +2610,7 @@ void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
             control.mControl == kOctaveDownButton ||
             control.mControl == kMoveUndoButton)
    {
-      if (GetButtonState(kCaptureButton))
-      {
-         //view panning happening in Poll()
-      }
-      else if (displayKnobIndex != -1)
+      if (displayKnobIndex != -1)
       {
          if (control.mValue > 0)
          {

@@ -513,6 +513,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
    mLastActivityBound = false;
    //if (value > 0)
    mLastActivityTime = gTime;
+   mLastActivityValue = value;
 
    GetLayoutControl(control, messageType).mLastActivityTime = gTime;
    GetLayoutControl(control, messageType).mLastValue = value;
@@ -604,6 +605,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
          mLastActivityBound = true;
          //if (value > 0)
          connection->mLastActivityTime = gTime;
+         connection->mLastActivityValue = value;
 
          IUIControl* uicontrol = connection->GetUIControl();
          if (uicontrol == nullptr)
@@ -1020,7 +1022,10 @@ void MidiController::DrawModule()
          ofSetColor(0, 255, 0, 255 * (1 - (gTime - mLastActivityTime) / 200));
       else
          ofSetColor(255, 0, 0, 255 * (1 - (gTime - mLastActivityTime) / 200));
-      ofFill();
+      if (mLastActivityValue > 0)
+         ofFill();
+      else
+         ofNoFill();
       ofRect(30 + gFont.GetStringWidth(Name(), 13), -11, 10, 10);
       ofPopStyle();
    }
@@ -1102,7 +1107,10 @@ void MidiController::DrawModule()
             ofSetColor(0, 255, 0, 255 * (1 - (gTime - mLastActivityTime) / 200));
          else
             ofSetColor(255, 0, 0, 255 * (1 - (gTime - mLastActivityTime) / 200));
-         ofFill();
+         if (mLastActivityValue > 0)
+            ofFill();
+         else
+            ofNoFill();
          ofRect(48, h - 14, 10, 10);
          ofPopStyle();
       }
@@ -1170,7 +1178,10 @@ void MidiController::DrawModule()
                   ofSetColor(0, 255, 0, 255 * (1 - (gTime - control.mLastActivityTime) / 200));
                else
                   ofSetColor(255, 0, 0, 255 * (1 - (gTime - control.mLastActivityTime) / 200));
-               ofFill();
+               if (control.mLastValue > 0)
+                  ofFill();
+               else
+                  ofNoFill();
                ofRect(control.mPosition.x, control.mPosition.y, 5, 5);
                ofPopStyle();
             }
@@ -2935,7 +2946,10 @@ void UIControlConnection::DrawList(int index)
          ofSetColor(0, 255, 0, 255 * (1 - (gTime - mLastActivityTime) / 200));
       else
          ofSetColor(255, 0, 0, 255 * (1 - (gTime - mLastActivityTime) / 200));
-      ofFill();
+      if (mLastActivityValue > 0)
+         ofFill();
+      else
+         ofNoFill();
       ofRect(1, y + 3, 10, 10);
       ofPopStyle();
    }

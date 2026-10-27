@@ -470,6 +470,8 @@ void BeatColumn::CreateUIControls()
    mClipNumBarsSlider = new IntSlider(mOwner, ("clip bars" + suffix).c_str(), 0, 0, 95, 15, &mDummyClipNumBars, 1, 8);
    mClipPitchShiftSlider = new FloatSlider(mOwner, ("clip pitch" + suffix).c_str(), 0, 0, controlWidth, 15, &mDummyClipPitchShift, 0, 2, 2);
 
+   mFilterSlider->AddDetent(0);
+
    mSelector->SetForcedWidth(controlWidth);
 
    UpdateRadioButtonLabels();
