@@ -76,16 +76,15 @@ namespace
       return (ssfn_font_t*)fontdata;
    }
 
-   void set_up_ssfn_font(uint8_t* pixels, int width, int height)
+   //the font renderer is shared between all LCD instances, so it is loaded once and freed when the last instance goes away
+   int ssfn_instance_count = 0;
+
+   void set_up_ssfn_font()
    {
       int ret, size;
 
       /* initialize the normal renderer */
       memset(&ssfn_ctx, 0, sizeof(ssfn_t));
-      ssfn_buf.ptr = pixels;
-      ssfn_buf.p = width * 4;
-      ssfn_buf.w = width;
-      ssfn_buf.h = height;
       ssfn_buf.fg = 0xFFFFFFFF;
       ssfn_buf.bg = 0;
 
@@ -99,9 +98,15 @@ namespace
       }
    }
 
-   void draw_ssfn_text(const char* text, int x, int y, int style = SSFN_STYLE_REGULAR, int fontSize = 12)
+   void draw_ssfn_text(uint8_t* pixels, int width, int height, const char* text, int x, int y, int style = SSFN_STYLE_REGULAR, int fontSize = 12)
    {
       int ret;
+
+      //point the shared renderer at the buffer of the LCD we're drawing to
+      ssfn_buf.ptr = pixels;
+      ssfn_buf.p = width * 4;
+      ssfn_buf.w = width;
+      ssfn_buf.h = height;
 
       ret = ssfn_select(&ssfn_ctx, SSFN_FAMILY_ANY, NULL, style | SSFN_STYLE_NOAA, fontSize);
       if (ret != SSFN_OK)
@@ -125,15 +130,31 @@ AbletonMoveLCD::AbletonMoveLCD()
 
 AbletonMoveLCD::~AbletonMoveLCD()
 {
-   ssfn_free(&ssfn_ctx);
-   free(ssfn_font);
+   if (mPixels != nullptr)
+   {
+      delete[] mPixels;
+
+      --ssfn_instance_count;
+      if (ssfn_instance_count == 0)
+      {
+         ssfn_free(&ssfn_ctx);
+         free(ssfn_font);
+         ssfn_font = nullptr;
+      }
+   }
 }
 
 void AbletonMoveLCD::Init()
 {
-   mPixels = new uint8_t[GetNumDisplayPixels()];
+   if (mPixels != nullptr)
+      return; //already initialized
 
-   set_up_ssfn_font(mPixels, kMoveDisplayWidth, kMoveDisplayHeight);
+   mPixels = new uint8_t[GetNumDisplayPixels()];
+   memset(mPixels, 0, sizeof(uint8_t) * GetNumDisplayPixels());
+
+   if (ssfn_instance_count == 0)
+      set_up_ssfn_font();
+   ++ssfn_instance_count;
 }
 
 void AbletonMoveLCD::Clear()
@@ -144,7 +165,8 @@ void AbletonMoveLCD::Clear()
 
 void AbletonMoveLCD::DrawLCDText(const char* text, int x, int y, int style, int fontSize)
 {
-   draw_ssfn_text(text, x, y, style, fontSize);
+   if (mPixels != nullptr)
+      draw_ssfn_text(mPixels, kMoveDisplayWidth, kMoveDisplayHeight, text, x, y, style, fontSize);
 }
 
 void AbletonMoveLCD::DrawRect(int x, int y, int width, int height, LCDDrawMode drawMode)

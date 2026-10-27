@@ -466,6 +466,63 @@ namespace AbletonDevice
       float increment = midiInputValue < 64 ? midiInputValue : midiInputValue - 128;
       return increment * .005f;
    }
+
+   //control surface layout
+   //the controlsurface module presents every device it supports to grid controllers using the move's control indices.
+   //these extend that layout for devices that have more track buttons or main encoders than the move.
+   const int kMaxTrackButtons = 8; //track buttons 4-7 continue below the move's four, at CCs 39 down to 36
+   const int kMaxMainEncoders = 16;
+   const int kExtraMainEncoderSection = 91 + 128; //turn for main encoders 8-15
+   const int kExtraMainEncoderTouchSection = 100; //touch for main encoders 8-15
+
+   //track button 0 is the top button
+   inline int GetTrackButtonControl(int trackButtonIndex)
+   {
+      return kTrackButtonSection + kNumTrackButtons - 1 - trackButtonIndex;
+   }
+
+   //returns -1 if controlIndex is not a track button
+   inline int GetTrackButtonIndex(int controlIndex)
+   {
+      int index = kTrackButtonSection + kNumTrackButtons - 1 - controlIndex;
+      if (index >= 0 && index < kMaxTrackButtons)
+         return index;
+      return -1;
+   }
+
+   inline int GetMainEncoderControl(int encoderIndex)
+   {
+      if (encoderIndex < kNumMainEncoders)
+         return kMainEncoderSection + encoderIndex;
+      return kExtraMainEncoderSection + encoderIndex - kNumMainEncoders;
+   }
+
+   inline int GetMainEncoderTouchControl(int encoderIndex)
+   {
+      if (encoderIndex < kNumMainEncoders)
+         return kMainEncoderTouchSection + encoderIndex;
+      return kExtraMainEncoderTouchSection + encoderIndex - kNumMainEncoders;
+   }
+
+   //returns -1 if controlIndex is not a main encoder turn
+   inline int GetMainEncoderIndex(int controlIndex)
+   {
+      if (controlIndex >= kMainEncoderSection && controlIndex < kMainEncoderSection + kNumMainEncoders)
+         return controlIndex - kMainEncoderSection;
+      if (controlIndex >= kExtraMainEncoderSection && controlIndex < kExtraMainEncoderSection + kMaxMainEncoders - kNumMainEncoders)
+         return controlIndex - kExtraMainEncoderSection + kNumMainEncoders;
+      return -1;
+   }
+
+   //returns -1 if controlIndex is not a main encoder touch
+   inline int GetMainEncoderTouchIndex(int controlIndex)
+   {
+      if (controlIndex >= kMainEncoderTouchSection && controlIndex < kMainEncoderTouchSection + kNumMainEncoders)
+         return controlIndex - kMainEncoderTouchSection;
+      if (controlIndex >= kExtraMainEncoderTouchSection && controlIndex < kExtraMainEncoderTouchSection + kMaxMainEncoders - kNumMainEncoders)
+         return controlIndex - kExtraMainEncoderTouchSection + kNumMainEncoders;
+      return -1;
+   }
 }
 #include "leathers/pop"
 
@@ -482,6 +539,7 @@ class IAbletonGridDevice
 public:
    virtual ~IAbletonGridDevice() {}
    virtual void SetLed(int index, int color, int flashColor = -1, LedPriority priority = LedPriority::Normal) = 0;
+   virtual void SetLedFlashColor(int index, int flashColor) {} //change the flash color of an led that was already set this frame
    virtual bool GetButtonState(int index) const = 0;
    virtual int GetGridControllerOption1Control() const = 0;
    virtual int GetGridControllerOption2Control() const = 0;

@@ -42,8 +42,6 @@ target_sources(BespokeSynth PRIVATE
     AbletonDeviceShared.h
     AbletonLink.cpp
     AbletonLink.h
-    AbletonMoveControl.cpp
-    AbletonMoveControl.h
     AbletonMoveLCD.cpp
     AbletonMoveLCD.h
     Acciaccatura.cpp
@@ -144,6 +142,11 @@ target_sources(BespokeSynth PRIVATE
     ControlSequencer.h
     ControlTactileFeedback.cpp
     ControlTactileFeedback.h
+    ControlSurface.cpp
+    ControlSurface.h
+    ControlSurfaceDevice.cpp
+    ControlSurfaceDevice.h
+    ControlSurfaceDevicePush2.cpp
     ControllingSong.cpp
     ControllingSong.h
     Curve.cpp
