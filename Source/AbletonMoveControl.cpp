@@ -2154,9 +2154,9 @@ void AbletonMoveControl::OnMidiControl_Consume(MidiControl& control)
       }
 
       if (control.mControl == kPageLeftButton ||
-            control.mControl == kPageRightButton ||
-            control.mControl == kOctaveUpButton ||
-            control.mControl == kOctaveDownButton)
+          control.mControl == kPageRightButton ||
+          control.mControl == kOctaveUpButton ||
+          control.mControl == kOctaveDownButton)
       {
          //view panning happening in Poll()
          return;

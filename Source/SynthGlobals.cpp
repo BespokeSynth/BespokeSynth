@@ -189,7 +189,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
       const float halfH = height * 0.5f;
       const int pixelWidth = (int)width;
       const float samplesPerPixel = length / pixelWidth;
-      const int innerStride = 1;//MAX(1, (int)(samplesPerPixel / 100));
+      const int innerStride = 1; //MAX(1, (int)(samplesPerPixel / 100));
 
       // fix "crawling" effect by quantizing displayed start sample
       start -= int(start) % int(samplesPerPixel);
