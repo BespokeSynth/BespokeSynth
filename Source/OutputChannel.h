@@ -42,16 +42,18 @@ public:
    static bool AcceptsPulses() { return false; }
 
    void CreateUIControls() override;
+   void RefreshChannels();
 
    //IAudioReceiver
-   InputMode GetInputMode() override { return mChannelSelectionIndex < mStereoSelectionOffset ? kInputMode_Mono : kInputMode_Multichannel; }
+   InputMode GetInputMode() override { return mSelectedStereo ? kInputMode_Multichannel : kInputMode_Mono; }
 
    //IAudioSource
    void Process(double time) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
    bool IsEnabled() const override { return true; }
@@ -61,12 +63,15 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
 
-   int GetNumChannels() const { return mChannelSelectionIndex < mStereoSelectionOffset ? 1 : 2; }
+   int GetNumChannels() const { return mSelectedStereo ? 2 : 1; }
 
    float mHeight{ 40 };
    DropdownList* mChannelSelector{ nullptr };
    int mChannelSelectionIndex{ 0 };
    int mStereoSelectionOffset{ 0 };
+   int mUnavailableSelectionIndex{ -1 };
+   int mSelectedChannel{ 0 };
+   bool mSelectedStereo{ false };
    float mLimit{ 1 };
 
    LevelMeterDisplay mLevelMeterDisplay;

@@ -42,16 +42,55 @@ void OutputChannel::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    mChannelSelector = new DropdownList(this, "ch", 3, 3, &mChannelSelectionIndex);
-
-   for (int i = 0; i < TheSynth->GetNumOutputChannels(); ++i)
-      mChannelSelector->AddLabel(ofToString(i + 1), i);
-   mStereoSelectionOffset = mChannelSelector->GetNumValues(); //after this, the stereo pairs
-   for (int i = 0; i < TheSynth->GetNumOutputChannels() - 1; ++i)
-      mChannelSelector->AddLabel(ofToString(i + 1) + "&" + ofToString(i + 2), mChannelSelector->GetNumValues());
    mChannelSelector->DrawLabel(true);
    mChannelSelector->SetWidth(43);
+   RefreshChannels();
 
    GetPatchCableSource()->SetEnabled(false);
+}
+
+void OutputChannel::RefreshChannels()
+{
+   if (mChannelSelector == nullptr)
+      return;
+
+   int count = TheSynth->GetNumOutputChannels();
+   mChannelSelector->Clear();
+   for (int i = 0; i < count; ++i)
+      mChannelSelector->AddLabel(ofToString(i + 1), i);
+   mStereoSelectionOffset = count;
+   for (int i = 0; i < count - 1; ++i)
+      mChannelSelector->AddLabel(ofToString(i + 1) + "&" + ofToString(i + 2), count + i);
+
+   mChannelSelectionIndex = mSelectedChannel + (mSelectedStereo ? mStereoSelectionOffset : 0);
+   mUnavailableSelectionIndex = -1;
+   if (mSelectedChannel + (mSelectedStereo ? 1 : 0) >= count)
+   {
+      mUnavailableSelectionIndex = count * 2 + mSelectedChannel + 1;
+      mChannelSelectionIndex = mUnavailableSelectionIndex;
+      std::string label = ofToString(mSelectedChannel + 1);
+      if (mSelectedStereo)
+         label += "&" + ofToString(mSelectedChannel + 2);
+      mChannelSelector->AddLabel(label + " (unavailable)", mChannelSelectionIndex);
+   }
+   if (mModuleSaveData.HasProperty("channels"))
+   {
+      mModuleSaveData.SetEnumMapFromList("channels", mChannelSelector);
+      mModuleSaveData.SetEnum("channels", mChannelSelectionIndex);
+   }
+}
+
+void OutputChannel::DropdownUpdated(DropdownList* list, int oldVal, double time)
+{
+   if (list == mChannelSelector)
+   {
+      if (mChannelSelectionIndex != mUnavailableSelectionIndex)
+      {
+         mSelectedStereo = mStereoSelectionOffset > 0 && mChannelSelectionIndex >= mStereoSelectionOffset;
+         mSelectedChannel = mChannelSelectionIndex - (mSelectedStereo ? mStereoSelectionOffset : 0);
+      }
+      RefreshChannels();
+   }
 }
 
 void OutputChannel::Process(double time)
@@ -60,10 +99,9 @@ void OutputChannel::Process(double time)
 
    SyncBuffers(numChannels);
 
-   int channelSelectionIndex = mChannelSelectionIndex;
    if (numChannels == 1)
    {
-      int channel = channelSelectionIndex;
+      int channel = mSelectedChannel;
       auto getBufferGetChannel0 = GetBuffer()->GetChannel(0);
       if (channel >= 0 && channel < TheSynth->GetNumOutputChannels())
       {
@@ -80,11 +118,11 @@ void OutputChannel::Process(double time)
       }
       GetVizBuffer()->WriteChunk(getBufferGetChannel0, gBufferSize, 0);
 
-      mLevelMeterDisplay.Process(0, TheSynth->GetOutputBuffer(channel), gBufferSize);
+      mLevelMeterDisplay.Process(0, channel >= 0 && channel < TheSynth->GetNumOutputChannels() ? TheSynth->GetOutputBuffer(channel) : gZeroBuffer, gBufferSize);
    }
    else //stereo
    {
-      int channel1 = channelSelectionIndex - mStereoSelectionOffset;
+      int channel1 = mSelectedChannel;
       if (channel1 >= 0 && channel1 < TheSynth->GetNumOutputChannels())
       {
          auto getBufferGetChannel0 = GetBuffer()->GetChannel(0);
@@ -118,8 +156,8 @@ void OutputChannel::Process(double time)
          GetVizBuffer()->WriteChunk(getBufferGetChannel2, gBufferSize, 1);
       }
 
-      mLevelMeterDisplay.Process(0, TheSynth->GetOutputBuffer(channel1), gBufferSize);
-      mLevelMeterDisplay.Process(1, TheSynth->GetOutputBuffer(channel2), gBufferSize);
+      mLevelMeterDisplay.Process(0, channel1 >= 0 && channel1 < TheSynth->GetNumOutputChannels() ? TheSynth->GetOutputBuffer(channel1) : gZeroBuffer, gBufferSize);
+      mLevelMeterDisplay.Process(1, channel2 >= 0 && channel2 < TheSynth->GetNumOutputChannels() ? TheSynth->GetOutputBuffer(channel2) : gZeroBuffer, gBufferSize);
    }
 
    GetBuffer()->Reset();
@@ -155,6 +193,18 @@ void OutputChannel::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("limit", moduleInfo, 1, 0, 1000, K(isTextField));
 
    SetUpFromSaveData();
+   if (!moduleInfo["channel_index"].isNull() && !moduleInfo["stereo"].isNull())
+   {
+      mSelectedChannel = MAX(0, moduleInfo["channel_index"].asInt());
+      mSelectedStereo = moduleInfo["stereo"].asBool();
+      RefreshChannels();
+   }
+}
+
+void OutputChannel::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   moduleInfo["channel_index"] = mSelectedChannel;
+   moduleInfo["stereo"] = mSelectedStereo;
 }
 
 void OutputChannel::SetUpFromSaveData()
@@ -163,6 +213,9 @@ void OutputChannel::SetUpFromSaveData()
       mChannelSelectionIndex = mModuleSaveData.GetInt("channel") - 1;
    else
       mChannelSelectionIndex = mModuleSaveData.GetEnum<int>("channels");
+   mSelectedStereo = mStereoSelectionOffset > 0 && mChannelSelectionIndex >= mStereoSelectionOffset;
+   mSelectedChannel = MAX(0, mChannelSelectionIndex - (mSelectedStereo ? mStereoSelectionOffset : 0));
+   RefreshChannels();
    mLimit = mModuleSaveData.GetFloat("limit");
 
    mLevelMeterDisplay.SetLimit(mLimit);
