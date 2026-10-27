@@ -60,6 +60,16 @@ void Stutter::ProcessAudio(double time, ChannelBuffer* buffer)
    for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
       mRecordBuffer.WriteChunk(buffer->GetChannel(ch), bufferSize, ch);
 
+   // Safety net: if the blend ramp is still active but the stutter state says stopped,
+   // start a proper ramp to zero. This catches edge cases where DoStutter and StopStutter
+   // create ramp entries with the same start time, causing the Ramp's ring buffer
+   // search (strict less-than) to miss the stop entry.
+   // The Target>0 check avoids re-triggering once a ramp-to-zero is already in progress.
+   if (!mStuttering && mStutterStack.empty() && mBlendRamp.Value(time) > 0 && mBlendRamp.Target(time) > 0)
+   {
+      mBlendRamp.Start(time, 0, time + STUTTER_START_BLEND_MS);
+   }
+
    if (mBlendRamp.Target(time) > 0 || mBlendRamp.Value(time) > 0)
    {
       if (mCurrentStutter.interval == kInterval_None)
@@ -177,17 +187,20 @@ void Stutter::EndStutter(double time, StutterParams stutter)
    {
       mStutterStack.remove(stutter);
    }
+   bool stackEmpty = mStutterStack.empty();
    mMutex.unlock();
 
-   bool quantize = sQuantize;
-   if (stutter.interval == kInterval_None && mStutterStack.empty())
-      quantize = false; //"free stutter" shouldn't be quantized if we're releasing the only stutter
-
-   if (!quantize)
+   if (stackEmpty)
    {
-      if (mStutterStack.empty())
-         StopStutter(time);
-      else if (hasNewStutter)
+      StopStutter(time);
+   }
+   else
+   {
+      bool quantize = sQuantize;
+      if (stutter.interval == kInterval_None)
+         quantize = false; //"free stutter" shouldn't be quantized
+
+      if (!quantize && hasNewStutter)
          DoStutter(time, stutter);
    }
 }
