@@ -523,9 +523,18 @@ void DrumPlayer::PlayNote(NoteMessage note)
    }
 }
 
+void DrumPlayer::SetPitchContext(int pitch)
+{
+   mPush2SelectedHitIdx = pitch;
+   if (pitch != -1)
+      mHasExternalGridController = true;
+   else
+      mHasExternalGridController = false;
+}
+
 bool DrumPlayer::OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
-   if (controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
+   if (!mHasExternalGridController && controlIndex >= abletonGrid->GetGridStartIndex() && controlIndex < abletonGrid->GetGridStartIndex() + abletonGrid->GetGridNumPads())
    {
       int gridIndex = controlIndex - abletonGrid->GetGridStartIndex();
       int x = gridIndex % 8;
@@ -550,6 +559,18 @@ bool DrumPlayer::OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGri
          }
       }
 
+      return true;
+   }
+
+   return false;
+}
+
+bool DrumPlayer::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
+{
+   if (controlIndex == AbletonDevice::kMoveDeleteButton && abletonGrid->GetButtonState(AbletonDevice::kShiftButton))
+   {
+      if (midiValue > 0)
+         mDrawWaveformOnController = !mDrawWaveformOnController;
       return true;
    }
 
@@ -601,24 +622,23 @@ void DrumPlayer::GetPush2OverrideControls(std::vector<IUIControl*>& controls) co
       int i = mPush2SelectedHitIdx;
       controls.push_back(mDrumHits[i].mVolSlider);
       controls.push_back(mDrumHits[i].mSpeedSlider);
-      if (mDrumHits[i].mUseEnvelope)
-      {
-         controls.push_back(mDrumHits[i].mEnvelopeDisplay);
-         controls.push_back(mDrumHits[i].mEnvelopeDisplay->GetASlider());
-         controls.push_back(mDrumHits[i].mEnvelopeDisplay->GetDSlider());
-         controls.push_back(mDrumHits[i].mEnvelopeDisplay->GetSSlider());
-         controls.push_back(mDrumHits[i].mEnvelopeDisplay->GetRSlider());
-      }
-      controls.push_back(mDrumHits[i].mTestButton);
-      controls.push_back(mDrumHits[i].mPrevButton);
-      controls.push_back(mDrumHits[i].mNextButton);
-      controls.push_back(mDrumHits[i].mRandomButton);
-      controls.push_back(mDrumHits[i].mUseEnvelopeCheckbox);
+      //controls.push_back(mDrumHits[i].mPrevButton);
+      //controls.push_back(mDrumHits[i].mNextButton);
+      //controls.push_back(mDrumHits[i].mRandomButton);
       controls.push_back(mDrumHits[i].mPanSlider);
       controls.push_back(mDrumHits[i].mWidenSlider);
       controls.push_back(mDrumHits[i].mLinkIdSlider);
       controls.push_back(mDrumHits[i].mHitCategoryDropdown);
       controls.push_back(mDrumHits[i].mStartOffsetSlider);
+      controls.push_back(mDrumHits[i].mUseEnvelopeCheckbox);
+      if (mDrumHits[i].mUseEnvelope)
+      {
+         controls.push_back(mDrumHits[i].mEnvelopeDisplay->GetASlider());
+         controls.push_back(mDrumHits[i].mEnvelopeDisplay->GetDSlider());
+         controls.push_back(mDrumHits[i].mEnvelopeDisplay->GetSSlider());
+         controls.push_back(mDrumHits[i].mEnvelopeDisplay->GetRSlider());
+         controls.push_back(mDrumHits[i].mEnvelopeDisplay);
+      }
    }
 }
 
@@ -635,13 +655,17 @@ bool DrumPlayer::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Ableto
 
          DrumHit& drumHit = mDrumHits[mPush2SelectedHitIdx];
          Sample& sample = drumHit.mSample;
-         float displayLength = sample.LengthInSamples();
-         if (drumHit.mUseEnvelope)
-            displayLength = MIN((drumHit.mEnvelope.GetA() + drumHit.mEnvelope.GetR()) * gSampleRateMs, displayLength);
-         lcd->DrawAudioBuffer(0, 0, AbletonMoveLCD::kMoveDisplayWidth, AbletonMoveLCD::kMoveDisplayHeight, sample.Data()->GetChannel(0), drumHit.mStartOffset * displayLength, displayLength, drumHit.GetPlaySampleIndex(gTime));
+         if (mDrawWaveformOnController)
+         {
+            float start = drumHit.mStartOffset * sample.LengthInSamples();
+            float end = sample.LengthInSamples();
+            if (drumHit.mUseEnvelope)
+               end = MIN(start + (drumHit.mEnvelope.GetA() + drumHit.mEnvelope.GetD() + drumHit.mEnvelope.GetR()) * gSampleRateMs, sample.LengthInSamples());
+            lcd->DrawAudioBuffer(0, 0, AbletonMoveLCD::kMoveDisplayWidth, AbletonMoveLCD::kMoveDisplayHeight, sample.Data()->GetChannel(0), start, end, drumHit.GetPlaySampleIndex(gTime));
+         }
 
          lcd->DrawRect(1, 2, AbletonMoveLCD::kMoveDisplayWidth - 2, 13, LCDDrawMode::Clear);
-         lcd->DrawLCDText(drumHit.mSample.Name().c_str(), 4, 12, LCDFONT_STYLE_REGULAR);
+         lcd->DrawLCDText(sample.Name().c_str(), 4, 12, LCDFONT_STYLE_REGULAR);
 
          mLoadSamplesDrawMutex.unlock();
       }
@@ -933,15 +957,16 @@ void DrumPlayer::OnControllerPageSelected()
 
 void DrumPlayer::DrumHit::DrawUIControls()
 {
-   float displayLength = mSample.LengthInSamples();
+   float start = mStartOffset * mSample.LengthInSamples();
+   float end = mSample.LengthInSamples();
    if (mUseEnvelope)
-      displayLength = MIN(mEnvelopeLength * gSampleRateMs, displayLength);
+      end = MIN(start + mEnvelopeLength * gSampleRateMs, mSample.LengthInSamples());
    ofPushMatrix();
    ofTranslate(mEnvelopeDisplay->GetPosition(true).x, mEnvelopeDisplay->GetPosition(true).y);
    if (!mOwner->mLoadingSamples)
    {
       mOwner->mLoadSamplesDrawMutex.lock();
-      DrawAudioBuffer(135, 100, mSample.Data(), mStartOffset * displayLength, displayLength, GetPlaySampleIndex(gTime));
+      DrawAudioBuffer(135, 100, mSample.Data(), start, end, GetPlaySampleIndex(gTime));
       mOwner->mLoadSamplesDrawMutex.unlock();
    }
    ofPopMatrix();

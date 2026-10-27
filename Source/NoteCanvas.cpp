@@ -359,6 +359,17 @@ bool NoteCanvas::OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGri
       return true;
    }*/
 
+   if (IsInAbletonGridFocusMode())
+   {
+      IAbletonGridController* pitchContextGrid = dynamic_cast<IAbletonGridController*>(mPitchContextInterface);
+      if (pitchContextGrid != nullptr)
+      {
+         bool handled = pitchContextGrid->OnAbletonGridControl_InputThread(abletonGrid, controlIndex, midiValue);
+         if (handled)
+            return true;
+      }
+   }
+
    if (mGridKeyboardInterface != nullptr)
    {
       int pressedPitch = -1;
@@ -371,6 +382,22 @@ bool NoteCanvas::OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGri
          if (pitch >= 0 && pitch <= 127)
          {
             pressedPitch = pitch;
+         }
+         else
+         {
+            int drumContextPitch = mGridKeyboardInterface->GridToPitch(gridX - 4, gridY);
+            if (drumContextPitch >= 0 && drumContextPitch <= 127)
+            {
+               if (midiValue > 0 || drumContextPitch == mEditCurrentPitchContext)
+               {
+                  if (midiValue == 0) //we released the button for what was the current context
+                     drumContextPitch = -1;
+
+                  mEditCurrentPitchContext = drumContextPitch;
+                  if (mPitchContextInterface)
+                     mPitchContextInterface->SetPitchContext(mEditCurrentPitchContext);
+               }
+            }
          }
       }
 
@@ -443,6 +470,17 @@ bool NoteCanvas::OnAbletonGridControl_InputThread(IAbletonGridDevice* abletonGri
 
 bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int controlIndex, float midiValue)
 {
+   if (IsInAbletonGridFocusMode())
+   {
+      IAbletonGridController* pitchContextGrid = dynamic_cast<IAbletonGridController*>(mPitchContextInterface);
+      if (pitchContextGrid != nullptr)
+      {
+         bool handled = pitchContextGrid->OnAbletonGridControl(abletonGrid, controlIndex, midiValue);
+         if (handled)
+            return true;
+      }
+   }
+
    if (!mCurrentEditElements.empty())
    {
       if (controlIndex == AbletonDevice::kVolumeEncoderTurn ||
@@ -728,7 +766,8 @@ bool NoteCanvas::OnAbletonGridControl(IAbletonGridDevice* abletonGrid, int contr
       return true;
    }
 
-   if (mGridKeyboardInterface->OnAbletonGridControl(abletonGrid, controlIndex, midiValue))
+   if (mGridKeyboardInterface != nullptr &&
+       mGridKeyboardInterface->OnAbletonGridControl(abletonGrid, controlIndex, midiValue))
       return true;
 
    return false;
@@ -856,13 +895,20 @@ void NoteCanvas::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
             int pitch = mGridKeyboardInterface->GridToPitch(x, y);
             int ledIndex = x + (abletonMove->GetGridNumRows() - 1 - y) * abletonMove->GetGridNumCols() + abletonMove->GetGridStartIndex();
 
-            if (pitch > 0 && pitch < (int)mPitchMuted.size() && mPitchMuted[pitch])
+            if (pitch >= 0 && pitch < (int)mPitchMuted.size() && mPitchMuted[pitch])
                abletonMove->SetLed(ledIndex, AbletonDevice::kColorDarkRed);
 
             int flashColor = -1;
             if (pitch == mEditCurrentPitchContext)
                flashColor = AbletonDevice::kColorLightBlue;
             abletonMove->SetLedFlashColor(ledIndex, flashColor);
+
+            if (pitch < 0)
+            {
+               int drumContextPitch = mGridKeyboardInterface->GridToPitch(x - 4, y);
+               if (drumContextPitch >= 0 && drumContextPitch == mEditCurrentPitchContext)
+                  abletonMove->SetLed(ledIndex, AbletonDevice::kColorLightBlue);
+            }
          }
       }
    }

@@ -51,6 +51,7 @@ void PitchBender::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mBendSlider = new FloatSlider(this, "bend", 5, 2, 110, 15, &mBend, -mRange, mRange);
+   mBendSlider->AddDetent(0);
 }
 
 void PitchBender::DrawModule()

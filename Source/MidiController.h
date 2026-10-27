@@ -191,6 +191,7 @@ struct UIControlConnection
    int mLastControlValue{ -1 };
    std::string mLastDisplayValue{ "" };
    double mLastActivityTime{ -9999 };
+   float mLastActivityValue{ 0 };
    MidiController* mUIOwner{ nullptr };
 
    //editor controls
@@ -444,6 +445,7 @@ private:
    int mControllerIndex{ -1 };
    double mLastActivityTime{ -9999 };
    bool mLastActivityBound{ false };
+   float mLastActivityValue{ 0 };
    bool mShowActivityUIOverlay{ true };
    bool mBlink{ false };
    int mControllerPage{ 0 };
