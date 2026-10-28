@@ -34,4 +34,3 @@ SortIncludes: false
 SpaceBeforeCpp11BracedList: false
 SpaceInEmptyBlock: false
 Standard: Auto
-...

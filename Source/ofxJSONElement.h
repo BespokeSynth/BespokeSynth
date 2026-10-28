@@ -18,7 +18,7 @@ extern "C" size_t decode_html_entities_utf8(char* dest, const char* src);
 class ofxJSONElement : public Json::Value
 {
 public:
-   ofxJSONElement(){};
+   ofxJSONElement() {};
    ofxJSONElement(std::string jsonString);
    ofxJSONElement(const Json::Value& v);
 
