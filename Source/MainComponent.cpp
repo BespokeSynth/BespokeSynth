@@ -15,6 +15,29 @@ using namespace juce;
 #include "SpaceMouseControl.h"
 #include "UserPrefs.h"
 
+#if BESPOKE_LINUX
+#include "JackAudioDeviceType.h"
+
+class BespokeAudioDeviceManager : public AudioDeviceManager
+{
+public:
+   void createAudioDeviceTypes(OwnedArray<AudioIODeviceType>& types) override
+   {
+      AudioDeviceManager::createAudioDeviceTypes(types);
+      for (int i = 0; i < types.size(); ++i)
+      {
+         if (types[i]->getTypeName() == "JACK")
+         {
+            std::unique_ptr<AudioIODeviceType> type(types.removeAndReturn(i));
+            const int numInputs = UserPrefs.audio_input_device.Get() == "none" ? 0 : UserPrefs.max_input_channels.Get();
+            const int numOutputs = UserPrefs.audio_output_device.Get() == "none" ? 0 : UserPrefs.max_output_channels.Get();
+            types.insert(i, new JackAudioDeviceType(std::move(type), numInputs, numOutputs, UserPrefs.jack_autoconnect.Get()));
+         }
+      }
+   }
+};
+#endif
+
 #ifdef JUCE_WINDOWS
 #include <windows.h>
 #endif
@@ -194,6 +217,11 @@ public:
       mAudioDeviceConnectionState = AudioDeviceConnectionState::CheckForDisconnection;
    }
 
+   void audioDeviceError(const String& errorMessage) override
+   {
+      mSynth.LogEvent("audio device error: " + errorMessage.toStdString(), kLogEventType_Error);
+   }
+
    void shutdownAudio()
    {
       mGlobalManagers.mDeviceManager.removeAudioCallback(this);
@@ -314,6 +342,10 @@ public:
    std::string GetInputDeviceName() const
    {
       std::string inputDevice = UserPrefs.audio_input_device.Get();
+#if BESPOKE_LINUX
+      if (inputDevice == "BespokeSynth")
+         inputDevice = kAutoDevice;
+#endif
       if (!mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
          inputDevice = GetOutputDeviceName(); //asio must have identical input and output
       return inputDevice;
@@ -321,6 +353,10 @@ public:
 
    std::string GetOutputDeviceName() const
    {
+#if BESPOKE_LINUX
+      if (UserPrefs.audio_output_device.Get() == "BespokeSynth")
+         return kAutoDevice;
+#endif
       return UserPrefs.audio_output_device.Get();
    }
 
@@ -630,7 +666,11 @@ private:
 
    struct
    {
+#if BESPOKE_LINUX
+      BespokeAudioDeviceManager mDeviceManager;
+#else
       juce::AudioDeviceManager mDeviceManager;
+#endif
       juce::AudioFormatManager mAudioFormatManager;
    } mGlobalManagers;
 

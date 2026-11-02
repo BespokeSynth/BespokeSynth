@@ -596,13 +596,6 @@ void ModularSynth::Draw()
    if (UserPrefs.draw_background_lissajous.Get())
       DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB, UserPrefs.background_lissajous_autocorrelate.Get());
 
-   if (gTime == 1 && !HasFatalError())
-   {
-      std::string loading("Bespoke is initializing audio...");
-      DrawTextNormal(loading, ofGetWidth() / 2 - GetStringWidth(loading, 28) / 2, ofGetHeight() / 2 - 6, 28);
-      return;
-   }
-
    if (!mInitialized && !HasFatalError())
    {
       std::string loading("Bespoke is loading...");

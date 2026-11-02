@@ -2023,6 +2023,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~devicetype~what kind of audio device bespoke should use (requires restart)
 ~audio_output_device~which device to use for audio output (requires restart)
 ~audio_input_device~which device to use for audio input (requires restart)
+~jack_autoconnect~connect JACK ports to the selected audio devices on startup or device reopening. disable for session-managed or manual routing. both modes register max_input_channels and max_output_channels ports independently of the selected devices (requires restart)
 ~samplerate~what sample rate to use with your audio device (requires restart)
 ~buffersize~what buffer size to use with your audio device. lower values use require more CPU power, higher values add more latency. (requires restart)
 ~oversampling~global oversampling multiplier. uses additional CPU for higher-resolution audio processing. (requires restart)
@@ -2046,8 +2047,8 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~immediate_paste~when enabled, pasting values on UI controls will apply immediately instead of requiring you to press enter
 ~record_buffer_length_minutes~length of always-on recording buffer for "write audio" button in the title bar (requires restart)
 ~vst_always_on_top~should plugin windows always stay on top of bespoke when opened
-~max_output_channels~number of output channels to allocate (requires restart)
-~max_input_channels~number of input channels to allocate (requires restart)
+~max_output_channels~number of output channels to allocate. with JACK, registers this many output ports regardless of the selected device; choosing none disables outputs (requires restart)
+~max_input_channels~number of input channels to allocate. with JACK, registers this many input ports regardless of the selected device; choosing none disables inputs (requires restart)
 ~plugin_preference_order~semicolon-separated list of plugin formats, in preferred order. if a plugin exists with multiple formats, only the most preferred format will be shown. leave this blank to always show all plugins. (default value: "VST3;VST;AudioUnit;LV2")
 ~force_juce_file_chooser~use file chooser dialog windows provided by JUCE even when a native file chooser is available
 ~draw_background_lissajous~should the background lissajous curve draw
