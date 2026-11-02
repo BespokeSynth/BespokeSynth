@@ -36,7 +36,8 @@
 enum BinaryValueCode
 {
    kCodeByte,
-   kCodeGray
+   kCodeGray,
+   kCodePermutation
 };
 
 class PatchCableSource;
@@ -90,6 +91,33 @@ private:
       int mIndex{ 0 };
    };
 
+   struct Permutation
+   {
+      int ones() const
+      {
+         if (!value)
+            return 0;
+         int ones = 0;
+         for (int i = 0; i < log(value) / log(2) + 1; i++)
+         {
+            if (value & (1 << i))
+               ones++;
+         }
+         return ones;
+      }
+      bool operator<(const Permutation& other) const
+      {
+         int ones_this = ones();
+         int ones_other = other.ones();
+         if (ones_this == ones_other)
+            return this->value < other.value;
+         else
+            return ones_this < ones_other;
+      }
+      int value{ 0 };
+   };
+
+   std::array<Permutation, 1 << NUM_BITS> mPermutations;
    std::array<BitModulator, NUM_BITS> mBits;
 
    FloatSlider* mInputSlider{ nullptr };
