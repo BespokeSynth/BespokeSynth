@@ -25,12 +25,15 @@
 
 #include "HelpDisplay.h"
 
+#include <thread>
+
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "TitleBar.h"
 #include "EffectChain.h"
 #include "UserPrefs.h"
 #include "VersionInfo.h"
+#include "ofxJSONElement.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 #include "juce_opengl/juce_opengl.h"
@@ -38,6 +41,7 @@
 bool HelpDisplay::sShowTooltips = false;
 bool HelpDisplay::sTooltipsLoaded = false;
 std::list<HelpDisplay::ModuleTooltipInfo> HelpDisplay::sTooltips;
+std::atomic<HelpDisplay::NightlyCheckState> HelpDisplay::sNightlyState{ HelpDisplay::NightlyCheckState::Idle };
 
 HelpDisplay::HelpDisplay()
 : IDrawableModule(700, 700)
@@ -60,6 +64,10 @@ void HelpDisplay::CreateUIControls()
    mTutorialVideoLinkButton = new ClickButton(this, "youtu.be/SYBc8X2IxqM", 160, 61);
    mDocsLinkButton = new ClickButton(this, "bespokesynth.com/docs", 95, 80);
    mDiscordLinkButton = new ClickButton(this, "bespoke discord", 304, 80);
+
+#if BESPOKE_NIGHTLY && !BESPOKE_SUPPRESS_NIGHTLY_LABEL
+   mCheckNightlyButton = new ClickButton(this, "check for new version", (int)mWidth - 150, 25);
+#endif
 
    //mDumpModuleInfo->SetShowing(false);
 }
@@ -90,6 +98,25 @@ void HelpDisplay::DrawModule()
    ofPopStyle();
 
    DrawTextRightJustify(GetBuildInfoString(), mWidth - 5, 12);
+
+   if (mCheckNightlyButton != nullptr)
+   {
+      const char* label = "check for new version";
+      switch (sNightlyState.load())
+      {
+         case NightlyCheckState::Idle: label = "check for new version"; break;
+         case NightlyCheckState::Checking: label = "checking..."; break;
+         case NightlyCheckState::UpToDate: label = "using latest nightly"; break;
+         case NightlyCheckState::UpdateAvailable: label = "update available - click to open"; break;
+         case NightlyCheckState::Failed: label = "check failed - click to retry"; break;
+      }
+      mCheckNightlyButton->SetLabel(label);
+
+      float bw = 0, bh = 0;
+      mCheckNightlyButton->GetDimensions(bw, bh);
+      mCheckNightlyButton->SetPosition(mWidth - 5 - bw, 25);
+      mCheckNightlyButton->Draw();
+   }
 
    mShowTooltipsCheckbox->Draw();
    mCopyBuildInfoButton->Draw();
@@ -409,6 +436,22 @@ void HelpDisplay::ButtonClicked(ClickButton* button, double time)
    {
       juce::SystemClipboard::copyTextToClipboard("bespoke " + juce::String(GetBuildInfoString()) + " - " + juce::SystemStats::getOperatingSystemName() + " - " + Bespoke::GIT_BRANCH + " " + Bespoke::GIT_HASH);
    }
+   if (button == mCheckNightlyButton && mCheckNightlyButton != nullptr)
+   {
+      switch (sNightlyState.load())
+      {
+         case NightlyCheckState::Idle:
+         case NightlyCheckState::Failed:
+            StartNightlyCheck();
+            break;
+         case NightlyCheckState::UpdateAvailable:
+            juce::URL(kNightlyReleaseUrl).launchInDefaultBrowser();
+            break;
+         case NightlyCheckState::Checking:
+         case NightlyCheckState::UpToDate:
+            break;
+      }
+   }
    if (button == mDumpModuleInfoButton)
    {
       LoadTooltips();
@@ -654,4 +697,65 @@ void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, std::str
       for (int i = 0; i < width*height * 3; ++i)
          stream << pixels[i] << ' ';
    }*/
+}
+
+void HelpDisplay::StartNightlyCheck()
+{
+   sNightlyState = NightlyCheckState::Checking;
+   std::thread(&HelpDisplay::RunNightlyCheck).detach();
+}
+
+//static
+void HelpDisplay::RunNightlyCheck()
+{
+   auto fail = []()
+   {
+      sNightlyState = NightlyCheckState::Failed;
+   };
+
+   juce::URL url(kNightlyApiUrl);
+   auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress)
+                  .withExtraHeaders("User-Agent: BespokeSynth\r\n")
+                  .withConnectionTimeoutMs(10000);
+   auto stream = url.createInputStream(options);
+
+   if (stream == nullptr)
+   {
+      fail();
+      return;
+   }
+
+   juce::String body = stream->readEntireStreamAsString();
+   if (body.isEmpty())
+   {
+      fail();
+      return;
+   }
+
+   ofxJSONElement json;
+   if (!json.parse(body.toStdString()))
+   {
+      fail();
+      return;
+   }
+
+   if (!json.isMember("target_commitish") || !json["target_commitish"].isString())
+   {
+      fail();
+      return;
+   }
+
+   juce::String remoteSha(json["target_commitish"].asString());
+   juce::String localHash(Bespoke::GIT_HASH);
+
+   if (localHash.isEmpty() || localHash == "deadbeef")
+   {
+      fail();
+      return;
+   }
+
+   if (remoteSha.startsWith(localHash))
+      sNightlyState = NightlyCheckState::UpToDate;
+   else
+      sNightlyState = NightlyCheckState::UpdateAvailable;
 }

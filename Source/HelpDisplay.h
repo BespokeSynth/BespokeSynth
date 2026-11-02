@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <atomic>
+
 #include "IDrawableModule.h"
 #include "RadioButton.h"
 #include "ClickButton.h"
@@ -100,6 +102,24 @@ private:
    ClickButton* mTutorialVideoLinkButton{ nullptr };
    ClickButton* mDocsLinkButton{ nullptr };
    ClickButton* mDiscordLinkButton{ nullptr };
+   ClickButton* mCheckNightlyButton{ nullptr };
+
+   enum class NightlyCheckState
+   {
+      Idle,
+      Checking,
+      UpToDate,
+      UpdateAvailable,
+      Failed
+   };
+   static std::atomic<NightlyCheckState> sNightlyState;
+
+   void StartNightlyCheck();
+   static void RunNightlyCheck();
+
+   static constexpr const char* kNightlyReleaseUrl = "https://github.com/BespokeSynth/BespokeSynth/releases/tag/Nightly";
+   static constexpr const char* kNightlyApiUrl = "https://api.github.com/repos/BespokeSynth/BespokeSynth/releases/tags/Nightly";
+
    static bool sTooltipsLoaded;
    static std::list<ModuleTooltipInfo> sTooltips;
 
