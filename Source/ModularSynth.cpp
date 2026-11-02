@@ -111,6 +111,11 @@ ModularSynth::~ModularSynth()
 {
    DeleteAllModules();
 
+   for (auto* buffer : mInputBuffers)
+      delete[] buffer;
+   for (auto* buffer : mOutputBuffers)
+      delete[] buffer;
+
    delete mGlobalRecordBuffer;
    mAudioPluginFormatManager.reset();
    mKnownPluginList.reset();
@@ -307,10 +312,31 @@ void ModularSynth::LoadResources()
 
 void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
 {
+   ScopedMutex mutex(&mAudioThreadMutex, "InitIOBuffers()");
+   std::lock_guard<std::recursive_mutex> renderLock(mRenderLock);
+
+   for (auto* buffer : mInputBuffers)
+      delete[] buffer;
+   for (auto* buffer : mOutputBuffers)
+      delete[] buffer;
+   mInputBuffers.clear();
+   mOutputBuffers.clear();
+
    for (int i = 0; i < inputChannelCount; ++i)
-      mInputBuffers.push_back(new float[gBufferSize]);
+      mInputBuffers.push_back(new float[gBufferSize]{});
    for (int i = 0; i < outputChannelCount; ++i)
-      mOutputBuffers.push_back(new float[gBufferSize]);
+      mOutputBuffers.push_back(new float[gBufferSize]{});
+
+   std::vector<IDrawableModule*> modules;
+   mModuleContainer.GetAllModules(modules);
+   mUILayerModuleContainer.GetAllModules(modules);
+   for (auto* module : modules)
+   {
+      if (auto* input = dynamic_cast<InputChannel*>(module))
+         input->RefreshChannels();
+      if (auto* output = dynamic_cast<OutputChannel*>(module))
+         output->RefreshChannels();
+   }
 }
 
 //static
@@ -2523,6 +2549,8 @@ void ModularSynth::AudioIn(const float* const* input, int bufferSize, int nChann
          }
       }
    }
+   for (int i = channelsToProcess; i < mInputBuffers.size(); ++i)
+      Clear(mInputBuffers[i], mIOBufferSize);
 }
 
 float* ModularSynth::GetInputBuffer(int channel)

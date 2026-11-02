@@ -26,6 +26,7 @@
 */
 
 #include "UserPrefsEditor.h"
+#include "AudioDeviceSettings.h"
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
 #include "UserPrefs.h"
@@ -112,6 +113,7 @@ void UserPrefsEditor::CreateUIControls()
 
 void UserPrefsEditor::Show()
 {
+   mAudioApplyError.clear();
    SetPosition(100 / TheSynth->GetUIScale() - TheSynth->GetDrawOffset().x, 250 / TheSynth->GetUIScale() - TheSynth->GetDrawOffset().y);
 
    UpdateDropdowns({});
@@ -131,10 +133,18 @@ void UserPrefsEditor::CreatePrefsFileIfNonexistent()
    UpdateDropdowns({});
 
    if (!juce::File(TheSynth->GetUserPrefsPath()).existsAsFile())
-   {
       Save();
-      UserPrefs.mUserPrefsFile.open(TheSynth->GetUserPrefsPath());
-   }
+}
+
+juce::AudioIODeviceType* UserPrefsEditor::GetSelectedAudioDeviceType() const
+{
+   AudioDeviceSelection selection;
+   selection.type = UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex());
+   const auto selectedTypeName = GetResolvedAudioDeviceTypeName(TheSynth->GetMainComponent(), selection);
+   for (auto* deviceType : TheSynth->GetAudioDeviceManager().getAvailableDeviceTypes())
+      if (deviceType->getTypeName().toStdString() == selectedTypeName)
+         return deviceType;
+   return nullptr;
 }
 
 void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
@@ -152,14 +162,15 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       for (auto* deviceType : deviceManager.getAvailableDeviceTypes())
       {
          UserPrefs.devicetype.GetDropdown()->AddLabel(deviceType->getTypeName().toStdString(), i);
-         if (deviceType == deviceManager.getCurrentDeviceTypeObject() &&
-             UserPrefs.devicetype.Get() != "auto")
+         if (deviceType->getTypeName().toStdString() == UserPrefs.devicetype.Get())
             UserPrefs.devicetype.GetIndex() = i;
          ++i;
       }
    }
 
-   auto* selectedDeviceType = UserPrefs.devicetype.GetIndex() != -1 ? deviceManager.getAvailableDeviceTypes()[UserPrefs.devicetype.GetIndex()] : deviceManager.getCurrentDeviceTypeObject();
+   auto* selectedDeviceType = GetSelectedAudioDeviceType();
+   if (selectedDeviceType == nullptr)
+      return;
    selectedDeviceType->scanForDevices();
 
    if (toUpdate.empty() || VectorContains(UserPrefs.audio_output_device.GetDropdown(), toUpdate))
@@ -172,9 +183,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       for (auto& outputDevice : selectedDeviceType->getDeviceNames())
       {
          UserPrefs.audio_output_device.GetDropdown()->AddLabel(outputDevice.toStdString(), i);
-         if (deviceManager.getCurrentAudioDevice() != nullptr &&
-             i == selectedDeviceType->getIndexOfDevice(deviceManager.getCurrentAudioDevice(), false) &&
-             UserPrefs.audio_output_device.Get() != "auto")
+         if (outputDevice.toStdString() == UserPrefs.audio_output_device.Get())
             UserPrefs.audio_output_device.GetIndex() = i;
          ++i;
       }
@@ -201,9 +210,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       for (auto& inputDevice : selectedDeviceType->getDeviceNames(true))
       {
          UserPrefs.audio_input_device.GetDropdown()->AddLabel(inputDevice.toStdString(), i);
-         if (deviceManager.getCurrentAudioDevice() != nullptr &&
-             i == selectedDeviceType->getIndexOfDevice(deviceManager.getCurrentAudioDevice(), true) &&
-             UserPrefs.audio_input_device.Get() != "auto")
+         if (inputDevice.toStdString() == UserPrefs.audio_input_device.Get())
             UserPrefs.audio_input_device.GetIndex() = i;
          ++i;
       }
@@ -219,18 +226,28 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
    }
 
    juce::String outputDeviceName;
-   if (UserPrefs.audio_output_device.GetIndex() >= 0)
-      outputDeviceName = selectedDeviceType->getDeviceNames()[UserPrefs.audio_output_device.GetIndex()];
+   auto outputNames = selectedDeviceType->getDeviceNames();
+   auto inputNames = selectedDeviceType->getDeviceNames(true);
+   if (UserPrefs.audio_output_device.GetIndex() >= 0 && UserPrefs.audio_output_device.GetIndex() < outputNames.size())
+      outputDeviceName = outputNames[UserPrefs.audio_output_device.GetIndex()];
    else if (UserPrefs.audio_output_device.GetIndex() == -1)
-      outputDeviceName = selectedDeviceType->getDeviceNames()[selectedDeviceType->getDefaultDeviceIndex(false)];
+   {
+      int defaultIndex = selectedDeviceType->getDefaultDeviceIndex(false);
+      if (defaultIndex >= 0 && defaultIndex < outputNames.size())
+         outputDeviceName = outputNames[defaultIndex];
+   }
 
    juce::String inputDeviceName;
    if (selectedDeviceType->hasSeparateInputsAndOutputs())
    {
-      if (UserPrefs.audio_input_device.GetIndex() >= 0)
-         inputDeviceName = selectedDeviceType->getDeviceNames(true)[UserPrefs.audio_input_device.GetIndex()];
+      if (UserPrefs.audio_input_device.GetIndex() >= 0 && UserPrefs.audio_input_device.GetIndex() < inputNames.size())
+         inputDeviceName = inputNames[UserPrefs.audio_input_device.GetIndex()];
       else if (UserPrefs.audio_input_device.GetIndex() == -1)
-         inputDeviceName = selectedDeviceType->getDeviceNames()[selectedDeviceType->getDefaultDeviceIndex(true)];
+      {
+         int defaultIndex = selectedDeviceType->getDefaultDeviceIndex(true);
+         if (defaultIndex >= 0 && defaultIndex < inputNames.size())
+            inputDeviceName = inputNames[defaultIndex];
+      }
    }
    else
    {
@@ -247,13 +264,19 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
 
    if (toUpdate.empty() || VectorContains(UserPrefs.samplerate.GetDropdown(), toUpdate))
    {
+      int selectedRate = ofToInt(UserPrefs.samplerate.GetDropdown()->GetLabel(UserPrefs.samplerate.GetIndex()));
+      if (selectedRate <= 0)
+         selectedRate = UserPrefs.samplerate.Get();
       UserPrefs.samplerate.GetIndex() = -1;
       UserPrefs.samplerate.GetDropdown()->Clear();
       i = 0;
-      for (auto& rate : selectedDevice->getAvailableSampleRates())
+      auto rates = selectedDevice->getAvailableSampleRates();
+      if (selectedRate > 0)
+         rates.addIfNotAlreadyThere((double)selectedRate);
+      for (auto& rate : rates)
       {
          UserPrefs.samplerate.GetDropdown()->AddLabel(ofToString(rate), i);
-         if (rate == gSampleRate / UserPrefs.oversampling.Get())
+         if (rate == selectedRate)
             UserPrefs.samplerate.GetIndex() = i;
          ++i;
       }
@@ -261,13 +284,19 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
 
    if (toUpdate.empty() || VectorContains(UserPrefs.buffersize.GetDropdown(), toUpdate))
    {
+      int selectedBufferSize = ofToInt(UserPrefs.buffersize.GetDropdown()->GetLabel(UserPrefs.buffersize.GetIndex()));
+      if (selectedBufferSize <= 0)
+         selectedBufferSize = UserPrefs.buffersize.Get();
       UserPrefs.buffersize.GetIndex() = -1;
       UserPrefs.buffersize.GetDropdown()->Clear();
       i = 0;
-      for (auto& bufferSize : selectedDevice->getAvailableBufferSizes())
+      auto bufferSizes = selectedDevice->getAvailableBufferSizes();
+      if (selectedBufferSize > 0)
+         bufferSizes.addIfNotAlreadyThere(selectedBufferSize);
+      for (auto& bufferSize : bufferSizes)
       {
          UserPrefs.buffersize.GetDropdown()->AddLabel(ofToString(bufferSize), i);
-         if (bufferSize == gBufferSize / UserPrefs.oversampling.Get())
+         if (bufferSize == selectedBufferSize)
             UserPrefs.buffersize.GetIndex() = i;
          ++i;
       }
@@ -279,8 +308,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
 
 void UserPrefsEditor::DrawModule()
 {
-   auto& deviceManager = TheSynth->GetAudioDeviceManager();
-   auto* selectedDeviceType = UserPrefs.devicetype.GetIndex() != -1 ? deviceManager.getAvailableDeviceTypes()[UserPrefs.devicetype.GetIndex()] : deviceManager.getCurrentDeviceTypeObject();
+   auto* selectedDeviceType = GetSelectedAudioDeviceType();
 
    mCategorySelector->Draw();
 
@@ -292,7 +320,7 @@ void UserPrefsEditor::DrawModule()
       bool onPage = pref->mCategory == mCategory;
       bool hide = false;
       if (pref == &UserPrefs.audio_input_device)
-         hide = !selectedDeviceType->hasSeparateInputsAndOutputs();
+         hide = selectedDeviceType == nullptr || !selectedDeviceType->hasSeparateInputsAndOutputs();
       if (pref == &UserPrefs.position_x || pref == &UserPrefs.position_y)
          hide = !UserPrefs.set_manual_window_position.Get();
 
@@ -322,10 +350,43 @@ void UserPrefsEditor::DrawModule()
    mWidth = 1150;
    mHeight = controlY + 20;
 
+   if (mCategory == UserPrefCategory::General)
+   {
+      auto hardware = GetActiveAudioHardwareSettings(TheSynth->GetMainComponent());
+      auto engine = GetActiveAudioEngineSettings(TheSynth->GetMainComponent());
+      if (hardware.outputSampleRate > 0 || hardware.inputSampleRate > 0)
+      {
+         std::string format = "running: engine " + ofToString(engine.sampleRate) + " Hz / " + ofToString(engine.bufferSize) + " samples";
+         if (hardware.outputSampleRate > 0)
+            format += "; output " + ofToString(hardware.outputSampleRate) + " Hz / " + ofToString(hardware.outputBufferSize) + " samples";
+         if (hardware.inputSampleRate > 0)
+            format += "; input " + ofToString(hardware.inputSampleRate) + " Hz / " + ofToString(hardware.inputBufferSize) + " samples";
+         DrawTextNormal(format, 3, mHeight + 12, 11);
+         mHeight += 20;
+      }
+   }
+
+   if (!mAudioApplyError.empty())
+   {
+      ofPushStyle();
+      ofSetColor(ofColor::yellow);
+      DrawTextNormal("audio device: " + mAudioApplyError, 3, mHeight + 12, 11);
+      ofPopStyle();
+      mHeight += 20;
+   }
+   if (mAudioSettingsPendingRestart && mCategory == UserPrefCategory::General)
+   {
+      ofPushStyle();
+      ofSetColor(ofColor::magenta);
+      DrawTextNormal("audio settings saved; restart to apply them", 3, mHeight + 12, 11);
+      ofPopStyle();
+      mHeight += 20;
+   }
+
    if (UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex()) == "DirectSound")
       DrawRightLabel(UserPrefs.devicetype.GetControl(), "warning: DirectSound can cause crackle and strange behavior for some sample rates and buffer sizes", ofColor::yellow);
 
-   if (!selectedDeviceType->hasSeparateInputsAndOutputs() && mCategory == UserPrefCategory::General)
+   if (selectedDeviceType != nullptr && !selectedDeviceType->hasSeparateInputsAndOutputs() && mCategory == UserPrefCategory::General)
    {
       ofRectangle rect = UserPrefs.audio_output_device.GetControl()->GetRect(true);
       ofPushStyle();
@@ -336,7 +397,7 @@ void UserPrefsEditor::DrawModule()
 
    if (UserPrefs.samplerate.GetDropdown()->GetNumValues() == 0)
    {
-      if (selectedDeviceType->hasSeparateInputsAndOutputs())
+      if (selectedDeviceType != nullptr && selectedDeviceType->hasSeparateInputsAndOutputs())
          DrawRightLabel(UserPrefs.samplerate.GetControl(), "couldn't find a sample rate compatible between these output and input devices", ofColor::yellow);
       else
          DrawRightLabel(UserPrefs.samplerate.GetControl(), "couldn't find any sample rates for this device, for some reason (is it plugged in?)", ofColor::yellow);
@@ -344,7 +405,7 @@ void UserPrefsEditor::DrawModule()
 
    if (UserPrefs.buffersize.GetDropdown()->GetNumValues() == 0)
    {
-      if (selectedDeviceType->hasSeparateInputsAndOutputs())
+      if (selectedDeviceType != nullptr && selectedDeviceType->hasSeparateInputsAndOutputs())
          DrawRightLabel(UserPrefs.buffersize.GetControl(), "couldn't find a buffer size compatible between these output and input devices", ofColor::yellow);
       else
          DrawRightLabel(UserPrefs.buffersize.GetControl(), "couldn't find any buffer sizes for this device, for some reason (is it plugged in?)", ofColor::yellow);
@@ -392,10 +453,7 @@ void UserPrefsEditor::CleanUpSave(std::string& json) //remove the markup hack th
 
 bool UserPrefsEditor::PrefRequiresRestart(UserPref* pref) const
 {
-   return pref == &UserPrefs.devicetype ||
-          pref == &UserPrefs.audio_output_device ||
-          pref == &UserPrefs.audio_input_device ||
-          pref == &UserPrefs.samplerate ||
+   return pref == &UserPrefs.samplerate ||
           pref == &UserPrefs.buffersize ||
           pref == &UserPrefs.oversampling ||
           pref == &UserPrefs.max_output_channels ||
@@ -404,7 +462,7 @@ bool UserPrefsEditor::PrefRequiresRestart(UserPref* pref) const
           pref == &UserPrefs.show_minimap;
 }
 
-void UserPrefsEditor::Save()
+bool UserPrefsEditor::Save()
 {
    //make a copy
    ofxJSONElement prefsFile = UserPrefs.mUserPrefsFile;
@@ -420,23 +478,83 @@ void UserPrefsEditor::Save()
    CleanUpSave(output);
 
    juce::File file(TheSynth->GetUserPrefsPath());
-   file.create();
-   file.replaceWithText(output);
+   if (!file.create() || !file.replaceWithText(output))
+      return false;
+   UserPrefs.mUserPrefsFile.open(TheSynth->GetUserPrefsPath());
 
    if (TheSynth->HasFatalError()) //this popup spawned at load due to a bad init setting. in this case, the button says "save and exit"
       juce::JUCEApplicationBase::quit();
+   return true;
 }
 
 void UserPrefsEditor::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSaveButton)
    {
-      Save();
-      SetShowing(false);
+      if (TheSynth->HasFatalError())
+      {
+         if (!Save())
+            mAudioApplyError = "could not save settings";
+         return;
+      }
+
+      AudioDeviceSelection selection{ UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex()),
+                                      UserPrefs.audio_input_device.GetDropdown()->GetLabel(UserPrefs.audio_input_device.GetIndex()),
+                                      UserPrefs.audio_output_device.GetDropdown()->GetLabel(UserPrefs.audio_output_device.GetIndex()) };
+      AudioEngineSettings desiredEngine{ ofToInt(UserPrefs.samplerate.GetDropdown()->GetLabel(UserPrefs.samplerate.GetIndex())),
+                                         ofToInt(UserPrefs.buffersize.GetDropdown()->GetLabel(UserPrefs.buffersize.GetIndex())),
+                                         ofToInt(UserPrefs.oversampling.GetDropdown()->GetLabel(UserPrefs.oversampling.GetIndex())),
+                                         UserPrefs.max_input_channels.Get(),
+                                         UserPrefs.max_output_channels.Get() };
+      if (desiredEngine.sampleRate <= 0 || desiredEngine.bufferSize <= 0 || desiredEngine.oversampling <= 0)
+      {
+         mAudioApplyError = "choose a valid sample rate, buffer size, and oversampling amount";
+         return;
+      }
+      if (desiredEngine != GetActiveAudioEngineSettings(TheSynth->GetMainComponent()))
+      {
+         if (Save())
+         {
+            UserPrefs.devicetype.Get() = selection.type;
+            UserPrefs.audio_input_device.Get() = selection.input;
+            UserPrefs.audio_output_device.Get() = selection.output;
+            UserPrefs.samplerate.Get() = desiredEngine.sampleRate;
+            UserPrefs.buffersize.Get() = desiredEngine.bufferSize;
+            mAudioSettingsPendingRestart = true;
+            mAudioApplyError.clear();
+         }
+         else
+            mAudioApplyError = "could not save settings";
+         return;
+      }
+      if (selection != GetActiveAudioDeviceSelection(TheSynth->GetMainComponent()))
+      {
+         auto result = ApplyAudioDeviceSelection(TheSynth->GetMainComponent(), selection);
+         if (!result.success)
+         {
+            mAudioApplyError = result.error;
+            return;
+         }
+      }
+      UserPrefs.devicetype.Get() = selection.type;
+      UserPrefs.audio_input_device.Get() = selection.input;
+      UserPrefs.audio_output_device.Get() = selection.output;
+      if (Save())
+      {
+         mAudioSettingsPendingRestart = false;
+         mAudioApplyError.clear();
+         SetShowing(false);
+      }
+      else
+         mAudioApplyError = "could not save settings";
    }
 
    if (button == mCancelButton)
+   {
+      mAudioApplyError.clear();
+      UpdateDropdowns({});
       SetShowing(false);
+   }
 }
 
 void UserPrefsEditor::CheckboxUpdated(Checkbox* checkbox, double time)
