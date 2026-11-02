@@ -169,10 +169,26 @@ void ScriptModule::InitializePythonIfNecessary()
    {
 #ifdef BESPOKE_PORTABLE_PYTHON
       static const auto pythonHomeUtf8{ ofToFactoryPath("python") };
+#if PY_VERSION_HEX >= PYBIND11_PYCONFIG_SUPPORT_PY_VERSION_HEX
+      // For Python 3.8+ use the PyConfig API to set the Python home, which replaces the
+      // Py_SetPythonHome() function that is deprecated (and treated as an error under
+      // -Werror) in Python 3.11+.
+      PyConfig config;
+      PyConfig_InitPythonConfig(&config);
+      config.parse_argv = 0;
+      if (PyStatus_Exception(PyConfig_SetBytesString(&config, &config.home, pythonHomeUtf8.c_str())) != 0)
+      {
+         PyConfig_Clear(&config);
+         throw std::runtime_error("Failed to set the Python home directory");
+      }
+      py::initialize_interpreter(&config);
+#else
+      // For older Python versions Py_SetPythonHome() is still the supported way to set the home.
       static auto PYTHONHOME{ toPythonHome(pythonHomeUtf8, Py_SetPythonHome) };
       Py_SetPythonHome(PYTHONHOME.data());
-#endif
       py::initialize_interpreter();
+#endif
+#endif
 #ifdef BESPOKE_PORTABLE_PYTHON
       py::exec(std::string{ "import sys; sys.executable = '" } + pythonHomeUtf8 + "/" BESPOKE_PORTABLE_PYTHON "'; del sys");
 #endif
