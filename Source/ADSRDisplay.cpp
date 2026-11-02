@@ -401,21 +401,21 @@ void ADSRDisplay::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* 
    GetDrawEventTimes(releaseTime, timeBeforeSustain);
    ADSR::EventInfo adsrEvent(0, releaseTime);
 
-   for (float x = 0; x < AbletonMoveLCD::kMoveDisplayWidth; ++x)
+   for (float x = 0; x < screen->GetWidth(); ++x)
    {
-      float time = x / AbletonMoveLCD::kMoveDisplayWidth * mMaxTime;
+      float time = x / screen->GetWidth() * mMaxTime;
       ofVec2f point = GetDrawPoint(time, adsrEvent);
-      int screenX = point.x / mWidth * AbletonMoveLCD::kMoveDisplayWidth;
-      int screenEnvelopeY = point.y / mHeight * AbletonMoveLCD::kMoveDisplayHeight;
-      for (int screenY = screenEnvelopeY; screenY < AbletonMoveLCD::kMoveDisplayHeight; ++screenY)
+      int screenX = point.x / mWidth * screen->GetWidth();
+      int screenEnvelopeY = point.y / mHeight * screen->GetHeight();
+      for (int screenY = screenEnvelopeY; screenY < screen->GetHeight(); ++screenY)
          screen->DrawPixel(screenX, screenY, LCDDrawMode::Toggle);
    }
 
    float drawTime = GetDrawTime(releaseTime);
-   int nowX = drawTime / mMaxTime * AbletonMoveLCD::kMoveDisplayWidth;
-   if (nowX >= 0 && nowX < AbletonMoveLCD::kMoveDisplayWidth)
+   int nowX = drawTime / mMaxTime * screen->GetWidth();
+   if (nowX >= 0 && nowX < screen->GetWidth())
    {
-      for (float y = 0; y < AbletonMoveLCD::kMoveDisplayHeight; ++y)
+      for (float y = 0; y < screen->GetHeight(); ++y)
          screen->DrawPixel(nowX, y, LCDDrawMode::Toggle);
    }
 }

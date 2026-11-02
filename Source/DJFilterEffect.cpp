@@ -193,17 +193,17 @@ void DJFilterEffect::DrawModule()
 
 void DJFilterEffect::DrawVisualizationToScreen(AbletonMoveLCD* screen, IUIControl* control)
 {
-   for (float x = 0; x < AbletonMoveLCD::kMoveDisplayWidth; ++x)
+   for (float x = 0; x < screen->GetWidth(); ++x)
    {
-      float freq = FreqForPos(x / AbletonMoveLCD::kMoveDisplayWidth);
+      float freq = FreqForPos(x / screen->GetWidth());
       if (freq < gSampleRate / 2)
       {
          float response = GetSignalResponseAt(freq);
          response *= GetVolumeFadeLevel();
-         float screenEnvelopeY = AbletonMoveLCD::kMoveDisplayHeight;
+         float screenEnvelopeY = screen->GetHeight();
          if (response > 0)
-            screenEnvelopeY = (.5f - .666f * log10(response)) * AbletonMoveLCD::kMoveDisplayHeight;
-         for (int screenY = screenEnvelopeY; screenY < AbletonMoveLCD::kMoveDisplayHeight; ++screenY)
+            screenEnvelopeY = (.5f - .666f * log10(response)) * screen->GetHeight();
+         for (int screenY = screenEnvelopeY; screenY < screen->GetHeight(); ++screenY)
             screen->DrawPixel(x, screenY, LCDDrawMode::Toggle);
       }
    }

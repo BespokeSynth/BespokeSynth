@@ -58,6 +58,7 @@ namespace
 AbletonPush2Surface::AbletonPush2Surface()
 {
    mControlMap.MapAllIdentity();
+   UnmapExtraLayoutButtons(mControlMap);
 
    //the move's main encoders, volume encoder (push's master encoder), shift, play, record, page left/right, octave up/down, and
    //track buttons (push's scene launch buttons) all share the push's numbers. pads are notes 36-99 instead of the move's 68-99.
@@ -91,7 +92,26 @@ AbletonPush2Surface::AbletonPush2Surface()
    mControlMap.Map(kHamburgerButton, kMixButton); //mixer
    mControlMap.Map(kCaptureButton, kBrowseButton); //navigate the canvas
    mControlMap.Map(kLoopButton, kAutomateButton); //record automation
-   mControlMap.Map(kMoveMuteButton, kMuteButton); //lfo
+   mControlMap.Map(kMoveMuteButton, kMuteButton); //mute tracks (the move uses it for lfos, see kLFOButton)
+   mControlMap.Map(kCopyButton, kDuplicateButton); //the move's copy shares the push's mute number, so it needs a new home
+
+   //functions that are button combos on the move get their own buttons
+   mControlMap.Map(kAddTrackSelectorButton, kAddTrackButton);
+   mControlMap.Map(kRandomizeButton, kMasterButton);
+   mControlMap.Map(kStoreSnapshotButton, kNewButton);
+   mControlMap.Map(kSoundSelectorButton, kSetupButton);
+   mControlMap.Map(kScalePageButton, kScaleButton);
+   mControlMap.Map(kAutoZoomButton, kLayoutButton);
+   mControlMap.Map(kLFOButton, kFixedLengthButton);
+   mControlMap.Map(kCancelRecordingButton, kStopClipButton);
+   mControlMap.Map(kBindButton, kUserButton);
+   mControlMap.Map(kGridOption1Button, kRepeatButton); //the push's undo already has the move's undo number, which grid interfaces would otherwise use as option 1
+
+   //the arrows: left and right step through pages of controls, up and down step through modules like the jog wheel
+   mControlMap.Map(kPrevControlPageButton, kLeftButton);
+   mControlMap.Map(kNextControlPageButton, kRightButton);
+   mControlMap.Map(kPrevModuleButton, kUpButton);
+   mControlMap.Map(kNextModuleButton, kDownButton);
 }
 
 int AbletonPush2Surface::GetGridStartIndex() const
@@ -139,34 +159,84 @@ bool AbletonPush2Surface::IsDisplayConnected() const
    return sPush2Bridge.IsInitialized();
 }
 
-void AbletonPush2Surface::SendDisplay(MidiDevice& device, const AbletonMoveLCD& lcd)
+//layout: a small knob screen under each of the 8 knobs along the top, and the module list, mixer and main screen along the bottom
+void AbletonPush2Surface::SendDisplayPanels(MidiDevice& device, const std::vector<ControlSurfaceDisplayPanel>& panels)
 {
    if (!sPush2Bridge.IsInitialized() || mPixels.empty())
       return;
 
-   //draw the move-sized display scaled up to the push's full height, centered horizontally
-   const float kScale = float(kPush2Height) / AbletonMoveLCD::kMoveDisplayHeight;
-   const int kDrawWidth = int(AbletonMoveLCD::kMoveDisplayWidth * kScale);
-   const int kOffsetX = (kPush2Width - kDrawWidth) / 2;
-
    std::fill(mPixels.begin(), mPixels.end(), 0);
-   for (int y = 0; y < kPush2Height; ++y)
+
+   const int kKnobPanelSpacing = kPush2Width / 8;
+   const int kBottomPanelGap = 10;
+
+   //panels are drawn at their lcd's own size
+   int knobPanelIndex = 0;
+   int otherPanelX = kBottomPanelGap;
+   for (const auto& panel : panels)
    {
-      int lcdY = int(y / kScale);
-      unsigned char* row = &mPixels[3 * (kPush2Height - 1 - y) * kPush2Width]; //bridge expects rows bottom-up
-      for (int x = 0; x < kDrawWidth; ++x)
+      if (panel.lcd == nullptr)
+         continue;
+
+      if (panel.role == ControlSurfaceDisplayPanel::Role::Knob)
       {
-         if (lcd.GetPixel(int(x / kScale), lcdY) > 100)
-         {
-            unsigned char* pixel = row + 3 * (x + kOffsetX);
-            pixel[0] = 255;
-            pixel[1] = 255;
-            pixel[2] = 255;
-         }
+         DrawPanel(*panel.lcd, knobPanelIndex * kKnobPanelSpacing, 0, panel.lcd->GetWidth(), panel.lcd->GetHeight(), panel.color);
+         ++knobPanelIndex;
+      }
+      else
+      {
+         DrawPanel(*panel.lcd, otherPanelX, kPush2Height - 10 - panel.lcd->GetHeight(), panel.lcd->GetWidth(), panel.lcd->GetHeight(), panel.color);
+         otherPanelX += panel.lcd->GetWidth() + kBottomPanelGap;
       }
    }
 
    sPush2Bridge.Flip(mPixels.data());
+}
+
+//draws an lcd scaled into a rectangle of the display, averaging 3x3 samples per pixel so scaling down or up stays smooth
+void AbletonPush2Surface::DrawPanel(const AbletonMoveLCD& lcd, int x, int y, int width, int height, const ofColor& color)
+{
+   const int kLcdWidth = lcd.GetWidth();
+   const int kLcdHeight = lcd.GetHeight();
+   std::vector<bool> lit(kLcdWidth * kLcdHeight);
+   for (int ly = 0; ly < kLcdHeight; ++ly)
+   {
+      for (int lx = 0; lx < kLcdWidth; ++lx)
+         lit[lx + ly * kLcdWidth] = lcd.GetPixel(lx, ly) > 100;
+   }
+
+   const int kSamples = 3;
+   for (int dy = 0; dy < height; ++dy)
+   {
+      int screenY = y + dy;
+      if (screenY < 0 || screenY >= kPush2Height)
+         continue;
+      unsigned char* row = &mPixels[3 * (kPush2Height - 1 - screenY) * kPush2Width]; //bridge expects rows bottom-up
+      for (int dx = 0; dx < width; ++dx)
+      {
+         int screenX = x + dx;
+         if (screenX < 0 || screenX >= kPush2Width)
+            continue;
+         int count = 0;
+         for (int sy = 0; sy < kSamples; ++sy)
+         {
+            int ly = std::min(int((dy + (sy + 0.5f) / kSamples) * kLcdHeight / height), kLcdHeight - 1);
+            for (int sx = 0; sx < kSamples; ++sx)
+            {
+               int lx = std::min(int((dx + (sx + 0.5f) / kSamples) * kLcdWidth / width), kLcdWidth - 1);
+               if (lit[lx + ly * kLcdWidth])
+                  ++count;
+            }
+         }
+         if (count > 0)
+         {
+            unsigned char* pixel = row + 3 * screenX;
+            pixel[0] = (unsigned char)(color.r * count / (kSamples * kSamples));
+            pixel[1] = (unsigned char)(color.g * count / (kSamples * kSamples));
+            pixel[2] = (unsigned char)(color.b * count / (kSamples * kSamples));
+         }
+      }
+   }
 }
 
 void AbletonPush2Surface::ClearDisplay(MidiDevice& device)

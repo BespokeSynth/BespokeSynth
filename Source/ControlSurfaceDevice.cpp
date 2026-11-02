@@ -35,6 +35,8 @@
 
 #include "juce_audio_devices/juce_audio_devices.h"
 
+#include <limits>
+
 using namespace AbletonDevice;
 
 namespace
@@ -168,6 +170,18 @@ int ControlSurfaceControlMap::GetRawLedIndex(int layoutIndex) const
    return -1;
 }
 
+void UnmapExtraLayoutButtons(ControlSurfaceControlMap& controlMap)
+{
+   for (int button : { kPrevModuleButton, kNextModuleButton, kPrevControlPageButton, kNextControlPageButton,
+                       kAddTrackSelectorButton, kRandomizeButton, kStoreSnapshotButton, kSoundSelectorButton,
+                       kScalePageButton, kAutoZoomButton, kLFOButton, kCancelRecordingButton, kBindButton, kGridOption1Button })
+   {
+      if (controlMap.GetLayoutIndex(button) == button)
+         controlMap.UnmapInput(button);
+      controlMap.UnmapLed(button);
+   }
+}
+
 std::unique_ptr<ControlSurfaceDevice> CreateControlSurfaceDevice(ControlSurfaceDeviceType type)
 {
    switch (type)
@@ -255,8 +269,25 @@ void ControlSurfaceDevice::Disconnect(MidiDevice& device)
    device.DisconnectOutput();
 }
 
+bool ControlSurfaceDevice::HasInput(int layoutIndex) const
+{
+   for (int raw = 0; raw < ControlSurfaceControlMap::kNumIndices; ++raw)
+   {
+      if (mControlMap.GetLayoutIndex(raw) == layoutIndex)
+         return true;
+   }
+   return false;
+}
+
+bool ControlSurfaceDevice::HasControlPageButtons() const
+{
+   return HasInput(kPrevControlPageButton) && HasInput(kNextControlPageButton);
+}
+
 int ControlSurfaceDevice::GetGridControllerOption1Control() const
 {
+   if (HasInput(kGridOption1Button))
+      return kGridOption1Button;
    return kRepeatButton;
 }
 
@@ -267,7 +298,7 @@ int ControlSurfaceDevice::GetGridControllerOption2Control() const
 
 void ControlSurfaceDevice::SendLed(MidiDevice& device, int layoutIndex, const ControlSurfaceLedState& state)
 {
-   int rawIndex = mControlMap.GetRawLedIndex(layoutIndex);
+   int rawIndex = GetRawLedIndex(layoutIndex);
    if (rawIndex == -1 || state.color < 0)
       return;
 
@@ -281,6 +312,8 @@ void ControlSurfaceDevice::SendLed(MidiDevice& device, int layoutIndex, const Co
 AbletonMoveSurface::AbletonMoveSurface()
 {
    mControlMap.MapAllIdentity();
+   UnmapExtraLayoutButtons(mControlMap);
+   mControlMap.UnmapLed(kClickyEncoderButton); //the jog wheel has no light
 }
 
 int AbletonMoveSurface::GetGridStartIndex() const
@@ -371,6 +404,11 @@ namespace
    const int kLCTrackButtonSection = 37 + 128;
    const int kLCShiftButton = 63 + 128;
    const int kLCFunctionButton = 66 + 128;
+   const int kLCPageUpButton = 106 + 128;
+   const int kLCPageDownButton = 107 + 128;
+   const int kLCTrackBackButton = 103 + 128;
+   const int kLCTrackForwardButton = 102 + 128;
+   const int kLCNovationButton = 104 + 128;
 
    const unsigned char kLCSysexCommandDawMode = 0x02;
    const unsigned char kLCSysexCommandLedColor = 0x01;
@@ -393,6 +431,13 @@ NovationLaunchControl3Surface::NovationLaunchControl3Surface()
 
    mControlMap.Map(kDotButton, kLCShiftButton);
    mControlMap.Map(kHamburgerButton, kLCFunctionButton);
+   mControlMap.Map(kBackButton, kLCNovationButton, -1); //global page. the novation button has no light
+
+   //page up and down step through the track's modules like the jog wheel, track back and forward step through pages of controls
+   mControlMap.Map(kPrevModuleButton, kLCPageUpButton);
+   mControlMap.Map(kNextModuleButton, kLCPageDownButton);
+   mControlMap.Map(kPrevControlPageButton, kLCTrackBackButton);
+   mControlMap.Map(kNextControlPageButton, kLCTrackForwardButton);
 }
 
 int NovationLaunchControl3Surface::GetGridStartIndex() const
@@ -471,7 +516,7 @@ void NovationLaunchControl3Surface::OnMidi(const juce::MidiMessage& message)
 
 void NovationLaunchControl3Surface::SendLed(MidiDevice& device, int layoutIndex, const ControlSurfaceLedState& state)
 {
-   int rawIndex = mControlMap.GetRawLedIndex(layoutIndex);
+   int rawIndex = GetRawLedIndex(layoutIndex);
    if (rawIndex < 128 || state.color < 0)
       return;
 
@@ -520,7 +565,8 @@ void NovationLaunchControl3Surface::SendBitmap(MidiDevice& device, const Ableton
    std::string bitmapMsg = mSysexHeader;
    bitmapMsg.push_back(kLCSysexCommandBitmap);
    bitmapMsg.push_back(0x35);
-   for (int row = 0; row < AbletonMoveLCD::kMoveDisplayHeight; ++row)
+   const int kDisplayHeight = 64;
+   for (int row = 0; row < kDisplayHeight; ++row)
    {
       for (int byteIndex = 0; byteIndex < 19; ++byteIndex)
       {
@@ -528,7 +574,7 @@ void NovationLaunchControl3Surface::SendBitmap(MidiDevice& device, const Ableton
          for (int bit = 0; bit < 7; ++bit)
          {
             int col = byteIndex * 7 + bit;
-            if (lcd != nullptr && col < AbletonMoveLCD::kMoveDisplayWidth && lcd->GetPixel(col, row))
+            if (lcd != nullptr && lcd->GetPixel(col, row))
                byteVal |= (1 << (6 - bit));
          }
          bitmapMsg.push_back(byteVal);

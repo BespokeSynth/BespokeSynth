@@ -124,7 +124,9 @@ namespace
    }
 }
 
-AbletonMoveLCD::AbletonMoveLCD()
+AbletonMoveLCD::AbletonMoveLCD(int width, int height)
+: mWidth(width)
+, mHeight(height)
 {
 }
 
@@ -142,6 +144,13 @@ AbletonMoveLCD::~AbletonMoveLCD()
          ssfn_font = nullptr;
       }
    }
+}
+
+void AbletonMoveLCD::SetSize(int width, int height)
+{
+   assert(mPixels == nullptr); //the buffer is allocated at the size from Init()
+   mWidth = width;
+   mHeight = height;
 }
 
 void AbletonMoveLCD::Init()
@@ -166,14 +175,14 @@ void AbletonMoveLCD::Clear()
 void AbletonMoveLCD::DrawLCDText(const char* text, int x, int y, int style, int fontSize)
 {
    if (mPixels != nullptr)
-      draw_ssfn_text(mPixels, kMoveDisplayWidth, kMoveDisplayHeight, text, x, y, style, fontSize);
+      draw_ssfn_text(mPixels, mWidth, mHeight, text, x, y, style, fontSize);
 }
 
 void AbletonMoveLCD::DrawRect(int x, int y, int width, int height, LCDDrawMode drawMode)
 {
-   for (int penX = x; penX < x + width && penX >= 0 && penX < kMoveDisplayWidth; ++penX)
+   for (int penX = x; penX < x + width && penX >= 0 && penX < mWidth; ++penX)
    {
-      for (int penY = y; penY < y + height && penY >= 0 && penY < kMoveDisplayHeight; ++penY)
+      for (int penY = y; penY < y + height && penY >= 0 && penY < mHeight; ++penY)
       {
          if (IsFill(drawMode) || penX == x || penY == y || penX == x + width - 1 || penY == y + height - 1)
             DrawPixel(penX, penY, drawMode);
@@ -198,27 +207,27 @@ void AbletonMoveLCD::DrawArrow(int pointX, int pointY, int arrowSize, bool left,
 
 void AbletonMoveLCD::DrawPixel(int x, int y, LCDDrawMode drawMode)
 {
-   if (x >= 0 && y >= 0 && x < kMoveDisplayWidth && y < kMoveDisplayHeight)
+   if (x >= 0 && y >= 0 && x < mWidth && y < mHeight)
    {
       if (IsClear(drawMode))
-         mPixels[(x + y * kMoveDisplayWidth) * 4] = 0;
+         mPixels[(x + y * mWidth) * 4] = 0;
       else if (IsToggle(drawMode))
-         mPixels[(x + y * kMoveDisplayWidth) * 4] = mPixels[(x + y * kMoveDisplayWidth) * 4] > 0 ? 0 : 255;
+         mPixels[(x + y * mWidth) * 4] = mPixels[(x + y * mWidth) * 4] > 0 ? 0 : 255;
       else
-         mPixels[(x + y * kMoveDisplayWidth) * 4] = 255;
+         mPixels[(x + y * mWidth) * 4] = 255;
    }
 }
 
 uint8_t AbletonMoveLCD::GetPixel(int x, int y) const
 {
-   if (x >= 0 && y >= 0 && x < kMoveDisplayWidth && y < kMoveDisplayHeight)
-      return mPixels[(x + y * kMoveDisplayWidth) * 4];
+   if (x >= 0 && y >= 0 && x < mWidth && y < mHeight)
+      return mPixels[(x + y * mWidth) * 4];
    return 0;
 }
 
 int AbletonMoveLCD::GetNumDisplayPixels() const
 {
-   return kMoveDisplayWidth * kMoveDisplayHeight * 4;
+   return mWidth * mHeight * 4;
 }
 
 void AbletonMoveLCD::DrawAudioBuffer(int x, int y, float width, float height, const float* buffer, float start, float end, float pos)

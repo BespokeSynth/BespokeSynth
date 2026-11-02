@@ -43,6 +43,7 @@
 
 class IUIControl;
 class ControlRecorder;
+class Checkbox;
 class TrackOrganizer;
 
 class ControlSurface : public IDrawableModule, public MidiDeviceListener, public IDropdownListener, public IAbletonGridDevice
@@ -105,11 +106,8 @@ private:
    void DrawModule() override;
    void DrawModuleUnclipped() override;
    void PostRender() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
+   void GetModuleDimensions(float& width, float& height) override;
+   bool ShowsLCDOnModule() const { return !Surface()->HasDisplay(); } //devices without a screen get one on the module
    void OnClicked(float x, float y, bool right) override;
 
    ControlSurfaceDevice* Surface() const;
@@ -125,7 +123,15 @@ private:
    void AutoDetectDevice();
    void ConnectDevice();
    void DisconnectDevice();
-   void DrawToFramebuffer();
+   void DrawToFramebuffer(bool separatePanels = false);
+   void DrawDisplayPanels();
+   void DrawModuleList(AbletonMoveLCD& lcd);
+   void DrawMixer(AbletonMoveLCD& lcd);
+   bool CanSelectModules() const;
+   FloatSlider* GetMixerSlider(int trackIndex) const;
+   int GetMixerAdjustTrackIndex();
+   void GetKnobColors(int controlIndex, int& color, int& flashColor) const;
+   IUIControl* GetControlAt(int controlIndex) const;
    void UpdateLeds();
    void SetLedWithBrightness(int index, int color, int flashColor, float brightness, LedPriority priority = LedPriority::Normal);
    void SendLeds(bool force);
@@ -133,8 +139,11 @@ private:
    void UpdateControlList();
    static bool IsDisplayableControl(IUIControl* control);
    int GetControlOffset() const;
+   int GetNumControlPages() const;
+   void StepControlPage(int direction);
 
    void DrawDisplayModuleRect(ofRectangle rect, float thickness);
+   void DrawLCDImage(float x, float y, float width, float height, float alpha);
    void SetGridControlInterface(IAbletonGridController* controller);
    void SetActiveTrackRow(int row, bool resetModuleIndex);
    TrackOrganizer* GetActiveTrackRow() const;
@@ -153,8 +162,25 @@ private:
    void ZoomToModule(IDrawableModule* module);
    void OnTrackRowExited(int newRow, int oldRow);
    void ShowSoundSelector();
+   void ShowAddTrackSelector();
+   void OnScalePageButton(int controlIndex, int velocity);
+   void ToggleAutoZoomToTrack();
+   void ToggleTrackEnabled(int trackIndex);
+   void AddLFOToControl(int controlIndex);
+   bool HandleDedicatedButton(int controlIndex, int velocity);
+   bool HasDedicatedButton(int layoutIndex) const { return Surface()->HasInput(layoutIndex); }
+   bool MuteButtonMutesTracks() const { return HasDedicatedButton(AbletonDevice::kLFOButton); } //when lfos have their own button, mute is free to mute tracks
+   bool IsStoreSnapshotHeld() const;
+   void TrackModifierUse(int index, int value);
+   void MarkUsedSincePress(int index) { mControlState[index].mUsedSincePress = true; }
+   bool IsHeldOnItsOwn(int index) const;
+   void UpdateHoldHints();
+   void DisplayHint(const std::string& hint);
+   int GetBindButton() const { return HasDedicatedButton(AbletonDevice::kBindButton) ? AbletonDevice::kBindButton : AbletonDevice::kCaptureButton; }
+   bool BindTouchedKnob();
    void StartControlRecorder(int controlIndex);
-   void DrawKnobDisplay(int controlIndex);
+   void DrawKnobDisplay(AbletonMoveLCD& lcd, IUIControl* control);
+   void DrawLissajousDisplay(AbletonMoveLCD& lcd, const TrackOrganizer* track);
    bool IsRandomizeChordHeld() const;
    IDrawableModule* GetCurrentControlModule() const;
 
@@ -178,9 +204,18 @@ private:
    std::string mStatusMessage{};
 
    AbletonMoveLCD mLCD;
+   //extra screens for devices that show several at once (push 2)
+   std::array<AbletonMoveLCD, AbletonDevice::kNumMainEncoders> mKnobLCDs;
+   AbletonMoveLCD mModuleListLCD;
+   AbletonMoveLCD mMixerLCD;
+   AbletonMoveLCD mLissajousLCD;
+   std::vector<ControlSurfaceDisplayPanel> mDisplayPanels;
+   std::array<int, (int)NanoVGRenderContext::Num> mLCDImages{}; //nanovg image of the lcd for each render context
+   std::vector<unsigned char> mLCDImagePixels;
    double mScreenOverrideTimeout{ 0.0 };
    std::string mTemporaryScreenMessage{};
    double mTemporaryScreenMessageTimeout{ 0.0 };
+   bool mTemporaryScreenMessageIsHint{ false };
    bool mShowSoundSelector{ false };
    int mSoundSelectorIndex{ 0 };
 
@@ -202,6 +237,7 @@ private:
    double mDisplayModuleSelectTimeout{ 0.0 };
    int mSnapshotOffset{ 0 };
    std::array<bool, AbletonDevice::kMaxTrackButtons> mTrackButtonPressedForSnapshot{};
+   std::array<bool, AbletonDevice::kMaxTrackButtons> mTrackButtonPressedForMute{};
 
    static constexpr int kNumPages{ 5 };
    std::array<PatchCableSource*, kNumPages> mGlobalControlModuleCables{};
@@ -242,6 +278,8 @@ private:
    double mLastResetTime{ -1 };
    int mLastGainAdjustTrackIndex{ -1 };
    double mLastGainAdjustTrackTime{ -1 };
+   int mVolumeKnobTrackIndex{ -1 }; //track whose volume the volume knob last adjusted, on devices with page buttons
+   double mVolumeKnobTrackTime{ -1 };
    float mTrackRowOffsetSmoothed{ 0 };
    bool mShowLCDOnScreen{ false };
    bool mAutoZoomToTrack{ false };
@@ -259,6 +297,8 @@ private:
       LedPriority mLedPriority{ LedPriority::None };
       int mButtonState{ 0 };
       double mLastChangeTime{ 0.0 };
+      double mPressTime{ 0.0 };
+      bool mUsedSincePress{ false }; //has another control been used while this one was held?
    };
 
    std::array<ControlState, 128 * 2> mControlState{}; //bottom 128 are notes, top 128 are CCs, in the move layout

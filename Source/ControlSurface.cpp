@@ -47,6 +47,10 @@
 #include "LooperRecorder.h"
 #include "IControlVisualizer.h"
 #include "AudioSyncer.h"
+#include "nanovg/nanovg.h"
+#include "Checkbox.h"
+
+#include <mutex>
 
 using namespace AbletonDevice;
 
@@ -55,20 +59,41 @@ IUIControl* ControlSurface::sBindToUIControl = nullptr;
 namespace
 {
    const int kCableAreaTop = 22;
+   const int kLCDOnModuleX = 3;
+
+   //nanovg images can only be deleted on the render thread, in the context that made them, so the images of deleted modules are
+   //recycled by the next module that needs one rather than deleted
+   std::mutex sFreeLCDImagesMutex;
+   std::vector<std::pair<NVGcontext*, int>> sFreeLCDImages;
 }
 
 ControlSurface::ControlSurface()
-: IDrawableModule(100, 82)
+: IDrawableModule(166, 82)
 , mDevice(this)
 {
    for (int i = 0; i < (int)ControlSurfaceDeviceType::Count; ++i)
       mSurfaces[i] = CreateControlSurfaceDevice((ControlSurfaceDeviceType)i);
 
    mLCD.Init();
+   for (auto& lcd : mKnobLCDs)
+   {
+      lcd.SetSize(120, 64); //the push 2 screen fits eight of these side by side, one above each knob
+      lcd.Init();
+   }
+   mModuleListLCD.Init();
+   mMixerLCD.Init();
+   mLissajousLCD.Init();
+   mLCDImages.fill(-1);
 }
 
 ControlSurface::~ControlSurface()
 {
+   std::lock_guard<std::mutex> lock(sFreeLCDImagesMutex);
+   for (int i = 0; i < (int)mLCDImages.size(); ++i)
+   {
+      if (mLCDImages[i] != -1)
+         sFreeLCDImages.push_back(std::make_pair(gNanoVGRenderContexts[i], mLCDImages[i]));
+   }
 }
 
 void ControlSurface::Exit()
@@ -160,7 +185,7 @@ void ControlSurface::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mDeviceTypeDropdown = new DropdownList(this, "device", 3, 3, (int*)(&mDeviceType), 94);
+   mDeviceTypeDropdown = new DropdownList(this, "device", 3, 3, (int*)(&mDeviceType), 160);
    for (int i = 0; i < (int)ControlSurfaceDeviceType::Count; ++i)
       mDeviceTypeDropdown->AddLabel(mSurfaces[i]->GetName(), i);
 
@@ -232,6 +257,9 @@ void ControlSurface::DrawModule()
          status = "not connected";
    }
    DrawTextNormal(status, 3, mHeight - 4, 10);
+
+   if (ShowsLCDOnModule())
+      DrawLCDImage(kLCDOnModuleX, mHeight, mLCD.GetWidth(), mLCD.GetHeight(), gModuleDrawAlpha / 255.0f);
 
    if (mGlobalModuleIndex >= 0 && mGlobalModuleIndex < mGlobalControlModuleCables.size())
    {
@@ -330,25 +358,10 @@ void ControlSurface::DrawModuleUnclipped()
       ofTranslate(-TheSynth->GetDrawOffset().x, -TheSynth->GetDrawOffset().y);
       ofScale(1 / gDrawScale, 1 / gDrawScale, 1 / gDrawScale);
 
-      ofPushStyle();
-      ofFill();
       const float kLcdX = 30;
       const float kLcdY = 75;
-      const float kLcdPixelW = 4;
-      const float kLcdPixelH = 4;
-      const float kPixelSpacing = 0;
-      for (int col = 0; col < mLCD.kMoveDisplayWidth; ++col)
-      {
-         for (int row = 0; row < mLCD.kMoveDisplayHeight; ++row)
-         {
-            if (mLCD.GetPixel(col, row) > 0)
-               ofSetColor(255, 255, 255, 150);
-            else
-               ofSetColor(0, 0, 0, 150);
-            ofRect(kLcdX + kLcdPixelW * col, kLcdY + kLcdPixelH * row, kLcdPixelW - kPixelSpacing, kLcdPixelH - kPixelSpacing, 0);
-         }
-      }
-      ofPopStyle();
+      const float kLcdScale = 4;
+      DrawLCDImage(kLcdX, kLcdY, mLCD.GetWidth() * kLcdScale, mLCD.GetHeight() * kLcdScale, 150 / 255.0f);
 
       ofPopMatrix();
    }
@@ -373,14 +386,151 @@ void ControlSurface::DrawDisplayModuleRect(ofRectangle rect, float thickness)
    ofRect(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6, 6);
 }
 
+void ControlSurface::GetModuleDimensions(float& width, float& height)
+{
+   width = mWidth;
+   height = mHeight;
+   if (ShowsLCDOnModule())
+   {
+      width = std::max(width, kLCDOnModuleX * 2.0f + mLCD.GetWidth());
+      height += mLCD.GetHeight() + 3;
+   }
+}
+
+//draws the lcd as a single nearest-neighbor scaled image. must be called on the render thread.
+void ControlSurface::DrawLCDImage(float x, float y, float width, float height, float alpha)
+{
+   int contextIndex = -1;
+   for (int i = 0; i < (int)gNanoVGRenderContexts.size(); ++i)
+   {
+      if (gNanoVGRenderContexts[i] == gNanoVG)
+         contextIndex = i;
+   }
+   if (contextIndex == -1)
+      return;
+
+   const int kWidth = mLCD.GetWidth();
+   const int kHeight = mLCD.GetHeight();
+
+   //the lcd only reliably fills in the first byte of each pixel, so build a proper rgba image from it
+   mLCDImagePixels.resize(kWidth * kHeight * 4);
+   for (int py = 0; py < kHeight; ++py)
+   {
+      for (int px = 0; px < kWidth; ++px)
+      {
+         unsigned char value = mLCD.GetPixel(px, py) > 0 ? 255 : 0;
+         unsigned char* pixel = &mLCDImagePixels[(px + py * kWidth) * 4];
+         pixel[0] = value;
+         pixel[1] = value;
+         pixel[2] = value;
+         pixel[3] = 255;
+      }
+   }
+
+   int& image = mLCDImages[contextIndex];
+   if (image == -1)
+   {
+      std::lock_guard<std::mutex> lock(sFreeLCDImagesMutex);
+      for (auto it = sFreeLCDImages.begin(); it != sFreeLCDImages.end(); ++it)
+      {
+         if (it->first == gNanoVG)
+         {
+            image = it->second;
+            sFreeLCDImages.erase(it);
+            break;
+         }
+      }
+   }
+
+   if (image == -1)
+      image = nvgCreateImageRGBA(gNanoVG, kWidth, kHeight, NVG_IMAGE_NEAREST, mLCDImagePixels.data());
+   else
+      nvgUpdateImage(gNanoVG, image, mLCDImagePixels.data());
+
+   if (image == -1)
+      return;
+
+   NVGpaint paint = nvgImagePattern(gNanoVG, x, y, width, height, 0, image, alpha);
+   nvgBeginPath(gNanoVG);
+   nvgRect(gNanoVG, x, y, width, height);
+   nvgFillPaint(gNanoVG, paint);
+   nvgFill(gNanoVG);
+}
+
 void ControlSurface::PostRender()
 {
    ControlSurfaceDevice* surface = mConnectedSurface;
    bool sendToDevice = surface != nullptr && surface->HasDisplay() && surface->IsDisplayConnected();
-   if (sendToDevice || mShowLCDOnScreen)
-      DrawToFramebuffer();
-   if (sendToDevice)
+   bool usePanels = sendToDevice && surface->WantsDisplayPanels();
+   if (sendToDevice || mShowLCDOnScreen || ShowsLCDOnModule())
+      DrawToFramebuffer(usePanels);
+   if (usePanels)
+   {
+      DrawDisplayPanels();
+      surface->SendDisplayPanels(mDevice, mDisplayPanels);
+   }
+   else if (sendToDevice)
+   {
       surface->SendDisplay(mDevice, mLCD);
+   }
+}
+
+//for devices with room for several screens: a knob detail screen per knob, tinted with its track's color, plus the module list,
+//the mixer, and the main screen
+void ControlSurface::DrawDisplayPanels()
+{
+   mDisplayPanels.clear();
+
+   bool mixer = ShouldDisplayMixer();
+   for (int i = 0; i < (int)mKnobLCDs.size() && i < NumMainEncoders(); ++i)
+   {
+      AbletonMoveLCD& lcd = mKnobLCDs[i];
+      lcd.Clear();
+      int controlIndex = i + GetControlOffset();
+      int color = kColorOff;
+      if (mixer)
+      {
+         //in the mixer, each knob adjusts a track
+         TrackOrganizer* track = mSessionOrganizer != nullptr ? mSessionOrganizer->GetTrack(controlIndex) : nullptr;
+         FloatSlider* slider = GetMixerSlider(controlIndex);
+         if (track != nullptr && slider != nullptr)
+         {
+            lcd.DrawLCDText(track->GetTrackName().c_str(), 5, 12, LCDFONT_STYLE_UNDERLINE);
+            DrawKnobDisplay(lcd, slider);
+            if (mLissajousDisplayMode != LissajousDisplayMode::Never)
+               DrawLissajousDisplay(lcd, track);
+            color = track->GetColorIndex();
+         }
+      }
+      else if (IUIControl* control = GetControlAt(controlIndex))
+      {
+         DrawKnobDisplay(lcd, control);
+         int flashColor;
+         GetKnobColors(controlIndex, color, flashColor);
+      }
+      const ofColor& tint = kColors[std::clamp(color, 0, (int)kColors.size() - 1)].color;
+      mDisplayPanels.push_back(ControlSurfaceDisplayPanel(&lcd, ControlSurfaceDisplayPanel::Role::Knob, tint));
+   }
+
+   const auto* trackRow = GetActiveTrackRow();
+   ofColor moduleTint = ofColor::white;
+   if (trackRow != nullptr)
+      moduleTint = kColors[std::clamp(trackRow->GetColorIndex(), 0, (int)kColors.size() - 1)].color;
+
+   mModuleListLCD.Clear();
+   if (CanSelectModules())
+      DrawModuleList(mModuleListLCD);
+   mDisplayPanels.push_back(ControlSurfaceDisplayPanel(&mModuleListLCD, ControlSurfaceDisplayPanel::Role::ModuleList, moduleTint));
+
+   mLissajousLCD.Clear();
+   DrawLissajousDisplay(mLissajousLCD, trackRow);
+   mDisplayPanels.push_back(ControlSurfaceDisplayPanel(&mLissajousLCD, ControlSurfaceDisplayPanel::Role::Lissajous, moduleTint));
+
+   mMixerLCD.Clear();
+   DrawMixer(mMixerLCD);
+   mDisplayPanels.push_back(ControlSurfaceDisplayPanel(&mMixerLCD, ControlSurfaceDisplayPanel::Role::Mixer));
+
+   mDisplayPanels.push_back(ControlSurfaceDisplayPanel(&mLCD, ControlSurfaceDisplayPanel::Role::Main));
 }
 
 void ControlSurface::OnClicked(float x, float y, bool right)
@@ -481,7 +631,7 @@ bool ControlSurface::ShouldDisplayMixer()
 
 bool ControlSurface::ShouldDisplaySnapshotView() const
 {
-   if (GetButtonState(kDotButton))
+   if (GetButtonState(kDotButton) || GetButtonState(kStoreSnapshotButton))
       return true;
    if (mSelectedTrackRow == kTrackRowMixer)
       return true;
@@ -535,7 +685,8 @@ void ControlSurface::SetModuleViewOffset(float offset)
    mModalModuleViewOffset = offset;
 }
 
-void ControlSurface::DrawToFramebuffer()
+//separatePanels: the module list and mixer are shown on their own panels, so leave them off the main screen
+void ControlSurface::DrawToFramebuffer(bool separatePanels)
 {
    if (gTime < mScreenOverrideTimeout)
       return;
@@ -568,8 +719,7 @@ void ControlSurface::DrawToFramebuffer()
       int displayKnobIndex = GetDisplayKnobIndex();
       if (displayKnobIndex != -1)
       {
-         int controlIndex = displayKnobIndex + GetControlOffset();
-         DrawKnobDisplay(controlIndex);
+         DrawKnobDisplay(mLCD, GetControlAt(displayKnobIndex + GetControlOffset()));
       }
       needToDraw = false;
    }
@@ -618,39 +768,15 @@ void ControlSurface::DrawToFramebuffer()
          if (trackRow != nullptr)
             mLCD.DrawLCDText(trackRow->GetTrackName().c_str(), 10, 1 + i * trackRowSpacingY + 6);
       }
-      mLCD.DrawRect(3, 0 + int(mTrackRowOffsetSmoothed * trackRowSpacingY), mLCD.kMoveDisplayWidth - 3, trackRowSpacingY * NumTrackButtons() + 1, LCDDrawMode::Outline);
+      mLCD.DrawRect(3, 0 + int(mTrackRowOffsetSmoothed * trackRowSpacingY), mLCD.GetWidth() - 3, trackRowSpacingY * NumTrackButtons() + 1, LCDDrawMode::Outline);
 
       needToDraw = false;
    }
 
-   bool canScrollModules = (mSelectedTrackRow == kTrackRowGlobal || mSelectedTrackRow >= 0);
-   if (needToDraw && ((GetButtonState(kClickyEncoderTouch) && canScrollModules) || gTime < mDisplayModuleSelectTimeout))
+   bool canScrollModules = CanSelectModules();
+   if (needToDraw && !separatePanels && ((GetButtonState(kClickyEncoderTouch) && canScrollModules) || gTime < mDisplayModuleSelectTimeout))
    {
-      //module select within track/global
-      std::string trackName;
-      TrackOrganizer* trackRow = GetActiveTrackRow();
-      int moduleIndex;
-      if (trackRow != nullptr)
-      {
-         moduleIndex = trackRow->GetModuleIndex();
-         trackName = trackRow->GetTrackName();
-      }
-      else
-      {
-         moduleIndex = mGlobalModuleIndex;
-         trackName = "global";
-      }
-
-      mLCD.DrawLCDText((trackName + ":").c_str(), 5, 12, LCDFONT_STYLE_REGULAR);
-      for (int i = 0; i < (int)mTrackControlLayout.size(); ++i)
-      {
-         mLCD.DrawLCDText(mTrackControlLayout[i].mName.c_str(), 14, 20 + i * 10, i == moduleIndex ? LCDFONT_STYLE_UNDERLINE : LCDFONT_STYLE_REGULAR);
-         for (int j = 0; j < mTrackControlLayout[i].mPageCount; ++j)
-         {
-            mLCD.DrawRect(84 + j * 9, 14 + i * 10, 5, 5, i == moduleIndex && int(GetModuleViewOffset()) == j ? LCDDrawMode::Fill : LCDDrawMode::Outline);
-         }
-      }
-
+      DrawModuleList(mLCD);
       needToDraw = false;
    }
 
@@ -660,81 +786,11 @@ void ControlSurface::DrawToFramebuffer()
       needToDraw = false;
    }
 
-   int mixerAdjustTrackIndex = -1;
-   float mixerAdjustValue = 0;
+   int mixerAdjustTrackIndex = GetMixerAdjustTrackIndex();
    if (needToDraw && ShouldDisplayMixer())
    {
-      std::string title = "mixer";
-      if (mShiftHeld)
-         title = "sends";
-      mLCD.DrawLCDText(title.c_str(), 5, 10, LCDFONT_STYLE_UNDERLINE);
-
-      const int kBarPadBelow = 3;
-      const int kMaxBarHeight = mLCD.kMoveDisplayHeight - 16;
-      for (int i = 0; mSessionOrganizer != nullptr && i < mSessionOrganizer->GetNumTracks(); ++i)
-      {
-         int x = 5 + i * 16;
-
-         TrackOrganizer* track = mSessionOrganizer->GetTrack(i);
-         if (track != nullptr)
-         {
-            Amplifier* gain = track->GetGain();
-            AudioSend* send = track->GetSend();
-            FloatSlider* adjustSlider = nullptr;
-            if (mShiftHeld)
-               adjustSlider = send != nullptr ? send->GetAmountSlider() : nullptr;
-            else
-               adjustSlider = gain != nullptr ? gain->GetGainSlider() : nullptr;
-            if (gain != nullptr && adjustSlider != nullptr)
-            {
-               bool isBeingAdjusted = false;
-               if (GetButtonState(GetMainEncoderTouchControl(i)) ||
-                   (i == mLastGainAdjustTrackIndex && mLastGainAdjustTrackTime > gTime - 300))
-               {
-                  isBeingAdjusted = true;
-                  mixerAdjustTrackIndex = i;
-                  mixerAdjustValue = adjustSlider != nullptr ? adjustSlider->GetValue() : 0;
-               }
-
-               float level, watermarkLevel;
-               gain->GetLevel(level, watermarkLevel);
-               int sliderPosition = std::clamp(int(adjustSlider->GetMidiValue() * kMaxBarHeight), 0, kMaxBarHeight);
-               int levelHeight = std::clamp(int(level * kMaxBarHeight), 0, kMaxBarHeight);
-               int watermarkLevelHeight = std::clamp(int(watermarkLevel * kMaxBarHeight), 0, kMaxBarHeight);
-               mLCD.DrawRect(x, mLCD.kMoveDisplayHeight - kBarPadBelow - kMaxBarHeight, 4, kMaxBarHeight, LCDDrawMode::Outline);
-               mLCD.DrawRect(x, mLCD.kMoveDisplayHeight - kBarPadBelow - levelHeight, 4, levelHeight, LCDDrawMode::Fill);
-               mLCD.DrawRect(x + 5, mLCD.kMoveDisplayHeight - kBarPadBelow - watermarkLevelHeight, 2, 1, LCDDrawMode::Fill);
-               if (!track->IsTrackEnabled())
-               {
-                  mLCD.DrawLCDText("x", x + 7, mLCD.kMoveDisplayHeight - kBarPadBelow - sliderPosition + 3);
-               }
-               else
-               {
-                  //arrow
-                  int arrowSize = 4;
-                  bool fillArrow = false;
-                  if (isBeingAdjusted)
-                  {
-                     arrowSize = 5;
-                     fillArrow = true;
-                  }
-                  mLCD.DrawArrow(x + 7, mLCD.kMoveDisplayHeight - kBarPadBelow - sliderPosition, arrowSize, true, fillArrow ? LCDDrawMode::Fill : LCDDrawMode::Outline);
-               }
-               //mLCD.DrawRect(x + 7, mLCD.kMoveDisplayHeight - kBarPadBelow - gainPosition - 3, 4, 6, LCDDrawMode::Fill);
-            }
-         }
-      }
-      if (mixerAdjustTrackIndex != -1)
-      {
-         TrackOrganizer* track = mSessionOrganizer->GetTrack(mixerAdjustTrackIndex);
-         if (track != nullptr)
-         {
-            std::string display = track->GetTrackName();
-            display += "  " + ofToString(mixerAdjustValue, 2);
-            mLCD.DrawLCDText(display.c_str(), 52, 10, LCDFONT_STYLE_REGULAR);
-         }
-      }
-
+      if (!separatePanels)
+         DrawMixer(mLCD);
       needToDraw = false;
    }
 
@@ -807,18 +863,15 @@ void ControlSurface::DrawToFramebuffer()
                float offsetStart = GetControlOffset() / numControlsQuantized;
                float offsetEnd = MIN(GetControlOffset() + NumMainEncoders(), numControlsQuantized) / numControlsQuantized;
                mLCD.DrawRect(kModuleViewBarX + offsetStart * kModuleViewBarWidth, kModuleViewBarY + 2, (offsetEnd - offsetStart) * kModuleViewBarWidth, kModuleViewBarHeight - 4, LCDDrawMode::Fill);
-               if (GetButtonState(kVolumeEncoderTouch))
+               if (GetButtonState(kVolumeEncoderTouch) && !Surface()->HasControlPageButtons())
                   mLCD.DrawRect(kModuleViewBarX + (GetModuleViewOffset() * EncoderPageSize() / numControlsQuantized) * kModuleViewBarWidth, kModuleViewBarY, 1, kModuleViewBarHeight, LCDDrawMode::Fill);
             }
          }
       }
 
       int displayKnobIndex = GetDisplayKnobIndex();
-      if (displayKnobIndex != -1)
-      {
-         int controlIndex = displayKnobIndex + GetControlOffset();
-         DrawKnobDisplay(controlIndex);
-      }
+      if (displayKnobIndex != -1 && !(separatePanels && ShouldDisplayMixer()))
+         DrawKnobDisplay(mLCD, GetControlAt(displayKnobIndex + GetControlOffset()));
 
       FloatSliderLFOControl* lfo = dynamic_cast<FloatSliderLFOControl*>(GetCurrentControlModule());
       if (lfo != nullptr)
@@ -838,10 +891,10 @@ void ControlSurface::DrawToFramebuffer()
             wrapLengthMeasures = recordableLength;
       }
    }
-   mLCD.DrawRect(0, 0, ((measurePos + (TheTransport->GetMeasure(gTime) % wrapLengthMeasures)) / wrapLengthMeasures) * mLCD.kMoveDisplayWidth, 1, LCDDrawMode::Fill);
+   mLCD.DrawRect(0, 0, ((measurePos + (TheTransport->GetMeasure(gTime) % wrapLengthMeasures)) / wrapLengthMeasures) * mLCD.GetWidth(), 1, LCDDrawMode::Fill);
    float numBeats = TheTransport->GetTimeSigTop();
    int beat = int(measurePos * numBeats);
-   float beatWidth = mLCD.kMoveDisplayWidth / numBeats;
+   float beatWidth = mLCD.GetWidth() / numBeats;
    mLCD.DrawRect(beat * beatWidth, 1, beatWidth, 1, LCDDrawMode::Fill);
 
    if (!ShouldDisplayMixer())
@@ -853,8 +906,8 @@ void ControlSurface::DrawToFramebuffer()
          {
             float level, watermarkLevel;
             gain->GetLevel(level, watermarkLevel);
-            mLCD.DrawRect(0, 2, std::clamp(int(level * mLCD.kMoveDisplayWidth), 0, mLCD.kMoveDisplayWidth), 1, LCDDrawMode::Fill);
-            mLCD.DrawRect(std::clamp(int(watermarkLevel * mLCD.kMoveDisplayWidth), 0, mLCD.kMoveDisplayWidth), 2, 1, 2, LCDDrawMode::Fill);
+            mLCD.DrawRect(0, 2, std::clamp(int(level * mLCD.GetWidth()), 0, mLCD.GetWidth()), 1, LCDDrawMode::Fill);
+            mLCD.DrawRect(std::clamp(int(watermarkLevel * mLCD.GetWidth()), 0, mLCD.GetWidth()), 2, 1, 2, LCDDrawMode::Fill);
          }
       }
    }
@@ -871,19 +924,11 @@ void ControlSurface::DrawToFramebuffer()
    if (mLissajousDisplayMode == LissajousDisplayMode::Always ||
        (ShouldDisplayMixer() && mLissajousDisplayMode == LissajousDisplayMode::MixerTrack))
    {
-      auto* buffer = TheSynth->GetGlobalRecordBuffer();
-
       TrackOrganizer* trackRowToDisplay = nullptr;
       if (!ShouldDisplayMixer())
          trackRowToDisplay = GetActiveTrackRow();
       else if (mixerAdjustTrackIndex != -1 && mSessionOrganizer != nullptr)
          trackRowToDisplay = mSessionOrganizer->GetTrack(mixerAdjustTrackIndex);
-      if (trackRowToDisplay != nullptr)
-      {
-         auto* gain = trackRowToDisplay != nullptr ? trackRowToDisplay->GetGain() : nullptr;
-         if (gain != nullptr)
-            buffer = gain->GetVizBuffer();
-      }
 
       if (mLissajousDisplayMode == LissajousDisplayMode::MixerTrack && trackRowToDisplay == nullptr)
       {
@@ -891,28 +936,7 @@ void ControlSurface::DrawToFramebuffer()
       }
       else
       {
-         const int kDelaySamps = 90;
-         const float kScale = 1.2f;
-         const int kCenterX = mLCD.kMoveDisplayWidth / 2;
-         const int kCenterY = mLCD.kMoveDisplayHeight / 2;
-         bool lissajousPixels[mLCD.kMoveDisplayWidth * mLCD.kMoveDisplayHeight];
-         for (int i = 0; i < mLCD.kMoveDisplayWidth * mLCD.kMoveDisplayHeight; ++i)
-            lissajousPixels[i] = false;
-
-         int numPoints = MIN(buffer->Size() - kDelaySamps - 1, .02f * gSampleRate);
-         for (int i = 100; i < numPoints; ++i)
-         {
-            int x = kCenterX + buffer->GetSample(i, 0) * kScale * mLCD.kMoveDisplayHeight;
-            int y = kCenterY + buffer->GetSample(i + kDelaySamps, 1) * kScale * mLCD.kMoveDisplayHeight;
-            if (x >= 0 && x < mLCD.kMoveDisplayWidth && y >= 0 && y < mLCD.kMoveDisplayHeight)
-               lissajousPixels[x + y * mLCD.kMoveDisplayWidth] = true;
-         }
-
-         for (int i = 0; i < mLCD.kMoveDisplayWidth * mLCD.kMoveDisplayHeight; ++i)
-         {
-            if (lissajousPixels[i])
-               mLCD.DrawPixel(i % mLCD.kMoveDisplayWidth, i / mLCD.kMoveDisplayWidth, LCDDrawMode::Toggle);
-         }
+         DrawLissajousDisplay(mLCD, trackRowToDisplay);
       }
    }
 
@@ -921,121 +945,329 @@ void ControlSurface::DrawToFramebuffer()
 
    if (gTime < mTemporaryScreenMessageTimeout)
    {
-      mLCD.DrawRect(1, 2, mLCD.kMoveDisplayWidth - 2, 13, LCDDrawMode::Clear);
-      mLCD.DrawRect(1, 2, mLCD.kMoveDisplayWidth - 2, 13, LCDDrawMode::Outline);
+      mLCD.DrawRect(1, 2, mLCD.GetWidth() - 2, 13, LCDDrawMode::Clear);
+      mLCD.DrawRect(1, 2, mLCD.GetWidth() - 2, 13, LCDDrawMode::Outline);
       mLCD.DrawLCDText(mTemporaryScreenMessage.c_str(), 4, 12, LCDFONT_STYLE_REGULAR);
    }
 }
 
-void ControlSurface::DrawKnobDisplay(int controlIndex)
+bool ControlSurface::CanSelectModules() const
 {
-   if (controlIndex >= 0 && controlIndex < (int)mControls.size())
+   return mSelectedTrackRow == kTrackRowGlobal || mSelectedTrackRow >= 0;
+}
+
+void ControlSurface::DrawModuleList(AbletonMoveLCD& lcd)
+{
+   //module select within track/global
+   std::string trackName;
+   TrackOrganizer* trackRow = GetActiveTrackRow();
+   int moduleIndex;
+   if (trackRow != nullptr)
    {
-      if (auto* control = mControls[controlIndex])
+      moduleIndex = trackRow->GetModuleIndex();
+      trackName = trackRow->GetTrackName();
+   }
+   else
+   {
+      moduleIndex = mGlobalModuleIndex;
+      trackName = "global";
+   }
+
+   lcd.DrawLCDText((trackName + ":").c_str(), 5, 12, LCDFONT_STYLE_REGULAR);
+   for (int i = 0; i < (int)mTrackControlLayout.size(); ++i)
+   {
+      lcd.DrawLCDText(mTrackControlLayout[i].mName.c_str(), 14, 20 + i * 10, i == moduleIndex ? LCDFONT_STYLE_UNDERLINE : LCDFONT_STYLE_REGULAR);
+      for (int j = 0; j < mTrackControlLayout[i].mPageCount; ++j)
       {
-         std::string displayName = control->GetDisplayName();
-         if (control->GetModulator() && control->GetModulator()->Active())
-            displayName = "*" + displayName;
-         mLCD.DrawLCDText(displayName.c_str(), 5, 26);
-         std::string displayValue = control->GetDisplayValue(control->GetValue());
-         if (control->GetModulator() && control->GetModulator()->Active())
-         {
-            if (mShiftHeld)
-               displayValue += "   min: " + control->GetDisplayValue(control->GetModulator()->GetMin());
-            else
-               displayValue += "   max: " + control->GetDisplayValue(control->GetModulator()->GetMax());
-         }
-         mLCD.DrawLCDText(displayValue.c_str(), 5, 40);
-
-         int sliderX = 5;
-         int sliderY = 42;
-         int sliderW = 122;
-         int sliderH = 10;
-         int sliderMinPos = sliderX + 2;
-         int sliderMaxPos = sliderX + sliderW - 3;
-         mLCD.DrawRect(sliderX, sliderY, sliderW, sliderH, LCDDrawMode::Outline);
-         mLCD.DrawRect(ofLerp(sliderMinPos, sliderMaxPos, control->GetMidiValue()), sliderY + 2, 1, sliderH - 4, LCDDrawMode::Outline);
-
-         int numValues = control->GetNumValues();
-         if (numValues > 0 && numValues < 20)
-         {
-            for (int i = 1; i < numValues; ++i)
-            {
-               int x = ofLerp(sliderMinPos, sliderMaxPos, (i - 0.5f) / (numValues - 1));
-               mLCD.DrawRect(x, sliderY, 1, 2, LCDDrawMode::Outline);
-               mLCD.DrawRect(x, sliderY + sliderH - 2, 1, 2, LCDDrawMode::Outline);
-            }
-         }
-
-         IModulator* modulator = control->GetModulator();
-         if (modulator != nullptr)
-         {
-            if (modulator == mCurrentControlRecorder)
-            {
-               mLCD.DrawLCDText("* RECORDING *", 5, 12, LCDFONT_STYLE_UNDERLINE);
-            }
-            else if (modulator->Active())
-            {
-               float sliderMin = 0;
-               float sliderMax = 1;
-               FloatSlider* slider = dynamic_cast<FloatSlider*>(control);
-               if (slider)
-               {
-                  sliderMin = slider->GetMin();
-                  sliderMax = slider->GetMax();
-               }
-               float modMin = ofMap(modulator->GetMin(), sliderMin, sliderMax, 0, 1);
-               float modMax = ofMap(modulator->GetMax(), sliderMin, sliderMax, 0, 1);
-               int min = ofLerp(sliderMinPos, sliderMaxPos, modMin);
-               int max = ofLerp(sliderMinPos, sliderMaxPos, modMax);
-               if (min > max) //swap
-               {
-                  float temp = min;
-                  min = max;
-                  max = temp;
-               }
-               mLCD.DrawRect(min, sliderY + 4, max - min, sliderH - 8, LCDDrawMode::Fill);
-            }
-         }
-
-         ControlRecorder* controlRecorder = dynamic_cast<ControlRecorder*>(modulator);
-         if (controlRecorder != nullptr && (modulator->Active() || modulator == mCurrentControlRecorder))
-         {
-            int progressPixel = -1;
-            if (controlRecorder->Active())
-               progressPixel = int(controlRecorder->GetPlaybackTime(gTime) / controlRecorder->GetLength() * AbletonMoveLCD::kMoveDisplayWidth);
-
-            int lastY = -1;
-            for (float x = 0; x < AbletonMoveLCD::kMoveDisplayWidth; ++x)
-            {
-               float percent = x / AbletonMoveLCD::kMoveDisplayWidth;
-               int newY = int(ofMap(controlRecorder->GetValue(percent),
-                                    modulator->GetMin(), modulator->GetMax(),
-                                    AbletonMoveLCD::kMoveDisplayHeight - 10, 10));
-               if (lastY == -1)
-                  lastY = newY;
-               if (lastY <= newY)
-               {
-                  for (int y = lastY; y <= newY; ++y)
-                     mLCD.DrawPixel(x, y, LCDDrawMode::Toggle);
-               }
-               else
-               {
-                  for (int y = lastY; y >= newY; --y)
-                     mLCD.DrawPixel(x, y, LCDDrawMode::Toggle);
-               }
-
-               if (x == progressPixel)
-                  mLCD.DrawRect(x - 1, newY - 1, 3, 3, LCDDrawMode::Outline);
-
-               lastY = newY;
-            }
-         }
-
-         if (IControlVisualizer* visualizer = control->GetControlVisualizer())
-            visualizer->DrawVisualizationToScreen(&mLCD, control);
+         lcd.DrawRect(84 + j * 9, 14 + i * 10, 5, 5, i == moduleIndex && int(GetModuleViewOffset()) == j ? LCDDrawMode::Fill : LCDDrawMode::Outline);
       }
    }
+}
+
+//the gain (or with shift, send) slider that the mixer adjusts for a track
+FloatSlider* ControlSurface::GetMixerSlider(int trackIndex) const
+{
+   TrackOrganizer* track = mSessionOrganizer != nullptr ? mSessionOrganizer->GetTrack(trackIndex) : nullptr;
+   if (track == nullptr)
+      return nullptr;
+   if (mShiftHeld)
+      return track->GetSend() != nullptr ? track->GetSend()->GetAmountSlider() : nullptr;
+   return track->GetGain() != nullptr ? track->GetGain()->GetGainSlider() : nullptr;
+}
+
+//the track whose gain is being touched or was just adjusted, or -1
+int ControlSurface::GetMixerAdjustTrackIndex()
+{
+   int adjustTrackIndex = -1;
+   if (ShouldDisplayMixer())
+   {
+      for (int i = 0; mSessionOrganizer != nullptr && i < mSessionOrganizer->GetNumTracks(); ++i)
+      {
+         TrackOrganizer* track = mSessionOrganizer->GetTrack(i);
+         if (track == nullptr || track->GetGain() == nullptr || GetMixerSlider(i) == nullptr)
+            continue;
+         if (GetButtonState(GetMainEncoderTouchControl(i)) ||
+             (i == mLastGainAdjustTrackIndex && mLastGainAdjustTrackTime > gTime - 300) ||
+             (i == mVolumeKnobTrackIndex && mVolumeKnobTrackTime > gTime - 300))
+            adjustTrackIndex = i;
+      }
+   }
+   return adjustTrackIndex;
+}
+
+void ControlSurface::DrawMixer(AbletonMoveLCD& lcd)
+{
+   int mixerAdjustTrackIndex = GetMixerAdjustTrackIndex();
+   std::string title = "mixer";
+   if (mShiftHeld)
+      title = "sends";
+   lcd.DrawLCDText(title.c_str(), 5, 10, LCDFONT_STYLE_UNDERLINE);
+
+   const int kBarPadBelow = 3;
+   const int kMaxBarHeight = lcd.GetHeight() - 16;
+   for (int i = 0; mSessionOrganizer != nullptr && i < mSessionOrganizer->GetNumTracks(); ++i)
+   {
+      int x = 5 + i * 16;
+
+      TrackOrganizer* track = mSessionOrganizer->GetTrack(i);
+      if (track != nullptr)
+      {
+         Amplifier* gain = track->GetGain();
+         AudioSend* send = track->GetSend();
+         FloatSlider* adjustSlider = nullptr;
+         if (mShiftHeld)
+            adjustSlider = send != nullptr ? send->GetAmountSlider() : nullptr;
+         else
+            adjustSlider = gain != nullptr ? gain->GetGainSlider() : nullptr;
+         if (gain != nullptr && adjustSlider != nullptr)
+         {
+            bool isBeingAdjusted = (i == mixerAdjustTrackIndex);
+
+            float level, watermarkLevel;
+            gain->GetLevel(level, watermarkLevel);
+            int sliderPosition = std::clamp(int(adjustSlider->GetMidiValue() * kMaxBarHeight), 0, kMaxBarHeight);
+            int levelHeight = std::clamp(int(level * kMaxBarHeight), 0, kMaxBarHeight);
+            int watermarkLevelHeight = std::clamp(int(watermarkLevel * kMaxBarHeight), 0, kMaxBarHeight);
+            lcd.DrawRect(x, lcd.GetHeight() - kBarPadBelow - kMaxBarHeight, 4, kMaxBarHeight, LCDDrawMode::Outline);
+            lcd.DrawRect(x, lcd.GetHeight() - kBarPadBelow - levelHeight, 4, levelHeight, LCDDrawMode::Fill);
+            lcd.DrawRect(x + 5, lcd.GetHeight() - kBarPadBelow - watermarkLevelHeight, 2, 1, LCDDrawMode::Fill);
+            if (!track->IsTrackEnabled())
+            {
+               lcd.DrawLCDText("x", x + 7, lcd.GetHeight() - kBarPadBelow - sliderPosition + 3);
+            }
+            else
+            {
+               //arrow
+               int arrowSize = 4;
+               bool fillArrow = false;
+               if (isBeingAdjusted)
+               {
+                  arrowSize = 5;
+                  fillArrow = true;
+               }
+               lcd.DrawArrow(x + 7, lcd.GetHeight() - kBarPadBelow - sliderPosition, arrowSize, true, fillArrow ? LCDDrawMode::Fill : LCDDrawMode::Outline);
+            }
+            //lcd.DrawRect(x + 7, lcd.GetHeight() - kBarPadBelow - gainPosition - 3, 4, 6, LCDDrawMode::Fill);
+         }
+      }
+   }
+   if (mixerAdjustTrackIndex != -1)
+   {
+      TrackOrganizer* track = mSessionOrganizer->GetTrack(mixerAdjustTrackIndex);
+      FloatSlider* adjustSlider = GetMixerSlider(mixerAdjustTrackIndex);
+      if (track != nullptr && adjustSlider != nullptr)
+      {
+         std::string display = track->GetTrackName();
+         display += "  " + ofToString(adjustSlider->GetValue(), 2);
+         lcd.DrawLCDText(display.c_str(), 52, 10, LCDFONT_STYLE_REGULAR);
+      }
+   }
+}
+
+void ControlSurface::DrawKnobDisplay(AbletonMoveLCD& lcd, IUIControl* control)
+{
+   if (control != nullptr)
+   {
+      std::string displayName = control->GetDisplayName();
+      if (control->GetModulator() && control->GetModulator()->Active())
+         displayName = "*" + displayName;
+      lcd.DrawLCDText(displayName.c_str(), 5, 26);
+      std::string displayValue = control->GetDisplayValue(control->GetValue());
+      if (control->GetModulator() && control->GetModulator()->Active())
+      {
+         if (mShiftHeld)
+            displayValue += "   min: " + control->GetDisplayValue(control->GetModulator()->GetMin());
+         else
+            displayValue += "   max: " + control->GetDisplayValue(control->GetModulator()->GetMax());
+      }
+      lcd.DrawLCDText(displayValue.c_str(), 5, 40);
+
+      int sliderX = 5;
+      int sliderY = 42;
+      int sliderW = lcd.GetWidth() - 6;
+      int sliderH = 10;
+      int sliderMinPos = sliderX + 2;
+      int sliderMaxPos = sliderX + sliderW - 3;
+      lcd.DrawRect(sliderX, sliderY, sliderW, sliderH, LCDDrawMode::Outline);
+      lcd.DrawRect(ofLerp(sliderMinPos, sliderMaxPos, control->GetMidiValue()), sliderY + 2, 1, sliderH - 4, LCDDrawMode::Outline);
+
+      int numValues = control->GetNumValues();
+      if (numValues > 0 && numValues < 20)
+      {
+         for (int i = 1; i < numValues; ++i)
+         {
+            int x = ofLerp(sliderMinPos, sliderMaxPos, (i - 0.5f) / (numValues - 1));
+            lcd.DrawRect(x, sliderY, 1, 2, LCDDrawMode::Outline);
+            lcd.DrawRect(x, sliderY + sliderH - 2, 1, 2, LCDDrawMode::Outline);
+         }
+      }
+
+      IModulator* modulator = control->GetModulator();
+      if (modulator != nullptr)
+      {
+         if (modulator == mCurrentControlRecorder)
+         {
+            lcd.DrawLCDText("* RECORDING *", 5, 12, LCDFONT_STYLE_UNDERLINE);
+         }
+         else if (modulator->Active())
+         {
+            float sliderMin = 0;
+            float sliderMax = 1;
+            FloatSlider* slider = dynamic_cast<FloatSlider*>(control);
+            if (slider)
+            {
+               sliderMin = slider->GetMin();
+               sliderMax = slider->GetMax();
+            }
+            float modMin = ofMap(modulator->GetMin(), sliderMin, sliderMax, 0, 1);
+            float modMax = ofMap(modulator->GetMax(), sliderMin, sliderMax, 0, 1);
+            int min = ofLerp(sliderMinPos, sliderMaxPos, modMin);
+            int max = ofLerp(sliderMinPos, sliderMaxPos, modMax);
+            if (min > max) //swap
+            {
+               float temp = min;
+               min = max;
+               max = temp;
+            }
+            lcd.DrawRect(min, sliderY + 4, max - min, sliderH - 8, LCDDrawMode::Fill);
+         }
+      }
+
+      ControlRecorder* controlRecorder = dynamic_cast<ControlRecorder*>(modulator);
+      if (controlRecorder != nullptr && (modulator->Active() || modulator == mCurrentControlRecorder))
+      {
+         int progressPixel = -1;
+         if (controlRecorder->Active())
+            progressPixel = int(controlRecorder->GetPlaybackTime(gTime) / controlRecorder->GetLength() * lcd.GetWidth());
+
+         int lastY = -1;
+         for (float x = 0; x < lcd.GetWidth(); ++x)
+         {
+            float percent = x / lcd.GetWidth();
+            int newY = int(ofMap(controlRecorder->GetValue(percent),
+                                 modulator->GetMin(), modulator->GetMax(),
+                                 lcd.GetHeight() - 10, 10));
+            if (lastY == -1)
+               lastY = newY;
+            if (lastY <= newY)
+            {
+               for (int y = lastY; y <= newY; ++y)
+                  lcd.DrawPixel(x, y, LCDDrawMode::Toggle);
+            }
+            else
+            {
+               for (int y = lastY; y >= newY; --y)
+                  lcd.DrawPixel(x, y, LCDDrawMode::Toggle);
+            }
+
+            if (x == progressPixel)
+               lcd.DrawRect(x - 1, newY - 1, 3, 3, LCDDrawMode::Outline);
+
+            lastY = newY;
+         }
+      }
+
+      if (IControlVisualizer* visualizer = control->GetControlVisualizer())
+         visualizer->DrawVisualizationToScreen(&lcd, control);
+   }
+}
+
+void ControlSurface::DrawLissajousDisplay(AbletonMoveLCD& lcd, const TrackOrganizer* track)
+{
+   RollingBuffer* buffer = nullptr;
+
+   if (track != nullptr)
+   {
+      auto* gain = track->GetGain();
+      if (gain != nullptr)
+         buffer = gain->GetVizBuffer();
+   }
+   else
+   {
+      buffer = TheSynth->GetGlobalRecordBuffer();
+   }
+
+   if (buffer != nullptr)
+   {
+      const int kDelaySamps = 90;
+      const float kScale = 1.2f;
+      const int kCenterX = lcd.GetWidth() / 2;
+      const int kCenterY = lcd.GetHeight() / 2;
+      std::vector<bool> lissajousPixels(lcd.GetWidth() * lcd.GetHeight(), false);
+
+      int numPoints = MIN(buffer->Size() - kDelaySamps - 1, .02f * gSampleRate);
+      for (int i = 100; i < numPoints; ++i)
+      {
+         int x = kCenterX + buffer->GetSample(i, 0) * kScale * lcd.GetHeight();
+         int y = kCenterY + buffer->GetSample(i + kDelaySamps, 1) * kScale * lcd.GetHeight();
+         if (x >= 0 && x < lcd.GetWidth() && y >= 0 && y < lcd.GetHeight())
+            lissajousPixels[x + y * lcd.GetWidth()] = true;
+      }
+
+      for (int i = 0; i < lcd.GetWidth() * lcd.GetHeight(); ++i)
+      {
+         if (lissajousPixels[i])
+            lcd.DrawPixel(i % lcd.GetWidth(), i / lcd.GetWidth(), LCDDrawMode::Toggle);
+      }
+   }
+}
+
+//the color a knob's light (and its push 2 screen) uses for the control at controlIndex
+void ControlSurface::GetKnobColors(int controlIndex, int& color, int& flashColor) const
+{
+   color = kColorLightGrey;
+   flashColor = -1;
+
+   const auto* trackRow = GetActiveTrackRow();
+   if (trackRow != nullptr)
+      color = trackRow->GetColorIndex();
+
+   if (dynamic_cast<FloatSliderLFOControl*>(GetCurrentControlModule()))
+      color = kColorPurple;
+
+   IUIControl* control = GetControlAt(controlIndex);
+   if (control != nullptr && control->GetModulator() != nullptr &&
+       (control->GetModulator()->Active() || control->GetModulator() == mCurrentControlRecorder))
+   {
+      FloatSlider* slider = dynamic_cast<FloatSlider*>(control);
+      if (slider != nullptr && slider->GetLFO()) // flash purple for LFO
+      {
+         color = kColorBrightMagenta;
+         flashColor = kColorPaleMagenta;
+      }
+      else // flash red for other modulator
+      {
+         color = kColorRed;
+         flashColor = kColorSoftRed;
+      }
+   }
+}
+
+IUIControl* ControlSurface::GetControlAt(int controlIndex) const
+{
+   if (controlIndex >= 0 && controlIndex < (int)mControls.size())
+      return mControls[controlIndex];
+   return nullptr;
 }
 
 void ControlSurface::UpdateLeds()
@@ -1106,7 +1338,22 @@ void ControlSurface::UpdateLeds()
       SetLed(i + kStepButtonLedSection, 0);
    }
 
-   SetLed(kMoveMuteButton, ShouldDisplayMixer() ? 127 : 0);
+   if (MuteButtonMutesTracks())
+   {
+      //flashing while the selected track is off. high priority so grid interfaces that light mute for their own use don't hide it
+      TrackOrganizer* track = GetActiveTrackRow();
+      if (track != nullptr && track->GetEnabledControl())
+         SetLed(kMoveMuteButton, track->GetColorIndex(), track->IsTrackEnabled() ? -1 : kColorOff, LedPriority::High);
+      else
+         SetLed(kMoveMuteButton, kColorWhite, -1, LedPriority::High);
+   }
+   else
+   {
+      SetLed(kMoveMuteButton, ShouldDisplayMixer() ? 127 : 0);
+   }
+
+   //only grid interfaces use copy, so it's off unless the current one lights it
+   SetLed(kCopyButton, 0);
 
    bool soundSelectorAvailable = false;
    TrackOrganizer* trackRow = GetActiveTrackRow();
@@ -1195,7 +1442,7 @@ void ControlSurface::UpdateLeds()
    }
 
    SetLed(kBackButton, 127, mSelectedTrackRow == kTrackRowGlobal ? 20 : -1);
-   SetLed(kHamburgerButton, 127, mSelectedTrackRow == kTrackRowMixer ? 20 : -1);
+   SetLed(kHamburgerButton, kColorWhite, mSelectedTrackRow == kTrackRowMixer ? 20 : -1); //white rather than 127, which is red on the launch control 3
    SetLed(kPlayButton, TheSynth->IsAudioPaused() ? kColorRed : kColorGreen, mSelectedTrackRow == kTrackRowTransport ? kColorBrightBlue : -1);
 
    int recordColor1 = kColorOff;
@@ -1266,7 +1513,7 @@ void ControlSurface::UpdateLeds()
                      int snapshotIdx = col + mSnapshotOffset;
                      if (snapshots->GetCurrentSnapshot() == snapshotIdx)
                      {
-                        colors[col] = GetButtonState(kDotButton) ? kColorRed : kColorWhite;
+                        colors[col] = IsStoreSnapshotHeld() ? kColorRed : kColorWhite;
                         if (IUIControl::IsInactiveValue(snapshots->GetLabel(snapshotIdx)))
                            colors2[col] = kColorDarkGrey;
                         else
@@ -1334,6 +1581,20 @@ void ControlSurface::UpdateLeds()
       SetLed(kLedAdd, 10);
    else
       SetLed(kLedAdd, 0);
+
+   //dedicated buttons: bright while active, dim while available
+   bool knobTouched = mMostRecentlyTouchedKnobIndex != -1 && GetButtonState(GetMainEncoderTouchControl(mMostRecentlyTouchedKnobIndex));
+   auto* activeRecorder = GetActiveTrackRow() != nullptr ? GetActiveTrackRow()->GetRecorder() : nullptr;
+   SetLed(kClickyEncoderButton, mShowAddTrackSelector || mShowSoundSelector ? 127 : 0); //lit when there's a choice to confirm (push 2's tap tempo)
+   SetLed(kAddTrackSelectorButton, mShowAddTrackSelector ? 127 : 20);
+   SetLed(kRandomizeButton, IsRandomizeChordHeld() ? 127 : 20);
+   SetLed(kStoreSnapshotButton, GetButtonState(kStoreSnapshotButton) ? 127 : 20);
+   SetLed(kSoundSelectorButton, mShowSoundSelector ? 127 : (soundSelectorAvailable ? 20 : 0));
+   SetLed(kScalePageButton, mDisplayModule == TheScale ? 127 : 20);
+   SetLed(kAutoZoomButton, mAutoZoomToTrack ? 127 : 20);
+   SetLed(kLFOButton, GetButtonState(kLFOButton) || knobTouched ? 127 : 20);
+   SetLed(kBindButton, sBindToUIControl != nullptr ? 127 : 20);
+   SetLed(kCancelRecordingButton, activeRecorder != nullptr && activeRecorder->IsRecording() ? kColorRed : kColorOff);
 
    if (mBottomRowMode)
    {
@@ -1431,35 +1692,8 @@ void ControlSurface::UpdateLeds()
          int controlIndex = i + GetControlOffset();
          if (controlIndex >= 0 && controlIndex < (int)mControls.size())
          {
-            int color = kColorLightGrey;
-            int flashColor = -1;
-
-            const auto* trackRow = GetActiveTrackRow();
-            if (trackRow != nullptr)
-               color = trackRow->GetColorIndex();
-
-            if (dynamic_cast<FloatSliderLFOControl*>(GetCurrentControlModule()))
-            {
-               color = kColorPurple;
-               flashColor = -1;
-            }
-
-            if (mControls[controlIndex] != nullptr && mControls[controlIndex]->GetModulator() != nullptr &&
-                (mControls[controlIndex]->GetModulator()->Active() || mControls[controlIndex]->GetModulator() == mCurrentControlRecorder))
-            {
-               FloatSlider* slider = dynamic_cast<FloatSlider*>(mControls[controlIndex]);
-               if (slider != nullptr && slider->GetLFO()) // flash purple for LFO
-               {
-                  color = kColorBrightMagenta;
-                  flashColor = kColorPaleMagenta;
-               }
-               else // flash red for other modulator
-               {
-                  color = kColorRed;
-                  flashColor = kColorSoftRed;
-               }
-            }
-
+            int color, flashColor;
+            GetKnobColors(controlIndex, color, flashColor);
             SetLedWithBrightness(GetMainEncoderControl(i), color, flashColor, GetLedBrightness(mControls[controlIndex]));
          }
          else
@@ -1469,7 +1703,15 @@ void ControlSurface::UpdateLeds()
       }
    }
 
-   SetLed(kCaptureButton, 127);
+   SetLed(kCaptureButton, 127, GetBindButton() == kCaptureButton && sBindToUIControl != nullptr ? 0 : -1); //flashing while waiting for a midi controller to bind
+
+   //navigation buttons, lit when they can do something
+   bool canSelectModule = mSelectedTrackRow == kTrackRowGlobal || GetActiveTrackRow() != nullptr;
+   //white rather than 127, which is red on devices that read these as palette colors (launch control 3)
+   SetLed(kPrevModuleButton, canSelectModule ? kColorWhite : kColorOff);
+   SetLed(kNextModuleButton, canSelectModule ? kColorWhite : kColorOff);
+   SetLed(kPrevControlPageButton, int(GetModuleViewOffset()) > 0 ? kColorWhite : kColorOff);
+   SetLed(kNextControlPageButton, int(GetModuleViewOffset()) < GetNumControlPages() - 1 ? kColorWhite : kColorOff);
 
    if (IsRandomizeChordHeld())
    {
@@ -1547,6 +1789,7 @@ void ControlSurface::Poll()
       UpdateControlList();
 
    UpdateLeds();
+   UpdateHoldHints();
 
    if (GetButtonState(kCaptureButton))
    {
@@ -1561,7 +1804,8 @@ void ControlSurface::Poll()
          TheSynth->PanView(0, -kMovementRate * ofGetLastFrameTime());
    }
 
-   SendLeds(false);
+   ControlSurfaceDevice* surface = mConnectedSurface;
+   SendLeds(surface != nullptr && surface->ConsumeLedRefreshRequest());
 
    for (int i = 0; i < NumMainEncoders(); ++i)
    {
@@ -1588,6 +1832,62 @@ void ControlSurface::DisplayScreenMessage(std::string message, float durationMs 
 {
    mTemporaryScreenMessage = message;
    mTemporaryScreenMessageTimeout = gTime + durationMs;
+   mTemporaryScreenMessageIsHint = false;
+}
+
+//a screen message that's refreshed every frame while it applies. real messages take precedence
+void ControlSurface::DisplayHint(const std::string& hint)
+{
+   if (gTime < mTemporaryScreenMessageTimeout && !mTemporaryScreenMessageIsHint)
+      return;
+   mTemporaryScreenMessage = hint;
+   mTemporaryScreenMessageTimeout = gTime + 100;
+   mTemporaryScreenMessageIsHint = true;
+}
+
+//remembers which held buttons have been used as modifiers since they were pressed, for telling taps from holds and for hold hints
+void ControlSurface::TrackModifierUse(int index, int value)
+{
+   if (value <= 0 || index < 0 || index >= (int)mControlState.size())
+      return;
+
+   for (int i = 0; i < (int)mControlState.size(); ++i)
+   {
+      if (i != index && mControlState[i].mButtonState)
+         mControlState[i].mUsedSincePress = true;
+   }
+   mControlState[index].mUsedSincePress = false;
+   mControlState[index].mPressTime = gTime;
+}
+
+//held for a moment without using anything else with it
+bool ControlSurface::IsHeldOnItsOwn(int index) const
+{
+   return GetButtonState(index) && !mControlState[index].mUsedSincePress && gTime - mControlState[index].mPressTime > 300;
+}
+
+//explains what to do next while a modifier button is held on its own
+void ControlSurface::UpdateHoldHints()
+{
+   std::string hint;
+   int storeSnapshotButton = HasDedicatedButton(kStoreSnapshotButton) ? kStoreSnapshotButton : kDotButton;
+   if (sBindToUIControl != nullptr && VectorContains(sBindToUIControl, mControls))
+      hint = "move a MIDI control";
+   else if (IsHeldOnItsOwn(GetBindButton()))
+      hint = "touch a knob to bind";
+   else if (IsHeldOnItsOwn(kLFOButton))
+      hint = "touch a knob: add LFO";
+   else if (IsHeldOnItsOwn(kLoopButton))
+      hint = "touch knob: record";
+   else if (IsRandomizeChordHeld() && (IsHeldOnItsOwn(kRandomizeButton) || IsHeldOnItsOwn(kMoveUndoButton)))
+      hint = "touch knob: randomize";
+   else if (HasGrid() && !GetButtonState(kShiftButton) && IsHeldOnItsOwn(storeSnapshotButton))
+      hint = "tap a pad to store";
+   else if (MuteButtonMutesTracks() && IsHeldOnItsOwn(kMoveMuteButton))
+      hint = "press scene: mute track";
+
+   if (!hint.empty())
+      DisplayHint(hint);
 }
 
 //static
@@ -1701,9 +2001,178 @@ void ControlSurface::ShowSoundSelector()
    }
 }
 
+void ControlSurface::ShowAddTrackSelector()
+{
+   mShowAddTrackSelector = true;
+   mAddTrackSelectorIndex = 0;
+
+   mAddTrackSelectorList.clear();
+   for (const auto& entry : juce::RangedDirectoryIterator{ juce::File{ ofToDataPath("trackorganizer") }, false, "*.pfb" })
+   {
+      const auto& file = entry.getFile();
+      mAddTrackSelectorList.push_back(file.getFullPathName().toStdString());
+   }
+}
+
+void ControlSurface::OnScalePageButton(int controlIndex, int velocity)
+{
+   if (velocity > 0)
+   {
+      SetActiveTrackRow(kTrackRowScale, false);
+   }
+   else
+   {
+      bool wasHold = WasPeekHold(controlIndex);
+
+      //if we held it, then we were just "peeking" into the scale page, so switch back
+      if (wasHold)
+         SetActiveTrackRow(mPreviousSelectedTrackRow, false);
+      else
+         OnTrackRowExited(kTrackRowScale, mPreviousSelectedTrackRow);
+   }
+}
+
+void ControlSurface::ToggleAutoZoomToTrack()
+{
+   mAutoZoomToTrack = !mAutoZoomToTrack;
+   DisplayScreenMessage(mAutoZoomToTrack ? "auto-zoom to track: on" : "auto-zoom to track: off");
+}
+
+void ControlSurface::ToggleTrackEnabled(int trackIndex)
+{
+   if (mSessionOrganizer == nullptr)
+      return;
+   if (TrackOrganizer* track = mSessionOrganizer->GetTrack(trackIndex))
+      track->SetTrackEnabled(!track->IsTrackEnabled());
+}
+
+void ControlSurface::AddLFOToControl(int controlIndex)
+{
+   if (controlIndex < 0 || controlIndex >= (int)mControls.size())
+      return;
+
+   FloatSlider* slider = dynamic_cast<FloatSlider*>(mControls[controlIndex]);
+   if (slider != nullptr)
+   {
+      bool hadLFO = (slider->GetLFO() != nullptr);
+      FloatSliderLFOControl* lfo = slider->AcquireLFO();
+      if (!hadLFO)
+         lfo->SetLFOEnabled(true);
+      SetDisplayModule(lfo, true);
+   }
+}
+
+//touch a knob, then press the bind button: the next midi controller that's moved gets bound to the knob's control.
+//(or hold the bind button, then touch a knob, see OnNoteInput().) returns false if no knob is being touched
+bool ControlSurface::BindTouchedKnob()
+{
+   if (mMostRecentlyTouchedKnobIndex == -1 || !GetButtonState(GetMainEncoderTouchControl(mMostRecentlyTouchedKnobIndex)))
+      return false;
+
+   int controlIndex = mMostRecentlyTouchedKnobIndex + GetControlOffset();
+   if (controlIndex >= 0 && controlIndex < (int)mControls.size() && mControls[controlIndex] != nullptr)
+      sBindToUIControl = mControls[controlIndex];
+   return true;
+}
+
+//on devices with a dedicated store button, the dot button only shows the snapshot view, and tapping a pad there recalls
+bool ControlSurface::IsStoreSnapshotHeld() const
+{
+   if (HasDedicatedButton(kStoreSnapshotButton))
+      return GetButtonState(kStoreSnapshotButton);
+   return GetButtonState(kDotButton);
+}
+
+//buttons for functions that the move reaches through combos, on devices that have buttons to spare. returns true if handled
+bool ControlSurface::HandleDedicatedButton(int controlIndex, int velocity)
+{
+   if (controlIndex == kAddTrackSelectorButton)
+   {
+      if (velocity > 0)
+      {
+         if (mShowAddTrackSelector)
+            mShowAddTrackSelector = false;
+         else
+            ShowAddTrackSelector();
+      }
+      return true;
+   }
+
+   if (controlIndex == kSoundSelectorButton)
+   {
+      if (velocity > 0)
+      {
+         if (mShowSoundSelector)
+            mShowSoundSelector = false;
+         else
+            ShowSoundSelector();
+      }
+      return true;
+   }
+
+   if (controlIndex == kScalePageButton)
+   {
+      OnScalePageButton(controlIndex, velocity);
+      return true;
+   }
+
+   if (controlIndex == kAutoZoomButton)
+   {
+      if (velocity > 0)
+         ToggleAutoZoomToTrack();
+      return true;
+   }
+
+   if (controlIndex == kLFOButton)
+   {
+      //touch a knob, then press. (or hold, then touch a knob, see OnNoteInput())
+      if (velocity > 0 && mMostRecentlyTouchedKnobIndex != -1 && GetButtonState(GetMainEncoderTouchControl(mMostRecentlyTouchedKnobIndex)))
+      {
+         AddLFOToControl(mMostRecentlyTouchedKnobIndex + GetControlOffset());
+         MarkUsedSincePress(kLFOButton);
+      }
+      return true;
+   }
+
+   if (controlIndex == kCancelRecordingButton)
+   {
+      if (velocity > 0)
+      {
+         auto* trackRow = GetActiveTrackRow();
+         auto* recorder = trackRow != nullptr ? trackRow->GetRecorder() : nullptr;
+         if (recorder != nullptr && recorder->IsRecording())
+            recorder->CancelRecording();
+      }
+      return true;
+   }
+
+   if (controlIndex == kBindButton)
+   {
+      if (velocity > 0)
+         BindTouchedKnob();
+      return true;
+   }
+
+   //held as modifiers, see IsRandomizeChordHeld() and IsStoreSnapshotHeld()
+   if (controlIndex == kRandomizeButton || controlIndex == kStoreSnapshotButton)
+      return true;
+
+   return false;
+}
+
 int ControlSurface::GetControlOffset() const
 {
    return int(GetModuleViewOffset()) * EncoderPageSize();
+}
+
+int ControlSurface::GetNumControlPages() const
+{
+   return std::max(1, ((int)mControls.size() + EncoderPageSize() - 1) / EncoderPageSize());
+}
+
+void ControlSurface::StepControlPage(int direction)
+{
+   SetModuleViewOffset(std::clamp(int(GetModuleViewOffset()) + direction, 0, GetNumControlPages() - 1));
 }
 
 void ControlSurface::StartControlRecorder(int controlIndex)
@@ -1830,12 +2299,13 @@ void ControlSurface::HandleInput_InputThread(int rawIndex, int value)
       return;
 
    //translate from the device's own midi into the move layout
-   int index = surface->GetLayoutIndex(rawIndex);
+   int index = surface->TranslateInput(rawIndex, value);
    if (index == -1)
       return;
    value = surface->ConvertInputValue(index, value);
 
    mControlState[index].mButtonState = value > 0;
+   TrackModifierUse(index, value); //before grid interfaces get a chance to consume the input here
 
    if (!ShouldDisplaySnapshotView() && !mBottomRowMode && mGridControlInterface != nullptr)
    {
@@ -1850,6 +2320,28 @@ void ControlSurface::HandleInput_InputThread(int rawIndex, int value)
 
 void ControlSurface::OnNoteInput(int pitch, int velocity)
 {
+   if (pitch == kPrevModuleButton || pitch == kNextModuleButton)
+   {
+      //step like the jog wheel does
+      if (velocity > 0)
+         OnControlInput(kClickyEncoderTurn, pitch == kNextModuleButton ? 1 : 127);
+      mControlState[pitch].mLastChangeTime = gTime;
+      return;
+   }
+
+   if (pitch == kPrevControlPageButton || pitch == kNextControlPageButton)
+   {
+      if (velocity > 0)
+         StepControlPage(pitch == kNextControlPageButton ? 1 : -1);
+      mControlState[pitch].mLastChangeTime = gTime;
+      return;
+   }
+
+   if (HandleDedicatedButton(pitch, velocity))
+   {
+      mControlState[pitch].mLastChangeTime = gTime;
+      return;
+   }
 
    int touchedEncoderIndex = GetMainEncoderTouchIndex(pitch);
    if (touchedEncoderIndex >= NumMainEncoders())
@@ -1882,7 +2374,7 @@ void ControlSurface::OnNoteInput(int pitch, int velocity)
       if (pitch == kButtonNew)
       {
          if (velocity > 0)
-            mAutoZoomToTrack = !mAutoZoomToTrack;
+            ToggleAutoZoomToTrack();
          handled = true;
       }
       if (pitch == kButtonGroove)
@@ -1895,20 +2387,7 @@ void ControlSurface::OnNoteInput(int pitch, int velocity)
       }
       if (pitch == kButtonScale)
       {
-         if (velocity > 0)
-         {
-            SetActiveTrackRow(kTrackRowScale, false);
-         }
-         else
-         {
-            bool wasHold = WasPeekHold(pitch);
-
-            //if we held it, then we were just "peeking" into the scale page, so switch back
-            if (wasHold)
-               SetActiveTrackRow(mPreviousSelectedTrackRow, false);
-            else
-               OnTrackRowExited(kTrackRowScale, mPreviousSelectedTrackRow);
-         }
+         OnScalePageButton(pitch, velocity);
          handled = true;
       }
       if (pitch == kButtonStar)
@@ -1934,17 +2413,7 @@ void ControlSurface::OnNoteInput(int pitch, int velocity)
       if (pitch == kButtonAdd)
       {
          if (velocity > 0)
-         {
-            mShowAddTrackSelector = true;
-            mAddTrackSelectorIndex = 0;
-
-            mAddTrackSelectorList.clear();
-            for (const auto& entry : juce::RangedDirectoryIterator{ juce::File{ ofToDataPath("trackorganizer") }, false, "*.pfb" })
-            {
-               const auto& file = entry.getFile();
-               mAddTrackSelectorList.push_back(file.getFullPathName().toStdString());
-            }
-         }
+            ShowAddTrackSelector();
          handled = true;
       }
 
@@ -1990,7 +2459,11 @@ void ControlSurface::OnNoteInput(int pitch, int velocity)
                            modulatorModule->SetEnabled(false);
                      }
                   }
-                  else if (GetButtonState(kDuplicateButton))
+                  else if (GetButtonState(kLFOButton))
+                  {
+                     AddLFOToControl(controlIndex);
+                  }
+                  else if (GetButtonState(GetBindButton()))
                   {
                      sBindToUIControl = mControls[controlIndex];
                   }
@@ -2032,9 +2505,7 @@ void ControlSurface::OnNoteInput(int pitch, int velocity)
             if (GetButtonState(kMoveMuteButton))
             {
                //one pad per track, toggle it on/off
-               int trackIndex = colFromLeft + rowFromTop * GetGridNumCols();
-               if (TrackOrganizer* track = mSessionOrganizer->GetTrack(trackIndex))
-                  track->SetTrackEnabled(!track->IsTrackEnabled());
+               ToggleTrackEnabled(colFromLeft + rowFromTop * GetGridNumCols());
             }
             else if (rowFromTop < NumTrackButtons())
             {
@@ -2050,7 +2521,7 @@ void ControlSurface::OnNoteInput(int pitch, int velocity)
                      {
                         DisplayScreenMessage(snapshots->GetLabel(col));
                      }
-                     else if (GetButtonState(kDotButton))
+                     else if (IsStoreSnapshotHeld())
                      {
                         snapshots->StoreSnapshot(col, true);
                      }
@@ -2137,6 +2608,15 @@ void ControlSurface::OnNoteInput(int pitch, int velocity)
 
 void ControlSurface::OnControlInput(int controlId, int value)
 {
+   if (controlId == kMoveMuteButton && value > 0)
+   {
+      //pressing mute while touching a knob isn't a tap either
+      for (int i = 0; i < NumMainEncoders(); ++i)
+      {
+         if (GetButtonState(GetMainEncoderTouchControl(i)))
+            MarkUsedSincePress(kMoveMuteButton);
+      }
+   }
 
    if (IsRandomizeChordHeld())
    {
@@ -2196,8 +2676,8 @@ void ControlSurface::OnControlInput(int controlId, int value)
                      mLastGainAdjustTrackIndex = trackIndex;
                      mLastGainAdjustTrackTime = gTime;
                      /*mLCD.Clear();
-                     mLCD.DrawRect(5, 4, mLCD.kMoveDisplayWidth - 6, 4, LCDDrawMode::Outline);
-                     mLCD.DrawRect(5, 4, (mLCD.kMoveDisplayWidth - 6) * ofMap(gainSlider->GetValue(), gainSlider->GetMin(), gainSlider->GetMax(), 0, 1), 4, LCDDrawMode::Fill);
+                     mLCD.DrawRect(5, 4, mLCD.GetWidth() - 6, 4, LCDDrawMode::Outline);
+                     mLCD.DrawRect(5, 4, (mLCD.GetWidth() - 6) * ofMap(gainSlider->GetValue(), gainSlider->GetMin(), gainSlider->GetMax(), 0, 1), 4, LCDDrawMode::Fill);
                      mLCD.DrawText(("track " + ofToString(trackIndex) + " gain: " + ofToString(gainSlider->GetValue())).c_str(), 5, 23, LCDFONT_STYLE_REGULAR);
                      mScreenOverrideTimeout = gTime + 500;*/
                   }
@@ -2209,11 +2689,7 @@ void ControlSurface::OnControlInput(int controlId, int value)
          {
             if (value > 0)
             {
-               if (mSessionOrganizer != nullptr)
-               {
-                  if (TrackOrganizer* track = mSessionOrganizer->GetTrack(trackIndex))
-                     track->SetTrackEnabled(!track->IsTrackEnabled());
-               }
+               ToggleTrackEnabled(trackIndex);
             }
          }
       }
@@ -2229,11 +2705,12 @@ void ControlSurface::OnControlInput(int controlId, int value)
          {
             AdjustControlWithEncoder(gainSlider, value);
             mLCD.Clear();
-            mLCD.DrawRect(3, 4, mLCD.kMoveDisplayWidth - 6, 4, LCDDrawMode::Outline);
-            mLCD.DrawRect(3, 4, (mLCD.kMoveDisplayWidth - 6) * gainSlider->GetMidiValue(), 4, LCDDrawMode::Fill);
+            mLCD.DrawRect(3, 4, mLCD.GetWidth() - 6, 4, LCDDrawMode::Outline);
+            mLCD.DrawRect(3, 4, (mLCD.GetWidth() - 6) * gainSlider->GetMidiValue(), 4, LCDDrawMode::Fill);
             mLCD.DrawLCDText(("output gain: " + ofToString(gainSlider->GetValue(), 2)).c_str(), 5, 23, LCDFONT_STYLE_REGULAR);
             mScreenOverrideTimeout = gTime + 500;
          }
+         return;
       }
    }
 
@@ -2283,24 +2760,10 @@ void ControlSurface::OnControlInput(int controlId, int value)
          return;
       }
 
-      if (controlId == kMoveMuteButton)
+      if (controlId == kMoveMuteButton && !MuteButtonMutesTracks())
       {
          if (value > 0)
-         {
-            int controlIndex = mMostRecentlyTouchedKnobIndex + GetControlOffset();
-            if (controlIndex >= 0 && controlIndex < (int)mControls.size())
-            {
-               FloatSlider* slider = dynamic_cast<FloatSlider*>(mControls[controlIndex]);
-               if (slider != nullptr)
-               {
-                  bool hadLFO = (slider->GetLFO() != nullptr);
-                  FloatSliderLFOControl* lfo = slider->AcquireLFO();
-                  if (!hadLFO)
-                     lfo->SetLFOEnabled(true);
-                  SetDisplayModule(lfo, true);
-               }
-            }
-         }
+            AddLFOToControl(mMostRecentlyTouchedKnobIndex + GetControlOffset());
          return;
       }
    }
@@ -2360,6 +2823,13 @@ void ControlSurface::OnControlInput(int controlId, int value)
             }
          }
       }
+   }
+   else if (trackButtonIndex != -1 && MuteButtonMutesTracks() && (value > 0 ? GetButtonState(kMoveMuteButton) : mTrackButtonPressedForMute[trackButtonIndex]))
+   {
+      //hold mute and press a track button to turn that track on or off
+      mTrackButtonPressedForMute[trackButtonIndex] = value > 0;
+      if (value > 0)
+         ToggleTrackEnabled(trackButtonIndex + mTrackRowOffset);
    }
    else if (trackButtonIndex != -1 && (UseTrackButtonsForSnapshots() || mTrackButtonPressedForSnapshot[trackButtonIndex]))
    {
@@ -2621,9 +3091,25 @@ void ControlSurface::OnControlInput(int controlId, int value)
    }
    else if (controlId == kVolumeEncoderTurn)
    {
-      float increment = value < 64 ? value : value - 128;
-      increment *= 0.03f;
-      SetModuleViewOffset(ofClamp(GetModuleViewOffset() + increment, 0, MAX(0, ((int)mControls.size() + EncoderPageSize() - 1) / EncoderPageSize()) - .01f));
+      if (Surface()->HasControlPageButtons())
+      {
+         //devices with buttons for paging through controls use this knob for the current track's volume (shift: send) instead
+         TrackOrganizer* track = GetActiveTrackRow();
+         FloatSlider* slider = track != nullptr ? GetMixerSlider(mSelectedTrackRow) : nullptr;
+         if (slider != nullptr)
+         {
+            AdjustControlWithEncoder(slider, value, K(ignoreShift));
+            mVolumeKnobTrackIndex = mSelectedTrackRow;
+            mVolumeKnobTrackTime = gTime;
+            DisplayScreenMessage(track->GetTrackName() + (mShiftHeld ? " send " : " gain ") + ofToString(slider->GetValue(), 2));
+         }
+      }
+      else
+      {
+         float increment = value < 64 ? value : value - 128;
+         increment *= 0.03f;
+         SetModuleViewOffset(ofClamp(GetModuleViewOffset() + increment, 0, MAX(0, ((int)mControls.size() + EncoderPageSize() - 1) / EncoderPageSize()) - .01f));
+      }
    }
    /*else if (controlId == kSetupButton && value > 0)
    {
@@ -2646,7 +3132,10 @@ void ControlSurface::OnControlInput(int controlId, int value)
       if (value > 0)
       {
          if (mMostRecentlyTouchedKnobIndex != -1 && GetButtonState(GetMainEncoderTouchControl(mMostRecentlyTouchedKnobIndex)))
+         {
             StartControlRecorder(mMostRecentlyTouchedKnobIndex);
+            MarkUsedSincePress(kLoopButton);
+         }
       }
       else if (value == 0)
       {
@@ -2800,7 +3289,7 @@ void ControlSurface::OnControlInput(int controlId, int value)
 
       if (value > 0)
       {
-         if (gTime - mControlState[controlId].mLastChangeTime < 200) //double-click
+         if (gTime - mControlState[controlId].mLastChangeTime < 200 && NumStepButtons() > 0) //double-click
             mBottomRowMode = true;
          else
             mBottomRowMode = false;
@@ -2849,6 +3338,12 @@ void ControlSurface::OnControlInput(int controlId, int value)
          }
       }
    }
+   else if (controlId == kMoveMuteButton)
+   {
+      //tap mute to turn the selected track on or off
+      if (value == 0 && MuteButtonMutesTracks() && !mControlState[kMoveMuteButton].mUsedSincePress && !WasPeekHold(controlId))
+         ToggleTrackEnabled(mSelectedTrackRow);
+   }
    else if (controlId == kCircleButton)
    {
       if (value > 0)
@@ -2877,7 +3372,11 @@ void ControlSurface::OnControlInput(int controlId, int value)
    }
    else if (controlId == kCaptureButton)
    {
-      if (value > 0)
+      if (value > 0 && GetBindButton() == kCaptureButton && BindTouchedKnob())
+      {
+         //binding instead of zooming
+      }
+      else if (value > 0)
       {
          if (GetButtonState(kShiftButton))
          {
@@ -2919,7 +3418,7 @@ void ControlSurface::OnControlInput(int controlId, int value)
 
 bool ControlSurface::IsRandomizeChordHeld() const
 {
-   return GetButtonState(kShiftButton) && GetButtonState(kMoveUndoButton);
+   return (GetButtonState(kShiftButton) && GetButtonState(kMoveUndoButton)) || GetButtonState(kRandomizeButton);
 }
 
 IDrawableModule* ControlSurface::GetCurrentControlModule() const

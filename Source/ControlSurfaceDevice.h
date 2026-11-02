@@ -39,6 +39,9 @@
 
 #pragma once
 
+#include "OpenFrameworksPort.h"
+
+
 #include <array>
 #include <atomic>
 #include <memory>
@@ -77,6 +80,29 @@ struct ControlSurfaceLedState
    int color{ -1 }; //index into AbletonDevice::kColors, -1 for unset
    int flashColor{ -1 };
    float brightness{ 1.0f };
+};
+
+//one of several screens that controlsurface draws for a device with room to show them side by side
+struct ControlSurfaceDisplayPanel
+{
+   enum class Role
+   {
+      Knob, //what touching a knob shows
+      ModuleList,
+      Mixer,
+      Lissajous,
+      Main //everything else the screen would show
+   };
+
+   ControlSurfaceDisplayPanel(const AbletonMoveLCD* _lcd, Role _role, ofColor _color = ofColor::white)
+   : lcd(_lcd)
+   , role(_role)
+   , color(_color)
+   {}
+
+   const AbletonMoveLCD* lcd{ nullptr };
+   Role role{ Role::Main };
+   ofColor color;
 };
 
 //maps a device's raw midi controls to and from the move layout
@@ -130,16 +156,20 @@ public:
    bool HasGrid() const { return GetGridNumPads() > 0; }
    virtual bool HasEncoderTouch() const { return true; }
    virtual float GetEncoderSensitivity() const { return 1.0f; }
+   bool HasInput(int layoutIndex) const; //does any of the device's controls send this layout index?
+   virtual bool HasControlPageButtons() const; //if so, the volume knob controls the current track's volume instead of paging
    virtual int GetGridControllerOption1Control() const;
    virtual int GetGridControllerOption2Control() const;
 
    //input
-   int GetLayoutIndex(int rawIndex) const { return mControlMap.GetLayoutIndex(rawIndex); }
+   virtual int TranslateInput(int rawIndex, int value) { return mControlMap.GetLayoutIndex(rawIndex); } //called on the midi input thread, returns the layout index or -1 to ignore
    virtual int ConvertInputValue(int layoutIndex, int value) const { return value; } //convert to the move's conventions, e.g. two's complement relative encoders
    virtual void OnMidi(const juce::MidiMessage& message) {} //called on the midi input thread
 
    //leds
-   bool HasLed(int layoutIndex) const { return mControlMap.GetRawLedIndex(layoutIndex) != -1; }
+   virtual int GetRawLedIndex(int layoutIndex) const { return mControlMap.GetRawLedIndex(layoutIndex); }
+   bool HasLed(int layoutIndex) const { return GetRawLedIndex(layoutIndex) != -1; }
+   bool ConsumeLedRefreshRequest() { return mLedRefreshRequested.exchange(false); } //true if every led should be resent, e.g. because which layout control an led shows has changed
    virtual bool SupportsLedFlashing() const { return true; } //if false, controlsurface will blink leds itself
    virtual bool SupportsLedBrightness() const { return false; }
    virtual void SendLed(MidiDevice& device, int layoutIndex, const ControlSurfaceLedState& state);
@@ -148,6 +178,8 @@ public:
    virtual bool HasDisplay() const { return true; }
    virtual bool IsDisplayConnected() const { return false; }
    virtual void SendDisplay(MidiDevice& device, const AbletonMoveLCD& lcd) {} //called on the render thread
+   virtual bool WantsDisplayPanels() const { return false; } //true to get SendDisplayPanels() instead of SendDisplay()
+   virtual void SendDisplayPanels(MidiDevice& device, const std::vector<ControlSurfaceDisplayPanel>& panels) {} //called on the render thread
    virtual void ClearDisplay(MidiDevice& device) {}
 
 protected:
@@ -158,13 +190,21 @@ protected:
    virtual void OnConnected(MidiDevice& device) {}
    virtual void OnDisconnecting(MidiDevice& device) {}
 
+   void RequestLedRefresh() { mLedRefreshRequested = true; }
+
    ControlSurfaceControlMap mControlMap;
 
 private:
+   std::atomic<bool> mLedRefreshRequested{ false };
+
    std::string FindPort(const std::vector<std::string>& availablePorts, const std::vector<std::string>& desiredNames) const;
 };
 
 std::unique_ptr<ControlSurfaceDevice> CreateControlSurfaceDevice(ControlSurfaceDeviceType type);
+
+//for devices that map everything through: unmaps the layout's extra buttons (navigation, and the dedicated buttons for the move's combos)
+//so they're only present when the device maps them explicitly. call before those explicit mappings.
+void UnmapExtraLayoutButtons(ControlSurfaceControlMap& controlMap);
 
 class AbletonMoveSurface : public ControlSurfaceDevice
 {
@@ -201,7 +241,8 @@ public:
    int GetGridNumRows() const override { return 8; }
 
    bool IsDisplayConnected() const override;
-   void SendDisplay(MidiDevice& device, const AbletonMoveLCD& lcd) override;
+   bool WantsDisplayPanels() const override { return true; }
+   void SendDisplayPanels(MidiDevice& device, const std::vector<ControlSurfaceDisplayPanel>& panels) override;
    void ClearDisplay(MidiDevice& device) override;
 
 protected:
@@ -211,6 +252,8 @@ protected:
    void OnConnected(MidiDevice& device) override;
 
 private:
+   void DrawPanel(const AbletonMoveLCD& lcd, int x, int y, int width, int height, const ofColor& color);
+
    std::vector<unsigned char> mPixels;
 };
 

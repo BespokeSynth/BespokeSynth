@@ -475,6 +475,24 @@ namespace AbletonDevice
    const int kExtraMainEncoderSection = 91 + 128; //turn for main encoders 8-15
    const int kExtraMainEncoderTouchSection = 100; //touch for main encoders 8-15
 
+   //navigation buttons for devices without the move's jog wheel and volume encoder
+   const int kPrevModuleButton = 108; //same as turning the jog wheel left one step
+   const int kNextModuleButton = 109; //same as turning the jog wheel right one step
+   const int kPrevControlPageButton = 110; //show the previous page of the current module's controls
+   const int kNextControlPageButton = 111; //show the next page of the current module's controls
+
+   //dedicated buttons for devices with more buttons than the move, for functions the move reaches through combos
+   const int kAddTrackSelectorButton = 112; //open the add-track list, like bottom-row mode's add button
+   const int kRandomizeButton = 113; //hold and touch a knob (or the jog wheel) to randomize, like holding shift + undo
+   const int kStoreSnapshotButton = 114; //hold and tap a pad in snapshot view to store, like holding the dot button
+   const int kSoundSelectorButton = 115; //open the sound selector, like shift + dot
+   const int kScalePageButton = 116; //scale page (tap, or hold to peek), like bottom-row mode's scale button
+   const int kAutoZoomButton = 117; //toggle zooming the canvas to the selected track, like bottom-row mode's new button
+   const int kLFOButton = 118; //hold and touch a knob, or touch a knob and press, to add an lfo. frees the mute button to mute tracks
+   const int kCancelRecordingButton = 119; //cancel the track's recording in progress, like shift + record
+   const int kBindButton = 120; //hold and touch a knob, or touch a knob and press, then move a midi controller to bind it, like holding capture and touching a knob
+   const int kGridOption1Button = 121; //the grid interfaces' first option button. without it, that's the move's undo (which shares a number with the push's repeat)
+
    //track button 0 is the top button
    inline int GetTrackButtonControl(int trackButtonIndex)
    {
