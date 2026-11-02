@@ -887,27 +887,26 @@ void NoteCanvas::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 
       mGridKeyboardInterface->UpdateAbletonGridLeds(abletonGrid);
 
-      AbletonMoveControl* abletonMove = dynamic_cast<AbletonMoveControl*>(abletonGrid); //TODO(Ryan) make this not specific to move
-      for (int x = 0; x < abletonMove->GetGridNumCols(); ++x)
+      for (int x = 0; x < abletonGrid->GetGridNumCols(); ++x)
       {
-         for (int y = 0; y < abletonMove->GetGridNumRows(); ++y)
+         for (int y = 0; y < abletonGrid->GetGridNumRows(); ++y)
          {
             int pitch = mGridKeyboardInterface->GridToPitch(x, y);
-            int ledIndex = x + (abletonMove->GetGridNumRows() - 1 - y) * abletonMove->GetGridNumCols() + abletonMove->GetGridStartIndex();
+            int ledIndex = x + (abletonGrid->GetGridNumRows() - 1 - y) * abletonGrid->GetGridNumCols() + abletonGrid->GetGridStartIndex();
 
             if (pitch >= 0 && pitch < (int)mPitchMuted.size() && mPitchMuted[pitch])
-               abletonMove->SetLed(ledIndex, AbletonDevice::kColorDarkRed);
+               abletonGrid->SetLed(ledIndex, AbletonDevice::kColorDarkRed);
 
             int flashColor = -1;
             if (pitch == mEditCurrentPitchContext)
                flashColor = AbletonDevice::kColorLightBlue;
-            abletonMove->SetLedFlashColor(ledIndex, flashColor);
+            abletonGrid->SetLedFlashColor(ledIndex, flashColor);
 
             if (pitch < 0)
             {
                int drumContextPitch = mGridKeyboardInterface->GridToPitch(x - 4, y);
                if (drumContextPitch >= 0 && drumContextPitch == mEditCurrentPitchContext)
-                  abletonMove->SetLed(ledIndex, AbletonDevice::kColorLightBlue);
+                  abletonGrid->SetLed(ledIndex, AbletonDevice::kColorLightBlue);
             }
          }
       }

@@ -466,6 +466,81 @@ namespace AbletonDevice
       float increment = midiInputValue < 64 ? midiInputValue : midiInputValue - 128;
       return increment * .005f;
    }
+
+   //control surface layout
+   //the controlsurface module presents every device it supports to grid controllers using the move's control indices.
+   //these extend that layout for devices that have more track buttons or main encoders than the move.
+   const int kMaxTrackButtons = 8; //track buttons 4-7 continue below the move's four, at CCs 39 down to 36
+   const int kMaxMainEncoders = 16;
+   const int kExtraMainEncoderSection = 91 + 128; //turn for main encoders 8-15
+   const int kExtraMainEncoderTouchSection = 100; //touch for main encoders 8-15
+
+   //navigation buttons for devices without the move's jog wheel and volume encoder
+   const int kPrevModuleButton = 108; //same as turning the jog wheel left one step
+   const int kNextModuleButton = 109; //same as turning the jog wheel right one step
+   const int kPrevControlPageButton = 110; //show the previous page of the current module's controls
+   const int kNextControlPageButton = 111; //show the next page of the current module's controls
+
+   //dedicated buttons for devices with more buttons than the move, for functions the move reaches through combos
+   const int kAddTrackSelectorButton = 112; //open the add-track list, like bottom-row mode's add button
+   const int kRandomizeButton = 113; //hold and touch a knob (or the jog wheel) to randomize, like holding shift + undo
+   const int kStoreSnapshotButton = 114; //hold and tap a pad in snapshot view to store, like holding the dot button
+   const int kSoundSelectorButton = 115; //open the sound selector, like shift + dot
+   const int kScalePageButton = 116; //scale page (tap, or hold to peek), like bottom-row mode's scale button
+   const int kAutoZoomButton = 117; //toggle zooming the canvas to the selected track, like bottom-row mode's new button
+   const int kLFOButton = 118; //hold and touch a knob, or touch a knob and press, to add an lfo. frees the mute button to mute tracks
+   const int kCancelRecordingButton = 119; //cancel the track's recording in progress, like shift + record
+   const int kBindButton = 120; //hold and touch a knob, or touch a knob and press, then move a midi controller to bind it, like holding capture and touching a knob
+   const int kGridOption1Button = 121; //the grid interfaces' first option button. without it, that's the move's undo (which shares a number with the push's repeat)
+
+   //track button 0 is the top button
+   inline int GetTrackButtonControl(int trackButtonIndex)
+   {
+      return kTrackButtonSection + kNumTrackButtons - 1 - trackButtonIndex;
+   }
+
+   //returns -1 if controlIndex is not a track button
+   inline int GetTrackButtonIndex(int controlIndex)
+   {
+      int index = kTrackButtonSection + kNumTrackButtons - 1 - controlIndex;
+      if (index >= 0 && index < kMaxTrackButtons)
+         return index;
+      return -1;
+   }
+
+   inline int GetMainEncoderControl(int encoderIndex)
+   {
+      if (encoderIndex < kNumMainEncoders)
+         return kMainEncoderSection + encoderIndex;
+      return kExtraMainEncoderSection + encoderIndex - kNumMainEncoders;
+   }
+
+   inline int GetMainEncoderTouchControl(int encoderIndex)
+   {
+      if (encoderIndex < kNumMainEncoders)
+         return kMainEncoderTouchSection + encoderIndex;
+      return kExtraMainEncoderTouchSection + encoderIndex - kNumMainEncoders;
+   }
+
+   //returns -1 if controlIndex is not a main encoder turn
+   inline int GetMainEncoderIndex(int controlIndex)
+   {
+      if (controlIndex >= kMainEncoderSection && controlIndex < kMainEncoderSection + kNumMainEncoders)
+         return controlIndex - kMainEncoderSection;
+      if (controlIndex >= kExtraMainEncoderSection && controlIndex < kExtraMainEncoderSection + kMaxMainEncoders - kNumMainEncoders)
+         return controlIndex - kExtraMainEncoderSection + kNumMainEncoders;
+      return -1;
+   }
+
+   //returns -1 if controlIndex is not a main encoder touch
+   inline int GetMainEncoderTouchIndex(int controlIndex)
+   {
+      if (controlIndex >= kMainEncoderTouchSection && controlIndex < kMainEncoderTouchSection + kNumMainEncoders)
+         return controlIndex - kMainEncoderTouchSection;
+      if (controlIndex >= kExtraMainEncoderTouchSection && controlIndex < kExtraMainEncoderTouchSection + kMaxMainEncoders - kNumMainEncoders)
+         return controlIndex - kExtraMainEncoderTouchSection + kNumMainEncoders;
+      return -1;
+   }
 }
 #include "leathers/pop"
 
@@ -482,6 +557,7 @@ class IAbletonGridDevice
 public:
    virtual ~IAbletonGridDevice() {}
    virtual void SetLed(int index, int color, int flashColor = -1, LedPriority priority = LedPriority::Normal) = 0;
+   virtual void SetLedFlashColor(int index, int flashColor) {} //change the flash color of an led that was already set this frame
    virtual bool GetButtonState(int index) const = 0;
    virtual int GetGridControllerOption1Control() const = 0;
    virtual int GetGridControllerOption2Control() const = 0;

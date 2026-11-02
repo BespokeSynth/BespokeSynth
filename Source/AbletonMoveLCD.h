@@ -56,9 +56,10 @@ enum class LCDDrawMode
 class AbletonMoveLCD
 {
 public:
-   AbletonMoveLCD();
+   AbletonMoveLCD(int width = 128, int height = 64); //the move's screen is 128x64
    virtual ~AbletonMoveLCD();
 
+   void SetSize(int width, int height); //call before Init()
    void Init();
    void Clear();
    void DrawLCDText(const char* text, int x, int y, int style = LCDFONT_STYLE_REGULAR, int fontSize = 12);
@@ -70,9 +71,9 @@ public:
    uint8_t* GetPixels() const { return mPixels; }
    uint8_t GetPixel(int x, int y) const;
    int GetNumDisplayPixels() const;
+   int GetWidth() const { return mWidth; }
+   int GetHeight() const { return mHeight; }
 
-   static constexpr int kMoveDisplayWidth = 128;
-   static constexpr int kMoveDisplayHeight = 64;
    static constexpr int kTextLineSpacing = 8;
 
 private:
@@ -81,4 +82,6 @@ private:
    static bool IsToggle(LCDDrawMode drawMode) { return drawMode == LCDDrawMode::Toggle || drawMode == LCDDrawMode::OutlineToggle; }
 
    uint8_t* mPixels{ nullptr };
+   int mWidth{ 128 };
+   int mHeight{ 64 };
 };

@@ -215,9 +215,9 @@ void FloatSliderLFOControl::GetCurrentPhaseDrawPosition(float& xNormalized, floa
 void FloatSliderLFOControl::DrawToAbletonMoveScreen(AbletonMoveLCD* screen)
 {
    int lastY = -1;
-   for (float x = 0; x < AbletonMoveLCD::kMoveDisplayWidth; ++x)
+   for (float x = 0; x < screen->GetWidth(); ++x)
    {
-      float phase = x / AbletonMoveLCD::kMoveDisplayWidth;
+      float phase = x / screen->GetWidth();
       if (mLFO.GetOsc()->GetShuffle() > 0)
          phase *= 2;
       if (mLFO.GetOsc()->GetType() != kOsc_Perlin)
@@ -225,7 +225,7 @@ void FloatSliderLFOControl::DrawToAbletonMoveScreen(AbletonMoveLCD* screen)
       float value = GetLFOValue(0, mLFO.TransformPhase(phase));
       int newY = int(ofMap(value,
                            GetTargetMax(), GetTargetMin(),
-                           10, AbletonMoveLCD::kMoveDisplayHeight - 10));
+                           10, screen->GetHeight() - 10));
 
       if (lastY == -1)
          lastY = newY;
@@ -249,8 +249,8 @@ void FloatSliderLFOControl::DrawToAbletonMoveScreen(AbletonMoveLCD* screen)
       float yNormalized;
       GetCurrentPhaseDrawPosition(xNormalized, yNormalized);
 
-      screen->DrawRect(ofLerp(0, AbletonMoveLCD::kMoveDisplayWidth, xNormalized),
-                       ofLerp(10, AbletonMoveLCD::kMoveDisplayHeight - 10, yNormalized), 3, 3, LCDDrawMode::Outline);
+      screen->DrawRect(ofLerp(0, screen->GetWidth(), xNormalized),
+                       ofLerp(10, screen->GetHeight() - 10, yNormalized), 3, 3, LCDDrawMode::Outline);
    }
 }
 

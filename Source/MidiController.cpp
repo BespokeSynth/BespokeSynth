@@ -38,6 +38,7 @@
 #include "MidiCapturer.h"
 #include "ScriptModule.h"
 #include "Push2Control.h"
+#include "ControlSurface.h"
 #include "QwertyController.h"
 
 using namespace juce;
@@ -560,6 +561,16 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
       sLastBoundUIControl = Push2Control::sBindToUIControl;
       sLastBoundUIControl->StartBeacon();
       Push2Control::sBindToUIControl = nullptr;
+      return;
+   }
+
+   if (ControlSurface::sBindToUIControl)
+   {
+      AddControlConnection(messageType, control, channel, ControlSurface::sBindToUIControl);
+      sLastBoundControlTime = gTime;
+      sLastBoundUIControl = ControlSurface::sBindToUIControl;
+      sLastBoundUIControl->StartBeacon();
+      ControlSurface::sBindToUIControl = nullptr;
       return;
    }
 

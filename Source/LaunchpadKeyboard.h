@@ -34,7 +34,6 @@
 #include "INoteSource.h"
 #include "GridController.h"
 #include "Push2Control.h"
-#include "AbletonMoveControl.h"
 
 class LaunchpadNoteDisplayer;
 

@@ -661,10 +661,10 @@ bool DrumPlayer::UpdateAbletonMoveScreen(IAbletonGridDevice* abletonGrid, Ableto
             float end = sample.LengthInSamples();
             if (drumHit.mUseEnvelope)
                end = MIN(start + (drumHit.mEnvelope.GetA() + drumHit.mEnvelope.GetD() + drumHit.mEnvelope.GetR()) * gSampleRateMs, sample.LengthInSamples());
-            lcd->DrawAudioBuffer(0, 0, AbletonMoveLCD::kMoveDisplayWidth, AbletonMoveLCD::kMoveDisplayHeight, sample.Data()->GetChannel(0), start, end, drumHit.GetPlaySampleIndex(gTime));
+            lcd->DrawAudioBuffer(0, 0, lcd->GetWidth(), lcd->GetHeight(), sample.Data()->GetChannel(0), start, end, drumHit.GetPlaySampleIndex(gTime));
          }
 
-         lcd->DrawRect(1, 2, AbletonMoveLCD::kMoveDisplayWidth - 2, 13, LCDDrawMode::Clear);
+         lcd->DrawRect(1, 2, lcd->GetWidth() - 2, 13, LCDDrawMode::Clear);
          lcd->DrawLCDText(sample.Name().c_str(), 4, 12, LCDFONT_STYLE_REGULAR);
 
          mLoadSamplesDrawMutex.unlock();

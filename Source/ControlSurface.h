@@ -1,6 +1,6 @@
 /**
     bespoke synth, a software modular synthesizer
-    Copyright (C) 2021 Ryan Challinor (contact: awwbees@gmail.com)
+    Copyright (C) 2026 Ryan Challinor (contact: awwbees@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,9 +18,13 @@
 /*
   ==============================================================================
 
-    AbletonMoveControl.h
-    Created: 22 Apr 2025
+    ControlSurface.h
+    Created: 24 Oct 2026
     Author:  Ryan Challinor
+
+    Uses a hardware control surface (ableton move, ableton push 2, novation
+    launch control 3, ...) to drive a sessionorganizer. The hardware specifics
+    live in ControlSurfaceDevice.
 
   ==============================================================================
 */
@@ -30,26 +34,24 @@
 #include "IDrawableModule.h"
 #include "MidiDevice.h"
 #include "MidiController.h"
-#include "TitleBar.h"
 #include "DropdownList.h"
 #include "AbletonMoveLCD.h"
 #include "AbletonDeviceShared.h"
-#include "pybind11/attr.h"
+#include "ControlSurfaceDevice.h"
 #include "LockFreeQueue.h"
 #include "SessionOrganizer.h"
 
 class IUIControl;
-class Snapshots;
 class ControlRecorder;
+class Checkbox;
 class TrackOrganizer;
-class SessionOrganizer;
 
-class AbletonMoveControl : public IDrawableModule, public MidiDeviceListener, public IDropdownListener, public IAbletonGridDevice
+class ControlSurface : public IDrawableModule, public MidiDeviceListener, public IDropdownListener, public IAbletonGridDevice
 {
 public:
-   AbletonMoveControl();
-   virtual ~AbletonMoveControl();
-   static IDrawableModule* Create() { return new AbletonMoveControl(); }
+   ControlSurface();
+   virtual ~ControlSurface();
+   static IDrawableModule* Create() { return new ControlSurface(); }
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return false; }
    static bool AcceptsPulses() { return false; }
@@ -57,42 +59,43 @@ public:
    void CreateUIControls() override;
    void Poll() override;
    void Exit() override;
-   void KeyPressed(int key, bool isRepeat) override;
 
+   //IAbletonGridDevice
    void SetLed(int index, int color, int flashColor = -1, LedPriority priority = LedPriority::Normal) override;
-   void SetLedFlashColor(int index, int flashColor = -1);
+   void SetLedFlashColor(int index, int flashColor) override;
    bool GetButtonState(int index) const override;
+   int GetGridControllerOption1Control() const override;
+   int GetGridControllerOption2Control() const override;
+   MidiDevice* GetDevice() override { return &mDevice; }
    void SetDisplayModule(IDrawableModule* module, bool addToHistory = true) override;
    void SetDisplayModuleWithContext(IDrawableModule* module, std::string context);
-   void DisplayScreenMessage(std::string message, float durationMs = 500) override;
    IDrawableModule* GetDisplayModule() const override { return mDisplayModule; }
-   AbletonDeviceType GetAbletonDeviceType() const override { return AbletonDeviceType::Move; }
-   int GetGridStartIndex() const override { return AbletonDevice::kMovePadsSection; }
-   int GetGridNumPads() const override { return AbletonDevice::kNumMovePads; }
-   int GetGridNumCols() const override { return 8; }
-   int GetGridNumRows() const override { return 4; }
+   AbletonDeviceType GetAbletonDeviceType() const override { return AbletonDeviceType::Move; } //every device is presented to grid controllers with the move's layout
+   int GetGridStartIndex() const override { return Surface()->GetGridStartIndex(); }
+   int GetGridNumPads() const override { return Surface()->GetGridNumPads(); }
+   int GetGridNumCols() const override { return Surface()->GetGridNumCols(); }
+   int GetGridNumRows() const override { return Surface()->GetGridNumRows(); }
+   void DisplayScreenMessage(std::string message, float durationMs = 500) override;
 
+   //MidiDeviceListener
+   void OnMidi(const juce::MidiMessage& message) override;
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
    void OnMidiPressure(MidiPressure& pressure) override;
 
-   MidiDevice* GetDevice() override { return &mDevice; }
-
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
-   void DropdownUpdated(DropdownList* list, int oldVal, double time) override {}
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
+   void PostLoadState() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    int GetModuleSaveStateRev() const override { return 3; }
-
-   int GetGridControllerOption1Control() const override;
-   int GetGridControllerOption2Control() const override;
 
    static IUIControl* sBindToUIControl;
 
@@ -103,24 +106,44 @@ private:
    void DrawModule() override;
    void DrawModuleUnclipped() override;
    void PostRender() override;
-   void GetModuleDimensions(float& width, float& height) override
-   {
-      width = mWidth;
-      height = mHeight;
-   }
+   void GetModuleDimensions(float& width, float& height) override;
+   bool ShowsLCDOnModule() const { return !Surface()->HasDisplay(); } //devices without a screen get one on the module
    void OnClicked(float x, float y, bool right) override;
 
-   bool Initialize();
-   void DrawToFramebuffer();
-   void RenderMoveDisplay();
+   ControlSurfaceDevice* Surface() const;
+   int NumMainEncoders() const { return Surface()->GetNumMainEncoders(); }
+   int EncoderPageSize() const { return Surface()->GetEncoderPageSize(); }
+   int NumTrackButtons() const { return Surface()->GetNumTrackButtons(); }
+   int NumStepButtons() const { return Surface()->GetNumStepButtons(); }
+   bool HasGrid() const { return Surface()->HasGrid(); }
+   int GetMaxTrackRowOffset() const;
+   int GetNumSnapshotColumns() const;
+   bool UseTrackButtonsForSnapshots() const;
+
+   void AutoDetectDevice();
+   void ConnectDevice();
+   void DisconnectDevice();
+   void DrawToFramebuffer(bool separatePanels = false);
+   void DrawDisplayPanels();
+   void DrawModuleList(AbletonMoveLCD& lcd);
+   void DrawMixer(AbletonMoveLCD& lcd);
+   bool CanSelectModules() const;
+   FloatSlider* GetMixerSlider(int trackIndex) const;
+   int GetMixerAdjustTrackIndex();
+   void GetKnobColors(int controlIndex, int& color, int& flashColor) const;
+   IUIControl* GetControlAt(int controlIndex) const;
    void UpdateLeds();
+   void SetLedWithBrightness(int index, int color, int flashColor, float brightness, LedPriority priority = LedPriority::Normal);
    void SendLeds(bool force);
 
    void UpdateControlList();
    static bool IsDisplayableControl(IUIControl* control);
    int GetControlOffset() const;
+   int GetNumControlPages() const;
+   void StepControlPage(int direction);
 
    void DrawDisplayModuleRect(ofRectangle rect, float thickness);
+   void DrawLCDImage(float x, float y, float width, float height, float alpha);
    void SetGridControlInterface(IAbletonGridController* controller);
    void SetActiveTrackRow(int row, bool resetModuleIndex);
    TrackOrganizer* GetActiveTrackRow() const;
@@ -130,7 +153,7 @@ private:
    void AdjustControlWithEncoder(IUIControl* control, float midiInputValue, bool ignoreShift = false);
    int GetDisplayKnobIndex();
    bool ShouldDisplayMixer();
-   bool ShouldDisplaySnapshotView();
+   bool ShouldDisplaySnapshotView() const;
    float GetModuleViewOffset() const;
    void SetModuleViewOffset(float offset);
    void DetermineTrackControlLayout();
@@ -139,25 +162,60 @@ private:
    void ZoomToModule(IDrawableModule* module);
    void OnTrackRowExited(int newRow, int oldRow);
    void ShowSoundSelector();
+   void ShowAddTrackSelector();
+   void OnScalePageButton(int controlIndex, int velocity);
+   void ToggleAutoZoomToTrack();
+   void ToggleTrackEnabled(int trackIndex);
+   void AddLFOToControl(int controlIndex);
+   bool HandleDedicatedButton(int controlIndex, int velocity);
+   bool HasDedicatedButton(int layoutIndex) const { return Surface()->HasInput(layoutIndex); }
+   bool MuteButtonMutesTracks() const { return HasDedicatedButton(AbletonDevice::kLFOButton); } //when lfos have their own button, mute is free to mute tracks
+   bool IsStoreSnapshotHeld() const;
+   void TrackModifierUse(int index, int value);
+   void MarkUsedSincePress(int index) { mControlState[index].mUsedSincePress = true; }
+   bool IsHeldOnItsOwn(int index) const;
+   void UpdateHoldHints();
+   void DisplayHint(const std::string& hint);
+   int GetBindButton() const { return HasDedicatedButton(AbletonDevice::kBindButton) ? AbletonDevice::kBindButton : AbletonDevice::kCaptureButton; }
+   bool BindTouchedKnob();
    void StartControlRecorder(int controlIndex);
-   void DrawKnobDisplay(int controlIndex);
+   void DrawKnobDisplay(AbletonMoveLCD& lcd, IUIControl* control);
+   void DrawLissajousDisplay(AbletonMoveLCD& lcd, const TrackOrganizer* track);
    bool IsRandomizeChordHeld() const;
    IDrawableModule* GetCurrentControlModule() const;
 
-   void OnMidiNote_Consume(MidiNote& note);
-   void OnMidiControl_Consume(MidiControl& control);
-   void OnMidiPitchBend_Consume(MidiPitchBend& pitchBend);
-   void OnMidiPressure_Consume(MidiPressure& pressure);
+   void HandleInput_InputThread(int rawIndex, int value);
+   void OnNoteInput(int pitch, int velocity);
+   void OnControlInput(int controlId, int value);
+   void OnPitchBendInput(MidiPitchBend& pitchBend);
+   void OnPressureInput(MidiPressure& pressure);
 
    const int kTrackRowGlobal = -1;
    const int kTrackRowMixer = -2;
    const int kTrackRowTransport = -3;
    const int kTrackRowScale = -4;
 
+   ControlSurfaceDeviceType mDeviceType{ ControlSurfaceDeviceType::AbletonMove };
+   DropdownList* mDeviceTypeDropdown{ nullptr };
+   std::array<std::unique_ptr<ControlSurfaceDevice>, (int)ControlSurfaceDeviceType::Count> mSurfaces{};
+   std::atomic<ControlSurfaceDevice*> mConnectedSurface{ nullptr };
+   bool mNeedsConnect{ true };
+   bool mLoadedFromState{ false };
+   std::string mStatusMessage{};
+
    AbletonMoveLCD mLCD;
+   //extra screens for devices that show several at once (push 2)
+   std::array<AbletonMoveLCD, AbletonDevice::kNumMainEncoders> mKnobLCDs;
+   AbletonMoveLCD mModuleListLCD;
+   AbletonMoveLCD mMixerLCD;
+   AbletonMoveLCD mLissajousLCD;
+   std::vector<ControlSurfaceDisplayPanel> mDisplayPanels;
+   std::array<int, (int)NanoVGRenderContext::Num> mLCDImages{}; //nanovg image of the lcd for each render context
+   std::vector<unsigned char> mLCDImagePixels;
    double mScreenOverrideTimeout{ 0.0 };
    std::string mTemporaryScreenMessage{};
    double mTemporaryScreenMessageTimeout{ 0.0 };
+   bool mTemporaryScreenMessageIsHint{ false };
    bool mShowSoundSelector{ false };
    int mSoundSelectorIndex{ 0 };
 
@@ -172,12 +230,14 @@ private:
    bool mDisplayModuleIsShowingOverrideControls{ false };
 
    SessionOrganizer* mSessionOrganizer{ nullptr };
-   PatchCableSource* mSessionOrganizerCable;
+   PatchCableSource* mSessionOrganizerCable{ nullptr };
    int mTrackRowOffset{ 0 };
    int mSelectedTrackRow{ kTrackRowMixer };
    int mPreviousSelectedTrackRow{ -1 };
    double mDisplayModuleSelectTimeout{ 0.0 };
    int mSnapshotOffset{ 0 };
+   std::array<bool, AbletonDevice::kMaxTrackButtons> mTrackButtonPressedForSnapshot{};
+   std::array<bool, AbletonDevice::kMaxTrackButtons> mTrackButtonPressedForMute{};
 
    static constexpr int kNumPages{ 5 };
    std::array<PatchCableSource*, kNumPages> mGlobalControlModuleCables{};
@@ -212,12 +272,14 @@ private:
 
    bool mShiftHeld{ false };
    int mMostRecentlyTouchedKnobIndex{ -1 };
-   std::array<double, AbletonDevice::kNumMainEncoders> mLastTouchedKnobTime{};
+   std::array<double, AbletonDevice::kMaxMainEncoders> mLastTouchedKnobTime{};
    int mLastAdjustedKnobIndex{ -1 };
    double mLastAdjustedKnobTime{ -1 };
    double mLastResetTime{ -1 };
    int mLastGainAdjustTrackIndex{ -1 };
    double mLastGainAdjustTrackTime{ -1 };
+   int mVolumeKnobTrackIndex{ -1 }; //track whose volume the volume knob last adjusted, on devices with page buttons
+   double mVolumeKnobTrackTime{ -1 };
    float mTrackRowOffsetSmoothed{ 0 };
    bool mShowLCDOnScreen{ false };
    bool mAutoZoomToTrack{ false };
@@ -228,42 +290,33 @@ private:
 
    IAbletonGridController* mGridControlInterface{ nullptr };
 
-   struct LedState
-   {
-      LedState() {}
-      LedState(int _color, int _flashColor)
-      : color(_color)
-      , flashColor(_flashColor)
-      {}
-      bool operator==(LedState& other) const
-      {
-         return color == other.color && flashColor == other.flashColor;
-      }
-      bool operator!=(LedState& other) const
-      {
-         return color != other.color || flashColor != other.flashColor;
-      }
-      int color{ -1 };
-      int flashColor{ -1 };
-   };
-
    struct ControlState
    {
-      LedState mQueuedLedState{};
-      LedState mLedState{};
+      ControlSurfaceLedState mQueuedLedState{};
+      ControlSurfaceLedState mLedState{}; //what was last sent to the device
       LedPriority mLedPriority{ LedPriority::None };
       int mButtonState{ 0 };
       double mLastChangeTime{ 0.0 };
+      double mPressTime{ 0.0 };
+      bool mUsedSincePress{ false }; //has another control been used while this one was held?
    };
 
-   std::array<ControlState, 128 * 2> mControlState{}; //bottom 128 are notes, top 128 are CCs
+   std::array<ControlState, 128 * 2> mControlState{}; //bottom 128 are notes, top 128 are CCs, in the move layout
 
    MidiDevice mDevice;
 
-   std::string mPushBridgeInitErrMsg;
+   struct ControlInput
+   {
+      ControlInput() {}
+      ControlInput(int _index, int _value)
+      : index(_index)
+      , value(_value)
+      {}
+      int index{ 0 }; //move layout index
+      int value{ 0 };
+   };
 
-   LockFreeQueue<MidiNote> mQueuedNoteMessages{};
-   LockFreeQueue<MidiControl> mQueuedControlMessages{};
+   LockFreeQueue<ControlInput> mQueuedInputs{};
    LockFreeQueue<MidiPitchBend> mQueuedPitchBendMessages{};
    LockFreeQueue<MidiPressure> mQueuedPressureMessages{};
 };

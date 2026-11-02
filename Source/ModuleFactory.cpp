@@ -274,7 +274,6 @@
 #include "DopplerShift.h"
 #include "StereoRotation.h"
 #include "LatencyCalculator.h"
-#include "AbletonMoveControl.h"
 #include "TrackOrganizer.h"
 #include "ModulatorBinaryValue.h"
 #include "VelocityToDuration.h"
@@ -285,6 +284,7 @@
 #include "ChordKeyboard.h"
 #include "TapeLooper.h"
 #include "DiscontinuitySmoother.h"
+#include "ControlSurface.h"
 
 #include <juce_core/juce_core.h>
 
@@ -514,7 +514,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(StereoRotation, stereorotation, kModuleCategory_Audio);
    REGISTER(LatencyCalculatorSender, latencycalculator, kModuleCategory_Synth);
    REGISTER(LatencyCalculatorReceiver, latencycalculatorreceiver, kModuleCategory_Audio);
-   REGISTER(AbletonMoveControl, abletonmovecontrol, kModuleCategory_Other);
    REGISTER(TrackOrganizer, trackorganizer, kModuleCategory_Other);
    REGISTER(ModulatorBinaryValue, binaryvalue, kModuleCategory_Modulator);
    REGISTER(VelocityToDuration, velocitytoduration, kModuleCategory_Note);
@@ -525,6 +524,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(ChordKeyboard, chordkeyboard, kModuleCategory_Note);
    REGISTER(TapeLooper, tapelooper, kModuleCategory_Audio);
    REGISTER(DiscontinuitySmoother, discontinuitysmoother, kModuleCategory_Audio)
+   REGISTER(ControlSurface, controlsurface, kModuleCategory_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);
@@ -866,6 +866,9 @@ std::string ModuleFactory::FixUpTypeName(std::string name)
 
    if (name == "arpsequencer")
       return "rhythmsequencer";
+
+   if (name == "abletonmovecontrol")
+      return "controlsurface";
 
    return name;
 }
