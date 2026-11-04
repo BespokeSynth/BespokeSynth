@@ -1,7 +1,12 @@
 project(psmove)
 
 set(DOC_STRING "Enable PlayStation Move support (currently macOS only)")
-option(BESPOKE_PSMOVE_SUPPORT "${DOC_STRING}" ${APPLE})
+if(APPLE AND NOT BESPOKE_IOS)
+    set(BESPOKE_PSMOVE_DEFAULT ON)
+else()
+    set(BESPOKE_PSMOVE_DEFAULT OFF)
+endif()
+option(BESPOKE_PSMOVE_SUPPORT "${DOC_STRING}" ${BESPOKE_PSMOVE_DEFAULT})
 
 add_library(${PROJECT_NAME}
     hidapi.h

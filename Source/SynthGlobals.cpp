@@ -936,6 +936,21 @@ ofLog::~ofLog()
 {
    std::string output = ofToString(gTime / 1000, 8) + ": " + mMessage;
    DBG(output);
+#if BESPOKE_IOS
+   {
+      //DBG is compiled out of release builds, and there's no easy way to see stdout on a device, so log to a file that can be pulled off with devicectl
+      static juce::CriticalSection sLogFileLock;
+      static FILE* sLogFile = nullptr;
+      juce::ScopedLock lock(sLogFileLock);
+      if (sLogFile == nullptr)
+         sLogFile = fopen(ofToDataPath("log.txt").c_str(), "w");
+      if (sLogFile != nullptr)
+      {
+         fprintf(sLogFile, "%s\n", output.c_str());
+         fflush(sLogFile);
+      }
+   }
+#endif
    if (mSendToBespokeConsole)
       TheSynth->LogEvent(output, kLogEventType_Verbose);
 }

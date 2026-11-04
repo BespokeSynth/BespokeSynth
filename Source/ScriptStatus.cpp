@@ -38,6 +38,7 @@
 #undef ssize_t
 #endif
 
+#if BESPOKE_PYTHON_SUPPORT
 #include "leathers/push"
 #include "leathers/unused-value"
 #include "leathers/range-loop-analysis"
@@ -45,6 +46,7 @@
 #include "leathers/pop"
 
 namespace py = pybind11;
+#endif
 
 ScriptStatus::ScriptStatus()
 {
@@ -77,12 +79,14 @@ void ScriptStatus::Poll()
    if (!ScriptModule::sPythonInitialized)
       return;
 
+#if BESPOKE_PYTHON_SUPPORT
    if (gTime > mNextUpdateTime)
    {
       mStatus = py::str(py::globals());
       ofStringReplace(mStatus, ",", "\n");
       mNextUpdateTime = gTime + 100;
    }
+#endif
 }
 
 void ScriptStatus::DrawModule()
@@ -92,7 +96,11 @@ void ScriptStatus::DrawModule()
 
    if (!ScriptModule::sHasPythonEverSuccessfullyInitialized)
    {
+#if BESPOKE_PYTHON_SUPPORT
       DrawTextNormal("please create a \"script\" module to initialize Python", 20, 20);
+#else
+      DrawTextNormal("this build of bespoke doesn't include Python support", 20, 20);
+#endif
       return;
    }
 

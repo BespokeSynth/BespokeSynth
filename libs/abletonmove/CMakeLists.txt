@@ -1,7 +1,7 @@
 project(abletonmove)
 
 set(DOC_STRING "Enable Ableton Move support. When off, the abletonmovecontrol module is present but non-functional.")
-option(BESPOKE_ABLETONMOVE_SUPPORT "${DOC_STRING}" ON)
+option(BESPOKE_ABLETONMOVE_SUPPORT "${DOC_STRING}" ${BESPOKE_DESKTOP})
 
 add_library(${PROJECT_NAME}
         JuceToMoveDisplayBridge.cpp
@@ -71,6 +71,7 @@ else()
     message(STATUS "Ableton Move support disabled")
 endif()
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE BESPOKE_ABLETONMOVE_SUPPORT=$<BOOL:${BESPOKE_ABLETONMOVE_SUPPORT}>)
+# public because Source/ includes Move-Display.h, whose layout depends on this
+target_compile_definitions(${PROJECT_NAME} PUBLIC BESPOKE_ABLETONMOVE_SUPPORT=$<BOOL:${BESPOKE_ABLETONMOVE_SUPPORT}>)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 add_library(bespoke::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

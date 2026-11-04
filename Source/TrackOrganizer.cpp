@@ -34,7 +34,6 @@
 #include "AudioSend.h"
 #include "UIControlMacros.h"
 #include "Prefab.h"
-#include "pybind11/pybind11.h"
 
 #include <cstring>
 

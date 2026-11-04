@@ -304,6 +304,7 @@ public:
    UserPrefTextEntryInt position_y{ "position_y", 200, -10000, 10000, 5, UserPrefCategory::General };
    UserPrefFloat zoom{ "zoom", 1.3f, .25f, 2, UserPrefCategory::General };
    UserPrefFloat ui_scale{ "ui_scale", 1.3f, .25f, 2, UserPrefCategory::General };
+   UserPrefFloat safe_area_margin{ "safe_area_margin", .6f, 0, 1.5f, UserPrefCategory::General }; //how much of the screen's safe area inset (e.g. for rounded corners on phones) to keep the title bar's contents out of
    UserPrefDropdownString cable_drop_behavior{ "cable_drop_behavior", "show quickspawn", 150, UserPrefCategory::General };
    UserPrefDropdownString qwerty_to_pitch_mode{ "qwerty_to_pitch_mode", "Ableton", 150, UserPrefCategory::General };
    UserPrefFloat grid_snap_size{ "grid_snap_size", 30, 5, 150, UserPrefCategory::General };

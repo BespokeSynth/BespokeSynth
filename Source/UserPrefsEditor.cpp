@@ -203,7 +203,8 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
          UserPrefs.audio_input_device.GetDropdown()->AddLabel(inputDevice.toStdString(), i);
          if (deviceManager.getCurrentAudioDevice() != nullptr &&
              i == selectedDeviceType->getIndexOfDevice(deviceManager.getCurrentAudioDevice(), true) &&
-             UserPrefs.audio_input_device.Get() != "auto")
+             UserPrefs.audio_input_device.Get() != "auto" &&
+             UserPrefs.audio_input_device.Get() != "none") //otherwise, single-device systems like iOS would switch "none" to the device (and enable the microphone) on save
             UserPrefs.audio_input_device.GetIndex() = i;
          ++i;
       }
@@ -264,7 +265,14 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       UserPrefs.buffersize.GetIndex() = -1;
       UserPrefs.buffersize.GetDropdown()->Clear();
       i = 0;
-      for (auto& bufferSize : selectedDevice->getAvailableBufferSizes())
+#if BESPOKE_IOS
+      //iOS treats buffer sizes as approximate hints and reports odd values (like 65) back, so offer
+      //standard sizes instead. our audio callback regroups whatever iOS delivers into this block size.
+      juce::Array<int> availableBufferSizes{ 64, 128, 256, 512, 1024, 2048 };
+#else
+      juce::Array<int> availableBufferSizes = selectedDevice->getAvailableBufferSizes();
+#endif
+      for (auto& bufferSize : availableBufferSizes)
       {
          UserPrefs.buffersize.GetDropdown()->AddLabel(ofToString(bufferSize), i);
          if (bufferSize == gBufferSize / UserPrefs.oversampling.Get())

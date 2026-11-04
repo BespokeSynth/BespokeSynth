@@ -191,6 +191,7 @@ private:
 
    bool HiddenByZoom() const;
    float GetPixelWidth() const;
+   float GetSideMargin() const;
 
    ClickButton* mPlayPauseButton{ nullptr };
    ClickButton* mMenuButton{ nullptr };
@@ -198,6 +199,7 @@ private:
    DropdownList* mLoadLayoutDropdown{ nullptr };
    ClickButton* mDisplayHelpButton{ nullptr };
    ClickButton* mDisplayUserPrefsEditorButton{ nullptr };
+   ClickButton* mTouchNavigationButton{ nullptr };
    int mLoadLayoutIndex{ -1 };
 
    HelpDisplay* mHelpDisplay{ nullptr };

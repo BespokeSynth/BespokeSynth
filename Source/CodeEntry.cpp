@@ -37,16 +37,20 @@
 #undef ssize_t
 #endif
 
+#if BESPOKE_PYTHON_SUPPORT
 #include "leathers/push"
 #include "leathers/unused-value"
 #include "leathers/range-loop-analysis"
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
 #include "leathers/pop"
+#endif
 
 #include "juce_gui_basics/juce_gui_basics.h"
 
+#if BESPOKE_PYTHON_SUPPORT
 namespace py = pybind11;
+#endif
 
 //static
 bool CodeEntry::sWarnJediNotInstalled = false;
@@ -76,6 +80,7 @@ void CodeEntry::Poll()
    {
       if (mDoSyntaxHighlighting && sDoSyntaxHighlighting)
       {
+#if BESPOKE_PYTHON_SUPPORT
          try
          {
             py::globals()["syntax_highlight_code"] = GetVisibleCode();
@@ -86,6 +91,7 @@ void CodeEntry::Poll()
          {
             ofLog() << "syntax highlight execution exception: " << e.what();
          }
+#endif
       }
       else
       {
@@ -98,6 +104,7 @@ void CodeEntry::Poll()
       mCodeUpdated = false;
    }
 
+#if BESPOKE_PYTHON_SUPPORT
    if (mAutocompleteUpdateTimer > 0)
    {
       mAutocompleteUpdateTimer -= 1.0 / ofGetFrameRate();
@@ -235,6 +242,7 @@ void CodeEntry::Poll()
          }
       }
    }
+#endif
 }
 
 void CodeEntry::Render()
@@ -597,6 +605,7 @@ std::string CodeEntry::FilterText(std::string input, std::vector<int> mapping, i
 //static
 void CodeEntry::OnPythonInit()
 {
+#if BESPOKE_PYTHON_SUPPORT
    const std::string syntaxHighlightCode = R"(def syntax_highlight_basic():
    #this uses the built in lexer/tokenizer in python to identify part of code
    #will return a meaningful lookuptable for index colours per character
@@ -730,6 +739,7 @@ void CodeEntry::OnPythonInit()
       ofLog() << "maybe jedi is not installed? if you want autocompletion, use \"python -m pip install jedi\" in your system console to install";
       sWarnJediNotInstalled = true;
    }
+#endif
 }
 
 void CodeEntry::OnCodeUpdated()

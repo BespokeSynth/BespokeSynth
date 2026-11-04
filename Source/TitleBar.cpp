@@ -143,6 +143,11 @@ void TitleBar::CreateUIControls()
    BUTTON_SIZE(mMenuButton, "menu", 50, 32);
    ENDUIBLOCK0();
 
+#if BESPOKE_IOS
+   mTouchNavigationButton = new ClickButton(this, "pan/zoom", 195, 1);
+   mTouchNavigationButton->SetDimensions(60, 32);
+#endif
+
    mDisplayHelpButton = new ClickButton(this, " ? ", 380, 1);
    mDisplayUserPrefsEditorButton = new ClickButton(this, "settings", 330, 1);
    mPlayPauseButton = new ClickButton(this, "play/pause", 300, 1, ButtonDisplayStyle::kPause);
@@ -299,7 +304,7 @@ bool TitleBar::MouseMoved(float x, float y)
 {
    IDrawableModule::MouseMoved(x, y);
 
-   if (x < 130 && y < 36)
+   if (x < 130 + GetSideMargin() && y < 36)
       mLeftCornerHovered = true;
    else
       mLeftCornerHovered = false;
@@ -312,6 +317,18 @@ float TitleBar::GetPixelWidth() const
    return ofGetWidth() / GetOwningContainer()->GetDrawScale();
 }
 
+//keeps the title bar's contents clear of screen areas that might be cut off, like the rounded corners of phone screens.
+//iOS doesn't expose the corner radius, so this uses the screen's safe area insets, which cover the corners (and notches)
+//for the full height of the screen. the title bar only spans the top of the corners, so by default it uses a fraction of them
+float TitleBar::GetSideMargin() const
+{
+   auto* display = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay();
+   if (display == nullptr)
+      return 0;
+   int inset = std::max(display->safeAreaInsets.getLeft(), display->safeAreaInsets.getRight());
+   return inset * UserPrefs.safe_area_margin.Get() / GetOwningContainer()->GetDrawScale();
+}
+
 void TitleBar::DrawModule()
 {
    if (HiddenByZoom())
@@ -319,19 +336,21 @@ void TitleBar::DrawModule()
 
    ofSetColor(255, 255, 255);
 
+   const float margin = GetSideMargin();
+
    ofPushStyle();
    if (gHoveredModule == this && mLeftCornerHovered)
       ofSetColor(ofColor::lerp(ofColor::black, ofColor::white, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, .7f, .9f)));
-   DrawTextBold("bespoke", 2, 28, 34);
+   DrawTextBold("bespoke", 2 + margin, 28, 34);
 #if BESPOKE_NIGHTLY && !BESPOKE_SUPPRESS_NIGHTLY_LABEL
-   DrawTextNormal("nightly", 90, 35, 8);
+   DrawTextNormal("nightly", 90 + margin, 35, 8);
 #endif
 #if DEBUG
    ofFill();
    ofSetColor(0, 0, 0, 180);
-   ofRect(13, 12, 90, 17);
+   ofRect(13 + margin, 12, 90, 17);
    ofSetColor(255, 0, 0);
-   DrawTextBold("debug build", 17, 25, 17);
+   DrawTextBold("debug build", 17 + margin, 25, 17);
 #endif
    ofPopStyle();
 
@@ -341,16 +360,34 @@ void TitleBar::DrawModule()
    if (IKeyboardFocusListener::GetActiveKeyboardFocus())
       info += " (entering text)";
 
-   float pixelWidth = GetPixelWidth();
+   float pixelWidth = GetPixelWidth() - margin; //the right edge to lay out against
 
    DrawTextRightJustify(info, pixelWidth - 140, 32);
 
+   mMenuButton->SetPosition(140 + margin, 1);
+   mLoadLayoutDropdown->SetPosition(140 + margin, 20);
+   mSaveLayoutButton->SetPosition(280 + margin, 19);
    mMenuButton->Draw();
+   if (mTouchNavigationButton != nullptr)
+   {
+      mTouchNavigationButton->SetPosition(195 + margin, 1);
+      mTouchNavigationButton->Draw();
+   }
+   if (mTouchNavigationButton != nullptr && TheSynth->IsTouchNavigationMode())
+   {
+      //highlight to show the toggle is on
+      ofPushStyle();
+      ofNoFill();
+      ofSetLineWidth(2);
+      ofSetColor(100, 220, 255);
+      ofRect(mTouchNavigationButton->GetRect(K(local)));
+      ofPopStyle();
+   }
    mSaveLayoutButton->Draw();
    mLoadLayoutDropdown->Draw();
    mPlayPauseButton->Draw();
 
-   float startX = 200;
+   float startX = (mTouchNavigationButton != nullptr ? 260 : 200) + margin;
    float startY = 2;
 
    bool newline = true;
@@ -395,8 +432,8 @@ void TitleBar::DrawModule()
       ofSetColor(255, 150, 150);
    else
       ofSetColor(255, 255, 255);
-   DrawTextRightJustify(stats, ofGetWidth() / GetOwningContainer()->GetDrawScale() - 5, 33);
-   mDisplayHelpButton->SetPosition(ofGetWidth() / GetOwningContainer()->GetDrawScale() - 20, 4);
+   DrawTextRightJustify(stats, pixelWidth - 5, 33);
+   mDisplayHelpButton->SetPosition(pixelWidth - 20, 4);
    mDisplayHelpButton->Draw();
    mDisplayUserPrefsEditorButton->SetPosition(mDisplayHelpButton->GetPosition(true).x - mDisplayUserPrefsEditorButton->GetRect().width - 5, 4);
    mDisplayUserPrefsEditorButton->Draw();
@@ -438,6 +475,16 @@ void TitleBar::DrawModuleUnclipped()
 
    if (HiddenByZoom())
       return;
+
+   if (int deviceRate = TheSynth->GetResamplingDeviceSampleRate(); deviceRate > 0)
+   {
+      ofPushStyle();
+      ofSetColor(ofColor::yellow);
+      float titleBarWidth, titleBarHeight;
+      TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
+      DrawTextNormal("warning: resampling " + ofToString(gSampleRate / UserPrefs.oversampling.Get()) + " to " + ofToString(deviceRate) + " for the audio device", 5 + GetSideMargin(), titleBarHeight + 14);
+      ofPopStyle();
+   }
 
    if (sShowInitialHelpOverlay)
    {
@@ -569,6 +616,8 @@ void TitleBar::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mPlayPauseButton)
       TheSynth->SetAudioPaused(!TheSynth->IsAudioPaused());
+   if (button == mTouchNavigationButton)
+      TheSynth->SetTouchNavigationMode(!TheSynth->IsTouchNavigationMode());
 }
 
 void TitleBar::ShowHelp()

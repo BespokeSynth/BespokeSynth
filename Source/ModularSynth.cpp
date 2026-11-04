@@ -354,7 +354,12 @@ void ModularSynth::Poll()
          mUserPrefsEditor->CreatePrefsFileIfNonexistent();
 
          if (!mStartupSaveStateFile.empty())
+         {
+            //allow paths relative to the data folder, since its absolute path isn't easily known on iOS
+            if (!juce::File::isAbsolutePath(mStartupSaveStateFile))
+               mStartupSaveStateFile = ofToDataPath(mStartupSaveStateFile);
             LoadState(mStartupSaveStateFile);
+         }
          else
             LoadLayoutFromFile(ofToDataPath(UserPrefs.layout.Get()));
          mInitialized = true;
@@ -381,6 +386,13 @@ void ModularSynth::Poll()
    {
       mShowLoadStatePopup = false;
       LoadStatePopupImp();
+   }
+
+   if (!mPendingSaveStateFile.empty())
+   {
+      std::string file = std::move(mPendingSaveStateFile);
+      mPendingSaveStateFile.clear();
+      LoadState(file);
    }
 
    if (mScheduledEnvelopeEditorSpawnDisplay != nullptr)
@@ -2189,6 +2201,18 @@ void ModularSynth::MouseMagnify(int intX, int intY, float scaleFactor, const juc
    ZoomView(scaleFactor - 1, true);
 }
 
+//in touch navigation mode, touches on the canvas pan/zoom, but some places still need regular clicks
+bool ModularSynth::ShouldTouchAlwaysClick(int x, int y)
+{
+   if (!mModalFocusItemStack.empty()) //popup menus (e.g. the title bar's main menu) need to be tappable and dismissable
+      return true;
+
+   //the title bar and other UI-layer elements
+   float uiX = GetMouseX(&mUILayerModuleContainer, x);
+   float uiY = GetMouseY(&mUILayerModuleContainer, y);
+   return mUILayerModuleContainer.GetModuleAt(uiX, uiY) != nullptr;
+}
+
 bool ModularSynth::InMidiMapMode()
 {
    return IsKeyHeld('m', kModifier_Shift);
@@ -3371,6 +3395,14 @@ void ModularSynth::CompleteQueuedSaveState()
 void ModularSynth::SetStartupSaveStateFile(std::string bskPath)
 {
    mStartupSaveStateFile = std::move(bskPath);
+}
+
+void ModularSynth::OpenSaveStateFile(std::string bskPath)
+{
+   if (mInitialized)
+      mPendingSaveStateFile = std::move(bskPath);
+   else
+      mStartupSaveStateFile = std::move(bskPath);
 }
 
 void ModularSynth::AddRecentFile(std::string file, bool saved)

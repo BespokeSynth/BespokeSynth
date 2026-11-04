@@ -6,19 +6,71 @@ else()
     include(../libs/ableton-link/AbletonLinkConfig.cmake)
 endif()
 
+set(BESPOKE_PLIST_TO_MERGE "")
+set(BESPOKE_APP_ICON ${CMAKE_SOURCE_DIR}/bespoke_icon.png)
+set(BESPOKE_DOCUMENT_EXTENSIONS .bsk)
+if(BESPOKE_IOS)
+    # iOS needs document types declared by type rather than extension, so that's done in the plist below instead
+    set(BESPOKE_DOCUMENT_EXTENSIONS "")
+    # iOS icons must be opaque (JUCE would otherwise fill transparency with white)
+    set(BESPOKE_APP_ICON ${CMAKE_SOURCE_DIR}/bespoke_icon_ios.png)
+    # CFBundleDisplayName: name shown under the home screen icon
+    # UTExportedTypeDeclarations: iOS file pickers filter by type, not extension, so without declaring
+    # types for our extensions, .bsk/.bskt files show up greyed out in the load dialog
+    # CFBundleDocumentTypes + LSSupportsOpeningDocumentsInPlace: lets .bsk files be opened in bespoke from other apps
+    set(BESPOKE_PLIST_TO_MERGE "<plist><dict>
+        <key>CFBundleDisplayName</key><string>bespoke</string>
+        <key>LSSupportsOpeningDocumentsInPlace</key><true/>
+        <key>CFBundleDocumentTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleTypeName</key><string>bespoke savestate</string>
+                <key>CFBundleTypeRole</key><string>Editor</string>
+                <key>LSHandlerRank</key><string>Owner</string>
+                <key>LSItemContentTypes</key><array><string>com.ryanchallinor.bespokesynth.bsk</string></array>
+            </dict>
+        </array>
+        <key>UTExportedTypeDeclarations</key>
+        <array>
+            <dict>
+                <key>UTTypeIdentifier</key><string>com.ryanchallinor.bespokesynth.bsk</string>
+                <key>UTTypeDescription</key><string>bespoke savestate</string>
+                <key>UTTypeConformsTo</key><array><string>public.data</string></array>
+                <key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>bsk</string></array></dict>
+            </dict>
+            <dict>
+                <key>UTTypeIdentifier</key><string>com.ryanchallinor.bespokesynth.bskt</string>
+                <key>UTTypeDescription</key><string>bespoke template</string>
+                <key>UTTypeConformsTo</key><array><string>public.data</string></array>
+                <key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>bskt</string></array></dict>
+            </dict>
+        </array>
+    </dict></plist>")
+endif()
+
 juce_add_gui_app(BespokeSynth
     PRODUCT_NAME BespokeSynth
-    ICON_BIG ${CMAKE_SOURCE_DIR}/bespoke_icon.png
+    ICON_BIG ${BESPOKE_APP_ICON}
     MICROPHONE_PERMISSION_ENABLED TRUE
     CAMERA_PERMISSION_ENABLED     TRUE
     BLUETOOTH_PERMISSION_ENABLED  TRUE
     FILE_SHARING_ENABLED          TRUE
     DOCUMENT_BROWSER_ENABLED      TRUE
-    DOCUMENT_EXTENSIONS           .bsk
+    DOCUMENT_EXTENSIONS           ${BESPOKE_DOCUMENT_EXTENSIONS}
     BUNDLE_ID                     com.ryanchallinor.bespokesynth
-    PLUGINHOST_AU                 TRUE
+    PLUGINHOST_AU                 ${BESPOKE_ENABLE_PLUGIN_HOSTING}
+
+    # iOS only
+    BACKGROUND_AUDIO_ENABLED      TRUE
+    STATUS_BAR_HIDDEN             TRUE
+    REQUIRES_FULL_SCREEN          TRUE
+    IPHONE_SCREEN_ORIENTATIONS    UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+    PLIST_TO_MERGE                "${BESPOKE_PLIST_TO_MERGE}"
     )
 
+if(NOT BESPOKE_ENABLE_PYTHON)
+    set(Python_VERSION "disabled")
+endif()
 bespoke_buildtime_version_info(BespokeSynth)
 
 if(MSVC)
@@ -322,6 +374,7 @@ target_sources(BespokeSynth PRIVATE
     LocationZoomer.cpp
     LocationZoomer.h
     LockFreeQueue.h
+    FixedBlockAudioAdapter.h
     LoopStorer.cpp
     LoopStorer.h
     Looper.cpp
@@ -815,7 +868,7 @@ if(BESPOKE_NIGHTLY)
         )
 endif()
 
-if(BESPOKE_PORTABLE)
+if(BESPOKE_PORTABLE AND BESPOKE_ENABLE_PYTHON)
     set_source_files_properties(ScriptModule.cpp PROPERTIES
         COMPILE_DEFINITIONS BESPOKE_PORTABLE_PYTHON="$<IF:$<BOOL:${WIN32}>,python.exe,bin/python>"
         )
@@ -848,15 +901,22 @@ target_compile_definitions(BespokeSynth PRIVATE
     JUCE_WASAPI=1
     JUCE_DIRECTSOUND=1
 
-    JUCE_PLUGINHOST_VST3=1
-    JUCE_PLUGINHOST_VST=$<BOOL:${BESPOKE_VST2_SDK_LOCATION}>
-    JUCE_PLUGINHOST_LV2=1
+    JUCE_PLUGINHOST_VST3=$<BOOL:${BESPOKE_ENABLE_PLUGIN_HOSTING}>
+    JUCE_PLUGINHOST_VST=$<AND:$<BOOL:${BESPOKE_ENABLE_PLUGIN_HOSTING}>,$<BOOL:${BESPOKE_VST2_SDK_LOCATION}>>
+    JUCE_PLUGINHOST_LV2=$<BOOL:${BESPOKE_ENABLE_PLUGIN_HOSTING}>
     JUCE_PLUGINHOST_LADSPA=0
 
     JUCE_CATCH_UNHANDLED_EXCEPTIONS=0
+
+    BESPOKE_PYTHON_SUPPORT=$<BOOL:${BESPOKE_ENABLE_PYTHON}>
     )
 
-if (APPLE)
+if (BESPOKE_IOS)
+    target_compile_definitions(BespokeSynth PRIVATE
+        BESPOKE_IOS=1
+        )
+    target_sources(BespokeSynth PRIVATE IOSAudioSession.h IOSAudioSession.mm IOSDocuments.h IOSDocuments.mm IOSDiagnostics.h IOSDiagnostics.mm)
+elseif (APPLE)
     target_compile_definitions(BespokeSynth PRIVATE
         BESPOKE_MAC=1
         )
@@ -939,7 +999,6 @@ target_link_libraries(BespokeSynth PRIVATE
     bespoke::nanovg
     bespoke::psmove
     bespoke::push2
-    bespoke::pybind11
     bespoke::xwax
     bespoke::scalable-font2
 
@@ -963,9 +1022,15 @@ target_link_libraries(BespokeSynth PRIVATE
     $<$<BOOL:${BESPOKE_DEVENDORED_SYSTEM_JUCE}>:vorbisenc>
     $<$<BOOL:${BESPOKE_DEVENDORED_SYSTEM_JUCE}>:vorbisfile>
 
-    ${Python_LIBRARIES}
     $<$<BOOL:${MINGW}>:dbghelp>
     )
+
+if(BESPOKE_ENABLE_PYTHON)
+    target_link_libraries(BespokeSynth PRIVATE
+        bespoke::pybind11
+        ${Python_LIBRARIES}
+        )
+endif()
 
 bespoke_copy_resource_dir(BespokeSynth)
 bespoke_make_portable(BespokeSynth)

@@ -19,6 +19,8 @@
 
 #ifdef BESPOKE_LINUX
 #include <climits>
+
+#include <atomic>
 #endif
 
 namespace juce
@@ -109,6 +111,11 @@ public:
    void MouseReleased(int x, int y, int button, const juce::MouseInputSource& source);
    void MouseScrolled(float xScroll, float yScroll, bool isSmoothScroll, bool isInvertedScroll, bool canZoomCanvas);
    void MouseMagnify(int x, int y, float scaleFactor, const juce::MouseInputSource& source);
+   bool IsTouchNavigationMode() const { return mTouchNavigationMode; }
+   void SetResamplingDeviceSampleRate(int rate) { mResamplingDeviceSampleRate = rate; } //0 when not resampling. may be called from the audio thread
+   int GetResamplingDeviceSampleRate() const { return mResamplingDeviceSampleRate; }
+   void SetTouchNavigationMode(bool enabled) { mTouchNavigationMode = enabled; }
+   bool ShouldTouchAlwaysClick(int x, int y);
    void FilesDropped(std::vector<std::string> files, int x, int y);
 
    void AddExtraPoller(IPollable* poller);
@@ -285,6 +292,7 @@ public:
    void LoadState(std::string file);
    static void LoadStateHeader(FileStreamIn& in, unsigned char*& screenshotData, int& screenshotSize, std::string& jsonLayoutString);
    void SetStartupSaveStateFile(std::string bskPath);
+   void OpenSaveStateFile(std::string bskPath); //loads now if we're running, or at startup if we're not yet
    void SaveCurrentState();
    void SaveStatePopup();
    void LoadStatePopup();
@@ -362,6 +370,12 @@ private:
    ofVec2f mLastMoveMouseScreenPos;
    ofVec2f mLastMouseDragPos;
    bool mIsMousePanning{ false };
+   std::atomic<int> mResamplingDeviceSampleRate{ 0 };
+#if BESPOKE_IOS
+   bool mTouchNavigationMode{ true }; //when true, touches on the canvas pan and pinch-zoom instead of clicking
+#else
+   bool mTouchNavigationMode{ false };
+#endif
    std::array<bool, 5> mIsMouseButtonHeld{ false };
    struct SpaceMouseInfo
    {
@@ -430,6 +444,7 @@ private:
    bool mWantReloadInitialLayout{ false };
    std::string mCurrentSaveStatePath;
    std::string mStartupSaveStateFile;
+   std::string mPendingSaveStateFile; //opened while running, loaded on the next poll
 
    Sample* mHeldSample{ nullptr };
 
