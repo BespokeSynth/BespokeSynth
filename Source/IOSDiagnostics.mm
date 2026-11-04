@@ -22,6 +22,7 @@
 
 #include "IOSDiagnostics.h"
 
+#import <AVFoundation/AVFoundation.h>
 #import <Foundation/Foundation.h>
 
 namespace
@@ -43,4 +44,28 @@ void IOSDiagnostics::LogUncaughtExceptions(std::function<void(const juce::String
 {
    sLog = std::move(log);
    NSSetUncaughtExceptionHandler(&HandleUncaughtException);
+}
+
+void IOSDiagnostics::LogAudioSessionEvents(std::function<void(const juce::String& message)> log)
+{
+   NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
+   for (NSNotificationName name in @[ AVAudioSessionInterruptionNotification, AVAudioSessionRouteChangeNotification, AVAudioSessionMediaServicesWereLostNotification, AVAudioSessionMediaServicesWereResetNotification, AVAudioSessionSilenceSecondaryAudioHintNotification ])
+   {
+      [center addObserverForName:name
+                          object:nil
+                           queue:[NSOperationQueue mainQueue]
+                      usingBlock:^(NSNotification* notification)
+                      {
+                         log("audio session event: " + juce::String::fromUTF8(notification.name.UTF8String) + " " + juce::String::fromUTF8(notification.userInfo.description.UTF8String).removeCharacters("\n") + "   " + GetAudioSessionState());
+                      }];
+   }
+}
+
+juce::String IOSDiagnostics::GetAudioSessionState()
+{
+   AVAudioSession* session = [AVAudioSession sharedInstance];
+   juce::String route;
+   for (AVAudioSessionPortDescription* port in session.currentRoute.outputs)
+      route << juce::String::fromUTF8(port.portType.UTF8String) << " ";
+   return "category: " + juce::String::fromUTF8(session.category.UTF8String) + "   route: " + route + "  session rate: " + juce::String(session.sampleRate) + "   io buffer: " + juce::String(session.IOBufferDuration * session.sampleRate, 1) + "   other audio: " + juce::String((int)session.otherAudioPlaying);
 }

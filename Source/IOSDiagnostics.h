@@ -31,4 +31,9 @@ namespace IOSDiagnostics
    //logs the name, reason and call stack of uncaught Objective-C exceptions (e.g. UIKit assertions), which bespoke's
    //crash handler otherwise only sees as an abort with no explanation
    void LogUncaughtExceptions(std::function<void(const juce::String& message)> log);
+
+   //logs audio session interruptions, route changes and media server resets
+   void LogAudioSessionEvents(std::function<void(const juce::String& message)> log);
+
+   juce::String GetAudioSessionState();
 }

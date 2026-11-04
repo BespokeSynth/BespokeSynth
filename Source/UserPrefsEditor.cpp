@@ -240,7 +240,10 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
 
    auto* selectedDevice = deviceManager.getCurrentAudioDevice();
    auto setup = deviceManager.getAudioDeviceSetup();
-   if (selectedDevice == nullptr || selectedDevice->getTypeName() != selectedDeviceType->getTypeName() || setup.outputDeviceName != outputDeviceName || setup.inputDeviceName != inputDeviceName)
+   //combined devices have no input name of their own, and iOS leaves it empty when the input is "none". creating a second device on iOS
+   //isn't harmless: it changes the shared audio session's category, which silently stops the running device
+   bool inputDeviceMatches = !selectedDeviceType->hasSeparateInputsAndOutputs() || setup.inputDeviceName == inputDeviceName;
+   if (selectedDevice == nullptr || selectedDevice->getTypeName() != selectedDeviceType->getTypeName() || setup.outputDeviceName != outputDeviceName || !inputDeviceMatches)
       selectedDevice = selectedDeviceType->createDevice(outputDeviceName, inputDeviceName);
 
    if (selectedDevice == nullptr)

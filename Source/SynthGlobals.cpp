@@ -943,7 +943,12 @@ ofLog::~ofLog()
       static FILE* sLogFile = nullptr;
       juce::ScopedLock lock(sLogFileLock);
       if (sLogFile == nullptr)
-         sLogFile = fopen(ofToDataPath("log.txt").c_str(), "w");
+      {
+         //don't use ofToDataPath() here: its first call runs UpdateUserData(), which logs, and re-entering its static initializer aborts
+         juce::File logFile = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("BespokeSynth").getChildFile("log.txt");
+         logFile.getParentDirectory().createDirectory();
+         sLogFile = fopen(logFile.getFullPathName().toRawUTF8(), "w");
+      }
       if (sLogFile != nullptr)
       {
          fprintf(sLogFile, "%s\n", output.c_str());

@@ -17,6 +17,7 @@ using namespace juce;
 #include "FixedBlockAudioAdapter.h"
 #if BESPOKE_IOS
 #include "IOSAudioSession.h"
+#include "IOSDiagnostics.h"
 #endif
 
 #ifdef JUCE_WINDOWS
@@ -171,7 +172,7 @@ public:
          //periodic audio diagnostics, since there's no debugger console on device
          static int sDiagnosticFrame = 0;
          if (++sDiagnosticFrame % 300 == 0)
-            ofLog() << "audio callbacks: " << mAudioCallbackCount.load() << "   last size: " << mLastCallbackSize.load() << "   block adapter: " << mUseBlockAdapter.load() << "   resampling: " << mBlockAdapter.IsResampling() << "   device rate: " << (mGlobalManagers.mDeviceManager.getCurrentAudioDevice() ? mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate() : 0) << "   bespoke rate: " << gSampleRate / UserPrefs.oversampling.Get() << "   paused: " << TheSynth->IsAudioPaused() << "   device: " << (mGlobalManagers.mDeviceManager.getCurrentAudioDevice() ? mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getName().toStdString() : "null") << "   playing: " << (mGlobalManagers.mDeviceManager.getCurrentAudioDevice() ? mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->isPlaying() : false);
+            ofLog() << IOSDiagnostics::GetAudioSessionState() << "   audio callbacks: " << mAudioCallbackCount.load() << "   last size: " << mLastCallbackSize.load() << "   block adapter: " << mUseBlockAdapter.load() << "   resampling: " << mBlockAdapter.IsResampling() << "   device rate: " << (mGlobalManagers.mDeviceManager.getCurrentAudioDevice() ? mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate() : 0) << "   bespoke rate: " << gSampleRate / UserPrefs.oversampling.Get() << "   paused: " << TheSynth->IsAudioPaused() << "   device: " << (mGlobalManagers.mDeviceManager.getCurrentAudioDevice() ? mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getName().toStdString() : "null") << "   playing: " << (mGlobalManagers.mDeviceManager.getCurrentAudioDevice() ? mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->isPlaying() : false);
       }
 
       {
@@ -278,6 +279,11 @@ public:
 
       mSynth.AudioIn(inputChannelData, numSamples, numInputChannels);
       mSynth.AudioOut(outputChannelData, numSamples, numOutputChannels);
+   }
+
+   void audioDeviceError(const String& errorMessage) override
+   {
+      ofLog() << "audioDeviceError(): " << errorMessage.toStdString();
    }
 
    void audioDeviceStopped() override
