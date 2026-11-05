@@ -88,7 +88,7 @@ public:
    bool MouseMoved(float x, float y) override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void TextEntryComplete(TextEntry* entry) override {}
+   void TextEntryComplete(TextEntry* entry) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -103,5 +103,5 @@ private:
    void DrawModule() override;
    void OnClicked(float x, float y, bool right) override;
 
-   std::array<RhythmLine*, 8> mRhythmLines{};
+   std::array<RhythmLine*, 8> mRhythmLines;
 };

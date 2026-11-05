@@ -185,17 +185,18 @@ void Polyrhythms::LoadState(FileStreamIn& in, int rev)
    for (size_t i = 0; i < mRhythmLines.size(); ++i)
    {
       mRhythmLines[i]->mGrid->LoadState(in);
-      if (isLegacySplitFormat) {
-        if (3 <= mRhythmLines[i]->mLength && mRhythmLines[i]->mLength <= 9)
-        {
-          mRhythmLines[i]->mLengthBeat = mRhythmLines[i]->mLength;
-          mRhythmLines[i]->mLengthSplit = 1;
-        }
-        else
-        {
-          mRhythmLines[i]->mLengthBeat = 4;
-          mRhythmLines[i]->mLengthSplit = mRhythmLines[i]->mLength / 4;
-        }
+      if (isLegacySplitFormat)
+      {
+         if (3 <= mRhythmLines[i]->mLength && mRhythmLines[i]->mLength <= 9)
+         {
+            mRhythmLines[i]->mLengthBeat = mRhythmLines[i]->mLength;
+            mRhythmLines[i]->mLengthSplit = 1;
+         }
+         else
+         {
+            mRhythmLines[i]->mLengthBeat = 4;
+            mRhythmLines[i]->mLengthSplit = mRhythmLines[i]->mLength / 4;
+         }
       }
       mRhythmLines[i]->UpdateLength();
    }
