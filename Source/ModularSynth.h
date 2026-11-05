@@ -115,6 +115,7 @@ public:
    void SetResamplingDeviceSampleRate(int rate) { mResamplingDeviceSampleRate = rate; } //0 when not resampling. may be called from the audio thread
    int GetResamplingDeviceSampleRate() const { return mResamplingDeviceSampleRate; }
    void SetTouchNavigationMode(bool enabled) { mTouchNavigationMode = enabled; }
+   void SetShowTouchTooltips(bool show) { mShowTouchTooltips = show; }
    bool ShouldTouchAlwaysClick(int x, int y);
    void FilesDropped(std::vector<std::string> files, int x, int y);
 
@@ -371,6 +372,7 @@ private:
    ofVec2f mLastMouseDragPos;
    bool mIsMousePanning{ false };
    std::atomic<int> mResamplingDeviceSampleRate{ 0 };
+   std::atomic<bool> mShowTouchTooltips{ false }; //there's no hover on a touchscreen, so on iOS tooltips only show while inspecting with a finger
 #if BESPOKE_IOS
    bool mTouchNavigationMode{ true }; //when true, touches on the canvas pan and pinch-zoom instead of clicking
 #else

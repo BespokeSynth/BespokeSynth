@@ -133,6 +133,8 @@ public:
       mSynth.Poll();
 
 #if BESPOKE_IOS
+      mSynth.SetShowTouchTooltips(mSynth.IsTouchNavigationMode() && Desktop::getInstance().getNumDraggingMouseSources() == 1);
+
       //show/hide the on-screen keyboard when a bespoke text field gains/loses focus
       if (isTextInputActive() != mWasTextInputActive)
       {

@@ -789,6 +789,9 @@ void ModularSynth::Draw()
       tooltipContainer = &mModuleContainer;
    }
    else if (HelpDisplay::sShowTooltips &&
+#if BESPOKE_IOS
+            mShowTouchTooltips &&
+#endif
             !mHideTooltipsUntilMouseMove &&
             !IUIControl::WasLastHoverSetManually() &&
             mGroupSelectContext == nullptr &&
