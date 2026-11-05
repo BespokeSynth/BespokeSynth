@@ -142,8 +142,8 @@ void Polyrhythms::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
    for (int i = 0; i < mRhythmLines.size(); ++i)
    {
-      if (list == mRhythmLines[i]->mLengthSelector)
-         mRhythmLines[i]->UpdateGrid();
+      if (list == mRhythmLines[i]->mLengthSelectorBeat || list == mRhythmLines[i]->mLengthSelectorSplit)
+         mRhythmLines[i]->UpdateLength();
    }
 }
 
@@ -181,8 +181,25 @@ void Polyrhythms::LoadState(FileStreamIn& in, int rev)
    int size;
    in >> size;
    LoadStateValidate(size == (int)mRhythmLines.size());
+   bool isLegacySplitFormat = (rev < 2);
    for (size_t i = 0; i < mRhythmLines.size(); ++i)
+   {
       mRhythmLines[i]->mGrid->LoadState(in);
+      if (isLegacySplitFormat)
+      {
+         if (3 <= mRhythmLines[i]->mLength && mRhythmLines[i]->mLength <= 9)
+         {
+            mRhythmLines[i]->mLengthBeat = mRhythmLines[i]->mLength;
+            mRhythmLines[i]->mLengthSplit = 1;
+         }
+         else
+         {
+            mRhythmLines[i]->mLengthBeat = 4;
+            mRhythmLines[i]->mLengthSplit = mRhythmLines[i]->mLength / 4;
+         }
+      }
+      mRhythmLines[i]->UpdateLength();
+   }
 }
 
 
@@ -196,9 +213,13 @@ RhythmLine::RhythmLine(Polyrhythms* owner, int index)
 void RhythmLine::CreateUIControls()
 {
    mGrid = new UIGrid(mOwner, "uigrid", 4, 4 + mIndex * 17, 100, 15, 4, 1);
-   mLengthSelector = new DropdownList(mOwner, ("length" + ofToString(mIndex)).c_str(), -1, -1, &mLength);
+   mLengthSelectorBeat = new DropdownList(mOwner, ("lengthbeat" + ofToString(mIndex)).c_str(), -1, -1, &mLengthBeat);
+   mLengthSelectorSplit = new DropdownList(mOwner, ("lengthsplit" + ofToString(mIndex)).c_str(), -1, -1, &mLengthSplit);
    mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), -1, -1, 4, &mPitch, 0, 127);
 
+   // unused legacy selector - needed for compatibility with old savestates
+   mLengthSelector = new DropdownList(mOwner, ("length" + ofToString(mIndex)).c_str(), -1, -1, &mLength);
+   mLengthSelector->SetShowing(false);
    mLengthSelector->AddLabel("3", 3);
    mLengthSelector->AddLabel("4", 4);
    mLengthSelector->AddLabel("5", 5);
@@ -214,32 +235,67 @@ void RhythmLine::CreateUIControls()
    mLengthSelector->AddLabel("8x4", 32);
    mLengthSelector->AddLabel("9x4", 36);
 
+   mLengthSelectorBeat->AddLabel("1", 1);
+   mLengthSelectorBeat->AddLabel("2", 2);
+   mLengthSelectorBeat->AddLabel("3", 3);
+   mLengthSelectorBeat->AddLabel("4", 4);
+   mLengthSelectorBeat->AddLabel("5", 5);
+   mLengthSelectorBeat->AddLabel("6", 6);
+   mLengthSelectorBeat->AddLabel("7", 7);
+   mLengthSelectorBeat->AddLabel("8", 8);
+   mLengthSelectorBeat->AddLabel("9", 9);
+   mLengthSelectorBeat->AddLabel("10", 10);
+   mLengthSelectorBeat->AddLabel("11", 11);
+   mLengthSelectorBeat->AddLabel("12", 12);
+
+   mLengthSelectorSplit->AddLabel("1", 1);
+   mLengthSelectorSplit->AddLabel("2", 2);
+   mLengthSelectorSplit->AddLabel("3", 3);
+   mLengthSelectorSplit->AddLabel("4", 4);
+   mLengthSelectorSplit->AddLabel("5", 5);
+   mLengthSelectorSplit->AddLabel("6", 6);
+   mLengthSelectorSplit->AddLabel("7", 7);
+   mLengthSelectorSplit->AddLabel("8", 8);
+   mLengthSelectorSplit->AddLabel("9", 9);
+   mLengthSelectorSplit->AddLabel("10", 10);
+   mLengthSelectorSplit->AddLabel("11", 11);
+   mLengthSelectorSplit->AddLabel("12", 12);
+
    mGrid->SetGridMode(UIGrid::kMultisliderBipolar);
    mGrid->SetRequireShiftForMultislider(true);
 
    OnResize();
+   UpdateGrid();
 }
 
 void RhythmLine::OnResize()
 {
-   mGrid->SetDimensions(mOwner->IClickable::GetDimensions().x - 100, 15);
-   mLengthSelector->PositionTo(mGrid, kAnchor_Right);
-   mNoteSelector->PositionTo(mLengthSelector, kAnchor_Right);
+   mGrid->SetDimensions(mOwner->IClickable::GetDimensions().x - 135, 15);
+   mLengthSelectorBeat->PositionTo(mGrid, kAnchor_Right);
+   mLengthSelectorSplit->PositionTo(mLengthSelectorBeat, kAnchor_Right);
+   mNoteSelector->PositionTo(mLengthSelectorSplit, kAnchor_Right);
 }
 
 void RhythmLine::UpdateGrid()
 {
    mGrid->SetGrid(mLength, 1);
-   if (mLength % 4 == 0)
-      mGrid->SetMajorColSize(mLength / 4);
+   if (mLength % mLengthBeat == 0 && mLength / mLengthBeat != 1)
+      mGrid->SetMajorColSize(mLength / mLengthBeat);
    else
       mGrid->SetMajorColSize(-1);
+}
+
+void RhythmLine::UpdateLength()
+{
+   mLength = mLengthBeat * mLengthSplit;
+   UpdateGrid();
 }
 
 void RhythmLine::Draw()
 {
    mGrid->Draw();
-   mLengthSelector->Draw();
+   mLengthSelectorBeat->Draw();
+   mLengthSelectorSplit->Draw();
    mNoteSelector->Draw();
 }
 

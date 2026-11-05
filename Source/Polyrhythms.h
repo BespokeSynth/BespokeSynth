@@ -46,11 +46,16 @@ public:
    void CreateUIControls();
    void OnResize();
    void UpdateGrid();
+   void UpdateLength();
 
    int mIndex{ 0 };
    UIGrid* mGrid{ nullptr };
    int mLength{ 4 };
+   int mLengthBeat{ 4 };
+   int mLengthSplit{ 1 };
    DropdownList* mLengthSelector{ nullptr };
+   DropdownList* mLengthSelectorBeat{ nullptr };
+   DropdownList* mLengthSelectorSplit{ nullptr };
    int mPitch{ 0 };
    int mLastPitch{ -1 };
    int mLastVelocity{ 0 };
@@ -83,13 +88,13 @@ public:
    bool MouseMoved(float x, float y) override;
 
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
-   void TextEntryComplete(TextEntry* entry) override {}
+   void TextEntryComplete(TextEntry* entry) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void LoadState(FileStreamIn& in, int rev) override;
    void SaveState(FileStreamOut& out) override;
-   int GetModuleSaveStateRev() const override { return 1; }
+   int GetModuleSaveStateRev() const override { return 2; }
 
    bool IsEnabled() const override { return mEnabled; }
 
