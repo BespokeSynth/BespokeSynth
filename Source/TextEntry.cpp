@@ -411,7 +411,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    {
       if (mCaretPosition != mCaretPosition2)
          RemoveSelectedText();
-      juce::String clipboard = TheSynth->GetTextFromClipboard();
+      juce::String clipboard = TheSynth->GetTextToPaste();
 
       std::string newString = mString;
       strcpy(mString, (newString.substr(0, mCaretPosition) + clipboard.toStdString() + newString.substr(mCaretPosition)).c_str());

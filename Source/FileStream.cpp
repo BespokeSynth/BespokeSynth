@@ -167,10 +167,10 @@ FileStreamIn& FileStreamIn::operator>>(double& var)
 
 FileStreamIn& FileStreamIn::operator>>(std::string& var)
 {
-   uint64_t len64;
+   uint64_t len64 = 0; //stays 0 if we're at the end of the file
    if (s32BitMode)
    {
-      uint32_t len32;
+      uint32_t len32 = 0;
       mStream->read(&len32, sizeof(len32));
       len64 = len32;
    }

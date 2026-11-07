@@ -15,6 +15,7 @@
 #include "ModuleContainer.h"
 #include "Minimap.h"
 #include "LockFreeQueue.h"
+#include "SaveTarget.h"
 #include <thread>
 
 #ifdef BESPOKE_LINUX
@@ -287,10 +288,12 @@ public:
    static void DumpStats(bool isCrash, void* crashContext);
 
    void SaveLayout(std::string jsonFile = "", bool makeDefaultLayout = true);
+   void SaveLayout(const SaveTarget& target, bool makeDefaultLayout = true);
    ofxJSONElement GetLayout();
    void SaveLayoutAsPopup();
    void SaveOutput();
    void LoadState(std::string file);
+   void LoadState(const SaveTarget& target);
    static void LoadStateHeader(FileStreamIn& in, unsigned char*& screenshotData, int& screenshotSize, std::string& jsonLayoutString);
    void SetStartupSaveStateFile(std::string bskPath);
    void OpenSaveStateFile(std::string bskPath); //loads now if we're running, or at startup if we're not yet
@@ -307,6 +310,7 @@ public:
    juce::Component* GetFileChooserParent() const;
 
    const juce::String& GetTextFromClipboard() const;
+   const juce::String& GetTextToPaste();
    void CopyTextToClipboard(const juce::String& text);
 
    void SetFatalError(std::string error);
@@ -327,6 +331,7 @@ public:
 
 private:
    void SaveState(std::string file, bool autosave);
+   void SaveState(const SaveTarget& target, bool autosave);
    void CompleteQueuedSaveState();
    void ReconnectMidiDevices();
    void DrawConsole();
@@ -348,7 +353,7 @@ private:
    struct QueuedSaveStateInfo
    {
       bool mQueued{ false };
-      std::string mFile{};
+      SaveTarget mTarget{};
       bool mAutosave{ false };
       bool mWaitingForScreenshot{ true };
    };
@@ -445,6 +450,7 @@ private:
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout{ false };
    std::string mCurrentSaveStatePath;
+   SaveTarget mCurrentSaveTarget; //how we last saved, which may be the only way to write to mCurrentSaveStatePath again
    std::string mStartupSaveStateFile;
    std::string mPendingSaveStateFile; //opened while running, loaded on the next poll
 

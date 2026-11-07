@@ -337,11 +337,17 @@ void ModuleSaveDataPanel::ButtonClicked(ClickButton* button, double time)
       FileChooser chooser("Save preset as...", File(ofToDataPath("presets/" + mSaveModule->GetTypeName() + "/preset.preset")), "*.preset", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
-         std::string path = chooser.getResult().getFullPathName().toStdString();
-         FileStreamOut output(path);
+         SaveTarget target(chooser);
+         std::string path = target.GetPath();
 
-         output << ModularSynth::kSaveStateRev;
-         mSaveModule->SaveState(output);
+         {
+            FileStreamOut output(target.GetWritePath());
+
+            output << ModularSynth::kSaveStateRev;
+            mSaveModule->SaveState(output);
+         }
+
+         target.Commit();
 
          RefreshPresetFiles();
 

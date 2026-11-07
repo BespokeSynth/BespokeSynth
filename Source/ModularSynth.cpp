@@ -1156,7 +1156,9 @@ void ModularSynth::Exit()
 
 void ModularSynth::Focus()
 {
+#if !BESPOKE_IOS //iOS shows a permission prompt when an app reads the clipboard, so there it waits for an actual paste
    ReadClipboardTextFromSystem();
+#endif
 }
 
 IDrawableModule* ModularSynth::GetLastClickedModule() const
@@ -3234,10 +3236,17 @@ void ModularSynth::SaveLayout(std::string jsonFile, bool makeDefaultLayout /*= t
    if (jsonFile.empty())
       jsonFile = ofToDataPath(mLoadedLayoutPath);
 
-   ofxJSONElement root = GetLayout();
-   root.save(jsonFile, true);
+   SaveLayout(SaveTarget(jsonFile), makeDefaultLayout);
+}
 
-   mLoadedLayoutPath = String(jsonFile).replace(ofToDataPath("").c_str(), "").toStdString();
+void ModularSynth::SaveLayout(const SaveTarget& target, bool makeDefaultLayout /*= true*/)
+{
+   ofxJSONElement root = GetLayout();
+   root.save(target.GetWritePath(), true);
+   if (!target.Commit())
+      return;
+
+   mLoadedLayoutPath = String(target.GetPath()).replace(ofToDataPath("").c_str(), "").toStdString();
 
    TheTitleBar->ListLayouts();
    if (makeDefaultLayout)
@@ -3250,7 +3259,7 @@ void ModularSynth::SaveLayoutAsPopup()
 
    FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", isNativeFileChooser, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
-      SaveLayout(chooser.getResult().getFullPathName().toStdString());
+      SaveLayout(SaveTarget(chooser));
 }
 
 void ModularSynth::SaveCurrentState()
@@ -3261,7 +3270,7 @@ void ModularSynth::SaveCurrentState()
       return;
    }
 
-   SaveState(mCurrentSaveStatePath, false);
+   SaveState(mCurrentSaveTarget.GetPath() == mCurrentSaveStatePath ? mCurrentSaveTarget : SaveTarget(mCurrentSaveStatePath), false);
 }
 
 juce::Component* ModularSynth::GetFileChooserParent() const
@@ -3296,7 +3305,7 @@ void ModularSynth::SaveStatePopup()
 
    FileChooser chooser("Save current state as...", targetFile, "*.bsk", isNativeFileChooser, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
-      SaveState(chooser.getResult().getFullPathName().toStdString(), false);
+      SaveState(SaveTarget(chooser), false);
 }
 
 void ModularSynth::LoadStatePopup()
@@ -3316,15 +3325,17 @@ void ModularSynth::LoadStatePopupImp()
 
    FileChooser chooser("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", isNativeFileChooser, false, GetFileChooserParent());
    if (chooser.browseForFileToOpen())
-      LoadState(chooser.getResult().getFullPathName().toStdString());
+      LoadState(SaveTarget(chooser));
 }
 
 void ModularSynth::SaveState(std::string file, bool autosave)
 {
-   if (!autosave)
-      AddRecentFile(file, true);
+   SaveState(SaveTarget(file), autosave);
+}
 
-   mQueuedSaveStateInfo.mFile = file;
+void ModularSynth::SaveState(const SaveTarget& target, bool autosave)
+{
+   mQueuedSaveStateInfo.mTarget = target;
    mQueuedSaveStateInfo.mAutosave = autosave;
    mQueuedSaveStateInfo.mWaitingForScreenshot = true;
    mQueuedSaveStateInfo.mQueued = true;
@@ -3332,17 +3343,9 @@ void ModularSynth::SaveState(std::string file, bool autosave)
 
 void ModularSynth::CompleteQueuedSaveState()
 {
-   std::string file = mQueuedSaveStateInfo.mFile;
+   SaveTarget target = mQueuedSaveStateInfo.mTarget;
    bool autosave = mQueuedSaveStateInfo.mAutosave;
    mQueuedSaveStateInfo.mQueued = false;
-
-   if (!autosave)
-   {
-      mCurrentSaveStatePath = file;
-      std::string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
-      mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
-      TheTitleBar->DisplayTemporaryMessage("saved " + filename);
-   }
 
    mAudioThreadMutex.Lock("SaveState()");
 
@@ -3388,11 +3391,18 @@ void ModularSynth::CompleteQueuedSaveState()
       mUILayerModuleContainer.SaveState(out);
    }
 
-   juce::File writtenFile(tmpFilePath);
-   juce::File targetFile(file);
-   writtenFile.copyFileTo(targetFile);
-
    mAudioThreadMutex.Unlock();
+
+   //the temp file stays in place if this fails, so the data can still be recovered
+   if (target.CommitFrom(juce::File(tmpFilePath)) && !autosave)
+   {
+      mCurrentSaveStatePath = target.GetPath();
+      mCurrentSaveTarget = target;
+      std::string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
+      mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
+      TheTitleBar->DisplayTemporaryMessage("saved " + filename);
+      AddRecentFile(mCurrentSaveStatePath, true);
+   }
 }
 
 void ModularSynth::SetStartupSaveStateFile(std::string bskPath)
@@ -3434,9 +3444,16 @@ void ModularSynth::AddRecentFile(std::string file, bool saved)
 
 void ModularSynth::LoadState(std::string file)
 {
+   LoadState(file == mCurrentSaveTarget.GetPath() ? mCurrentSaveTarget : SaveTarget(file));
+}
+
+void ModularSynth::LoadState(const SaveTarget& target)
+{
+   std::string file = target.GetPath();
    ofLog() << "LoadState() " << file;
 
-   if (!juce::File(file).existsAsFile())
+   auto stream = target.CreateInputStream();
+   if (stream == nullptr)
    {
       LogEvent("couldn't find file " + file, kLogEventType_Error);
       return;
@@ -3447,7 +3464,7 @@ void ModularSynth::LoadState(std::string file)
    if (mInitialized)
       TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup
 
-   FileStreamIn in(ofToDataPath(file));
+   FileStreamIn in(std::move(stream));
 
    if (in.Eof())
    {
@@ -3483,10 +3500,14 @@ void ModularSynth::LoadState(std::string file)
 
    FileStreamIn::s32BitMode = false;
 
-   mCurrentSaveStatePath = file;
-   File savePath(mCurrentSaveStatePath);
-   std::string filename = savePath.getFileName().toStdString();
-   mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
+   if (layoutLoaded) //otherwise the previous patch is still here, and saving shouldn't write it over this file
+   {
+      mCurrentSaveStatePath = file;
+      mCurrentSaveTarget = target;
+      File savePath(mCurrentSaveStatePath);
+      std::string filename = savePath.getFileName().toStdString();
+      mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
+   }
 
    mAudioThreadMutex.Lock("LoadState()");
    LockRender(true);
@@ -3500,10 +3521,9 @@ void ModularSynth::LoadState(std::string file)
 void ModularSynth::LoadStateHeader(FileStreamIn& in, unsigned char*& screenshotData, int& screenshotSize, std::string& jsonLayoutString)
 {
    // here's a little hack to allow older BSK files that were saved in 32-bit to load.
-   uint64_t firstLength[1];
+   uint64_t firstLength[1]{ 0 }; //stays 0 if the file is too short to read
    in.Peek(firstLength, sizeof(uint64_t));
-   if (firstLength[0] >= FileStreamIn::sMaxStringLength)
-      FileStreamIn::s32BitMode = true;
+   FileStreamIn::s32BitMode = firstLength[0] >= FileStreamIn::sMaxStringLength;
 
    std::string headerString;
    in >> headerString;
@@ -4005,6 +4025,14 @@ void ModularSynth::SaveOutput()
 
 const String& ModularSynth::GetTextFromClipboard() const
 {
+   return TheClipboard;
+}
+
+const String& ModularSynth::GetTextToPaste()
+{
+#if BESPOKE_IOS
+   ReadClipboardTextFromSystem();
+#endif
    return TheClipboard;
 }
 

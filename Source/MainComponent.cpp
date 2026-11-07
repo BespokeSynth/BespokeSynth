@@ -18,6 +18,7 @@ using namespace juce;
 #if BESPOKE_IOS
 #include "IOSAudioSession.h"
 #include "IOSDiagnostics.h"
+#include "IOSPointerInput.h"
 #endif
 
 #ifdef JUCE_WINDOWS
@@ -133,7 +134,16 @@ public:
       mSynth.Poll();
 
 #if BESPOKE_IOS
-      mSynth.SetShowTouchTooltips(mSynth.IsTouchNavigationMode() && Desktop::getInstance().getNumDraggingMouseSources() == 1);
+      if (auto* peer = getPeer())
+      {
+         IOSPointerInput::Install(peer->getNativeHandle(), [this](float x, float y, float scaleFactor)
+                                  {
+                                     if (auto* currentPeer = getPeer())
+                                        currentPeer->handleMagnifyGesture(MouseInputSource::InputSourceType::touch, { x, y }, Time::currentTimeMillis(), scaleFactor);
+                                  });
+      }
+
+      mSynth.SetShowTouchTooltips(mSynth.IsTouchNavigationMode() && !mClickTouchIsPointer && Desktop::getInstance().getNumDraggingMouseSources() == 1);
 
       //show/hide the on-screen keyboard when a bespoke text field gains/loses focus
       if (isTextInputActive() != mWasTextInputActive)
@@ -644,9 +654,18 @@ private:
                           { return touch.mSourceIndex == e.source.getIndex(); });
    }
 
+   bool ShouldAlwaysClick(const MouseEvent& e)
+   {
+#if BESPOKE_IOS
+      if (IOSPointerInput::WasLastPressFromPointer()) //mice and trackpads have their own ways to scroll, so they always click
+         return true;
+#endif
+      return mSynth.ShouldTouchAlwaysClick(e.getMouseDownX(), e.getMouseDownY());
+   }
+
    bool StartNavigationTouch(const MouseEvent& e)
    {
-      bool alwaysClick = mSynth.ShouldTouchAlwaysClick(e.getMouseDownX(), e.getMouseDownY());
+      bool alwaysClick = ShouldAlwaysClick(e);
 
       //navigation mode, or joining a two-finger gesture that's already underway
       if (!alwaysClick && (mSynth.IsTouchNavigationMode() || (e.source.isTouch() && !mNavigationTouches.empty())))
@@ -729,7 +748,10 @@ private:
       if (e.source.isTouch())
       {
          mClickTouch = { e.source.getIndex(), e.position };
-         mClickTouchAlwaysClicks = mSynth.ShouldTouchAlwaysClick(e.getMouseDownX(), e.getMouseDownY());
+         mClickTouchAlwaysClicks = ShouldAlwaysClick(e);
+#if BESPOKE_IOS
+         mClickTouchIsPointer = IOSPointerInput::WasLastPressFromPointer();
+#endif
       }
       mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), GetMouseButton(e), e.source);
    }
@@ -748,6 +770,9 @@ private:
          if (e.source.getIndex() != mClickTouch.mSourceIndex)
             return;
          mClickTouch.mSourceIndex = -1;
+#if BESPOKE_IOS
+         mClickTouchIsPointer = false;
+#endif
       }
       mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, GetMouseButton(e), e.source);
    }
@@ -773,8 +798,15 @@ private:
 
    void mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& wheel) override
    {
+#if BESPOKE_IOS
+      //juce can't report this on iOS, and iOS doesn't expose the natural scrolling setting. natural is the default there
+      bool isReversed = true;
+#else
+      bool isReversed = wheel.isReversed;
+#endif
+
       float invert = 1;
-      if (wheel.isReversed)
+      if (isReversed)
          invert = -1;
 
       float scale = 6;
@@ -782,7 +814,7 @@ private:
          scale = 30;
 
       if (!wheel.isInertial)
-         mSynth.MouseScrolled(wheel.deltaX * scale, wheel.deltaY * scale * invert, wheel.isSmooth, wheel.isReversed, true);
+         mSynth.MouseScrolled(wheel.deltaX * scale, wheel.deltaY * scale * invert, wheel.isSmooth, isReversed, true);
    }
 
    void mouseMagnify(const MouseEvent& e, float scaleFactor) override
@@ -960,6 +992,7 @@ private:
    std::atomic<bool> mUseBlockAdapter{ false };
 #if BESPOKE_IOS
    bool mWasTextInputActive{ false };
+   bool mClickTouchIsPointer{ false }; //mClickTouch is a mouse or trackpad press
    Range<int> mTextInputHighlight{ kFakeCaretPosition, kFakeCaretPosition };
 #endif
    int mMatchingCallbackCount{ 0 }; //audio thread only

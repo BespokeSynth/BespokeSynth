@@ -764,8 +764,9 @@ void SamplePlayer::SaveFile()
                        "*.wav", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
    {
-      auto file = chooser.getResult();
-      Sample::WriteDataToFile(file.getFullPathName().toStdString().c_str(), mSample->Data(), mSample->LengthInSamples());
+      SaveTarget target(chooser);
+      Sample::WriteDataToFile(target.GetWritePath(), mSample->Data(), mSample->LengthInSamples());
+      target.Commit();
    }
 }
 

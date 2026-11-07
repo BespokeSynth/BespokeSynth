@@ -18,8 +18,12 @@ if(BESPOKE_IOS)
     # UTExportedTypeDeclarations: iOS file pickers filter by type, not extension, so without declaring
     # types for our extensions, .bsk/.bskt files show up greyed out in the load dialog
     # CFBundleDocumentTypes + LSSupportsOpeningDocumentsInPlace: lets .bsk files be opened in bespoke from other apps
+    # UIApplicationSupportsIndirectInputEvents: makes mouse and trackpad clicks identifiable, rather than looking like finger touches
+    # NSLocalNetworkUsageDescription: shown when iOS asks for local network access, which Ableton Link uses to find peers
     set(BESPOKE_PLIST_TO_MERGE "<plist><dict>
         <key>CFBundleDisplayName</key><string>bespoke</string>
+        <key>UIApplicationSupportsIndirectInputEvents</key><true/>
+        <key>NSLocalNetworkUsageDescription</key><string>bespoke uses the local network to sync tempo with other devices over Ableton Link.</string>
         <key>LSSupportsOpeningDocumentsInPlace</key><true/>
         <key>CFBundleDocumentTypes</key>
         <array>
@@ -67,6 +71,13 @@ juce_add_gui_app(BespokeSynth
     IPHONE_SCREEN_ORIENTATIONS    UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
     PLIST_TO_MERGE                "${BESPOKE_PLIST_TO_MERGE}"
     )
+
+if(BESPOKE_IOS)
+    # replaces the empty file that juce generates. Ableton Link finds peers over multicast, which iOS blocks without
+    # this entitlement. Apple grants it per team, so it also has to be enabled on the App ID for signing to succeed
+    set_target_properties(BespokeSynth PROPERTIES
+        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_SOURCE_DIR}/scripts/ios/entitlements.plist")
+endif()
 
 if(NOT BESPOKE_ENABLE_PYTHON)
     set(Python_VERSION "disabled")
@@ -714,6 +725,8 @@ target_sources(BespokeSynth PRIVATE
     SamplerGrid.h
     SaveStateLoader.cpp
     SaveStateLoader.h
+    SaveTarget.cpp
+    SaveTarget.h
     Scale.cpp
     Scale.h
     ScaleDegree.cpp
@@ -915,7 +928,10 @@ if (BESPOKE_IOS)
     target_compile_definitions(BespokeSynth PRIVATE
         BESPOKE_IOS=1
         )
-    target_sources(BespokeSynth PRIVATE IOSAudioSession.h IOSAudioSession.mm IOSDocuments.h IOSDocuments.mm IOSDiagnostics.h IOSDiagnostics.mm)
+    target_sources(BespokeSynth PRIVATE IOSAudioSession.h IOSAudioSession.mm IOSDocuments.h IOSDocuments.mm IOSDiagnostics.h IOSDiagnostics.mm IOSPointerInput.h IOSPointerInput.mm)
+    # the asio bundled with Link reads uninitialized memory in thread_info_base's constructor. recent clang treats that
+    # as unreachable when optimizing and deletes io_context::run()'s event loop, so Link silently never starts discovery
+    set_source_files_properties(AbletonLink.cpp PROPERTIES COMPILE_OPTIONS "-ftrivial-auto-var-init=zero")
 elseif (APPLE)
     target_compile_definitions(BespokeSynth PRIVATE
         BESPOKE_MAC=1

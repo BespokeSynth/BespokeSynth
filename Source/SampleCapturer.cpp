@@ -218,7 +218,11 @@ void SampleCapturer::ButtonClicked(ClickButton* button, double time)
       bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
       FileChooser chooser("Save sample as...", File(ofToSamplePath(ofGetTimestampString("%Y-%m-%d_%H-%M-%S.wav"))), "*.wav", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
-         Sample::WriteDataToFile(chooser.getResult().getFullPathName().toStdString(), &mSamples[mCurrentSampleIndex].mBuffer, mSamples[mCurrentSampleIndex].mRecordingLength);
+      {
+         SaveTarget target(chooser);
+         Sample::WriteDataToFile(target.GetWritePath(), &mSamples[mCurrentSampleIndex].mBuffer, mSamples[mCurrentSampleIndex].mRecordingLength);
+         target.Commit();
+      }
    }
 
    if (button == mDeleteButton)
