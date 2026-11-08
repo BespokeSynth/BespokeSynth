@@ -33,6 +33,11 @@
 #include "IModulator.h"
 #include "Push2Control.h"
 
+namespace
+{
+   constexpr float kDragVerticalDampBase = 1.015f;
+}
+
 FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, float* var, float min, float max, int digits /* = -1 */)
 : mVar(var)
 , mWidth(w)
@@ -347,9 +352,9 @@ void FloatSlider::OnClicked(float x, float y, bool right)
       return;
    }
 
-   mFineRefX = ofMap(ValToPos(*GetModifyValue(), false), 0.0f, 1.0f, mX + 1, mX + mWidth - 1, true) - mX;
    mRefY = y;
-   SetValueForMouse(x, y);
+   mClickStartPos.set(x, y);
+   SetValueForMouse(x, y, false);
    mMouseDown = true;
    mTouching = true;
    UpdateTouching();
@@ -360,7 +365,7 @@ void FloatSlider::MouseReleased()
    if (mMouseDown)
       mTouching = false;
    mMouseDown = false;
-   mRefY = -999;
+   mRefY = FLT_MAX;
    if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
       SetValue(0, NextBufferTime(false));
 }
@@ -369,29 +374,40 @@ bool FloatSlider::MouseMoved(float x, float y)
 {
    CheckHover(x, y);
    if (mMouseDown)
-      SetValueForMouse(x, y);
+      SetValueForMouse(x, y, true);
    return mMouseDown;
 }
 
-void FloatSlider::SetValueForMouse(float x, float y)
+void FloatSlider::SetValueForMouse(float x, float y, bool drag)
 {
    float* var = GetModifyValue();
-   float fX = x;
-   if (TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::FineTune))
+   float newX;
+   bool fineTune = TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::FineTune);
+   if (drag || fineTune)
    {
-      if (mFineRefX == -999)
+      float factor = 1.0f;
+
+      if (fineTune)
       {
-         mFineRefX = x;
+         float precision = mShowDigits != -1 ? 100 : 10;
+         factor /= precision;
       }
-      float precision = mShowDigits != -1 ? 100 : 10;
-      fX = mFineRefX + (fX - mFineRefX) / precision;
+
+      factor /= powf(kDragVerticalDampBase, fabsf(y - mClickStartPos.y));
+
+      float delta = (x - mLastDragPos.x) / (mWidth - 2);
+      delta *= factor;
+
+      newX = mX + 1 + (ValToPos(*var, true) + delta) * (mWidth - 2);
    }
    else
    {
-      mFineRefX = -999;
+      newX = mX + x;
    }
+
    float oldVal = *var;
-   float pos = ofMap(fX + mX, mX + 1, mX + mWidth - 1, 0.0f, 1.0f);
+   float pos = ofMap(newX, mX + 1, mX + mWidth - 1, 0.0f, 1.0f);
+   mLastDragPos.set(x, y);
 
    if (AdjustSmooth())
    {
@@ -403,7 +419,7 @@ void FloatSlider::SetValueForMouse(float x, float y)
    *var = PosToVal(pos, false);
    if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
    {
-      if (!mTouching || mRelativeOffset == -999)
+      if (!mTouching || mRelativeOffset == FLT_MAX)
       {
          mRelativeOffset = *var;
          *var = 0;
@@ -461,7 +477,7 @@ void FloatSlider::SetFromMidiCC(float slider, double time, SetValueMethod setVal
       float adjustAmount = newValue - currentValue;
       const float kDetentDelayTimeMs = 100;
       if (time < mLastHitDetentTimeMs + kDetentDelayTimeMs &&
-          ((adjustAmount > 0 && mLastAdjustdDirection > 0) || (adjustAmount < 0 && mLastAdjustdDirection < 0)))
+          ((adjustAmount > 0 && mLastAdjustedDirection > 0) || (adjustAmount < 0 && mLastAdjustedDirection < 0)))
       {
          mLastHitDetentTimeMs = time;
          return;
@@ -567,13 +583,13 @@ void FloatSlider::SetValue(float value, double time, bool forceUpdate /*= false*
 
    float adjustAmount = value - oldVal;
    if (adjustAmount > 0)
-      mLastAdjustdDirection = 1;
+      mLastAdjustedDirection = 1;
    else
-      mLastAdjustdDirection = -1;
+      mLastAdjustedDirection = -1;
 
    if (mRelative)
    {
-      if (!mTouching || mRelativeOffset == -999)
+      if (!mTouching || mRelativeOffset == FLT_MAX)
       {
          mRelativeOffset = value;
          value = 0;
@@ -600,7 +616,7 @@ void FloatSlider::UpdateTouching()
    {
       if (!mTouching)
          SetValue(0, NextBufferTime(false));
-      mRelativeOffset = -999;
+      mRelativeOffset = FLT_MAX;
    }
 }
 
@@ -1129,40 +1145,59 @@ void IntSlider::OnClicked(float x, float y, bool right)
       return;
    }
 
-   SetValueForMouse(x, y);
+   mClickStartPos.set(x, y);
+   SetValueForMouse(x, y, false);
    mMouseDown = true;
+}
+
+void IntSlider::MouseReleased()
+{
+   if (mMouseDown)
+      CalcSliderVal();
+   mMouseDown = false;
 }
 
 bool IntSlider::MouseMoved(float x, float y)
 {
    CheckHover(x, y);
    if (mMouseDown)
-      SetValueForMouse(x, y);
+      SetValueForMouse(x, y, true);
    return mMouseDown;
 }
 
-void IntSlider::SetValueForMouse(float x, float y)
+void IntSlider::SetValueForMouse(float x, float y, bool drag)
 {
    int oldVal = *mVar;
-   float fX = x;
-   if (TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::FineTune))
+   float newX;
+   bool fineTune = TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::FineTune);
+   if (drag || fineTune)
    {
-      if (mFineRefX == -999)
-      {
-         mFineRefX = x;
-      }
-      fX = mFineRefX + (fX - mFineRefX) / 10;
+      float factor = 1.0f;
+
+      if (fineTune)
+         factor /= 10;
+
+      factor /= powf(kDragVerticalDampBase, fabsf(y - mClickStartPos.y));
+
+      float delta = (x - mLastDragPos.x) / (mWidth - 2);
+      delta *= factor;
+
+      newX = mX + 1 + (mSliderVal + delta) * (mWidth - 2);
    }
    else
    {
-      mFineRefX = -999;
+      newX = mX + x;
    }
 
-   *mVar = (int)round(ofMap(fX + mX, mX + 1, mX + mWidth - 1, mMin, mMax));
-   *mVar = ofClamp(*mVar, mMin, mMax);
+   mSliderVal = ofMap(newX, mX + 1, mX + mWidth - 1, 0.0f, 1.0f, K(clamp));
+   mLastDragPos.set(x, y);
+
+   ofLog() << "mSliderVal: " << mSliderVal << "    newX: " << newX;
+
+   *mVar = ofClamp((int)round(ofLerp(mMin, mMax, mSliderVal)), mMin, mMax);
    if (oldVal != *mVar)
    {
-      CalcSliderVal();
+      mLastSetValue = *mVar;
       mOwner->IntSliderUpdated(this, oldVal, NextBufferTime(false));
    }
 }
