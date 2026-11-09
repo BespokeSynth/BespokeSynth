@@ -170,6 +170,7 @@ private:
    ofVec2f mClickStartPos{ FLT_MAX, FLT_MAX };
    ofVec2f mLastDragPos{ FLT_MAX, FLT_MAX };
    float mDragOffset{ 0 };
+   float mDragPrecision{ 1 };
    int mShowDigits;
    IFloatSliderListener* mOwner{ nullptr };
    FloatSliderLFOControl* mLFOControl{ nullptr };
@@ -305,6 +306,7 @@ private:
    ofVec2f mClickStartPos{ FLT_MAX, FLT_MAX };
    ofVec2f mLastDragPos{ FLT_MAX, FLT_MAX };
    float mDragOffset{ 0 };
+   float mDragPrecision{ 1 };
 
    int mLastDisplayedValue;
    int mLastSetValue;

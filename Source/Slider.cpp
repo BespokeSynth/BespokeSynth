@@ -43,6 +43,12 @@ namespace
       return 1.0f / powf(kDragVerticalDampBase, fabsf(dy));
    }
 
+   float IndicatorLineWidth(bool dragging, float precision)
+   {
+      //thinner indicator line while dragging with higher precision
+      return dragging ? std::max(2.0f * powf(precision, .5f), .3f) : 2.0f;
+   }
+
    //precision drag: the slider position is the cursor position plus an offset.
    //horizontal movement while away from the slider grows the offset (so the slider moves slower than the cursor),
    //and moving back toward the slider shrinks the offset proportionally, so that returning to the
@@ -228,7 +234,7 @@ void FloatSlider::Render()
          ofSetColor(255, 255, 0, gModuleDrawAlpha);
       float val = ofClamp(*mVar, mMin, mMax);
       screenPos = mX + 1 + (mWidth - 2) * ValToPos(val, false);
-      ofSetLineWidth(2);
+      ofSetLineWidth(IndicatorLineWidth(mMouseDown, mDragPrecision));
       ofLine(screenPos, mY + 1, screenPos, mY + mHeight - 1); //value bar
       ofPopStyle();
    }
@@ -430,6 +436,7 @@ void FloatSlider::SetValueForMouse(float x, float y, bool drag)
 
    float lastCursorPos = (mLastDragPos.x - 1) / (mWidth - 2);
    float pos = ApplyPrecisionDrag(mDragOffset, cursorPos, lastCursorPos, y - mClickStartPos.y, mLastDragPos.y - mClickStartPos.y, fineTuneFactor, !fineTune);
+   mDragPrecision = VerticalDamp(y - mClickStartPos.y) * fineTuneFactor;
 
    float oldVal = *var;
    mLastDragPos.set(x, y);
@@ -1056,6 +1063,7 @@ void IntSlider::Render()
    else
       ofSetColor(30, 30, 30, gModuleDrawAlpha);
    float xpos = mX + 1 + (mWidth - 2) * ((val - mMin) / float(mMax - mMin));
+   ofSetLineWidth(IndicatorLineWidth(mMouseDown, mDragPrecision));
    ofLine(xpos, mY + 1, xpos, mY + mHeight - 1);
 
    ofPopStyle();
@@ -1209,6 +1217,7 @@ void IntSlider::SetValueForMouse(float x, float y, bool drag)
    float fineTuneFactor = fineTune ? .1f : 1.0f;
    float lastCursorPos = (mLastDragPos.x - 1) / (mWidth - 2);
    mSliderVal = ApplyPrecisionDrag(mDragOffset, cursorPos, lastCursorPos, y - mClickStartPos.y, mLastDragPos.y - mClickStartPos.y, fineTuneFactor, !fineTune);
+   mDragPrecision = VerticalDamp(y - mClickStartPos.y) * fineTuneFactor;
    mLastDragPos.set(x, y);
 
    *mVar = ofClamp((int)round(ofLerp(mMin, mMax, mSliderVal)), mMin, mMax);
