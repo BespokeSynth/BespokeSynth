@@ -114,6 +114,14 @@ void AbletonLink::OnTransportAdvanced(float amount)
          auto sampleRate = device->getCurrentSampleRate();
          auto bufferSize = device->getCurrentBufferSizeSamples();
 
+         //the filter fits sample time against wall clock time over its last 512 calls. a gap in the calls (audio
+         //paused, or the device stopping) leaves sample time behind the clock, which skews the fit until those
+         //points age out: link's beat runs several times too fast and then too slow. start the fit over instead
+         const auto nowUs = mLink->clock().micros();
+         if (mLastAdvanceTimeUs.count() != 0 && nowUs - mLastAdvanceTimeUs > kMaxAdvanceGap)
+            sHostTimeFilter.reset();
+         mLastAdvanceTimeUs = nowUs;
+
          const auto hostTimeUs = sHostTimeFilter.sampleTimeToHostTime(mSampleTime);
          const auto outputLatencyUs = std::chrono::microseconds{ std::llround(1.0e6 * bufferSize / sampleRate) };
          auto offsetUs = std::chrono::microseconds{ llround(mOffsetMs * 1000) };
