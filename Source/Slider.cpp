@@ -36,6 +36,36 @@
 namespace
 {
    constexpr float kDragVerticalDampBase = 1.015f;
+
+   //how much horizontal movement is scaled down at a given vertical distance from the click (1 at the slider, approaching 0 far away)
+   float VerticalDamp(float dy)
+   {
+      return 1.0f / powf(kDragVerticalDampBase, fabsf(dy));
+   }
+
+   //precision drag: the slider position is the cursor position plus an offset.
+   //horizontal movement while away from the slider grows the offset (so the slider moves slower than the cursor),
+   //and moving back toward the slider shrinks the offset proportionally, so that returning to the
+   //slider's row puts the slider back under the cursor.
+   //positions are normalized (0-1 across the slider). the virtual position (cursor + offset) can go past the ends of
+   //the slider, and the returned position is clamped, so after overshooting min/max the value doesn't change until you
+   //drag back to where it hit the end. returns the new (clamped) slider position, and updates offset.
+   float ApplyPrecisionDrag(float& offset, float cursorPos, float lastCursorPos, float dy, float lastDy, float fineTuneFactor, bool allowReelIn)
+   {
+      float damp = VerticalDamp(dy);
+
+      //slider should move by the damped cursor movement, but the cursor's own movement is already accounted for
+      offset += (cursorPos - lastCursorPos) * (damp * fineTuneFactor - 1.0f);
+
+      if (allowReelIn && fabsf(dy) < fabsf(lastDy))
+      {
+         float lastWeight = 1.0f - VerticalDamp(lastDy);
+         if (lastWeight > 0)
+            offset *= (1.0f - damp) / lastWeight;
+      }
+
+      return ofClamp(cursorPos + offset, 0.0f, 1.0f);
+   }
 }
 
 FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, float* var, float min, float max, int digits /* = -1 */)
@@ -381,32 +411,27 @@ bool FloatSlider::MouseMoved(float x, float y)
 void FloatSlider::SetValueForMouse(float x, float y, bool drag)
 {
    float* var = GetModifyValue();
-   float newX;
    bool fineTune = TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::FineTune);
-   if (drag || fineTune)
-   {
-      float factor = 1.0f;
+   float cursorPos = (x - 1) / (mWidth - 2);
 
+   if (!drag)
+   {
+      //fine tune clicks start from the current value rather than jumping to the cursor
       if (fineTune)
-      {
-         float precision = mShowDigits != -1 ? 100 : 10;
-         factor /= precision;
-      }
-
-      factor /= powf(kDragVerticalDampBase, fabsf(y - mClickStartPos.y));
-
-      float delta = (x - mLastDragPos.x) / (mWidth - 2);
-      delta *= factor;
-
-      newX = mX + 1 + (ValToPos(*var, true) + delta) * (mWidth - 2);
+         mDragOffset = ValToPos(*var, false) - cursorPos;
+      else
+         mDragOffset = 0;
+      mLastDragPos.set(x, y);
    }
-   else
-   {
-      newX = mX + x;
-   }
+
+   float fineTuneFactor = 1.0f;
+   if (fineTune)
+      fineTuneFactor /= mShowDigits != -1 ? 100 : 10;
+
+   float lastCursorPos = (mLastDragPos.x - 1) / (mWidth - 2);
+   float pos = ApplyPrecisionDrag(mDragOffset, cursorPos, lastCursorPos, y - mClickStartPos.y, mLastDragPos.y - mClickStartPos.y, fineTuneFactor, !fineTune);
 
    float oldVal = *var;
-   float pos = ofMap(newX, mX + 1, mX + mWidth - 1, 0.0f, 1.0f);
    mLastDragPos.set(x, y);
 
    if (AdjustSmooth())
@@ -1168,31 +1193,23 @@ bool IntSlider::MouseMoved(float x, float y)
 void IntSlider::SetValueForMouse(float x, float y, bool drag)
 {
    int oldVal = *mVar;
-   float newX;
    bool fineTune = TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::FineTune);
-   if (drag || fineTune)
-   {
-      float factor = 1.0f;
+   float cursorPos = (x - 1) / (mWidth - 2);
 
+   if (!drag)
+   {
+      //fine tune clicks start from the current value rather than jumping to the cursor
       if (fineTune)
-         factor /= 10;
-
-      factor /= powf(kDragVerticalDampBase, fabsf(y - mClickStartPos.y));
-
-      float delta = (x - mLastDragPos.x) / (mWidth - 2);
-      delta *= factor;
-
-      newX = mX + 1 + (mSliderVal + delta) * (mWidth - 2);
-   }
-   else
-   {
-      newX = mX + x;
+         mDragOffset = mSliderVal - cursorPos;
+      else
+         mDragOffset = 0;
+      mLastDragPos.set(x, y);
    }
 
-   mSliderVal = ofMap(newX, mX + 1, mX + mWidth - 1, 0.0f, 1.0f, K(clamp));
+   float fineTuneFactor = fineTune ? .1f : 1.0f;
+   float lastCursorPos = (mLastDragPos.x - 1) / (mWidth - 2);
+   mSliderVal = ApplyPrecisionDrag(mDragOffset, cursorPos, lastCursorPos, y - mClickStartPos.y, mLastDragPos.y - mClickStartPos.y, fineTuneFactor, !fineTune);
    mLastDragPos.set(x, y);
-
-   ofLog() << "mSliderVal: " << mSliderVal << "    newX: " << newX;
 
    *mVar = ofClamp((int)round(ofLerp(mMin, mMax, mSliderVal)), mMin, mMax);
    if (oldVal != *mVar)
