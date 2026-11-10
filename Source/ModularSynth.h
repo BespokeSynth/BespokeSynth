@@ -378,11 +378,7 @@ private:
    bool mIsMousePanning{ false };
    std::atomic<int> mResamplingDeviceSampleRate{ 0 };
    std::atomic<bool> mShowTouchTooltips{ false }; //there's no hover on a touchscreen, so on iOS tooltips only show while inspecting with a finger
-#if BESPOKE_IOS
-   bool mTouchNavigationMode{ true }; //when true, touches on the canvas pan and pinch-zoom instead of clicking
-#else
-   bool mTouchNavigationMode{ false };
-#endif
+   bool mTouchNavigationMode{ false }; //when true, touches on the canvas pan and pinch-zoom instead of clicking, for use on touchscreen devices
    std::array<bool, 5> mIsMouseButtonHeld{ false };
    struct SpaceMouseInfo
    {
