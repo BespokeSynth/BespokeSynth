@@ -419,6 +419,7 @@ void FloatSlider::SetValueForMouse(float x, float y, bool drag)
    float* var = GetModifyValue();
    bool fineTune = TheSynth->IsKeyModifierComboHeld(KeyModifierCombo::FineTune);
    float cursorPos = (x - 1) / (mWidth - 2);
+   bool isAdjustingModulator = mModulator && mModulator->Active() && mModulator->CanAdjustRange();
 
    if (!drag)
    {
@@ -434,9 +435,13 @@ void FloatSlider::SetValueForMouse(float x, float y, bool drag)
    if (fineTune)
       fineTuneFactor /= mShowDigits != -1 ? 100 : 10;
 
+   //vertical drag adjusts the modulation range when adjusting a modulator, so don't use it for precision
+   float dy = isAdjustingModulator ? 0 : y - mClickStartPos.y;
+   float lastDy = isAdjustingModulator ? 0 : mLastDragPos.y - mClickStartPos.y;
+
    float lastCursorPos = (mLastDragPos.x - 1) / (mWidth - 2);
-   float pos = ApplyPrecisionDrag(mDragOffset, cursorPos, lastCursorPos, y - mClickStartPos.y, mLastDragPos.y - mClickStartPos.y, fineTuneFactor, !fineTune);
-   mDragPrecision = VerticalDamp(y - mClickStartPos.y) * fineTuneFactor;
+   float pos = ApplyPrecisionDrag(mDragOffset, cursorPos, lastCursorPos, dy, lastDy, fineTuneFactor, !fineTune);
+   mDragPrecision = VerticalDamp(dy) * fineTuneFactor;
 
    float oldVal = *var;
    mLastDragPos.set(x, y);
@@ -468,7 +473,7 @@ void FloatSlider::SetValueForMouse(float x, float y, bool drag)
       mOwner->FloatSliderUpdated(this, oldVal, NextBufferTime(false));
    }
 
-   if (mModulator && mModulator->Active() && mModulator->CanAdjustRange())
+   if (isAdjustingModulator)
    {
       float move = (y - mRefY) * -.003f;
       float change = move * (mMax - mMin);
