@@ -12,16 +12,26 @@ set(BESPOKE_DOCUMENT_EXTENSIONS .bsk)
 if(BESPOKE_IOS)
     # iOS needs document types declared by type rather than extension, so that's done in the plist below instead
     set(BESPOKE_DOCUMENT_EXTENSIONS "")
-    # iOS icons must be opaque (JUCE would otherwise fill transparency with white)
-    set(BESPOKE_APP_ICON ${CMAKE_SOURCE_DIR}/bespoke_icon_ios.png)
+    # our own asset catalog instead of icons generated from ICON_BIG: JUCE writes its icons through CoreGraphics,
+    # which always adds an alpha channel, and App Store Connect rejects a 1024px icon with one.
+    # AppIcon.png is rendered from scripts/ios/bespoke_icon_ios.svg; Xcode derives the smaller sizes from it
+    set(BESPOKE_IOS_XCASSETS ${CMAKE_SOURCE_DIR}/scripts/ios/Images.xcassets)
+    # CFBundleVersion. App Store Connect needs it to increase with every upload of the same version, so default to the
+    # configure time (up to 3 dot-separated integers allowed). Reconfigure before archiving, or pass -DBESPOKE_IOS_BUILD_NUMBER
+    if(NOT BESPOKE_IOS_BUILD_NUMBER)
+        string(TIMESTAMP BESPOKE_IOS_BUILD_NUMBER "%Y.%m%d.%H%M" UTC)
+    endif()
     # CFBundleDisplayName: name shown under the home screen icon
     # UTExportedTypeDeclarations: iOS file pickers filter by type, not extension, so without declaring
     # types for our extensions, .bsk/.bskt files show up greyed out in the load dialog
     # CFBundleDocumentTypes + LSSupportsOpeningDocumentsInPlace: lets .bsk files be opened in bespoke from other apps
     # UIApplicationSupportsIndirectInputEvents: makes mouse and trackpad clicks identifiable, rather than looking like finger touches
     # NSLocalNetworkUsageDescription: shown when iOS asks for local network access, which Ableton Link uses to find peers
+    # ITSAppUsesNonExemptEncryption: only OS-provided encryption (HTTPS) is used, which is exempt; without this key
+    # App Store Connect holds every build until the export compliance question is answered
     set(BESPOKE_PLIST_TO_MERGE "<plist><dict>
         <key>CFBundleDisplayName</key><string>bespoke</string>
+        <key>ITSAppUsesNonExemptEncryption</key><false/>
         <key>UIApplicationSupportsIndirectInputEvents</key><true/>
         <key>NSLocalNetworkUsageDescription</key><string>bespoke uses the local network to sync tempo with other devices over Ableton Link.</string>
         <key>LSSupportsOpeningDocumentsInPlace</key><true/>
@@ -70,6 +80,8 @@ juce_add_gui_app(BespokeSynth
     REQUIRES_FULL_SCREEN          TRUE
     IPHONE_SCREEN_ORIENTATIONS    UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
     PLIST_TO_MERGE                "${BESPOKE_PLIST_TO_MERGE}"
+    CUSTOM_XCASSETS_FOLDER        "${BESPOKE_IOS_XCASSETS}"
+    BUILD_VERSION                 "${BESPOKE_IOS_BUILD_NUMBER}"
     )
 
 if(BESPOKE_IOS)
@@ -77,6 +89,11 @@ if(BESPOKE_IOS)
     # this entitlement. Apple grants it per team, so it also has to be enabled on the App ID for signing to succeed
     set_target_properties(BespokeSynth PROPERTIES
         XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_SOURCE_DIR}/scripts/ios/entitlements.plist")
+
+    # App Store privacy manifest, copied to the bundle root by Xcode's resources phase
+    set(BESPOKE_PRIVACY_MANIFEST "${CMAKE_SOURCE_DIR}/scripts/ios/PrivacyInfo.xcprivacy")
+    target_sources(BespokeSynth PRIVATE "${BESPOKE_PRIVACY_MANIFEST}")
+    set_source_files_properties("${BESPOKE_PRIVACY_MANIFEST}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 endif()
 
 if(NOT BESPOKE_ENABLE_PYTHON)
