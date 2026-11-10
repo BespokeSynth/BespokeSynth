@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!-- for xcodebuild -exportArchive: signs an App Store Connect / TestFlight .ipa and writes it locally.
-     Change destination to "upload" to send it straight to App Store Connect instead. -->
+     Change destination to "upload" to send it straight to App Store Connect instead.
+     The signing team isn't set here, so it defaults to the team the archive was built with. -->
 <plist version="1.0">
 <dict>
 	<key>method</key>
 	<string>app-store-connect</string>
 	<key>destination</key>
 	<string>export</string>
-	<key>teamID</key>
-	<string>J5RJ562GN5</string>
 	<key>signingStyle</key>
 	<string>automatic</string>
 	<key>uploadSymbols</key>

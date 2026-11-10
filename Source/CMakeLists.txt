@@ -9,7 +9,23 @@ endif()
 set(BESPOKE_PLIST_TO_MERGE "")
 set(BESPOKE_APP_ICON ${CMAKE_SOURCE_DIR}/bespoke_icon.png)
 set(BESPOKE_DOCUMENT_EXTENSIONS .bsk)
+set(BESPOKE_BUNDLE_ID com.ryanchallinor.bespokesynth)
 if(BESPOKE_IOS)
+    # an App ID can only belong to one Apple developer team, so builds signed by other teams need their own.
+    # the default is derived from the team id, which makes it unique to whoever is building
+    set(BESPOKE_IOS_BUNDLE_ID "" CACHE STRING "Bundle identifier for the iOS app. Defaults to com.<team id>.bespokesynth")
+    option(BESPOKE_IOS_LINK_MULTICAST "Request the multicast networking entitlement, which Ableton Link needs to find peers. Apple must grant it to your team first, or signing fails" OFF)
+    if(BESPOKE_IOS_BUNDLE_ID)
+        set(BESPOKE_BUNDLE_ID ${BESPOKE_IOS_BUNDLE_ID})
+    elseif(CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM)
+        string(TOLOWER "${CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}" BESPOKE_TEAM_LOWER)
+        set(BESPOKE_BUNDLE_ID com.${BESPOKE_TEAM_LOWER}.bespokesynth)
+    else()
+        set(BESPOKE_BUNDLE_ID com.example.bespokesynth)
+        message(WARNING "No signing team set. Pass -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=<your team id> (or -DBESPOKE_IOS_BUNDLE_ID) so the app can be signed")
+    endif()
+    message(STATUS "iOS bundle id: ${BESPOKE_BUNDLE_ID}")
+
     # iOS needs document types declared by type rather than extension, so that's done in the plist below instead
     set(BESPOKE_DOCUMENT_EXTENSIONS "")
     # our own asset catalog instead of icons generated from ICON_BIG: JUCE writes its icons through CoreGraphics,
@@ -71,7 +87,7 @@ juce_add_gui_app(BespokeSynth
     FILE_SHARING_ENABLED          TRUE
     DOCUMENT_BROWSER_ENABLED      TRUE
     DOCUMENT_EXTENSIONS           ${BESPOKE_DOCUMENT_EXTENSIONS}
-    BUNDLE_ID                     com.ryanchallinor.bespokesynth
+    BUNDLE_ID                     ${BESPOKE_BUNDLE_ID}
     PLUGINHOST_AU                 ${BESPOKE_ENABLE_PLUGIN_HOSTING}
 
     # iOS only
@@ -86,9 +102,14 @@ juce_add_gui_app(BespokeSynth
 
 if(BESPOKE_IOS)
     # replaces the empty file that juce generates. Ableton Link finds peers over multicast, which iOS blocks without
-    # this entitlement. Apple grants it per team, so it also has to be enabled on the App ID for signing to succeed
-    set_target_properties(BespokeSynth PROPERTIES
-        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_SOURCE_DIR}/scripts/ios/entitlements.plist")
+    # this entitlement. Apple grants it per team, so it also has to be enabled on the App ID for signing to succeed.
+    # without it, everything else works, but link never sees any peers
+    if(BESPOKE_IOS_LINK_MULTICAST)
+        set_target_properties(BespokeSynth PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_SOURCE_DIR}/scripts/ios/entitlements.plist")
+        # lets the abletonlink module know peers can be found, so it doesn't show its warning
+        target_compile_definitions(BespokeSynth PRIVATE BESPOKE_IOS_LINK_MULTICAST=1)
+    endif()
 
     # App Store privacy manifest, copied to the bundle root by Xcode's resources phase
     set(BESPOKE_PRIVACY_MANIFEST "${CMAKE_SOURCE_DIR}/scripts/ios/PrivacyInfo.xcprivacy")

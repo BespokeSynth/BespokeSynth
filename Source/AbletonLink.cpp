@@ -36,6 +36,14 @@
 
 static ableton::link::HostTimeFilter<ableton::link::platform::Clock> sHostTimeFilter;
 
+//iOS only lets apps use multicast, which link needs to find peers, with an entitlement that Apple grants per developer
+//team. builds signed without it (see BESPOKE_IOS_LINK_MULTICAST in Source/CMakeLists.txt) can't see any peers
+#if BESPOKE_IOS && !BESPOKE_IOS_LINK_MULTICAST
+static constexpr bool kCanFindPeers = false;
+#else
+static constexpr bool kCanFindPeers = true;
+#endif
+
 AbletonLink::AbletonLink()
 : IDrawableModule(200, 20)
 {
@@ -168,7 +176,17 @@ void AbletonLink::DrawModule()
    mShiftBeatBackwardButton->Draw();
    mShiftBeatForwardButton->Draw();
 
-   DrawTextNormal("peers: " + ofToString(mNumPeers) + "\ntempo: " + ofToString(mTempo) + "\nbeat: " + ofToString(mLastReceivedBeat), 3, mHeight - 30);
+   if constexpr (!kCanFindPeers)
+   {
+      ofPushStyle();
+      ofSetColor(255, 180, 0);
+      DrawTextNormal("can't find peers:\nthis build lacks\nmulticast support", 3, mHeight - 30);
+      ofPopStyle();
+   }
+   else
+   {
+      DrawTextNormal("peers: " + ofToString(mNumPeers) + "\ntempo: " + ofToString(mTempo) + "\nbeat: " + ofToString(mLastReceivedBeat), 3, mHeight - 30);
+   }
 }
 
 void AbletonLink::CheckboxUpdated(Checkbox* checkbox, double time)
