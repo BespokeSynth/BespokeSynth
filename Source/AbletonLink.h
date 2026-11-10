@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <memory>
 
 #include "IDrawableModule.h"
@@ -86,5 +87,8 @@ private:
    std::size_t mNumPeers{ 0 };
    double mLastReceivedBeat{ 0 };
    double mSampleTime{ 0 };
+   std::chrono::microseconds mLastAdvanceTimeUs{ 0 };
+   //longer than any normal gap between audio callbacks, including iOS's large buffers while the screen is locked
+   static constexpr std::chrono::microseconds kMaxAdvanceGap{ 250000 };
    int mBeatOffset{ 0 };
 };
