@@ -80,7 +80,8 @@ void OutputChannel::Process(double time)
       }
       GetVizBuffer()->WriteChunk(getBufferGetChannel0, gBufferSize, 0);
 
-      mLevelMeterDisplay.Process(0, TheSynth->GetOutputBuffer(channel), gBufferSize);
+      if (channel >= 0 && channel < TheSynth->GetNumOutputChannels())
+         mLevelMeterDisplay.Process(0, TheSynth->GetOutputBuffer(channel), gBufferSize);
    }
    else //stereo
    {
@@ -118,8 +119,10 @@ void OutputChannel::Process(double time)
          GetVizBuffer()->WriteChunk(getBufferGetChannel2, gBufferSize, 1);
       }
 
-      mLevelMeterDisplay.Process(0, TheSynth->GetOutputBuffer(channel1), gBufferSize);
-      mLevelMeterDisplay.Process(1, TheSynth->GetOutputBuffer(channel2), gBufferSize);
+      if (channel1 >= 0 && channel1 < TheSynth->GetNumOutputChannels())
+         mLevelMeterDisplay.Process(0, TheSynth->GetOutputBuffer(channel1), gBufferSize);
+      if (channel2 >= 0 && channel2 < TheSynth->GetNumOutputChannels())
+         mLevelMeterDisplay.Process(1, TheSynth->GetOutputBuffer(channel2), gBufferSize);
    }
 
    GetBuffer()->Reset();
