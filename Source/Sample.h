@@ -84,6 +84,7 @@ public:
    void SetNumBars(int numBars) { mNumBars = numBars; }
    int GetNumBars() const { return mNumBars; }
    void SetVolume(float vol) { mVolume = vol; }
+   void SetPan(float pan) { mPan = pan; }
    void CopyFrom(Sample* sample);
    bool IsSampleLoading() { return mSamplesLeftToRead > 0; }
    float GetSampleLoadProgress() { return (mNumSamples > 0) ? (1 - (float(mSamplesLeftToRead) / mNumSamples)) : 1; }
@@ -112,6 +113,7 @@ private:
    bool mLooping{ false };
    int mNumBars{ -1 };
    float mVolume{ 1 };
+   float mPan{ 0 };
 
    juce::AudioFormatReader* mReader{};
    std::unique_ptr<juce::AudioSampleBuffer> mReadBuffer;

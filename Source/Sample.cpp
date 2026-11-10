@@ -248,6 +248,15 @@ bool Sample::ConsumeData(double time, ChannelBuffer* out, int size, bool replace
                out->GetChannel(ch)[i] += sample;
          }
 
+         if (out->NumActiveChannels() > 1)
+         {
+            float left = out->GetChannel(0)[i];
+            float right = out->GetChannel(1)[i];
+
+            out->GetChannel(0)[i] = left * ofMap(mPan, 0, 1, 1, 0, true) + right * ofMap(mPan, -1, 0, 1, 0, true);
+            out->GetChannel(1)[i] = right * ofMap(mPan, -1, 0, 0, 1, true) + left * ofMap(mPan, 0, 1, 0, 1, true);
+         }
+
          mOffset += mRate * mSampleRateRatio;
       }
       time += gInvSampleRateMs;

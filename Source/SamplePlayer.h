@@ -122,7 +122,7 @@ private:
    float GetZoomStartSeconds() const;
    float GetZoomEndSeconds() const;
    void UpdateActiveCuePoint();
-   void PlayCuePoint(double time, int index, int velocity, float speedMult, float startOffsetSeconds);
+   void PlayCuePoint(double time, int index, int velocity, float pan, float speedMult, float startOffsetSeconds);
    void RunProcess(const juce::StringArray& args);
    void AutoSlice(int slices);
    void StopRecording();
