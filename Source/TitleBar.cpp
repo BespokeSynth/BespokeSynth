@@ -217,7 +217,11 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mDropdowns.push_back(&mAudioModules);
    mDropdowns.push_back(&mModulatorModules);
    mDropdowns.push_back(&mPulseModules);
+#if BESPOKE_PLUGIN_HOSTING_SUPPORT
    mDropdowns.push_back(&mPlugins);
+#else
+   mPlugins.GetList()->SetShowing(false); //nothing to list, and "manage plugins..." would open a scanner with no formats
+#endif
    mDropdowns.push_back(&mOtherModules);
    mDropdowns.push_back(&mPrefabs);
 }
