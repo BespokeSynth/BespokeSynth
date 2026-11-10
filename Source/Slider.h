@@ -152,7 +152,7 @@ protected:
 
 private:
    void OnClicked(float x, float y, bool right) override;
-   void SetValueForMouse(float x, float y);
+   void SetValueForMouse(float x, float y, bool drag);
    float* GetModifyValue();
    bool AdjustSmooth() const;
    void SmoothUpdated();
@@ -166,14 +166,17 @@ private:
    float mModulatorMin;
    float mModulatorMax;
    bool mMouseDown{ false };
-   int mFineRefX{ -999 };
-   int mRefY{ -999 };
+   float mRefY{ FLT_MAX };
+   ofVec2f mClickStartPos{ FLT_MAX, FLT_MAX };
+   ofVec2f mLastDragPos{ FLT_MAX, FLT_MAX };
+   float mDragOffset{ 0 };
+   float mDragPrecision{ 1 };
    int mShowDigits;
    IFloatSliderListener* mOwner{ nullptr };
    FloatSliderLFOControl* mLFOControl{ nullptr };
    IModulator* mModulator{ nullptr };
    bool mRelative{ false };
-   float mRelativeOffset{ -999 };
+   float mRelativeOffset{ FLT_MAX };
    bool mClamped{ true };
    Mode mMode{ Mode::kNormal };
    float mDefaultValue{ 0 };
@@ -192,7 +195,7 @@ private:
    float* mLastComputeCacheValue;
    std::vector<float> mDetents;
    double mLastHitDetentTimeMs{ 0 };
-   int mLastAdjustdDirection{ 0 };
+   int mLastAdjustedDirection{ 0 };
 
    float mLastDisplayedValue{ std::numeric_limits<float>::max() };
 
@@ -223,7 +226,7 @@ public:
    void SetVar(int* var) { mVar = var; }
    void Render() override;
    bool MouseMoved(float x, float y) override;
-   void MouseReleased() override { mMouseDown = false; }
+   void MouseReleased() override;
    bool IsMouseDown() const override { return mMouseDown; }
    int GetMin() const { return mMin; }
    int GetMax() const { return mMax; }
@@ -289,7 +292,7 @@ private:
       width = mWidth;
       height = mHeight;
    }
-   void SetValueForMouse(float x, float y);
+   void SetValueForMouse(float x, float y, bool drag);
    void CalcSliderVal();
 
    int mWidth;
@@ -300,7 +303,10 @@ private:
    bool mMouseDown;
    int mDefaultValue;
    IIntSliderListener* mOwner;
-   int mFineRefX{ -999 };
+   ofVec2f mClickStartPos{ FLT_MAX, FLT_MAX };
+   ofVec2f mLastDragPos{ FLT_MAX, FLT_MAX };
+   float mDragOffset{ 0 };
+   float mDragPrecision{ 1 };
 
    int mLastDisplayedValue;
    int mLastSetValue;
