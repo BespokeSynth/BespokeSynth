@@ -114,11 +114,17 @@ public:
 
 #if BESPOKE_IOS
       IOSDiagnostics::LogUncaughtExceptions([](const juce::String& message)
-                                            { ofLog() << message.toStdString(); });
+                                            {
+                                               ofLog() << message.toStdString();
+                                            });
       IOSDiagnostics::LogAudioSessionEvents([](const juce::String& message)
-                                            { ofLog() << message.toStdString(); });
+                                            {
+                                               ofLog() << message.toStdString();
+                                            });
       IOSDocuments::SetOpenFileHandler([](const juce::File& file)
-                                       { OpenDocumentFromOtherApp(file); });
+                                       {
+                                          OpenDocumentFromOtherApp(file);
+                                       });
 #endif
 
 #if BESPOKE_WINDOWS

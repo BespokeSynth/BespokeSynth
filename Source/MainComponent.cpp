@@ -651,7 +651,9 @@ private:
    std::vector<NavigationTouch>::iterator FindNavigationTouch(const MouseEvent& e)
    {
       return std::find_if(mNavigationTouches.begin(), mNavigationTouches.end(), [&e](const NavigationTouch& touch)
-                          { return touch.mSourceIndex == e.source.getIndex(); });
+                          {
+                             return touch.mSourceIndex == e.source.getIndex();
+                          });
    }
 
    bool ShouldAlwaysClick(const MouseEvent& e)
