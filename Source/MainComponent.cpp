@@ -384,6 +384,9 @@ public:
             SetGlobalSampleRateAndBufferSize(roundToInt(loadedSetup.sampleRate), gBufferSize / UserPrefs.oversampling.Get());
          }
 #endif
+#if BESPOKE_ANDROID
+         ofLog() << "android audio: block " << gBufferSize / UserPrefs.oversampling.Get() << ", device buffer " << loadedSetup.bufferSize;
+#endif
          if (outputDevice != kAutoDevice && outputDevice != kNoneDevice &&
              loadedSetup.outputDeviceName.toStdString() != outputDevice)
          {
@@ -483,6 +486,51 @@ public:
       return UserPrefs.audio_output_device.Get();
    }
 
+#if BESPOKE_ANDROID
+   //android devices only accept buffer sizes that are multiples of their burst size, and JUCE falls back to a 40ms buffer
+   //for anything else. the burst size JUCE measures depends on whether the device is already open (exclusive vs shared
+   //streams), so this has to run while it's closed, which is also the state JUCE checks the size in when opening it.
+   //returns the smallest supported size that fits one block: callbacks arrive a burst at a time either way, and
+   //mBlockAdapter regroups them into blocks
+   int ChooseAndroidDeviceBufferSize(int blockSize)
+   {
+      if (mGlobalManagers.mDeviceManager.getCurrentAudioDevice() != nullptr)
+         return mAndroidDeviceBufferSize;
+
+      auto& types = mGlobalManagers.mDeviceManager.getAvailableDeviceTypes();
+      if (types.isEmpty())
+         return 0;
+      AudioIODeviceType* type = types[0];
+      for (auto* candidate : types)
+      {
+         if (candidate->getTypeName() == mGlobalManagers.mDeviceManager.getCurrentAudioDeviceType())
+            type = candidate;
+      }
+      type->scanForDevices();
+      auto outputNames = type->getDeviceNames(false);
+      String outputName = outputNames[jmax(0, type->getDefaultDeviceIndex(false))];
+      std::unique_ptr<AudioIODevice> device(type->createDevice(outputName, {}));
+      if (device == nullptr)
+      {
+         ofLog() << "android audio: couldn't create device '" << outputName << "' to check buffer sizes";
+         return 0;
+      }
+
+      auto availableSizes = device->getAvailableBufferSizes();
+      int bestSize = 0;
+      for (int size : availableSizes)
+      {
+         if (size >= blockSize && (bestSize == 0 || size < bestSize))
+            bestSize = size;
+      }
+      if (bestSize == 0 && !availableSizes.isEmpty())
+         bestSize = availableSizes.getLast();
+
+      ofLog() << "android audio: " << device->getTypeName() << " buffer sizes " << (availableSizes.isEmpty() ? 0 : availableSizes[0]) << "-" << (availableSizes.isEmpty() ? 0 : availableSizes.getLast()) << ", using " << bestSize << " for blocks of " << blockSize;
+      return bestSize;
+   }
+#endif
+
    AudioDeviceManager::AudioDeviceSetup GetPreferredSetupOptions() const
    {
       std::string inputDevice = GetInputDeviceName();
@@ -490,6 +538,10 @@ public:
       AudioDeviceManager::AudioDeviceSetup preferredSetupOptions;
       preferredSetupOptions.sampleRate = gSampleRate / UserPrefs.oversampling.Get();
       preferredSetupOptions.bufferSize = gBufferSize / UserPrefs.oversampling.Get();
+#if BESPOKE_ANDROID
+      if (mAndroidDeviceBufferSize > 0)
+         preferredSetupOptions.bufferSize = mAndroidDeviceBufferSize;
+#endif
       if (outputDevice != kAutoDevice && outputDevice != kNoneDevice)
          preferredSetupOptions.outputDeviceName = outputDevice;
       if (inputDevice != kAutoDevice && inputDevice != kNoneDevice)
@@ -501,6 +553,9 @@ public:
    {
       std::string inputDevice = GetInputDeviceName();
       std::string outputDevice = GetOutputDeviceName();
+#if BESPOKE_ANDROID
+      mAndroidDeviceBufferSize = ChooseAndroidDeviceBufferSize(gBufferSize / UserPrefs.oversampling.Get());
+#endif
       AudioDeviceManager::AudioDeviceSetup preferredSetupOptions = GetPreferredSetupOptions();
 
       int inputChannels = UserPrefs.max_input_channels.Get();
@@ -1005,6 +1060,9 @@ private:
    NavigationTouch mClickTouch{ -1, {} }; //the touch currently acting as the mouse, if any (bespoke only handles one pointer)
    bool mClickTouchAlwaysClicks{ false };
    std::vector<int> mIgnoredTouches; //extra touches that bespoke can't handle while a click is underway
+#if BESPOKE_ANDROID
+   int mAndroidDeviceBufferSize{ 0 }; //see ChooseAndroidDeviceBufferSize()
+#endif
 #if BESPOKE_IOS
    std::atomic<int> mAudioCallbackCount{ 0 };
    std::atomic<int> mLastCallbackSize{ 0 };
