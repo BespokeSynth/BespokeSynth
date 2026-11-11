@@ -37,6 +37,8 @@ public:
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return false; }
 
+   void CreateUIControls() override;
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
@@ -55,6 +57,9 @@ private:
    void GetModuleDimensions(float& width, float& height) override
    {
       width = 110;
-      height = 0;
+      height = 21;
    }
+
+   bool mContinuous{ false };
+   Checkbox* mContinuousCheckbox{ nullptr };
 };
