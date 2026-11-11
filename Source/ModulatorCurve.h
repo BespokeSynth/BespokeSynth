@@ -88,7 +88,7 @@ private:
    EnvelopeControl mEnvelopeControl{ ofVec2f(3, 19), ofVec2f(100, 100), nullptr };
    static constexpr float kMinWidth = 106;
    static constexpr float kMinHeight = 121;
-   ::ADSR mAdsr;
+   ADSR mAdsr;
 
    FloatSlider* mInputSlider{ nullptr };
 };
