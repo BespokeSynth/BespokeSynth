@@ -28,6 +28,9 @@
 #ifdef BESPOKE_WINDOWS
 #include <windows.h>
 #endif
+#if BESPOKE_ANDROID
+#include "AndroidSupport.h"
+#endif
 
 #include "UserPrefs.h"
 #include "juce_opengl/juce_opengl.h"
@@ -89,7 +92,12 @@ std::string ofToDataPath(const std::string& path)
 
    static const auto sDataDir = []
    {
+#if BESPOKE_ANDROID
+      //userDocumentsDirectory is the shared Documents folder on android, which apps can't write to without extra permissions
+      auto defaultDataDir = AndroidSupport::GetDataDir().getFullPathName().toStdString();
+#else
       auto defaultDataDir = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
+#endif
       auto dataDir = juce::SystemStats::getEnvironmentVariable("BESPOKE_DATA_DIR", defaultDataDir).toStdString();
 #if BESPOKE_WINDOWS
       std::replace(begin(dataDir), end(dataDir), '\\', '/');
@@ -109,6 +117,8 @@ std::string ofToFactoryPath(const std::string& subdir)
    auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getChildFile("Contents/Resources").getChildFile(subdir);
 #elif BESPOKE_IOS
    auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getChildFile(subdir);
+#elif BESPOKE_ANDROID
+   auto resDir = AndroidSupport::GetFactoryDir().getChildFile(subdir);
 #else
    auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentExecutableFile).getSiblingFile(subdir);
 #if BESPOKE_LINUX

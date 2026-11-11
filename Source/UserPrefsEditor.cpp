@@ -190,7 +190,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       }
    }
 
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
    if (toUpdate.empty() || VectorContains(UserPrefs.audio_input_device.GetDropdown(), toUpdate))
    {
       //iOS has a single combined device, so the only choice is whether to open its input. any value other than "none" does
@@ -281,7 +281,7 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       UserPrefs.buffersize.GetIndex() = -1;
       UserPrefs.buffersize.GetDropdown()->Clear();
       i = 0;
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
       //iOS treats buffer sizes as approximate hints and reports odd values (like 65) back, so offer
       //standard sizes instead. our audio callback regroups whatever iOS delivers into this block size.
       juce::Array<int> availableBufferSizes{ 64, 128, 256, 512, 1024, 2048 };
@@ -315,7 +315,7 @@ void UserPrefsEditor::DrawModule()
    {
       bool onPage = pref->mCategory == mCategory;
       bool hide = false;
-#if !BESPOKE_IOS //on iOS, it chooses whether to open the input at all
+#if !BESPOKE_MOBILE //on iOS, it chooses whether to open the input at all
       if (pref == &UserPrefs.audio_input_device)
          hide = !selectedDeviceType->hasSeparateInputsAndOutputs();
 #endif
@@ -349,7 +349,7 @@ void UserPrefsEditor::DrawModule()
    if (UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex()) == "DirectSound")
       DrawRightLabel(UserPrefs.devicetype.GetControl(), "warning: DirectSound can cause crackle and strange behavior for some sample rates and buffer sizes", ofColor::yellow);
 
-#if !BESPOKE_IOS //on iOS, this would overlap the input dropdown, which stays visible
+#if !BESPOKE_MOBILE //on iOS, this would overlap the input dropdown, which stays visible
    if (!selectedDeviceType->hasSeparateInputsAndOutputs() && mCategory == UserPrefCategory::General)
    {
       ofRectangle rect = UserPrefs.audio_output_device.GetControl()->GetRect(true);

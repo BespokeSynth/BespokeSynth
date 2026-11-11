@@ -213,7 +213,7 @@ public:
       {
          setUsingNativeTitleBar(true);
          setContentOwned(createMainContentComponent(), true);
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
          setFullScreen(true);
 #else
          setResizable(true, true);

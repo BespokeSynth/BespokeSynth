@@ -132,3 +132,23 @@ bool SaveTarget::CommitFrom(const juce::File& source) const
    ReportFailure(mPath, "copy failed");
    return false;
 }
+
+bool BrowseForFileToOpen(juce::FileChooser& chooser)
+{
+#if JUCE_MODAL_LOOPS_PERMITTED
+   return chooser.browseForFileToOpen();
+#else
+   TheSynth->LogEvent("opening files isn't supported on this platform yet", kLogEventType_Error);
+   return false;
+#endif
+}
+
+bool BrowseForFileToSave(juce::FileChooser& chooser)
+{
+#if JUCE_MODAL_LOOPS_PERMITTED
+   return chooser.browseForFileToSave(true);
+#else
+   TheSynth->LogEvent("saving files isn't supported on this platform yet", kLogEventType_Error);
+   return false;
+#endif
+}

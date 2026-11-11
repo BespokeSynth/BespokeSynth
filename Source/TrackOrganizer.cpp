@@ -478,7 +478,7 @@ void TrackOrganizer::ButtonClicked(ClickButton* button, double time)
    if (button == mSaveTrackButton)
    {
       juce::FileChooser chooser("Save trackorganizer as...", juce::File(ofToDataPath("trackorganizer/" + mTrackName + ".pfb")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
-      if (chooser.browseForFileToSave(true))
+      if (BrowseForFileToSave(chooser))
       {
          SaveTarget target(chooser);
 

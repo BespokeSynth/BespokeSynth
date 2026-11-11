@@ -966,6 +966,7 @@ target_compile_definitions(BespokeSynth PRIVATE
 if (BESPOKE_IOS)
     target_compile_definitions(BespokeSynth PRIVATE
         BESPOKE_IOS=1
+        BESPOKE_MOBILE=1 # phone/tablet behavior shared with android: touch navigation, full screen window, etc
         )
     target_sources(BespokeSynth PRIVATE IOSAudioSession.h IOSAudioSession.mm IOSDocuments.h IOSDocuments.mm IOSDiagnostics.h IOSDiagnostics.mm IOSPointerInput.h IOSPointerInput.mm)
     # the asio bundled with Link reads uninitialized memory in thread_info_base's constructor. recent clang treats that
@@ -1006,6 +1007,19 @@ elseif (APPLE)
                 COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --deep BespokeSynth.app
                 )
     endif()
+elseif (BESPOKE_ANDROID)
+    target_compile_definitions(BespokeSynth PRIVATE
+        BESPOKE_ANDROID=1
+        BESPOKE_MOBILE=1
+        )
+    # juce_add_gui_app makes a shared library on android, and JUCE's java side (com.rmsl.juce.Java) loads it by this name
+    set_target_properties(BespokeSynth PROPERTIES OUTPUT_NAME juce_jni)
+    target_sources(BespokeSynth PRIVATE AndroidSupport.h AndroidSupport.cpp)
+    target_link_options(BespokeSynth PRIVATE "-Wl,--no-undefined")
+    # same asio issue as on iOS, see above
+    set_source_files_properties(AbletonLink.cpp PROPERTIES COMPILE_OPTIONS "-ftrivial-auto-var-init=zero")
+    # Link's linux platform code works on android, but its cmake config only picks it for CMAKE_SYSTEM_NAME "Linux"
+    set_property(TARGET Ableton::Link APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS LINK_PLATFORM_LINUX=1)
 elseif (WIN32)
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_WINDOWS=1)
     target_link_libraries(BespokeSynth PRIVATE "dwmapi.lib")
@@ -1087,7 +1101,9 @@ if(BESPOKE_ENABLE_PYTHON)
         )
 endif()
 
-bespoke_copy_resource_dir(BespokeSynth)
+if(NOT BESPOKE_ANDROID) # on android, gradle packages resource/ into the apk as assets
+    bespoke_copy_resource_dir(BespokeSynth)
+endif()
 bespoke_make_portable(BespokeSynth)
 
 # Rules to do some installing and packaging which we will have to refactor  but

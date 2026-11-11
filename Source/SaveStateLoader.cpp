@@ -72,7 +72,7 @@ void SaveStateLoader::Poll()
 
          bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
          juce::FileChooser chooser("Select state file", juce::File(ofToDataPath("savestate")), "*.bsk;*.bskt", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-         if (chooser.browseForFileToOpen())
+         if (BrowseForFileToOpen(chooser))
          {
             mLoadButtons[i].mFilePath = chooser.getResult().getFullPathName().replace("\\", "/").toStdString();
             UpdateButtonLabel(i);

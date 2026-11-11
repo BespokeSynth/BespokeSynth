@@ -303,7 +303,7 @@ uint32_t ssfn_utf8(char **s)
 #  endif
 # endif
 
-#ifndef _STRING_H_
+#if !defined(_STRING_H_) && !defined(__BIONIC__) /* android's string.h declares these with a different exception spec */
 extern int memcmp (const void *__s1, const void *__s2, size_t __n) __THROW;
 extern void *memset (void *__s, int __c, size_t __n) __THROW;
 #endif

@@ -43,6 +43,9 @@
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 #include "nanovg/nanovg.h"
+#if BESPOKE_ANDROID
+#include "AndroidSupport.h"
+#endif
 
 #ifdef JUCE_MAC
 #import <execinfo.h>
@@ -936,6 +939,9 @@ ofLog::~ofLog()
 {
    std::string output = ofToString(gTime / 1000, 8) + ": " + mMessage;
    DBG(output);
+#if BESPOKE_ANDROID
+   AndroidSupport::Log(output.c_str());
+#endif
 #if BESPOKE_IOS
    {
       //DBG is compiled out of release builds, and there's no easy way to see stdout on a device, so log to a file that can be pulled off with devicectl

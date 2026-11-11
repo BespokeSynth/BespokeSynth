@@ -373,7 +373,7 @@ void SeaOfGrain::LoadFile()
    FileChooser chooser("Load sample", File(ofToSamplePath("")),
                        file_pattern, isNativeFileChooser, false, TheSynth->GetFileChooserParent());
 
-   if (chooser.browseForFileToOpen())
+   if (BrowseForFileToOpen(chooser))
    {
       auto file = chooser.getResult();
 

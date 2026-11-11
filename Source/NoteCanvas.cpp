@@ -1364,7 +1364,7 @@ void NoteCanvas::LoadMidi()
 
    bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
    FileChooser chooser("Load midi", File(ofToDataPath("")), file_pattern, isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-   if (chooser.browseForFileToOpen())
+   if (BrowseForFileToOpen(chooser))
    {
       bool wasPlaying = mPlay;
       mPlay = false;
@@ -1415,7 +1415,7 @@ void NoteCanvas::SaveMidi()
 
    bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
    FileChooser chooser("Save midi", File(ofToDataPath("midi")), "*.mid", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-   if (chooser.browseForFileToSave(true))
+   if (BrowseForFileToSave(chooser))
    {
       MidiFile midifile;
       midifile.setTicksPerQuarterNote(ticksPerQuarterNote);

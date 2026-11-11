@@ -1275,7 +1275,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
       juce::File(ofToDataPath("vst/presets/" + GetPluginId())).createDirectory();
       bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
       FileChooser chooser("Save preset as...", File(ofToDataPath("vst/presets/" + GetPluginId() + "/preset.vstp")), "*.vstp", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-      if (chooser.browseForFileToSave(true))
+      if (BrowseForFileToSave(chooser))
       {
          std::string path = chooser.getResult().getFullPathName().toStdString();
 

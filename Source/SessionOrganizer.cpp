@@ -39,6 +39,7 @@
 #include "IControlVisualizer.h"
 #include "Snapshots.h"
 #include "Prefab.h"
+#include "SaveTarget.h"
 
 namespace
 {
@@ -280,7 +281,7 @@ void SessionOrganizer::ButtonClicked(ClickButton* button, double time)
    if (button == mLoadTrackButton)
    {
       juce::FileChooser chooser("Load prefab...", juce::File(ofToDataPath("trackorganizer")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
-      if (chooser.browseForFileToOpen())
+      if (BrowseForFileToOpen(chooser))
       {
          std::string loadPath = chooser.getResult().getFullPathName().toStdString();
 

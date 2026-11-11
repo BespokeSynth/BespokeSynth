@@ -239,7 +239,7 @@ void Prefab::ButtonClicked(ClickButton* button, double time)
    {
       bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
       FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-      if (chooser.browseForFileToSave(true))
+      if (BrowseForFileToSave(chooser))
       {
          SavePrefab(SaveTarget(chooser));
       }
@@ -249,7 +249,7 @@ void Prefab::ButtonClicked(ClickButton* button, double time)
    {
       bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
       FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")), "*.pfb", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-      if (chooser.browseForFileToOpen())
+      if (BrowseForFileToOpen(chooser))
       {
          std::string loadPath = chooser.getResult().getFullPathName().toStdString();
          LoadPrefab(ofToDataPath(loadPath));

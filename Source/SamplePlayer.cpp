@@ -155,7 +155,7 @@ void SamplePlayer::Poll()
 {
    IDrawableModule::Poll();
 
-#if !BESPOKE_IOS
+#if !BESPOKE_MOBILE
    const juce::String& clipboard = TheSynth->GetTextFromClipboard();
    if (clipboard.contains("youtube"))
    {
@@ -748,7 +748,7 @@ void SamplePlayer::LoadFile()
    bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
    FileChooser chooser("Load sample", File(ofToSamplePath("")),
                        file_pattern, isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-   if (chooser.browseForFileToOpen())
+   if (BrowseForFileToOpen(chooser))
    {
       auto file = chooser.getResult();
 
@@ -764,7 +764,7 @@ void SamplePlayer::SaveFile()
    bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
    FileChooser chooser("Save sample", File(ofToSamplePath("")),
                        "*.wav", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-   if (chooser.browseForFileToSave(true))
+   if (BrowseForFileToSave(chooser))
    {
       SaveTarget target(chooser);
       Sample::WriteDataToFile(target.GetWritePath(), mSample->Data(), mSample->LengthInSamples());
@@ -955,7 +955,7 @@ void SamplePlayer::DrawModule()
 
    mTrimToZoomButton->SetShowing(mZoomLevel != 1);
 
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
    mDownloadYoutubeSearch->SetShowing(false);
    mDownloadYoutubeButton->SetShowing(false);
 #endif

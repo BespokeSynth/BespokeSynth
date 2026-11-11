@@ -789,7 +789,7 @@ void ModularSynth::Draw()
       tooltipContainer = &mModuleContainer;
    }
    else if (HelpDisplay::sShowTooltips &&
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
             mShowTouchTooltips &&
 #endif
             !mHideTooltipsUntilMouseMove &&
@@ -1156,7 +1156,7 @@ void ModularSynth::Exit()
 
 void ModularSynth::Focus()
 {
-#if !BESPOKE_IOS //iOS shows a permission prompt when an app reads the clipboard, so there it waits for an actual paste
+#if !BESPOKE_MOBILE //iOS shows a permission prompt when an app reads the clipboard, so there it waits for an actual paste
    ReadClipboardTextFromSystem();
 #endif
 }
@@ -3260,7 +3260,7 @@ void ModularSynth::SaveLayoutAsPopup()
    bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
 
    FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", isNativeFileChooser, false, GetFileChooserParent());
-   if (chooser.browseForFileToSave(true))
+   if (BrowseForFileToSave(chooser))
       SaveLayout(SaveTarget(chooser));
 }
 
@@ -3306,7 +3306,7 @@ void ModularSynth::SaveStatePopup()
    bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
 
    FileChooser chooser("Save current state as...", targetFile, "*.bsk", isNativeFileChooser, false, GetFileChooserParent());
-   if (chooser.browseForFileToSave(true))
+   if (BrowseForFileToSave(chooser))
       SaveState(SaveTarget(chooser), false);
 }
 
@@ -3326,7 +3326,7 @@ void ModularSynth::LoadStatePopupImp()
    bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
 
    FileChooser chooser("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", isNativeFileChooser, false, GetFileChooserParent());
-   if (chooser.browseForFileToOpen())
+   if (BrowseForFileToOpen(chooser))
       LoadState(SaveTarget(chooser));
 }
 
@@ -4027,7 +4027,7 @@ void ModularSynth::SaveOutput()
 
 const String& ModularSynth::GetTextFromClipboard()
 {
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
    ReadClipboardTextFromSystem();
 #endif
    return TheClipboard;

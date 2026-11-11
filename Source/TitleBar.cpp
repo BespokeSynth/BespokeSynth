@@ -143,7 +143,7 @@ void TitleBar::CreateUIControls()
    BUTTON_SIZE(mMenuButton, "menu", 50, 32);
    ENDUIBLOCK0();
 
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
    mTouchNavigationButton = new ClickButton(this, "pan/zoom", 195, 1);
    mTouchNavigationButton->SetDimensions(60, 32);
 #endif

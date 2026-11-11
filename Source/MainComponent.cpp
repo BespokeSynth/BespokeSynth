@@ -33,7 +33,7 @@ using namespace juce;
 class MainContentComponent : public OpenGLAppComponent,
                              public AudioIODeviceCallback,
                              public FileDragAndDropTarget,
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
                              public TextInputTarget, //lets bespoke's text fields bring up the on-screen keyboard
 #endif
                              private Timer
@@ -142,7 +142,9 @@ public:
                                         currentPeer->handleMagnifyGesture(MouseInputSource::InputSourceType::touch, { x, y }, Time::currentTimeMillis(), scaleFactor);
                                   });
       }
+#endif
 
+#if BESPOKE_MOBILE
       mSynth.SetShowTouchTooltips(mSynth.IsTouchNavigationMode() && !mClickTouchIsPointer && Desktop::getInstance().getNumDraggingMouseSources() == 1);
 
       //show/hide the on-screen keyboard when a bespoke text field gains/loses focus
@@ -355,7 +357,7 @@ public:
       if (audioError.isEmpty())
       {
          auto loadedSetup = mGlobalManagers.mDeviceManager.getAudioDeviceSetup();
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
          if (loadedSetup.sampleRate != gSampleRate / UserPrefs.oversampling.Get())
          {
             //iOS hardware may not support the requested rate (and what it supports varies by output route), so use the closest available rate
@@ -394,7 +396,7 @@ public:
             mSynth.SetFatalError("error setting input device to '" + inputDevice + "', fix this in userprefs.json (use \"auto\" for default device, or \"none\" for no device)" +
                                  "\n\n\nvalid devices:\n" + GetAudioDevices());
          }
-#if !BESPOKE_IOS //iOS treats buffer size as a hint, and mBlockAdapter handles any mismatch
+#if !BESPOKE_MOBILE //iOS treats buffer size as a hint, and mBlockAdapter handles any mismatch
          else if (loadedSetup.bufferSize != gBufferSize / UserPrefs.oversampling.Get())
          {
             mSynth.SetFatalError("error setting buffer size to " + ofToString(gBufferSize / UserPrefs.oversampling.Get()) + " on device '" + loadedSetup.outputDeviceName.toStdString() + "', fix this in userprefs.json" +
@@ -466,7 +468,7 @@ public:
    std::string GetInputDeviceName() const
    {
       std::string inputDevice = UserPrefs.audio_input_device.Get();
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
       //iOS also has a single combined device, but keep "none" so we don't open (and prompt for) the microphone
       if (inputDevice != kNoneDevice && !mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
 #else
@@ -864,7 +866,7 @@ private:
       return true;
    }
 
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
    //TextInputTarget
    //bespoke's text fields do their own editing from key presses, so rather than exposing their contents to iOS, this
    //pretends to be a one-character field with the caret after the character, and turns iOS's edits into key presses:
@@ -992,7 +994,7 @@ private:
    SpaceMouseMessageWindow mSpaceMouseReader;
    FixedBlockAudioAdapter mBlockAdapter;
    std::atomic<bool> mUseBlockAdapter{ false };
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
    bool mWasTextInputActive{ false };
    bool mClickTouchIsPointer{ false }; //mClickTouch is a mouse or trackpad press
    Range<int> mTextInputHighlight{ kFakeCaretPosition, kFakeCaretPosition };

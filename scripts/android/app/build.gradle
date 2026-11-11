@@ -1,0 +1,90 @@
+// Android build of bespoke. Gradle drives the top-level CMakeLists.txt through externalNativeBuild, which builds
+// bespoke as libjuce_jni.so, and packages it with JUCE's java glue and the resource folder.
+// see README.md for how to build
+
+plugins {
+    id 'com.android.application'
+}
+
+def repoRoot = file('../../..')
+def juceModules = new File(repoRoot, 'libs/JUCE/modules')
+
+// keep build output with the other builds, out of the source tree
+layout.buildDirectory = new File(repoRoot, 'build/android/app')
+
+android {
+    namespace 'com.ryanchallinor.bespokesynth'
+    compileSdk 35
+    ndkVersion '27.2.12479018'
+
+    defaultConfig {
+        applicationId 'com.ryanchallinor.bespokesynth'
+        // 24 is the oldest version ableton link supports (getifaddrs)
+        minSdk 24
+        targetSdk 35
+        versionCode 1
+        versionName '1.3.0'
+
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
+
+        externalNativeBuild {
+            cmake {
+                targets 'BespokeSynth'
+                arguments '-DANDROID_STL=c++_static',
+                          '-DBESPOKE_PUSH2_SUPPORT=OFF',
+                          '-DBESPOKE_ABLETONMOVE_SUPPORT=OFF',
+                          '-DBESPOKE_PSMOVE_SUPPORT=OFF'
+                // JUCE expects char to be signed, which it isn't by default on arm
+                cFlags '-fsigned-char'
+                cppFlags '-fsigned-char'
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            jniDebuggable true
+        }
+        release {
+            // signed with the debug key until there's a release keystore, so it can be installed for testing
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path new File(repoRoot, 'CMakeLists.txt')
+            version '3.31.6'
+            buildStagingDirectory new File(repoRoot, 'build/android/cxx')
+        }
+    }
+
+    sourceSets {
+        main {
+            // JUCE's java side: the Application/Activity classes. its other java classes are compiled into the
+            // native library as dex bytecode, so they don't need to be listed here
+            java.srcDirs += [
+                new File(juceModules, 'juce_core/native/javacore/init'),
+                new File(juceModules, 'juce_core/native/javacore/app'),
+            ]
+            assets.srcDirs = [layout.buildDirectory.dir('bespokeAssets')]
+        }
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging false
+        }
+    }
+}
+
+// packages the resource folder as assets/resource/..., which AndroidSupport.cpp unpacks on first launch
+def syncBespokeAssets = tasks.register('syncBespokeAssets', Sync) {
+    from new File(repoRoot, 'resource')
+    into layout.buildDirectory.dir('bespokeAssets/resource')
+    exclude '**/.DS_Store'
+}
+tasks.named('preBuild') { dependsOn syncBespokeAssets }

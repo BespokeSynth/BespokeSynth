@@ -61,3 +61,8 @@ private:
    juce::URL mChosenURL; //must stay this object or a copy of it, since it carries the permission to write
 #endif
 };
+
+//stand-ins for FileChooser::browseForFileToOpen()/browseForFileToSave(true), which need modal loops. android doesn't
+//have those, so there these log that browsing isn't supported yet and return false (TODO: switch callers to launchAsync)
+bool BrowseForFileToOpen(juce::FileChooser& chooser);
+bool BrowseForFileToSave(juce::FileChooser& chooser);

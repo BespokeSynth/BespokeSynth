@@ -576,7 +576,7 @@ void Scale::Poll()
          std::string pat = (button == mLoadSCLButton) ? "*.scl;*.SCL" : "*.kbm;*.KBM";
          bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
          juce::FileChooser chooser(prompt, juce::File(""), pat, isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-         if (chooser.browseForFileToOpen())
+         if (BrowseForFileToOpen(chooser))
          {
             auto file = chooser.getResult();
             std::cout << file.getFullPathName().toStdString() << std::endl;
