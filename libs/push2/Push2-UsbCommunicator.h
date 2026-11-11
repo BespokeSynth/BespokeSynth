@@ -120,9 +120,6 @@ namespace ableton
     uint8_t currentLine_;
     std::atomic<bool> terminate_;
     unsigned char sendBuffers_[kSendBufferCount * kSendBufferSize];
-#ifdef __ANDROID__
-    int fd_ = -1; // see Push2-Usb-Communicator-android.cpp
-#endif
 
   };
 }

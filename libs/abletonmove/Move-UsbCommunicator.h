@@ -27,10 +27,6 @@
 #include <assert.h>
 
 #include <atomic>
-#ifdef __ANDROID__
-#include <condition_variable>
-#include <mutex>
-#endif
 
 // Forward declarations. This avoid having to include libusb.h from here
 // which leads to declaration conflicts with juce
@@ -99,13 +95,6 @@ namespace abletonmove
     std::thread pollThread_;
     std::atomic<bool> terminate_;
     bool isWaitingForFrameToFinish_{ false };
-#ifdef __ANDROID__
-    // see Move-Usb-Communicator-android.cpp
-    int fd_ = -1;
-    std::mutex sendMutex_;
-    std::condition_variable sendCondition_;
-    bool frameRequested_{ false };
-#endif
 
   };
 }

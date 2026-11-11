@@ -25,15 +25,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
-import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.os.Build;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-// Opens USB devices for native code (see AndroidSupport.cpp), which then talks to them through the returned file
-// descriptor. Android apps can't open USB devices themselves, and need the user's permission for each device.
+// Opens USB devices for native code (see AndroidSupport.cpp), which hands the returned file descriptor to libusb.
+// Android apps can't list or open USB devices themselves, and need the user's permission for each device.
 // Used for the Ableton Move and Push 2 displays, which aren't MIDI, so Android's MIDI support doesn't cover them.
 public final class BespokeUsb
 {
@@ -41,19 +41,18 @@ public final class BespokeUsb
     public static final int kWaitingForPermission = -2;
     public static final int kPermissionDenied = -3;
     public static final int kOpenFailed = -4;
-    public static final int kClaimFailed = -5;
 
     private static final String kPermissionAction = "com.ryanchallinor.bespokesynth.USB_PERMISSION";
 
-    private static final HashMap<Integer, UsbDeviceConnection> sConnections = new HashMap<>(); // by file descriptor
+    private static final ArrayList<UsbDeviceConnection> sConnections = new ArrayList<>(); // keeps their descriptors open
     private static final HashSet<String> sPendingRequests = new HashSet<>(); // by device name
     private static final HashSet<String> sDeniedDevices = new HashSet<>(); // by device name, until it's unplugged
     private static boolean sReceiverRegistered = false;
 
-    // returns a file descriptor for the device with interfaceNumber claimed, or one of the k* error codes.
+    // returns a file descriptor for the device, or one of the k* error codes.
     // if the app doesn't have permission for the device yet, this asks the user, and returns kWaitingForPermission
     // until they answer, so callers should retry
-    public static synchronized int open (Context context, int vendorId, int productId, int interfaceNumber)
+    public static synchronized int open (Context context, int vendorId, int productId)
     {
         UsbManager manager = (UsbManager) context.getSystemService (Context.USB_SERVICE);
         if (manager == null)
@@ -79,38 +78,15 @@ public final class BespokeUsb
                 return kWaitingForPermission;
             }
 
-            UsbInterface usbInterface = null;
-            for (int i = 0; i < device.getInterfaceCount(); ++i)
-            {
-                if (device.getInterface (i).getId() == interfaceNumber)
-                    usbInterface = device.getInterface (i);
-            }
-            if (usbInterface == null)
-                return kClaimFailed;
-
             UsbDeviceConnection connection = manager.openDevice (device);
             if (connection == null)
                 return kOpenFailed;
 
-            if (! connection.claimInterface (usbInterface, false))
-            {
-                connection.close();
-                return kClaimFailed;
-            }
-
-            int fd = connection.getFileDescriptor();
-            sConnections.put (fd, connection); // the descriptor stays valid for as long as the connection is open
-            return fd;
+            sConnections.add (connection); // the descriptor stays valid for as long as the connection is open
+            return connection.getFileDescriptor();
         }
 
         return kNotFound;
-    }
-
-    public static synchronized void close (int fd)
-    {
-        UsbDeviceConnection connection = sConnections.remove (fd);
-        if (connection != null)
-            connection.close();
     }
 
     private static void requestPermission (Context context, UsbManager manager, UsbDevice device)

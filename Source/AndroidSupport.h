@@ -52,12 +52,9 @@ namespace AndroidSupport
 
 //USB access for the libraries that drive the Ableton Move and Push 2 displays (libs/abletonmove, libs/push2), which
 //can't use JUCE or JNI themselves. android apps can only open USB devices through the system, with the user's
-//permission, so the device is opened by the java side (BespokeUsb.java), and written to through its file descriptor
+//permission, so the device is opened by the java side (BespokeUsb.java), and its file descriptor is given to libusb
 extern "C" {
-//returns a file descriptor for the device with interfaceNumber claimed, or -1 with a reason in error. the first
-//time, this asks the user for permission and fails with "waiting for usb permission", so callers should retry
-int BespokeAndroidUsbOpen(int vendorId, int productId, int interfaceNumber, char* error, int errorSize);
-void BespokeAndroidUsbClose(int fd);
-//blocking bulk transfer to an OUT endpoint. returns false if it fails (eg if the device was unplugged)
-bool BespokeAndroidUsbBulkWrite(int fd, unsigned char endpoint, const unsigned char* data, int length, int timeoutMs);
+//returns a file descriptor for the device, or -1 with a reason in error. the first time, this asks the user for
+//permission and fails with "waiting for usb permission", so callers should retry
+int BespokeAndroidUsbOpen(int vendorId, int productId, char* error, int errorSize);
 }

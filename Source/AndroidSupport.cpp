@@ -26,11 +26,8 @@
 #include "AndroidSupport.h"
 
 #include <android/log.h>
-#include <cerrno>
 #include <cstdio>
 #include <cstring>
-#include <linux/usbdevice_fs.h>
-#include <sys/ioctl.h>
 
 namespace
 {
@@ -306,7 +303,7 @@ namespace
    }
 }
 
-int BespokeAndroidUsbOpen(int vendorId, int productId, int interfaceNumber, char* error, int errorSize)
+int BespokeAndroidUsbOpen(int vendorId, int productId, char* error, int errorSize)
 {
    auto setError = [error, errorSize](const char* message)
    {
@@ -329,8 +326,8 @@ int BespokeAndroidUsbOpen(int vendorId, int productId, int interfaceNumber, char
       return -1;
    }
 
-   jmethodID open = env->GetStaticMethodID(usbClass.get(), "open", "(Landroid/content/Context;III)I");
-   int result = env->CallStaticIntMethod(usbClass.get(), open, context.get(), vendorId, productId, interfaceNumber);
+   jmethodID open = env->GetStaticMethodID(usbClass.get(), "open", "(Landroid/content/Context;II)I");
+   int result = env->CallStaticIntMethod(usbClass.get(), open, context.get(), vendorId, productId);
    if (env->ExceptionCheck())
    {
       env->ExceptionClear();
@@ -348,49 +345,7 @@ int BespokeAndroidUsbOpen(int vendorId, int productId, int interfaceNumber, char
       case -2: setError("waiting for usb permission"); break;
       case -3: setError("usb access denied, reconnect to ask again"); break;
       case -4: setError("couldn't open usb device"); break;
-      case -5: setError("display interface is in use"); break;
       default: setError("usb error"); break;
    }
    return -1;
-}
-
-void BespokeAndroidUsbClose(int fd)
-{
-   auto* env = juce::getEnv();
-   auto context = juce::getAppContext();
-   if (env == nullptr || context.get() == nullptr)
-      return;
-
-   juce::LocalRef<jclass> usbClass(GetBespokeUsbClass(env, context.get()));
-   if (usbClass.get() == nullptr)
-      return;
-
-   jmethodID close = env->GetStaticMethodID(usbClass.get(), "close", "(I)V");
-   env->CallStaticVoidMethod(usbClass.get(), close, fd);
-   if (env->ExceptionCheck())
-      env->ExceptionClear();
-}
-
-bool BespokeAndroidUsbBulkWrite(int fd, unsigned char endpoint, const unsigned char* data, int length, int timeoutMs)
-{
-   //older kernels limit a single usbfs transfer to 16k
-   constexpr int kMaxChunk = 16384;
-   while (length > 0)
-   {
-      usbdevfs_bulktransfer transfer{};
-      transfer.ep = endpoint;
-      transfer.len = (unsigned int)std::min(length, kMaxChunk);
-      transfer.timeout = (unsigned int)timeoutMs;
-      transfer.data = (void*)data;
-
-      int written = ioctl(fd, USBDEVFS_BULK, &transfer);
-      if (written < 0 && errno == EINTR)
-         continue;
-      if (written <= 0)
-         return false;
-
-      data += written;
-      length -= written;
-   }
-   return true;
 }
