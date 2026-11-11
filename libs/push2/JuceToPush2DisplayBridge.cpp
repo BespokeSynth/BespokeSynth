@@ -44,7 +44,7 @@ NBase::Result Push2DisplayBridge::Init(DeviceType deviceType)
    if (!display)
    {
      if (deviceType == DeviceType::Move)
-        return {"no move support"};
+        return {"no LCD support"};
      return {"no push 2 support"};
    }
 

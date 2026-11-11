@@ -14,6 +14,12 @@ using namespace juce;
 #include "Push2Control.h" //TODO(Ryan) remove
 #include "SpaceMouseControl.h"
 #include "UserPrefs.h"
+#include "FixedBlockAudioAdapter.h"
+#if BESPOKE_IOS
+#include "IOSAudioSession.h"
+#include "IOSDiagnostics.h"
+#include "IOSPointerInput.h"
+#endif
 
 #ifdef JUCE_WINDOWS
 #include <windows.h>
@@ -27,6 +33,9 @@ using namespace juce;
 class MainContentComponent : public OpenGLAppComponent,
                              public AudioIODeviceCallback,
                              public FileDragAndDropTarget,
+#if BESPOKE_IOS
+                             public TextInputTarget, //lets bespoke's text fields bring up the on-screen keyboard
+#endif
                              private Timer
 {
 public:
@@ -124,6 +133,29 @@ public:
 
       mSynth.Poll();
 
+#if BESPOKE_IOS
+      if (auto* peer = getPeer())
+      {
+         IOSPointerInput::Install(peer->getNativeHandle(), [this](float x, float y, float scaleFactor)
+                                  {
+                                     if (auto* currentPeer = getPeer())
+                                        currentPeer->handleMagnifyGesture(MouseInputSource::InputSourceType::touch, { x, y }, Time::currentTimeMillis(), scaleFactor);
+                                  });
+      }
+
+      mSynth.SetShowTouchTooltips(mSynth.IsTouchNavigationMode() && !mClickTouchIsPointer && Desktop::getInstance().getNumDraggingMouseSources() == 1);
+
+      //show/hide the on-screen keyboard when a bespoke text field gains/loses focus
+      if (isTextInputActive() != mWasTextInputActive)
+      {
+         mWasTextInputActive = isTextInputActive();
+         if (mWasTextInputActive && !hasKeyboardFocus(false))
+            grabKeyboardFocus();
+         if (auto* peer = getPeer())
+            peer->refreshTextInputTarget();
+      }
+#endif
+
 #if DEBUG
       if (sRenderFrame % 2 == 0)
 #else
@@ -146,6 +178,31 @@ public:
       mScreenPosition = getScreenPosition();
 
       mSpaceMouseReader.Poll();
+
+#if BESPOKE_IOS
+      /*{
+         //periodic audio diagnostics, since there's no debugger console on device
+         static int sDiagnosticFrame = 0;
+         if (++sDiagnosticFrame % 300 == 0)
+            ofLog() << IOSDiagnostics::GetAudioSessionState() << "   audio callbacks: " << mAudioCallbackCount.load() << "   last size: " << mLastCallbackSize.load() << "   block adapter: " << mUseBlockAdapter.load() << "   resampling: " << mBlockAdapter.IsResampling() << "   device rate: " << (mGlobalManagers.mDeviceManager.getCurrentAudioDevice() ? mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate() : 0) << "   bespoke rate: " << gSampleRate / UserPrefs.oversampling.Get() << "   paused: " << TheSynth->IsAudioPaused() << "   device: " << (mGlobalManagers.mDeviceManager.getCurrentAudioDevice() ? mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getName().toStdString() : "null") << "   playing: " << (mGlobalManagers.mDeviceManager.getCurrentAudioDevice() ? mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->isPlaying() : false);
+      }*/
+
+      {
+         //JUCE re-requests its (size + 1) duration after route changes, interruptions, etc, so re-assert ours when callbacks drift.
+         //throttled, so we don't fight iOS when it deliberately uses large buffers (e.g. while the screen is locked)
+         int blockSize = gBufferSize / UserPrefs.oversampling.Get();
+         int lastCallbackSize = mLastCallbackSize.load();
+         double now = juce::Time::getMillisecondCounterHiRes();
+         if (lastCallbackSize != 0 && lastCallbackSize != blockSize && now - mLastBufferSizeRequestTime > 1000)
+         {
+            mLastBufferSizeRequestTime = now;
+            //use the hardware's current rate, which can differ from ours after a route change (e.g. a 44.1k usb device)
+            auto* device = mGlobalManagers.mDeviceManager.getCurrentAudioDevice();
+            double deviceRate = device != nullptr ? device->getCurrentSampleRate() : 0;
+            IOSAudioSession::RequestExactBufferSize(deviceRate > 0 ? deviceRate : gSampleRate / UserPrefs.oversampling.Get(), blockSize);
+         }
+      }
+#endif
 
       if (mAudioDeviceConnectionState == AudioDeviceConnectionState::CheckForDisconnection)
       {
@@ -173,7 +230,23 @@ public:
       // You can use this function to initialise any resources you might need,
       // but be careful - it will be called on the audio thread, not the GUI thread.
 
-      ofLog() << "audioDeviceAboutToStart()";
+      ofLog() << "audioDeviceAboutToStart()" << (device ? "   rate: " + juce::String(device->getCurrentSampleRate()) + "   buffer: " + juce::String(device->getCurrentBufferSizeSamples()) : juce::String());
+
+      //the device's sample rate can change mid-session (e.g. on iOS, when plugging into a 44.1k-only usb interface).
+      //bespoke's rate is fixed once modules exist, so resample to the device's rate when they differ.
+      //(JUCE holds its callback lock while calling this, so it can't overlap with the audio callback)
+      if (device != nullptr && mBlockAdapter.IsPrepared())
+         UpdateBlockAdapterSampleRate(device->getCurrentSampleRate());
+   }
+
+   void UpdateBlockAdapterSampleRate(double deviceSampleRate)
+   {
+      mBlockAdapter.SetSampleRates(gSampleRate / UserPrefs.oversampling.Get(), deviceSampleRate);
+      mBlockAdapter.Reset();
+      mMatchingCallbackCount = 0;
+      if (mBlockAdapter.IsResampling())
+         mUseBlockAdapter = true;
+      mSynth.SetResamplingDeviceSampleRate(mBlockAdapter.IsResampling() ? juce::roundToInt(deviceSampleRate) : 0);
    }
 
    void audioDeviceIOCallbackWithContext(const float* const* inputChannelData,
@@ -184,8 +257,45 @@ public:
                                          const AudioIODeviceCallbackContext& context) override
    {
       ignoreUnused(context);
+#if BESPOKE_IOS
+      ++mAudioCallbackCount;
+      mLastCallbackSize = numSamples;
+#endif
+
+      //when the device delivers a block size other than what we asked for, or runs at a different sample rate,
+      //regroup (and resample) into fixed blocks. once it's delivered the right size at the right rate for a while,
+      //go back to processing directly, to drop the adapter's latency
+      const int blockSize = gBufferSize / UserPrefs.oversampling.Get();
+      if (numSamples != blockSize || mBlockAdapter.IsResampling())
+      {
+         mMatchingCallbackCount = 0;
+         if (!mUseBlockAdapter && mBlockAdapter.IsPrepared())
+            mUseBlockAdapter = true;
+      }
+      else if (mUseBlockAdapter && ++mMatchingCallbackCount > kCallbacksBeforeAdapterBypass)
+      {
+         mUseBlockAdapter = false;
+         mBlockAdapter.Reset(); //drops any audio still buffered in the adapter: a single short discontinuity at the switch
+      }
+
+      if (mUseBlockAdapter)
+      {
+         mBlockAdapter.Process(inputChannelData, numInputChannels, outputChannelData, numOutputChannels, numSamples,
+                               [this, numInputChannels, numOutputChannels](const float* const* input, float* const* output, int blockSize)
+                               {
+                                  mSynth.AudioIn(input, blockSize, numInputChannels);
+                                  mSynth.AudioOut(output, blockSize, numOutputChannels);
+                               });
+         return;
+      }
+
       mSynth.AudioIn(inputChannelData, numSamples, numInputChannels);
       mSynth.AudioOut(outputChannelData, numSamples, numOutputChannels);
+   }
+
+   void audioDeviceError(const String& errorMessage) override
+   {
+      ofLog() << "audioDeviceError(): " << errorMessage.toStdString();
    }
 
    void audioDeviceStopped() override
@@ -245,6 +355,33 @@ public:
       if (audioError.isEmpty())
       {
          auto loadedSetup = mGlobalManagers.mDeviceManager.getAudioDeviceSetup();
+#if BESPOKE_IOS
+         if (loadedSetup.sampleRate != gSampleRate / UserPrefs.oversampling.Get())
+         {
+            //iOS hardware may not support the requested rate (and what it supports varies by output route), so use the closest available rate
+            double requestedRate = gSampleRate / UserPrefs.oversampling.Get();
+            if (auto* device = mGlobalManagers.mDeviceManager.getCurrentAudioDevice())
+            {
+               double closestRate = loadedSetup.sampleRate;
+               for (double rate : device->getAvailableSampleRates())
+               {
+                  if (std::abs(rate - requestedRate) < std::abs(closestRate - requestedRate))
+                     closestRate = rate;
+               }
+
+               if (closestRate != loadedSetup.sampleRate)
+               {
+                  auto setup = loadedSetup;
+                  setup.sampleRate = closestRate;
+                  mGlobalManagers.mDeviceManager.setAudioDeviceSetup(setup, true);
+                  loadedSetup = mGlobalManagers.mDeviceManager.getAudioDeviceSetup();
+               }
+            }
+
+            ofLog() << "couldn't use sample rate " << requestedRate << ", using " << loadedSetup.sampleRate << " instead";
+            SetGlobalSampleRateAndBufferSize(roundToInt(loadedSetup.sampleRate), gBufferSize / UserPrefs.oversampling.Get());
+         }
+#endif
          if (outputDevice != kAutoDevice && outputDevice != kNoneDevice &&
              loadedSetup.outputDeviceName.toStdString() != outputDevice)
          {
@@ -257,11 +394,13 @@ public:
             mSynth.SetFatalError("error setting input device to '" + inputDevice + "', fix this in userprefs.json (use \"auto\" for default device, or \"none\" for no device)" +
                                  "\n\n\nvalid devices:\n" + GetAudioDevices());
          }
+#if !BESPOKE_IOS //iOS treats buffer size as a hint, and mBlockAdapter handles any mismatch
          else if (loadedSetup.bufferSize != gBufferSize / UserPrefs.oversampling.Get())
          {
             mSynth.SetFatalError("error setting buffer size to " + ofToString(gBufferSize / UserPrefs.oversampling.Get()) + " on device '" + loadedSetup.outputDeviceName.toStdString() + "', fix this in userprefs.json" +
                                  "\n\n(a valid buffer size might be: " + ofToString(loadedSetup.bufferSize) + ")");
          }
+#endif
          else if (loadedSetup.sampleRate != gSampleRate / UserPrefs.oversampling.Get())
          {
             mSynth.SetFatalError("error setting sample rate to " + ofToString(gSampleRate / UserPrefs.oversampling.Get()) + " on device '" + loadedSetup.outputDeviceName.toStdString() + "', fix this in userprefs.json" +
@@ -270,11 +409,24 @@ public:
          else
          {
             ofLog() << "output: " << loadedSetup.outputDeviceName << "   input: " << loadedSetup.inputDeviceName;
+#if BESPOKE_IOS
+            if (auto* display = Desktop::getInstance().getDisplays().getPrimaryDisplay())
+               ofLog() << "safe area insets: left " << display->safeAreaInsets.getLeft() << "  right " << display->safeAreaInsets.getRight() << "  top " << display->safeAreaInsets.getTop() << "  bottom " << display->safeAreaInsets.getBottom();
+#endif
 
             int numInputChannels = loadedSetup.inputChannels.countNumberOfSetBits();
             int numOutputChannels = loadedSetup.outputChannels.countNumberOfSetBits();
 
             mSynth.InitIOBuffers(numInputChannels, numOutputChannels);
+            {
+               //the device is already running, so don't let the audio callback see a half-prepared adapter
+               const juce::ScopedLock lock(mGlobalManagers.mDeviceManager.getAudioCallbackLock());
+               mBlockAdapter.Prepare(numInputChannels, numOutputChannels, gBufferSize / UserPrefs.oversampling.Get(), 8192);
+               UpdateBlockAdapterSampleRate(loadedSetup.sampleRate);
+            }
+#if BESPOKE_IOS
+            IOSAudioSession::RequestExactBufferSize(loadedSetup.sampleRate, gBufferSize / UserPrefs.oversampling.Get());
+#endif
          }
       }
       else
@@ -314,7 +466,12 @@ public:
    std::string GetInputDeviceName() const
    {
       std::string inputDevice = UserPrefs.audio_input_device.Get();
+#if BESPOKE_IOS
+      //iOS also has a single combined device, but keep "none" so we don't open (and prompt for) the microphone
+      if (inputDevice != kNoneDevice && !mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
+#else
       if (!mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
+#endif
          inputDevice = GetOutputDeviceName(); //asio must have identical input and output
       return inputDevice;
    }
@@ -483,18 +640,155 @@ private:
       return 1;
    }
 
+   //touch navigation: in touch navigation mode, one finger pans the canvas and two fingers pan and pinch-zoom.
+   //outside of it, the first finger clicks as usual, but a second finger turns the gesture into a two-finger pan/zoom
+   struct NavigationTouch
+   {
+      int mSourceIndex{ 0 };
+      juce::Point<float> mPosition;
+   };
+
+   std::vector<NavigationTouch>::iterator FindNavigationTouch(const MouseEvent& e)
+   {
+      return std::find_if(mNavigationTouches.begin(), mNavigationTouches.end(), [&e](const NavigationTouch& touch)
+                          {
+                             return touch.mSourceIndex == e.source.getIndex();
+                          });
+   }
+
+   bool ShouldAlwaysClick(const MouseEvent& e)
+   {
+#if BESPOKE_IOS
+      if (IOSPointerInput::WasLastPressFromPointer()) //mice and trackpads have their own ways to scroll, so they always click
+         return true;
+#endif
+      return mSynth.ShouldTouchAlwaysClick(e.getMouseDownX(), e.getMouseDownY());
+   }
+
+   bool StartNavigationTouch(const MouseEvent& e)
+   {
+      bool alwaysClick = ShouldAlwaysClick(e);
+
+      //navigation mode, or joining a two-finger gesture that's already underway
+      if (!alwaysClick && (mSynth.IsTouchNavigationMode() || (e.source.isTouch() && !mNavigationTouches.empty())))
+      {
+         mNavigationTouches.push_back({ e.source.getIndex(), e.position });
+         return true;
+      }
+
+      if (!e.source.isTouch() || mClickTouch.mSourceIndex == -1)
+         return false;
+
+      //a second finger while the first is clicking
+      if (alwaysClick || mClickTouchAlwaysClicks)
+      {
+         mIgnoredTouches.push_back(e.source.getIndex()); //bespoke only handles one pointer, so leave the click alone
+         return true;
+      }
+
+      //turn it into a two-finger pan/zoom: end the first finger's click, and navigate with both
+      auto* clickSource = Desktop::getInstance().getMouseSource(mClickTouch.mSourceIndex);
+      mSynth.MouseReleased(mClickTouch.mPosition.x, mClickTouch.mPosition.y, 1, clickSource != nullptr ? *clickSource : e.source);
+      mNavigationTouches.push_back(mClickTouch);
+      mNavigationTouches.push_back({ e.source.getIndex(), e.position });
+      mClickTouch.mSourceIndex = -1;
+      return true;
+   }
+
+   bool IsIgnoredTouch(const MouseEvent& e) const
+   {
+      return std::find(mIgnoredTouches.begin(), mIgnoredTouches.end(), e.source.getIndex()) != mIgnoredTouches.end();
+   }
+
+   bool UpdateNavigationTouch(const MouseEvent& e)
+   {
+      auto it = FindNavigationTouch(e);
+      if (it == mNavigationTouches.end())
+         return false;
+
+      if (it - mNavigationTouches.begin() >= 2) //only the first two touches navigate
+      {
+         it->mPosition = e.position;
+         return true;
+      }
+
+      if (mNavigationTouches.size() == 1)
+      {
+         auto delta = e.position - it->mPosition;
+         it->mPosition = e.position;
+         mSynth.PanView(delta.x, delta.y);
+         return true;
+      }
+
+      auto& touchA = mNavigationTouches[0];
+      auto& touchB = mNavigationTouches[1];
+      auto oldCenter = (touchA.mPosition + touchB.mPosition) * .5f;
+      float oldDistance = touchA.mPosition.getDistanceFrom(touchB.mPosition);
+      it->mPosition = e.position;
+      auto newCenter = (touchA.mPosition + touchB.mPosition) * .5f;
+      float newDistance = touchA.mPosition.getDistanceFrom(touchB.mPosition);
+
+      mSynth.PanView(newCenter.x - oldCenter.x, newCenter.y - oldCenter.y);
+      if (oldDistance > 1 && newDistance > 1)
+         mSynth.MouseMagnify(newCenter.x, newCenter.y, newDistance / oldDistance, e.source);
+      return true;
+   }
+
+   bool EndNavigationTouch(const MouseEvent& e)
+   {
+      auto it = FindNavigationTouch(e);
+      if (it == mNavigationTouches.end())
+         return false;
+      mNavigationTouches.erase(it);
+      return true;
+   }
+
    void mouseDown(const MouseEvent& e) override
    {
+      if (StartNavigationTouch(e))
+         return;
+      if (e.source.isTouch())
+      {
+         mClickTouch = { e.source.getIndex(), e.position };
+         mClickTouchAlwaysClicks = ShouldAlwaysClick(e);
+#if BESPOKE_IOS
+         mClickTouchIsPointer = IOSPointerInput::WasLastPressFromPointer();
+#endif
+      }
       mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), GetMouseButton(e), e.source);
    }
 
    void mouseUp(const MouseEvent& e) override
    {
+      if (EndNavigationTouch(e))
+         return;
+      if (IsIgnoredTouch(e))
+      {
+         mIgnoredTouches.erase(std::find(mIgnoredTouches.begin(), mIgnoredTouches.end(), e.source.getIndex()));
+         return;
+      }
+      if (e.source.isTouch())
+      {
+         if (e.source.getIndex() != mClickTouch.mSourceIndex)
+            return;
+         mClickTouch.mSourceIndex = -1;
+#if BESPOKE_IOS
+         mClickTouchIsPointer = false;
+#endif
+      }
       mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, GetMouseButton(e), e.source);
    }
 
    void mouseDrag(const MouseEvent& e) override
    {
+      if (UpdateNavigationTouch(e) || IsIgnoredTouch(e))
+         return;
+      if (e.source.isTouch())
+      {
+         if (e.source.getIndex() != mClickTouch.mSourceIndex)
+            return;
+         mClickTouch.mPosition = e.position;
+      }
       mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, GetMouseButton(e), e.source);
    }
 
@@ -506,8 +800,15 @@ private:
 
    void mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& wheel) override
    {
+#if BESPOKE_IOS
+      //juce can't report this on iOS, and iOS doesn't expose the natural scrolling setting. natural is the default there
+      bool isReversed = true;
+#else
+      bool isReversed = wheel.isReversed;
+#endif
+
       float invert = 1;
-      if (wheel.isReversed)
+      if (isReversed)
          invert = -1;
 
       float scale = 6;
@@ -515,7 +816,7 @@ private:
          scale = 30;
 
       if (!wheel.isInertial)
-         mSynth.MouseScrolled(wheel.deltaX * scale, wheel.deltaY * scale * invert, wheel.isSmooth, wheel.isReversed, true);
+         mSynth.MouseScrolled(wheel.deltaX * scale, wheel.deltaY * scale * invert, wheel.isSmooth, isReversed, true);
    }
 
    void mouseMagnify(const MouseEvent& e, float scaleFactor) override
@@ -562,6 +863,52 @@ private:
       mSynth.KeyPressed(keyCode, isRepeat);
       return true;
    }
+
+#if BESPOKE_IOS
+   //TextInputTarget
+   //bespoke's text fields do their own editing from key presses, so rather than exposing their contents to iOS, this
+   //pretends to be a one-character field with the caret after the character, and turns iOS's edits into key presses:
+   //deleting a range becomes backspaces, and inserting text becomes typed characters
+   static constexpr int kFakeCaretPosition = 1;
+
+   bool isTextInputActive() const override { return IKeyboardFocusListener::GetActiveKeyboardFocus() != nullptr; }
+   Range<int> getHighlightedRegion() const override { return mTextInputHighlight; }
+   void setHighlightedRegion(const Range<int>& newRange) override { mTextInputHighlight = newRange; }
+   void setTemporaryUnderlining(const Array<Range<int>>&) override {}
+   String getTextInRange(const Range<int>& range) const override { return String::repeatedString(" ", range.getLength()); }
+   int getCaretPosition() const override { return mTextInputHighlight.getStart(); }
+   Rectangle<int> getCaretRectangleForCharIndex(int) const override { return {}; }
+   int getTotalNumChars() const override { return kFakeCaretPosition; }
+   int getCharIndexForPoint(Point<int>) const override { return kFakeCaretPosition; }
+   RectangleList<int> getTextBounds(Range<int>) const override { return {}; }
+
+   void insertTextAtCaret(const String& textToInsert) override
+   {
+      for (int i = 0; i < mTextInputHighlight.getLength(); ++i)
+         SendTypedKey(KeyPress::backspaceKey);
+      for (auto character : textToInsert)
+         SendTypedKey((int)character);
+      mTextInputHighlight = { kFakeCaretPosition, kFakeCaretPosition };
+   }
+
+   VirtualKeyboardType getKeyboardType() override
+   {
+      if (auto* textEntry = dynamic_cast<TextEntry*>(IKeyboardFocusListener::GetActiveKeyboardFocus()))
+      {
+         if (textEntry->GetTextEntryType() == kTextEntry_Int)
+            return numericKeyboard;
+         if (textEntry->GetTextEntryType() == kTextEntry_Float)
+            return decimalKeyboard;
+      }
+      return textKeyboard;
+   }
+
+   void SendTypedKey(int keyCode)
+   {
+      mSynth.KeyPressed(keyCode, false);
+      mSynth.KeyReleased(keyCode);
+   }
+#endif
 
    bool keyStateChanged(bool isKeyDown) override
    {
@@ -643,6 +990,24 @@ private:
    juce::Point<int> mScreenPosition;
    juce::Point<int> mDesiredInitialPosition;
    SpaceMouseMessageWindow mSpaceMouseReader;
+   FixedBlockAudioAdapter mBlockAdapter;
+   std::atomic<bool> mUseBlockAdapter{ false };
+#if BESPOKE_IOS
+   bool mWasTextInputActive{ false };
+   bool mClickTouchIsPointer{ false }; //mClickTouch is a mouse or trackpad press
+   Range<int> mTextInputHighlight{ kFakeCaretPosition, kFakeCaretPosition };
+#endif
+   int mMatchingCallbackCount{ 0 }; //audio thread only
+   static constexpr int kCallbacksBeforeAdapterBypass = 100; //~0.5s at 256 samples / 48k, avoids flip-flopping
+   std::vector<NavigationTouch> mNavigationTouches;
+   NavigationTouch mClickTouch{ -1, {} }; //the touch currently acting as the mouse, if any (bespoke only handles one pointer)
+   bool mClickTouchAlwaysClicks{ false };
+   std::vector<int> mIgnoredTouches; //extra touches that bespoke can't handle while a click is underway
+#if BESPOKE_IOS
+   std::atomic<int> mAudioCallbackCount{ 0 };
+   std::atomic<int> mLastCallbackSize{ 0 };
+   double mLastBufferSizeRequestTime{ 0 };
+#endif
 
    enum class AudioDeviceConnectionState
    {

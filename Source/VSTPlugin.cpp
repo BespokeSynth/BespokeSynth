@@ -168,7 +168,7 @@ namespace VSTLookup
       auto types = TheSynth->GetKnownPluginList().getTypes();
       for (int i = 0; i < types.size(); ++i)
       {
-#if BESPOKE_MAC
+#if JUCE_PLUGINHOST_AU && (JUCE_MAC || JUCE_IOS)
          if (types[i].pluginFormatName == juce::AudioUnitPluginFormat::getFormatName())
             continue; //"fileOrIdentifier" is not a valid path, can't check
 #endif

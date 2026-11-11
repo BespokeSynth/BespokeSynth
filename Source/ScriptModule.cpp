@@ -41,6 +41,7 @@
 #undef ssize_t
 #endif
 
+#if BESPOKE_PYTHON_SUPPORT
 #include "ScriptModule_PythonInterface.i"
 
 #include "leathers/push"
@@ -49,9 +50,12 @@
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
 #include "leathers/pop"
+#endif
 #include "juce_cryptography/juce_cryptography.h"
 
+#if BESPOKE_PYTHON_SUPPORT
 namespace py = pybind11;
+#endif
 using namespace juce;
 
 //static
@@ -150,21 +154,26 @@ void ScriptModule::CreateUIControls()
 
 void ScriptModule::UninitializePython()
 {
+#if BESPOKE_PYTHON_SUPPORT
    if (sPythonInitialized)
       py::finalize_interpreter();
+#endif
    sPythonInitialized = false;
 }
 
+#if BESPOKE_PYTHON_SUPPORT
 namespace
 {
    // Py_SetPythonHome()'s signature varies depending on Python version. This converts to the string type we need.
    std::string toPythonHome(const std::string& s, void (*)(char*)) { return s; }
    std::wstring toPythonHome(const std::string& s, void (*)(const wchar_t*)) { return juce::String{ s }.toWideCharPointer(); }
 }
+#endif
 
 //static
 void ScriptModule::InitializePythonIfNecessary()
 {
+#if BESPOKE_PYTHON_SUPPORT
    if (!sPythonInitialized)
    {
 #ifdef BESPOKE_PORTABLE_PYTHON
@@ -187,16 +196,19 @@ void ScriptModule::InitializePythonIfNecessary()
       File(ofToDataPath("internal/python_" + std::string(Bespoke::PYTHON_VERSION) + "_installed")).create();
       sHasPythonEverSuccessfullyInitialized = true;
    }
+#endif
 }
 
 //static
 void ScriptModule::CheckIfPythonEverSuccessfullyInitialized()
 {
+#if BESPOKE_PYTHON_SUPPORT
    if (!sHasPythonEverSuccessfullyInitialized)
    {
       if (File(ofToDataPath("internal/python_" + std::string(Bespoke::PYTHON_VERSION) + "_installed")).existsAsFile())
          sHasPythonEverSuccessfullyInitialized = true;
    }
+#endif
 }
 
 void ScriptModule::OnClicked(float x, float y, bool right)
@@ -218,6 +230,12 @@ void ScriptModule::DrawModule()
 
    if (!sHasPythonEverSuccessfullyInitialized)
    {
+#if !BESPOKE_PYTHON_SUPPORT
+      DrawTextNormal("this build of bespoke doesn't include Python support,\nso this script can't run", 20, 20);
+      mCodeEntry->SetShowing(false);
+      mPythonInstalledConfirmButton->SetShowing(false);
+      return;
+#endif
       //DrawTextNormal("please ensure that you have Python 3.8 installed\nif you do not have Python 3.8 installed, Bespoke may crash\n\nclick to continue...", 20, 20);
       juce::String pythonVersionRev = Bespoke::PYTHON_VERSION;
       juce::String pythonVersionMinor = pythonVersionRev.substring(0, pythonVersionRev.lastIndexOfChar('.'));
@@ -1217,11 +1235,15 @@ std::pair<int, int> ScriptModule::RunScript(double time, int lineStart /*=-1*/, 
 
    if (!sPythonInitialized)
    {
+#if BESPOKE_PYTHON_SUPPORT
       TheSynth->LogEvent("trying to call ScriptModule::RunScript() before python is initialized", kLogEventType_Error);
+#endif
       return std::make_pair(0, 0);
    }
 
+#if BESPOKE_PYTHON_SUPPORT
    py::exec(GetThisName() + " = scriptmodule.get_me(" + ofToString(mScriptModuleIndex) + ")", py::globals());
+#endif
    std::string code = mCodeEntry->GetText(true);
    std::vector<std::string> lines = ofSplitString(code, "\n");
 
@@ -1272,7 +1294,9 @@ void ScriptModule::RunCode(double time, std::string code, bool hasReturnValue /*
 
    if (!sPythonInitialized)
    {
+#if BESPOKE_PYTHON_SUPPORT
       TheSynth->LogEvent("trying to call ScriptModule::RunCode() before python is initialized", kLogEventType_Error);
+#endif
       return;
    }
 
@@ -1287,6 +1311,7 @@ void ScriptModule::RunCode(double time, std::string code, bool hasReturnValue /*
    ComputeSliders(0);
    sPriorExecutedModule = nullptr;
 
+#if BESPOKE_PYTHON_SUPPORT
    try
    {
       FixUpCode(code);
@@ -1357,6 +1382,7 @@ void ScriptModule::RunCode(double time, std::string code, bool hasReturnValue /*
    {
       ofLog() << "python execution exception: " << e.what();
    }
+#endif
 }
 
 std::string ScriptModule::GetMethodPrefix()

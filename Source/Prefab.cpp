@@ -241,8 +241,7 @@ void Prefab::ButtonClicked(ClickButton* button, double time)
       FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
-         std::string savePath = chooser.getResult().getFullPathName().toStdString();
-         SavePrefab(savePath);
+         SavePrefab(SaveTarget(chooser));
       }
    }
 
@@ -272,7 +271,7 @@ void Prefab::CheckboxUpdated(Checkbox* checkbox, double time)
    }
 }
 
-void Prefab::SavePrefab(std::string savePath)
+void Prefab::SavePrefab(const SaveTarget& target)
 {
    ofxJSONElement root;
 
@@ -294,12 +293,16 @@ void Prefab::SavePrefab(std::string savePath)
       lines += line + '\n';
    }
 
-   UpdatePrefabName(savePath);
+   UpdatePrefabName(target.GetPath());
 
-   FileStreamOut out(ofToDataPath(savePath));
+   {
+      FileStreamOut out(ofToDataPath(target.GetWritePath()));
 
-   out << lines;
-   mModuleContainer.SaveState(out);
+      out << lines;
+      mModuleContainer.SaveState(out);
+   }
+
+   target.Commit();
 }
 
 void Prefab::LoadPrefab(std::string loadPath)

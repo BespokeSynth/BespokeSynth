@@ -107,6 +107,8 @@ std::string ofToFactoryPath(const std::string& subdir)
    std::string result;
 #if BESPOKE_MAC
    auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getChildFile("Contents/Resources").getChildFile(subdir);
+#elif BESPOKE_IOS
+   auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getChildFile(subdir);
 #else
    auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentExecutableFile).getSiblingFile(subdir);
 #if BESPOKE_LINUX

@@ -14,6 +14,11 @@
 #include "SynthGlobals.h"
 
 #include "VersionInfo.h"
+#include "ModularSynth.h"
+#if BESPOKE_IOS
+#include "IOSDocuments.h"
+#include "IOSDiagnostics.h"
+#endif
 
 #if BESPOKE_WINDOWS
 #include <dwmapi.h>
@@ -107,6 +112,21 @@ public:
       appProperties = std::make_unique<juce::ApplicationProperties>();
       appProperties->setStorageParameters(options);
 
+#if BESPOKE_IOS
+      IOSDiagnostics::LogUncaughtExceptions([](const juce::String& message)
+                                            {
+                                               ofLog() << message.toStdString();
+                                            });
+      IOSDiagnostics::LogAudioSessionEvents([](const juce::String& message)
+                                            {
+                                               ofLog() << message.toStdString();
+                                            });
+      IOSDocuments::SetOpenFileHandler([](const juce::File& file)
+                                       {
+                                          OpenDocumentFromOtherApp(file);
+                                       });
+#endif
+
 #if BESPOKE_WINDOWS
       HWND hwnd = (HWND)this->mainWindow.get()->getWindowHandle();
 
@@ -115,6 +135,34 @@ public:
       UpdateWindow(hwnd);
 #endif
    }
+
+#if BESPOKE_IOS
+   //files opened from other apps may only be readable temporarily, so copy them into our savestate folder, then open the copy
+   static void OpenDocumentFromOtherApp(const juce::File& source)
+   {
+      if (!source.hasFileExtension(".bsk") || TheSynth == nullptr)
+         return;
+
+      juce::File savestateDir(ofToDataPath("savestate"));
+      juce::File dest = source;
+      if (!source.isAChildOf(savestateDir))
+      {
+         savestateDir.createDirectory();
+         dest = savestateDir.getChildFile(source.getFileName());
+         if (dest.existsAsFile() && !dest.hasIdenticalContentTo(source)) //don't overwrite a different patch with the same name
+            dest = savestateDir.getNonexistentChildFile(source.getFileNameWithoutExtension(), ".bsk", true);
+         if (!dest.existsAsFile() && !source.copyFileTo(dest))
+            return;
+
+         //iOS puts some opened files in Documents/Inbox for us to take, so clean those up
+         juce::File inbox = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("Inbox");
+         if (source.isAChildOf(inbox))
+            source.deleteFile();
+      }
+
+      TheSynth->OpenSaveStateFile(dest.getFullPathName().toStdString());
+   }
+#endif
 
    // Prints an error for arguments that expected an argument but were not given one
    void CliErrorExpectedOpt(String argument)
@@ -165,9 +213,13 @@ public:
       {
          setUsingNativeTitleBar(true);
          setContentOwned(createMainContentComponent(), true);
+#if BESPOKE_IOS
+         setFullScreen(true);
+#else
          setResizable(true, true);
 
          centreWithSize(getWidth(), getHeight());
+#endif
          setVisible(true);
       }
 

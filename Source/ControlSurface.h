@@ -200,6 +200,7 @@ private:
    std::array<std::unique_ptr<ControlSurfaceDevice>, (int)ControlSurfaceDeviceType::Count> mSurfaces{};
    std::atomic<ControlSurfaceDevice*> mConnectedSurface{ nullptr };
    bool mNeedsConnect{ true };
+   double mLastLedKeepAliveTime{ 0.0 };
    bool mLoadedFromState{ false };
    std::string mStatusMessage{};
 

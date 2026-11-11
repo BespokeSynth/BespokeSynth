@@ -51,7 +51,9 @@ namespace abletonmove
 
     void SendBitmapToDevice()
     {
+#if BESPOKE_ABLETONMOVE_SUPPORT
       communicator_.SendBitmapToDevice();
+#endif
     }
 
   private:
@@ -62,6 +64,8 @@ namespace abletonmove
 
     unsigned char dataSource_[kDataSourceWidth * kDataSourceHeight]{};
 
+#if BESPOKE_ABLETONMOVE_SUPPORT
     UsbCommunicator communicator_;
+#endif
   };
 }

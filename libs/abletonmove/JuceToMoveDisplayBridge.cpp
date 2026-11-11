@@ -42,7 +42,7 @@ NBase::Result MoveDisplayBridge::Init()
    std::unique_ptr<MoveDisplay> display{MoveDisplay::create()};
    if (!display)
    {
-     return {"no move support"};
+     return {"no LCD support"};
    }
 
    auto result{display->Init()};
