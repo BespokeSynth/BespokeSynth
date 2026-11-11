@@ -1,7 +1,12 @@
 project(abletonmove)
 
 set(DOC_STRING "Enable Ableton Move support. When off, the abletonmovecontrol module is present but non-functional.")
-option(BESPOKE_ABLETONMOVE_SUPPORT "${DOC_STRING}" ${BESPOKE_DESKTOP})
+if(BESPOKE_DESKTOP OR BESPOKE_ANDROID)
+    set(BESPOKE_ABLETONMOVE_SUPPORT_DEFAULT ON)
+else()
+    set(BESPOKE_ABLETONMOVE_SUPPORT_DEFAULT OFF)
+endif()
+option(BESPOKE_ABLETONMOVE_SUPPORT "${DOC_STRING}" ${BESPOKE_ABLETONMOVE_SUPPORT_DEFAULT})
 
 add_library(${PROJECT_NAME}
         JuceToMoveDisplayBridge.cpp
@@ -14,7 +19,8 @@ add_library(${PROJECT_NAME}
         include/abletonmove/Result.h
 )
 
-if(BESPOKE_ABLETONMOVE_SUPPORT)
+# android apps can't use libusb's device discovery, so android has its own communicator instead (see below)
+if(BESPOKE_ABLETONMOVE_SUPPORT AND NOT ANDROID)
     # FIXME: The code currently assumes that WIN32 == MSVC and will fail to build
     # on MinGW, so we use the system libusb on there. This is the best option for
     # native builds anyway, but for cross we should build libusb for convenience.
@@ -65,7 +71,11 @@ endif()
 
 # Gotta recheck in case it was vetoed above
 if(BESPOKE_ABLETONMOVE_SUPPORT)
-    target_sources(${PROJECT_NAME} PRIVATE Move-Usb-Communicator.cpp)
+    if(ANDROID)
+        target_sources(${PROJECT_NAME} PRIVATE Move-Usb-Communicator-android.cpp)
+    else()
+        target_sources(${PROJECT_NAME} PRIVATE Move-Usb-Communicator.cpp)
+    endif()
     message(STATUS "Ableton Move support enabled")
 else()
     message(STATUS "Ableton Move support disabled")

@@ -1,7 +1,12 @@
 project(push2)
 
 set(DOC_STRING "Enable Ableton Push 2 support. When off, the push2control module is present but non-functional.")
-option(BESPOKE_PUSH2_SUPPORT "${DOC_STRING}" ${BESPOKE_DESKTOP})
+if(BESPOKE_DESKTOP OR BESPOKE_ANDROID)
+    set(BESPOKE_PUSH2_SUPPORT_DEFAULT ON)
+else()
+    set(BESPOKE_PUSH2_SUPPORT_DEFAULT OFF)
+endif()
+option(BESPOKE_PUSH2_SUPPORT "${DOC_STRING}" ${BESPOKE_PUSH2_SUPPORT_DEFAULT})
 
 add_library(${PROJECT_NAME}
     JuceToPush2DisplayBridge.cpp
@@ -15,7 +20,8 @@ add_library(${PROJECT_NAME}
     include/push2/Result.h
     )
 
-if(BESPOKE_PUSH2_SUPPORT)
+# android apps can't use libusb's device discovery, so android has its own communicator instead (see below)
+if(BESPOKE_PUSH2_SUPPORT AND NOT ANDROID)
     # FIXME: The code currently assumes that WIN32 == MSVC and will fail to build
     # on MinGW, so we use the system libusb on there. This is the best option for
     # native builds anyway, but for cross we should build libusb for convenience.
@@ -66,7 +72,11 @@ endif()
 
 # Gotta recheck in case it was vetoed above
 if(BESPOKE_PUSH2_SUPPORT)
-    target_sources(${PROJECT_NAME} PRIVATE Push2-Usb-Communicator.cpp)
+    if(ANDROID)
+        target_sources(${PROJECT_NAME} PRIVATE Push2-Usb-Communicator-android.cpp)
+    else()
+        target_sources(${PROJECT_NAME} PRIVATE Push2-Usb-Communicator.cpp)
+    endif()
     message(STATUS "Ableton Push 2 support enabled")
 else()
     message(STATUS "Ableton Push 2 support disabled")

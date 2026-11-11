@@ -41,6 +41,14 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- offer to open bespoke when a Move or Push 2 is plugged in. if the user agrees, that also gives bespoke
+                 access to the device for its display, so it doesn't have to ask separately -->
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/usb_device_filter" />
         </activity>
     </application>
 </manifest>

@@ -33,8 +33,8 @@ android {
             cmake {
                 targets 'BespokeSynth'
                 arguments '-DANDROID_STL=c++_static',
-                          '-DBESPOKE_PUSH2_SUPPORT=OFF',
-                          '-DBESPOKE_ABLETONMOVE_SUPPORT=OFF',
+                          '-DBESPOKE_PUSH2_SUPPORT=ON',
+                          '-DBESPOKE_ABLETONMOVE_SUPPORT=ON',
                           '-DBESPOKE_PSMOVE_SUPPORT=OFF'
                 // JUCE expects char to be signed, which it isn't by default on arm
                 cFlags '-fsigned-char'

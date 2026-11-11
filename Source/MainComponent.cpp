@@ -15,9 +15,6 @@ using namespace juce;
 #include "SpaceMouseControl.h"
 #include "UserPrefs.h"
 #include "FixedBlockAudioAdapter.h"
-#if BESPOKE_ANDROID
-#include "AndroidSupport.h"
-#endif
 #if BESPOKE_IOS
 #include "IOSAudioSession.h"
 #include "IOSDiagnostics.h"
@@ -79,10 +76,6 @@ public:
 #endif
 
       UserPrefs.Init();
-
-#if BESPOKE_ANDROID
-      AndroidSupport::StartLoggingMidiPorts();
-#endif
 
       int screenWidth, screenHeight;
       {
@@ -399,9 +392,6 @@ public:
             SetGlobalSampleRateAndBufferSize(roundToInt(loadedSetup.sampleRate), gBufferSize / UserPrefs.oversampling.Get());
          }
 #endif
-#if BESPOKE_ANDROID
-         ofLog() << "android audio: block " << gBufferSize / UserPrefs.oversampling.Get() << ", device buffer " << loadedSetup.bufferSize;
-#endif
          if (outputDevice != kAutoDevice && outputDevice != kNoneDevice &&
              loadedSetup.outputDeviceName.toStdString() != outputDevice)
          {
@@ -541,7 +531,6 @@ public:
       if (bestSize == 0 && !availableSizes.isEmpty())
          bestSize = availableSizes.getLast();
 
-      ofLog() << "android audio: " << device->getTypeName() << " buffer sizes " << (availableSizes.isEmpty() ? 0 : availableSizes[0]) << "-" << (availableSizes.isEmpty() ? 0 : availableSizes.getLast()) << ", using " << bestSize << " for blocks of " << blockSize;
       return bestSize;
    }
 #endif

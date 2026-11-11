@@ -45,7 +45,13 @@ NBase::Result Push2DisplayBridge::Init()
      return {"no LCD support"}; // display support isn't compiled in (BESPOKE_PUSH2_SUPPORT)
    auto result{display->Init()};
    if (result.Failed())
+   {
+#ifdef __ANDROID__
+     return result; // says why, eg that it's waiting for the user to allow usb access
+#else
      return {"no push 2 found"};
+#endif
+   }
    push2Display_ = std::move(display);
    return result;
 }

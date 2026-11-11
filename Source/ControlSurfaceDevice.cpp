@@ -258,6 +258,23 @@ bool ControlSurfaceDevice::Connect(MidiDevice& device, std::string& statusMessag
    return true;
 }
 
+void ControlSurfaceDevice::RetryDisplay(std::string& statusMessage)
+{
+   if (!HasDisplay() || IsDisplayConnected())
+      return;
+
+   std::string displayError;
+   if (InitDisplay(displayError))
+   {
+      statusMessage = "";
+      ofLog() << GetName() << " display connected";
+   }
+   else
+   {
+      statusMessage = displayError;
+   }
+}
+
 void ControlSurfaceDevice::Disconnect(MidiDevice& device)
 {
    OnDisconnecting(device);

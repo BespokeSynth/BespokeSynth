@@ -1738,6 +1738,16 @@ void ControlSurface::Poll()
       ConnectDevice();
    }
 
+#if BESPOKE_ANDROID
+   //on android, the display can't be opened until the user allows usb access, which they're asked for when connecting
+   ControlSurfaceDevice* connectedSurface = mConnectedSurface;
+   if (connectedSurface != nullptr && gTime - mLastDisplayRetryTime > 1000)
+   {
+      mLastDisplayRetryTime = gTime;
+      connectedSurface->RetryDisplay(mStatusMessage);
+   }
+#endif
+
    ControlInput input;
    while (mQueuedInputs.consume(input))
    {

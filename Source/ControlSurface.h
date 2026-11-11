@@ -203,6 +203,7 @@ private:
    double mLastLedKeepAliveTime{ 0.0 };
    bool mLoadedFromState{ false };
    std::string mStatusMessage{};
+   double mLastDisplayRetryTime{ 0 };
 
    AbletonMoveLCD mLCD;
    //extra screens for devices that show several at once (push 2)

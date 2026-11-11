@@ -25,10 +25,12 @@
 
 #include "AndroidSupport.h"
 
-#include "juce_audio_devices/juce_audio_devices.h"
-
 #include <android/log.h>
+#include <cerrno>
 #include <cstdio>
+#include <cstring>
+#include <linux/usbdevice_fs.h>
+#include <sys/ioctl.h>
 
 namespace
 {
@@ -179,25 +181,6 @@ void AndroidSupport::Log(const char* message)
    }
 }
 
-void AndroidSupport::StartLoggingMidiPorts()
-{
-   static auto logPorts = []()
-   {
-      juce::String message = "midi ports changed.";
-      for (bool isInput : { true, false })
-      {
-         auto devices = isInput ? juce::MidiInput::getAvailableDevices() : juce::MidiOutput::getAvailableDevices();
-         message << "\n  " << (isInput ? "inputs" : "outputs") << " (" << devices.size() << "):";
-         for (const auto& device : devices)
-            message << "\n    \"" << device.name << "\"   id: " << device.identifier;
-      }
-      Log(message.toRawUTF8());
-   };
-
-   logPorts();
-   static auto sConnection = juce::MidiDeviceListConnection::make(logPorts);
-}
-
 bool AndroidSupport::IsDocument(const juce::URL& url)
 {
    return url.getScheme() == "content";
@@ -300,4 +283,114 @@ juce::Result AndroidSupport::WriteToDocument(const juce::URL& document, const ju
    ok = !checkException() && ok;
 
    return ok ? juce::Result::ok() : juce::Result::fail("couldn't write to the document");
+}
+
+namespace
+{
+   //calls a static method of com.ryanchallinor.bespokesynth.BespokeUsb. app classes have to be loaded through the
+   //app's class loader, since JNI's FindClass only sees system classes on threads that java didn't start
+   jclass GetBespokeUsbClass(JNIEnv* env, jobject context)
+   {
+      juce::LocalRef<jclass> contextClass(env->GetObjectClass(context));
+      jmethodID getClassLoader = env->GetMethodID(contextClass.get(), "getClassLoader", "()Ljava/lang/ClassLoader;");
+      juce::LocalRef<jobject> classLoader(env->CallObjectMethod(context, getClassLoader));
+      juce::LocalRef<jclass> classLoaderClass(env->GetObjectClass(classLoader.get()));
+      jmethodID loadClass = env->GetMethodID(classLoaderClass.get(), "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+      auto usbClass = (jclass)env->CallObjectMethod(classLoader.get(), loadClass, juce::javaString("com.ryanchallinor.bespokesynth.BespokeUsb").get());
+      if (env->ExceptionCheck())
+      {
+         env->ExceptionClear();
+         return nullptr;
+      }
+      return usbClass;
+   }
+}
+
+int BespokeAndroidUsbOpen(int vendorId, int productId, int interfaceNumber, char* error, int errorSize)
+{
+   auto setError = [error, errorSize](const char* message)
+   {
+      if (error != nullptr && errorSize > 0)
+         snprintf(error, errorSize, "%s", message);
+   };
+
+   auto* env = juce::getEnv();
+   auto context = juce::getAppContext();
+   if (env == nullptr || context.get() == nullptr)
+   {
+      setError("no android context");
+      return -1;
+   }
+
+   juce::LocalRef<jclass> usbClass(GetBespokeUsbClass(env, context.get()));
+   if (usbClass.get() == nullptr)
+   {
+      setError("couldn't load BespokeUsb");
+      return -1;
+   }
+
+   jmethodID open = env->GetStaticMethodID(usbClass.get(), "open", "(Landroid/content/Context;III)I");
+   int result = env->CallStaticIntMethod(usbClass.get(), open, context.get(), vendorId, productId, interfaceNumber);
+   if (env->ExceptionCheck())
+   {
+      env->ExceptionClear();
+      setError("usb error");
+      return -1;
+   }
+
+   if (result >= 0)
+      return result;
+
+   //see the error codes in BespokeUsb.java
+   switch (result)
+   {
+      case -1: setError("device not found"); break;
+      case -2: setError("waiting for usb permission"); break;
+      case -3: setError("usb access denied, reconnect to ask again"); break;
+      case -4: setError("couldn't open usb device"); break;
+      case -5: setError("display interface is in use"); break;
+      default: setError("usb error"); break;
+   }
+   return -1;
+}
+
+void BespokeAndroidUsbClose(int fd)
+{
+   auto* env = juce::getEnv();
+   auto context = juce::getAppContext();
+   if (env == nullptr || context.get() == nullptr)
+      return;
+
+   juce::LocalRef<jclass> usbClass(GetBespokeUsbClass(env, context.get()));
+   if (usbClass.get() == nullptr)
+      return;
+
+   jmethodID close = env->GetStaticMethodID(usbClass.get(), "close", "(I)V");
+   env->CallStaticVoidMethod(usbClass.get(), close, fd);
+   if (env->ExceptionCheck())
+      env->ExceptionClear();
+}
+
+bool BespokeAndroidUsbBulkWrite(int fd, unsigned char endpoint, const unsigned char* data, int length, int timeoutMs)
+{
+   //older kernels limit a single usbfs transfer to 16k
+   constexpr int kMaxChunk = 16384;
+   while (length > 0)
+   {
+      usbdevfs_bulktransfer transfer{};
+      transfer.ep = endpoint;
+      transfer.len = (unsigned int)std::min(length, kMaxChunk);
+      transfer.timeout = (unsigned int)timeoutMs;
+      transfer.data = (void*)data;
+
+      int written = ioctl(fd, USBDEVFS_BULK, &transfer);
+      if (written < 0 && errno == EINTR)
+         continue;
+      if (written <= 0)
+         return false;
+
+      data += written;
+      length -= written;
+   }
+   return true;
 }
