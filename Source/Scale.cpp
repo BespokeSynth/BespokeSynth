@@ -574,11 +574,9 @@ void Scale::Poll()
          std::string prompt = "Load ";
          prompt += (button == mLoadSCLButton) ? "SCL" : "KBM";
          std::string pat = (button == mLoadSCLButton) ? "*.scl;*.SCL" : "*.kbm;*.KBM";
-         bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-         juce::FileChooser chooser(prompt, juce::File(""), pat, isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-         if (BrowseForFileToOpen(chooser))
+         auto onChosen = [this, button](const juce::FileChooser& chooser)
          {
-            auto file = chooser.getResult();
+            auto file = GetChosenFileForReading(chooser);
             std::cout << file.getFullPathName().toStdString() << std::endl;
             if (button == mLoadSCLButton)
             {
@@ -589,7 +587,8 @@ void Scale::Poll()
                mKbmContents = file.loadFileAsString().toStdString();
             }
             UpdateTuningTable();
-         }
+         };
+         BrowseForFileToOpen(prompt, juce::File(""), pat, onChosen);
       }
    }
 }

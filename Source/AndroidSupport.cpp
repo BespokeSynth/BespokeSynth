@@ -149,3 +149,107 @@ void AndroidSupport::Log(const char* message)
 {
    __android_log_write(ANDROID_LOG_INFO, "bespoke", message);
 }
+
+bool AndroidSupport::IsDocument(const juce::URL& url)
+{
+   return url.getScheme() == "content";
+}
+
+juce::String AndroidSupport::GetDocumentName(const juce::URL& document)
+{
+   auto name = juce::AndroidDocument::fromDocument(document).getInfo().getName();
+   if (name.isEmpty()) //document ids usually end with the file name, eg primary%3ADocuments%2Fsong.bsk
+      name = juce::URL::removeEscapeChars(document.getFileName()).fromLastOccurrenceOf("/", false, false).fromLastOccurrenceOf(":", false, false);
+   if (name.isEmpty())
+      name = "document";
+   return name;
+}
+
+juce::File AndroidSupport::GetDocumentMirror(const juce::URL& document)
+{
+   return juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile("documents").getChildFile(juce::File::createLegalFileName(GetDocumentName(document)));
+}
+
+juce::Result AndroidSupport::CopyDocumentToMirror(const juce::URL& document)
+{
+   //rather than URL::createInputStream(), which first tries to look the document up as a file, and asserts when that
+   //needs storage permissions
+   auto input = juce::AndroidDocument::fromDocument(document).createInputStream();
+   if (input == nullptr)
+      return juce::Result::fail("couldn't open " + document.toString(false));
+
+   auto mirror = GetDocumentMirror(document);
+   mirror.getParentDirectory().createDirectory();
+   juce::FileOutputStream output(mirror);
+   if (!output.openedOk())
+      return output.getStatus();
+   output.setPosition(0);
+   output.truncate();
+   output.writeFromInputStream(*input, -1);
+   output.flush();
+   return output.getStatus();
+}
+
+juce::Result AndroidSupport::WriteToDocument(const juce::URL& document, const juce::File& source)
+{
+   juce::FileInputStream input(source);
+   if (!input.openedOk())
+      return input.getStatus();
+
+   auto* env = juce::getEnv();
+   auto context = juce::getAppContext();
+   if (env == nullptr || context.get() == nullptr)
+      return juce::Result::fail("no android context");
+
+   auto checkException = [env]()
+   {
+      if (!env->ExceptionCheck())
+         return false;
+      env->ExceptionClear();
+      return true;
+   };
+
+   //opened with ContentResolver.openOutputStream(uri, "wt") rather than JUCE's URL::createOutputStream(), which uses
+   //mode "w": some document providers don't truncate in that mode, which would leave the end of a longer previous
+   //version of the file in place
+   juce::LocalRef<jclass> contextClass(env->GetObjectClass(context.get()));
+   jmethodID getContentResolver = env->GetMethodID(contextClass.get(), "getContentResolver", "()Landroid/content/ContentResolver;");
+   juce::LocalRef<jobject> resolver(env->CallObjectMethod(context.get(), getContentResolver));
+   if (checkException() || resolver.get() == nullptr)
+      return juce::Result::fail("no content resolver");
+
+   juce::LocalRef<jclass> uriClass(env->FindClass("android/net/Uri"));
+   jmethodID parse = env->GetStaticMethodID(uriClass.get(), "parse", "(Ljava/lang/String;)Landroid/net/Uri;");
+   juce::LocalRef<jobject> uri(env->CallStaticObjectMethod(uriClass.get(), parse, juce::javaString(document.toString(true)).get()));
+   if (checkException() || uri.get() == nullptr)
+      return juce::Result::fail("bad document url");
+
+   juce::LocalRef<jclass> resolverClass(env->GetObjectClass(resolver.get()));
+   jmethodID openOutputStream = env->GetMethodID(resolverClass.get(), "openOutputStream", "(Landroid/net/Uri;Ljava/lang/String;)Ljava/io/OutputStream;");
+   juce::LocalRef<jobject> stream(env->CallObjectMethod(resolver.get(), openOutputStream, uri.get(), juce::javaString("wt").get()));
+   if (checkException() || stream.get() == nullptr)
+      return juce::Result::fail("couldn't open the document for writing");
+
+   juce::LocalRef<jclass> streamClass(env->GetObjectClass(stream.get()));
+   jmethodID write = env->GetMethodID(streamClass.get(), "write", "([BII)V");
+   jmethodID close = env->GetMethodID(streamClass.get(), "close", "()V");
+
+   constexpr int kChunkSize = 65536;
+   juce::HeapBlock<char> buffer(kChunkSize);
+   juce::LocalRef<jbyteArray> javaBuffer(env->NewByteArray(kChunkSize));
+   bool ok = true;
+   while (ok && !input.isExhausted())
+   {
+      int bytesRead = input.read(buffer.get(), kChunkSize);
+      if (bytesRead <= 0)
+         break;
+      env->SetByteArrayRegion(javaBuffer.get(), 0, bytesRead, reinterpret_cast<const jbyte*>(buffer.get()));
+      env->CallVoidMethod(stream.get(), write, javaBuffer.get(), 0, bytesRead);
+      ok = !checkException();
+   }
+
+   env->CallVoidMethod(stream.get(), close); //flushes, so this can fail too
+   ok = !checkException() && ok;
+
+   return ok ? juce::Result::ok() : juce::Result::fail("couldn't write to the document");
+}

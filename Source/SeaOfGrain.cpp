@@ -369,18 +369,15 @@ void SeaOfGrain::LoadFile()
    auto file_pattern = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
    if (File::areFileNamesCaseSensitive())
       file_pattern += ";" + file_pattern.toUpperCase();
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-   FileChooser chooser("Load sample", File(ofToSamplePath("")),
-                       file_pattern, isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-
-   if (BrowseForFileToOpen(chooser))
+   auto onChosen = [this](const juce::FileChooser& chooser)
    {
-      auto file = chooser.getResult();
+      auto file = GetChosenFileForReading(chooser);
 
       std::vector<std::string> fileArray;
       fileArray.push_back(file.getFullPathName().toStdString());
       FilesDropped(fileArray, 0, 0);
-   }
+   };
+   BrowseForFileToOpen("Load sample", File(ofToSamplePath("")), file_pattern, onChosen);
 }
 
 void SeaOfGrain::ButtonClicked(ClickButton* button, double time)

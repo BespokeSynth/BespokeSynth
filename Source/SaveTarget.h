@@ -20,7 +20,8 @@
 //  Bespoke
 //
 //  Where a save is going. iOS only allows writing outside of the app's own folders (e.g. to iCloud Drive) through the
-//  URL returned by the file chooser, so a plain path isn't enough there.
+//  URL returned by the file chooser, so a plain path isn't enough there. On Android, the file chooser returns
+//  content:// URLs, which aren't files at all, so those get a local copy to read from (see AndroidSupport.h).
 //
 //  To save: write to GetWritePath(), close the file, and then call Commit(). Failures are reported to the user.
 //  Reading is the same story, so files picked to load use this too, which also lets them be saved back to later.
@@ -30,6 +31,7 @@
 
 #include "juce_core/juce_core.h"
 
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -57,12 +59,19 @@ public:
 private:
    std::string mPath;
    std::string mWritePath;
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
    juce::URL mChosenURL; //must stay this object or a copy of it, since it carries the permission to write
 #endif
 };
 
-//stand-ins for FileChooser::browseForFileToOpen()/browseForFileToSave(true), which need modal loops. android doesn't
-//have those, so there these log that browsing isn't supported yet and return false (TODO: switch callers to launchAsync)
-bool BrowseForFileToOpen(juce::FileChooser& chooser);
-bool BrowseForFileToSave(juce::FileChooser& chooser);
+//show a file chooser, and call onChosen if the user picked a file. on platforms with modal loops, this blocks until
+//the chooser closes, like FileChooser::browseForFileToOpen()/browseForFileToSave(true). android doesn't have them, so
+//there it returns right away, and onChosen is called later on the message thread.
+//the chooser is the OS's native one unless the user prefers JUCE's (force_juce_file_chooser), or alwaysUseNativeChooser
+using FileChosenCallback = std::function<void(const juce::FileChooser& chooser)>;
+void BrowseForFileToOpen(const juce::String& title, const juce::File& initialFileOrDirectory, const juce::String& filePatterns, FileChosenCallback onChosen, bool alwaysUseNativeChooser = false);
+void BrowseForFileToSave(const juce::String& title, const juce::File& initialFileOrDirectory, const juce::String& filePatterns, FileChosenCallback onChosen, bool alwaysUseNativeChooser = false);
+
+//a local file with the chosen file's contents, for code that reads files by path. on android, the chosen document is
+//copied into app storage first. returns an empty File if that fails
+juce::File GetChosenFileForReading(const juce::FileChooser& chooser);

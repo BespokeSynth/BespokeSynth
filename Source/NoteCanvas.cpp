@@ -1362,16 +1362,14 @@ void NoteCanvas::LoadMidi()
    if (File::areFileNamesCaseSensitive())
       file_pattern += ";" + file_pattern.toUpperCase();
 
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-   FileChooser chooser("Load midi", File(ofToDataPath("")), file_pattern, isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-   if (BrowseForFileToOpen(chooser))
+   auto onChosen = [this](const juce::FileChooser& chooser)
    {
       bool wasPlaying = mPlay;
       mPlay = false;
 
       Clear(NextBufferTime(false));
       SetNumMeasures(1);
-      File file = chooser.getResult();
+      File file = GetChosenFileForReading(chooser);
       FileInputStream inputStream(file);
       MidiFile midifile;
       if (midifile.readFrom(inputStream))
@@ -1405,7 +1403,8 @@ void NoteCanvas::LoadMidi()
       }
 
       mPlay = wasPlaying;
-   }
+   };
+   BrowseForFileToOpen("Load midi", File(ofToDataPath("")), file_pattern, onChosen);
 }
 
 void NoteCanvas::SaveMidi()
@@ -1413,9 +1412,7 @@ void NoteCanvas::SaveMidi()
    using namespace juce;
    constexpr static int ticksPerQuarterNote = 960;
 
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-   FileChooser chooser("Save midi", File(ofToDataPath("midi")), "*.mid", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-   if (BrowseForFileToSave(chooser))
+   auto onChosen = [this](const juce::FileChooser& chooser)
    {
       MidiFile midifile;
       midifile.setTicksPerQuarterNote(ticksPerQuarterNote);
@@ -1446,7 +1443,8 @@ void NoteCanvas::SaveMidi()
          midifile.writeTo(out);
       }
       target.Commit();
-   }
+   };
+   BrowseForFileToSave("Save midi", File(ofToDataPath("midi")), "*.mid", onChosen);
 }
 
 void NoteCanvas::CheckboxUpdated(Checkbox* checkbox, double time)

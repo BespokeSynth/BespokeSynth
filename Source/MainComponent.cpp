@@ -325,9 +325,16 @@ public:
             printf("Could not init nanovg.\n");
       }
       gNanoVG = gNanoVGRenderContexts[(int)NanoVGRenderContext::Main];
+      ++gNanoVGContextGeneration;
 
       mSynth.LoadResources();
       Push2Control::CreateStaticFramebuffer();
+
+      //the GL context can be destroyed and recreated while the app runs (android does this every time the app goes to
+      //the background and comes back). when that happens, only the GL resources above need to be recreated
+      if (mHasInitialized)
+         return;
+      mHasInitialized = true;
 
       /*for (auto deviceType : mGlobalManagers.mDeviceManager.getAvailableDeviceTypes())
       {
@@ -1060,6 +1067,7 @@ private:
    NavigationTouch mClickTouch{ -1, {} }; //the touch currently acting as the mouse, if any (bespoke only handles one pointer)
    bool mClickTouchAlwaysClicks{ false };
    std::vector<int> mIgnoredTouches; //extra touches that bespoke can't handle while a click is underway
+   bool mHasInitialized{ false }; //initialise() has run once, see there
 #if BESPOKE_ANDROID
    int mAndroidDeviceBufferSize{ 0 }; //see ChooseAndroidDeviceBufferSize()
 #endif

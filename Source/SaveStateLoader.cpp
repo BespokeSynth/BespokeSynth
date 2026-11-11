@@ -70,13 +70,12 @@ void SaveStateLoader::Poll()
       {
          mLoadButtons[i].mShouldShowSelectDialog = false;
 
-         bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-         juce::FileChooser chooser("Select state file", juce::File(ofToDataPath("savestate")), "*.bsk;*.bskt", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-         if (BrowseForFileToOpen(chooser))
+         auto onChosen = [this, i](const juce::FileChooser& chooser)
          {
-            mLoadButtons[i].mFilePath = chooser.getResult().getFullPathName().replace("\\", "/").toStdString();
+            mLoadButtons[i].mFilePath = GetChosenFileForReading(chooser).getFullPathName().replace("\\", "/").toStdString();
             UpdateButtonLabel(i);
-         }
+         };
+         BrowseForFileToOpen("Select state file", juce::File(ofToDataPath("savestate")), "*.bsk;*.bskt", onChosen);
       }
    }
 }

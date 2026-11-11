@@ -745,31 +745,27 @@ void SamplePlayer::LoadFile()
    auto file_pattern = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
    if (File::areFileNamesCaseSensitive())
       file_pattern += ";" + file_pattern.toUpperCase();
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-   FileChooser chooser("Load sample", File(ofToSamplePath("")),
-                       file_pattern, isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-   if (BrowseForFileToOpen(chooser))
+   auto onChosen = [this](const juce::FileChooser& chooser)
    {
-      auto file = chooser.getResult();
+      auto file = GetChosenFileForReading(chooser);
 
       Sample* sample = new Sample();
       if (file.existsAsFile())
          sample->Read(file.getFullPathName().toStdString().c_str());
       UpdateSample(sample, true);
-   }
+   };
+   BrowseForFileToOpen("Load sample", File(ofToSamplePath("")), file_pattern, onChosen);
 }
 
 void SamplePlayer::SaveFile()
 {
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-   FileChooser chooser("Save sample", File(ofToSamplePath("")),
-                       "*.wav", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-   if (BrowseForFileToSave(chooser))
+   auto onChosen = [this](const juce::FileChooser& chooser)
    {
       SaveTarget target(chooser);
       Sample::WriteDataToFile(target.GetWritePath(), mSample->Data(), mSample->LengthInSamples());
       target.Commit();
-   }
+   };
+   BrowseForFileToSave("Save sample", File(ofToSamplePath("")), "*.wav", onChosen);
 }
 
 void SamplePlayer::FillData(std::vector<float> data)

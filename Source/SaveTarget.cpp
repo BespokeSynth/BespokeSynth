@@ -23,8 +23,13 @@
 #include "SaveTarget.h"
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
+#include "UserPrefs.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
+
+#if BESPOKE_ANDROID
+#include "AndroidSupport.h"
+#endif
 
 namespace
 {
@@ -70,8 +75,21 @@ SaveTarget::SaveTarget(const std::string& path)
 }
 
 SaveTarget::SaveTarget(const juce::FileChooser& chooser)
-: SaveTarget(chooser.getResult().getFullPathName().toStdString())
 {
+#if BESPOKE_ANDROID
+   auto url = chooser.getURLResult();
+   if (AndroidSupport::IsDocument(url))
+   {
+      mChosenURL = url;
+      mPath = AndroidSupport::GetDocumentMirror(url).getFullPathName().toStdString();
+      auto tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory);
+      mWritePath = tempDir.getNonexistentChildFile("bespoke_save", ".tmp", false).getFullPathName().toStdString();
+      return;
+   }
+#endif
+
+   mPath = chooser.getResult().getFullPathName().toStdString();
+   mWritePath = mPath;
 #if BESPOKE_IOS
    mChosenURL = chooser.getURLResult();
    auto tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory);
@@ -85,6 +103,14 @@ std::unique_ptr<juce::InputStream> SaveTarget::CreateInputStream() const
 #if BESPOKE_IOS
    if (!mChosenURL.isEmpty())
       stream = mChosenURL.createInputStream(juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress));
+#elif BESPOKE_ANDROID
+   //refresh the local copy (mPath), then read that
+   if (!mChosenURL.isEmpty())
+   {
+      auto result = AndroidSupport::CopyDocumentToMirror(mChosenURL);
+      if (result.failed())
+         ofLog() << "couldn't read " << mChosenURL.toString(false).toStdString() << ", using the last copy of it: " << result.getErrorMessage().toStdString();
+   }
 #endif
    if (stream == nullptr)
       stream = std::make_unique<juce::FileInputStream>(juce::File(ofToDataPath(mPath)));
@@ -125,6 +151,22 @@ bool SaveTarget::CommitFrom(const juce::File& source) const
          ReportFailure(mPath, result.getErrorMessage());
       return result.wasOk();
    }
+#elif BESPOKE_ANDROID
+   if (!mChosenURL.isEmpty())
+   {
+      auto result = AndroidSupport::WriteToDocument(mChosenURL, source);
+      if (result.failed())
+      {
+         ReportFailure(AndroidSupport::GetDocumentName(mChosenURL).toStdString(), result.getErrorMessage());
+         return false;
+      }
+      //keep the local copy (mPath) in sync, since that's what gets read
+      juce::File mirror(mPath);
+      mirror.getParentDirectory().createDirectory();
+      if (!source.copyFileTo(mirror))
+         ofLog() << "couldn't update " << mPath;
+      return true;
+   }
 #endif
 
    if (source.copyFileTo(juce::File(ofToDataPath(mPath))))
@@ -133,22 +175,62 @@ bool SaveTarget::CommitFrom(const juce::File& source) const
    return false;
 }
 
-bool BrowseForFileToOpen(juce::FileChooser& chooser)
+namespace
 {
-#if JUCE_MODAL_LOOPS_PERMITTED
-   return chooser.browseForFileToOpen();
-#else
-   TheSynth->LogEvent("opening files isn't supported on this platform yet", kLogEventType_Error);
-   return false;
+#if !JUCE_MODAL_LOOPS_PERMITTED
+   //only one chooser can be open at a time. it has to outlive launchAsync(), and is replaced by the next one
+   std::unique_ptr<juce::FileChooser> sActiveChooser;
 #endif
+
+   void BrowseForFile(bool save, const juce::String& title, const juce::File& initialFileOrDirectory, const juce::String& filePatterns, FileChosenCallback onChosen, bool alwaysUseNativeChooser)
+   {
+      bool useNativeChooser = alwaysUseNativeChooser || !UserPrefs.force_juce_file_chooser.Get();
+      auto chooser = std::make_unique<juce::FileChooser>(title, initialFileOrDirectory, filePatterns, useNativeChooser, false, TheSynth->GetFileChooserParent());
+
+#if JUCE_MODAL_LOOPS_PERMITTED
+      if (save ? chooser->browseForFileToSave(true) : chooser->browseForFileToOpen())
+         onChosen(*chooser);
+#else
+      int flags = juce::FileBrowserComponent::canSelectFiles;
+      if (save)
+         flags |= juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::warnAboutOverwriting;
+      else
+         flags |= juce::FileBrowserComponent::openMode;
+
+      sActiveChooser = std::move(chooser);
+      sActiveChooser->launchAsync(flags, [onChosen = std::move(onChosen)](const juce::FileChooser& finishedChooser)
+                                  {
+                                     if (!finishedChooser.getURLResults().isEmpty())
+                                        onChosen(finishedChooser);
+                                  });
+#endif
+   }
 }
 
-bool BrowseForFileToSave(juce::FileChooser& chooser)
+void BrowseForFileToOpen(const juce::String& title, const juce::File& initialFileOrDirectory, const juce::String& filePatterns, FileChosenCallback onChosen, bool alwaysUseNativeChooser)
 {
-#if JUCE_MODAL_LOOPS_PERMITTED
-   return chooser.browseForFileToSave(true);
-#else
-   TheSynth->LogEvent("saving files isn't supported on this platform yet", kLogEventType_Error);
-   return false;
+   BrowseForFile(false, title, initialFileOrDirectory, filePatterns, std::move(onChosen), alwaysUseNativeChooser);
+}
+
+void BrowseForFileToSave(const juce::String& title, const juce::File& initialFileOrDirectory, const juce::String& filePatterns, FileChosenCallback onChosen, bool alwaysUseNativeChooser)
+{
+   BrowseForFile(true, title, initialFileOrDirectory, filePatterns, std::move(onChosen), alwaysUseNativeChooser);
+}
+
+juce::File GetChosenFileForReading(const juce::FileChooser& chooser)
+{
+#if BESPOKE_ANDROID
+   auto url = chooser.getURLResult();
+   if (AndroidSupport::IsDocument(url))
+   {
+      auto result = AndroidSupport::CopyDocumentToMirror(url);
+      if (result.failed())
+      {
+         TheSynth->LogEvent("couldn't read " + AndroidSupport::GetDocumentName(url).toStdString() + ": " + result.getErrorMessage().toStdString(), kLogEventType_Error);
+         return {};
+      }
+      return AndroidSupport::GetDocumentMirror(url);
+   }
 #endif
+   return chooser.getResult();
 }

@@ -38,4 +38,14 @@ namespace AndroidSupport
 
    //writes to logcat (tag "bespoke"), since DBG is compiled out of release builds
    void Log(const char* message);
+
+   //documents picked with the system file picker are content:// URLs rather than files. bespoke works with files,
+   //so each one gets a local copy (its "mirror", named after the document) that it can be read from, and saves are
+   //written to both the mirror and the document
+   bool IsDocument(const juce::URL& url); //a content:// URL. (on android, juce's URL::isLocalFile() tries to look these up as files, which needs storage permissions)
+   juce::String GetDocumentName(const juce::URL& document);
+   juce::File GetDocumentMirror(const juce::URL& document);
+   juce::Result CopyDocumentToMirror(const juce::URL& document);
+   //replaces the document's contents with the source file's
+   juce::Result WriteToDocument(const juce::URL& document, const juce::File& source);
 }

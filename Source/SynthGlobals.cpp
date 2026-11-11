@@ -84,6 +84,7 @@ std::array<float, (int)StepVelocityType::NumVelocityLevels> gStepVelocityLevels{
 
 std::array<NVGcontext*, (int)NanoVGRenderContext::Num> gNanoVGRenderContexts{};
 NVGcontext* gNanoVG = nullptr;
+int gNanoVGContextGeneration = 0;
 
 std::random_device gRandomDevice;
 bespoke::core::Xoshiro256ss gRandom(gRandomDevice);

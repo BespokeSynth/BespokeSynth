@@ -88,6 +88,7 @@ private:
    };
 
    std::vector<RecentFile> mRecentFiles;
+   int mScreenshotContextGeneration{ -1 }; //see gNanoVGContextGeneration
    float mRecentFilesScrollOffset{ 0.0f };
    ClickButton* mTutorialVideoLinkButton{ nullptr };
    ClickButton* mDocsLinkButton{ nullptr };

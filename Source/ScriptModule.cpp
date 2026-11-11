@@ -1012,9 +1012,7 @@ void ScriptModule::ButtonClicked(ClickButton* button, double time)
 
    if (button == mSaveScriptButton)
    {
-      bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-      FileChooser chooser("Save script as...", File(ofToDataPath("scripts/script.py")), "*.py", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-      if (BrowseForFileToSave(chooser))
+      auto onChosen = [this](const juce::FileChooser& chooser)
       {
          std::string path = chooser.getResult().getFullPathName().toStdString();
 
@@ -1057,7 +1055,8 @@ void ScriptModule::ButtonClicked(ClickButton* button, double time)
                break;
             }
          }
-      }
+      };
+      BrowseForFileToSave("Save script as...", File(ofToDataPath("scripts/script.py")), "*.py", onChosen);
    }
 
    if (button == mLoadScriptButton)

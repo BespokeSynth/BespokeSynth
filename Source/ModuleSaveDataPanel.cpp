@@ -333,9 +333,7 @@ void ModuleSaveDataPanel::ButtonClicked(ClickButton* button, double time)
    if (button == mSavePresetAsButton && mSaveModule != nullptr)
    {
       juce::File(ofToDataPath("presets/" + mSaveModule->GetTypeName())).createDirectory();
-      bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-      FileChooser chooser("Save preset as...", File(ofToDataPath("presets/" + mSaveModule->GetTypeName() + "/preset.preset")), "*.preset", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-      if (BrowseForFileToSave(chooser))
+      auto onChosen = [this](const juce::FileChooser& chooser)
       {
          SaveTarget target(chooser);
          std::string path = target.GetPath();
@@ -359,7 +357,8 @@ void ModuleSaveDataPanel::ButtonClicked(ClickButton* button, double time)
                break;
             }
          }
-      }
+      };
+      BrowseForFileToSave("Save preset as...", File(ofToDataPath("presets/" + mSaveModule->GetTypeName() + "/preset.preset")), "*.preset", onChosen);
    }
 }
 

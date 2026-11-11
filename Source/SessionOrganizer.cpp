@@ -280,13 +280,13 @@ void SessionOrganizer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mLoadTrackButton)
    {
-      juce::FileChooser chooser("Load prefab...", juce::File(ofToDataPath("trackorganizer")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
-      if (BrowseForFileToOpen(chooser))
+      auto onChosen = [this](const juce::FileChooser& chooser)
       {
-         std::string loadPath = chooser.getResult().getFullPathName().toStdString();
+         std::string loadPath = GetChosenFileForReading(chooser).getFullPathName().toStdString();
 
          LoadTrackPrefab(loadPath);
-      }
+      };
+      BrowseForFileToOpen("Load prefab...", juce::File(ofToDataPath("trackorganizer")), "*.pfb", onChosen, true);
    }
 }
 

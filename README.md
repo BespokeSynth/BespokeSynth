@@ -141,8 +141,8 @@ iOS-specific options for the first cmake command:
 
 #### Building for Android
 
-Android support is at an early stage: bespoke runs and plays patches, but opening and saving files through the
-system file picker doesn't work yet. Python script modules and plugin hosting aren't available on Android.
+Android support is at an early stage. You can open, play, edit and save patches, and files are opened and saved
+through the system file picker. Python script modules and plugin hosting aren't available on Android.
 
 You'll need JDK 17 and the Android SDK (with NDK 27.2.12479018 and CMake 3.31.6; Android Studio installs these, or
 use the command line tools' `sdkmanager`), and a 64-bit ARM device running Android 7 or later with USB debugging on.

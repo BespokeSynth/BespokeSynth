@@ -980,12 +980,21 @@ void ModularSynth::PostRender()
 
    if (mQueuedSaveStateInfo.mQueued && mQueuedSaveStateInfo.mWaitingForScreenshot)
    {
+      if (mScreenshotFrameBuffer != nullptr && mScreenshotFrameBufferContextGeneration != gNanoVGContextGeneration)
+      {
+         //its GL objects went away with the old context, so just free the struct
+         free(mScreenshotFrameBuffer);
+         mScreenshotFrameBuffer = nullptr;
+      }
+
       if (mScreenshotFrameBuffer == nullptr)
       {
          mScreenshotFrameBuffer = nvgluCreateFramebuffer(gNanoVGRenderContexts[(int)NanoVGRenderContext::Screenshot], WelcomeScreen::kScreenshotWidth, WelcomeScreen::kScreenshotHeight, 0);
          assert(mScreenshotFrameBuffer);
+         mScreenshotFrameBufferContextGeneration = gNanoVGContextGeneration;
 
-         mScreenshotPixels = new unsigned char[WelcomeScreen::kScreenshotWidth * WelcomeScreen::kScreenshotHeight * 3];
+         if (mScreenshotPixels == nullptr)
+            mScreenshotPixels = new unsigned char[WelcomeScreen::kScreenshotWidth * WelcomeScreen::kScreenshotHeight * 3];
       }
 
       if (mScreenshotFrameBuffer != nullptr)
@@ -3257,11 +3266,11 @@ void ModularSynth::SaveLayout(const SaveTarget& target, bool makeDefaultLayout /
 
 void ModularSynth::SaveLayoutAsPopup()
 {
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-
-   FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", isNativeFileChooser, false, GetFileChooserParent());
-   if (BrowseForFileToSave(chooser))
+   auto onChosen = [this](const juce::FileChooser& chooser)
+   {
       SaveLayout(SaveTarget(chooser));
+   };
+   BrowseForFileToSave("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", onChosen);
 }
 
 void ModularSynth::SaveCurrentState()
@@ -3303,11 +3312,11 @@ void ModularSynth::SaveStatePopup()
       ++counter;
    } while (targetFile.existsAsFile());
 
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-
-   FileChooser chooser("Save current state as...", targetFile, "*.bsk", isNativeFileChooser, false, GetFileChooserParent());
-   if (BrowseForFileToSave(chooser))
+   auto onChosen = [this](const juce::FileChooser& chooser)
+   {
       SaveState(SaveTarget(chooser), false);
+   };
+   BrowseForFileToSave("Save current state as...", targetFile, "*.bsk", onChosen);
 }
 
 void ModularSynth::LoadStatePopup()
@@ -3323,11 +3332,11 @@ void ModularSynth::LoadStatePopupImp()
    else
       defaultDirectoryOrFile = ofToDataPath("savestate/");
 
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-
-   FileChooser chooser("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", isNativeFileChooser, false, GetFileChooserParent());
-   if (BrowseForFileToOpen(chooser))
+   auto onChosen = [this](const juce::FileChooser& chooser)
+   {
       LoadState(SaveTarget(chooser));
+   };
+   BrowseForFileToOpen("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", onChosen);
 }
 
 void ModularSynth::SaveState(std::string file, bool autosave)

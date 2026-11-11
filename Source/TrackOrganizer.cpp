@@ -477,8 +477,7 @@ void TrackOrganizer::ButtonClicked(ClickButton* button, double time)
 
    if (button == mSaveTrackButton)
    {
-      juce::FileChooser chooser("Save trackorganizer as...", juce::File(ofToDataPath("trackorganizer/" + mTrackName + ".pfb")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
-      if (BrowseForFileToSave(chooser))
+      auto onChosen = [this](const juce::FileChooser& chooser)
       {
          SaveTarget target(chooser);
 
@@ -496,7 +495,8 @@ void TrackOrganizer::ButtonClicked(ClickButton* button, double time)
          spawnedPrefab->SavePrefab(target);
 
          spawnedPrefab->Disband();
-      }
+      };
+      BrowseForFileToSave("Save trackorganizer as...", juce::File(ofToDataPath("trackorganizer/" + mTrackName + ".pfb")), "*.pfb", onChosen, true);
    }
 }
 

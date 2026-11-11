@@ -1273,9 +1273,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
    if (button == mSavePresetFileButton && mPlugin != nullptr)
    {
       juce::File(ofToDataPath("vst/presets/" + GetPluginId())).createDirectory();
-      bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-      FileChooser chooser("Save preset as...", File(ofToDataPath("vst/presets/" + GetPluginId() + "/preset.vstp")), "*.vstp", isNativeFileChooser, false, TheSynth->GetFileChooserParent());
-      if (BrowseForFileToSave(chooser))
+      auto onChosen = [this](const juce::FileChooser& chooser)
       {
          std::string path = chooser.getResult().getFullPathName().toStdString();
 
@@ -1339,7 +1337,8 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
                break;
             }
          }
-      }
+      };
+      BrowseForFileToSave("Save preset as...", File(ofToDataPath("vst/presets/" + GetPluginId() + "/preset.vstp")), "*.vstp", onChosen);
    }
 
    for (int i = 0; i < mParameterSliders.size(); ++i)
