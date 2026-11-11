@@ -181,6 +181,21 @@ void CircleSequencer::LoadState(FileStreamIn& in, int rev)
       mCircleSequencerRings[i]->LoadState(in);
 }
 
+void CircleSequencer::SaveSnapshotData(FileStreamOut& out, int snapshotIndex)
+{
+   out << (int)mCircleSequencerRings.size();
+   for (size_t i = 0; i < mCircleSequencerRings.size(); ++i)
+      mCircleSequencerRings[i]->SaveState(out);
+}
+
+void CircleSequencer::LoadSnapshotData(FileStreamIn& in, int snapshotIndex)
+{
+   int numRings;
+   in >> numRings;
+   for (size_t i = 0; i < mCircleSequencerRings.size() && i < numRings; ++i)
+      mCircleSequencerRings[i]->LoadState(in);
+}
+
 
 CircleSequencerRing::CircleSequencerRing(CircleSequencer* owner, int index)
 : mPitch(index)
