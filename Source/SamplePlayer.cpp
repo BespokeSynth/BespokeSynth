@@ -155,6 +155,7 @@ void SamplePlayer::Poll()
 {
    IDrawableModule::Poll();
 
+#if !BESPOKE_IOS
    const juce::String& clipboard = TheSynth->GetTextFromClipboard();
    if (clipboard.contains("youtube"))
    {
@@ -176,6 +177,7 @@ void SamplePlayer::Poll()
       mYoutubeId = "";
       mDownloadYoutubeButton->SetShowing(false);
    }
+#endif
 
    if (mRunningProcess != nullptr)
    {
@@ -952,6 +954,11 @@ void SamplePlayer::DrawModule()
       return;
 
    mTrimToZoomButton->SetShowing(mZoomLevel != 1);
+
+#if BESPOKE_IOS
+   mDownloadYoutubeSearch->SetShowing(false);
+   mDownloadYoutubeButton->SetShowing(false);
+#endif
 
    mVolumeSlider->Draw();
    mSpeedSlider->Draw();

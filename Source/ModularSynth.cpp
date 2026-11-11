@@ -4023,12 +4023,7 @@ void ModularSynth::SaveOutput()
    TheTitleBar->DisplayTemporaryMessage("wrote " + filename);
 }
 
-const String& ModularSynth::GetTextFromClipboard() const
-{
-   return TheClipboard;
-}
-
-const String& ModularSynth::GetTextToPaste()
+const String& ModularSynth::GetTextFromClipboard()
 {
 #if BESPOKE_IOS
    ReadClipboardTextFromSystem();

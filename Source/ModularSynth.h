@@ -309,8 +309,7 @@ public:
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
    juce::Component* GetFileChooserParent() const;
 
-   const juce::String& GetTextFromClipboard() const;
-   const juce::String& GetTextToPaste();
+   const juce::String& GetTextFromClipboard();
    void CopyTextToClipboard(const juce::String& text);
 
    void SetFatalError(std::string error);

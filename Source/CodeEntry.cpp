@@ -963,7 +963,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       if (mCaretPosition != mCaretPosition2)
          RemoveSelectedText();
 
-      juce::String clipboard = TheSynth->GetTextToPaste();
+      juce::String clipboard = TheSynth->GetTextFromClipboard();
       AddString(clipboard.toStdString());
    }
    else if (toupper(key) == 'V' && (GetKeyModifiers() == (kModifier_Command | kModifier_Shift)))
