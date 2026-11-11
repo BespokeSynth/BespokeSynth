@@ -25,11 +25,16 @@
 
 #include "AndroidSupport.h"
 
+#include "juce_audio_devices/juce_audio_devices.h"
+
 #include <android/log.h>
+#include <cstdio>
 
 namespace
 {
    const char* kAssetPrefix = "assets/";
+   //the build adds this to .gz files, since the android packager would otherwise decompress them (see app/build.gradle)
+   const char* kKeptGzSuffix = ".gz.keep";
 
    juce::File GetApkFile()
    {
@@ -50,7 +55,10 @@ namespace
          if (entry == nullptr || !entry->filename.startsWith(kAssetPrefix) || entry->filename.endsWithChar('/'))
             continue;
 
-         auto target = destination.getChildFile(entry->filename.substring((int)strlen(kAssetPrefix)));
+         auto relativePath = entry->filename.substring((int)strlen(kAssetPrefix));
+         if (relativePath.endsWith(kKeptGzSuffix))
+            relativePath = relativePath.dropLastCharacters((int)strlen(".keep"));
+         auto target = destination.getChildFile(relativePath);
          target.getParentDirectory().createDirectory();
 
          std::unique_ptr<juce::InputStream> in(zip.createStreamForEntry(i));
@@ -148,6 +156,46 @@ juce::File AndroidSupport::GetDataDir()
 void AndroidSupport::Log(const char* message)
 {
    __android_log_write(ANDROID_LOG_INFO, "bespoke", message);
+
+   //also keep it in a file, since logcat only holds recent messages, and isn't available while the device is unplugged
+   static juce::CriticalSection sLogFileLock;
+   static FILE* sLogFile = nullptr;
+   static bool sTriedOpening = false;
+   juce::ScopedLock lock(sLogFileLock);
+   if (!sTriedOpening)
+   {
+      sTriedOpening = true;
+      auto dataDir = GetDataDir();
+      dataDir.createDirectory();
+      auto logFile = dataDir.getChildFile("log.txt");
+      if (logFile.existsAsFile()) //keep the previous session's log around too
+         logFile.moveFileTo(dataDir.getChildFile("log_previous.txt"));
+      sLogFile = fopen(logFile.getFullPathName().toRawUTF8(), "w");
+   }
+   if (sLogFile != nullptr)
+   {
+      fprintf(sLogFile, "%s\n", message);
+      fflush(sLogFile);
+   }
+}
+
+void AndroidSupport::StartLoggingMidiPorts()
+{
+   static auto logPorts = []()
+   {
+      juce::String message = "midi ports changed.";
+      for (bool isInput : { true, false })
+      {
+         auto devices = isInput ? juce::MidiInput::getAvailableDevices() : juce::MidiOutput::getAvailableDevices();
+         message << "\n  " << (isInput ? "inputs" : "outputs") << " (" << devices.size() << "):";
+         for (const auto& device : devices)
+            message << "\n    \"" << device.name << "\"   id: " << device.identifier;
+      }
+      Log(message.toRawUTF8());
+   };
+
+   logPorts();
+   static auto sConnection = juce::MidiDeviceListConnection::make(logPorts);
 }
 
 bool AndroidSupport::IsDocument(const juce::URL& url)

@@ -15,6 +15,9 @@ using namespace juce;
 #include "SpaceMouseControl.h"
 #include "UserPrefs.h"
 #include "FixedBlockAudioAdapter.h"
+#if BESPOKE_ANDROID
+#include "AndroidSupport.h"
+#endif
 #if BESPOKE_IOS
 #include "IOSAudioSession.h"
 #include "IOSDiagnostics.h"
@@ -70,11 +73,16 @@ public:
       openGLContext.setComponentPaintingEnabled(false);
 #endif
 
-#ifndef BESPOKE_WINDOWS //windows crash handler is set up in ModularSynth() constructor
+#if !BESPOKE_WINDOWS && !BESPOKE_ANDROID //windows crash handler is set up in ModularSynth() constructor. on android, the system's crash
+      //reporter writes a full backtrace to logcat, which this would prevent (it can't get a backtrace itself there)
       SystemStats::setApplicationCrashHandler(ModularSynth::CrashHandler);
 #endif
 
       UserPrefs.Init();
+
+#if BESPOKE_ANDROID
+      AndroidSupport::StartLoggingMidiPorts();
+#endif
 
       int screenWidth, screenHeight;
       {

@@ -39,6 +39,9 @@ namespace AndroidSupport
    //writes to logcat (tag "bespoke"), since DBG is compiled out of release builds
    void Log(const char* message);
 
+   //logs the available midi ports now, and whenever they change
+   void StartLoggingMidiPorts();
+
    //documents picked with the system file picker are content:// URLs rather than files. bespoke works with files,
    //so each one gets a local copy (its "mirror", named after the document) that it can be read from, and saves are
    //written to both the mirror and the document

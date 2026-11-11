@@ -81,10 +81,14 @@ android {
     }
 }
 
-// packages the resource folder as assets/resource/..., which AndroidSupport.cpp unpacks on first launch
+// packages the resource folder as assets/resource/..., which AndroidSupport.cpp unpacks on first launch.
+// the android packager decompresses .gz assets and drops the extension (so galmuri7.sfn.gz would end up as an
+// uncompressed galmuri7.sfn), so they're renamed to .gz.keep here, and AndroidSupport.cpp renames them back
 def syncBespokeAssets = tasks.register('syncBespokeAssets', Sync) {
     from new File(repoRoot, 'resource')
     into layout.buildDirectory.dir('bespokeAssets/resource')
     exclude '**/.DS_Store'
+    rename { String name -> name.endsWith('.gz') ? name + '.keep' : name }
+    inputs.property('gzSuffix', '.keep') //gradle doesn't see changes to the rename closure, so bump this if it changes
 }
 tasks.named('preBuild') { dependsOn syncBespokeAssets }

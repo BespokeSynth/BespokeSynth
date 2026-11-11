@@ -26,6 +26,7 @@
 */
 
 #include "AbletonMoveLCD.h"
+#include "ModularSynth.h"
 
 #if BESPOKE_WINDOWS
 #define _STRING_H_ 1
@@ -44,6 +45,13 @@ namespace
    ssfn_t ssfn_ctx;
    ssfn_buf_t ssfn_buf;
    ssfn_font_t* ssfn_font;
+   bool ssfn_font_loaded = false; //if the font couldn't be loaded, LCDs still work, they just don't draw text
+
+   void report_font_error(const std::string& message)
+   {
+      ofLog() << "lcd font: " << message;
+      TheSynth->LogEvent("couldn't load the lcd font: " + message, kLogEventType_Error);
+   }
 
    ssfn_font_t* load_file(const char* filename, int* size)
    {
@@ -53,8 +61,8 @@ namespace
       f = fopen(filename, "rb");
       if (!f)
       {
-         fprintf(stderr, "unable to load %s\n", filename);
-         exit(3);
+         report_font_error(std::string("unable to open ") + filename);
+         return nullptr;
       }
       *size = 0;
       fseek(f, 0, SEEK_END);
@@ -62,14 +70,16 @@ namespace
       fseek(f, 0, SEEK_SET);
       if (!*size)
       {
-         fprintf(stderr, "unable to load %s\n", filename);
-         exit(3);
+         report_font_error(std::string(filename) + " is empty");
+         fclose(f);
+         return nullptr;
       }
       fontdata = (char*)malloc(*size);
       if (!fontdata)
       {
-         fprintf(stderr, "memory allocation error\n");
-         exit(2);
+         report_font_error("memory allocation error");
+         fclose(f);
+         return nullptr;
       }
       fread(fontdata, *size, 1, f);
       fclose(f);
@@ -90,12 +100,15 @@ namespace
 
       /* load and select a font */
       ssfn_font = load_file(ofToResourcePath("galmuri7.sfn.gz").c_str(), &size);
+      if (ssfn_font == nullptr)
+         return;
       ret = ssfn_load(&ssfn_ctx, ssfn_font);
       if (ret != SSFN_OK)
       {
-         fprintf(stderr, "ssfn load error: err=%d %s\n", ret, ssfn_error(ret));
-         exit(2);
+         report_font_error(std::string("ssfn load error: ") + ssfn_error(ret));
+         return;
       }
+      ssfn_font_loaded = true;
    }
 
    void draw_ssfn_text(uint8_t* pixels, int width, int height, const char* text, int x, int y, int style = SSFN_STYLE_REGULAR, int fontSize = 12)
@@ -108,11 +121,14 @@ namespace
       ssfn_buf.w = width;
       ssfn_buf.h = height;
 
+      if (!ssfn_font_loaded)
+         return;
+
       ret = ssfn_select(&ssfn_ctx, SSFN_FAMILY_ANY, NULL, style | SSFN_STYLE_NOAA, fontSize);
       if (ret != SSFN_OK)
       {
-         fprintf(stderr, "ssfn select error: err=%d %s\n", ret, ssfn_error(ret));
-         exit(2);
+         ofLog() << "lcd font: ssfn select error: " << ssfn_error(ret);
+         return;
       }
 
       ssfn_buf.x = x;
@@ -142,6 +158,7 @@ AbletonMoveLCD::~AbletonMoveLCD()
          ssfn_free(&ssfn_ctx);
          free(ssfn_font);
          ssfn_font = nullptr;
+         ssfn_font_loaded = false;
       }
    }
 }
