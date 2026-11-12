@@ -305,11 +305,13 @@ void ModularSynth::LoadResources()
       mFatalError = "couldn't load font from " + gFont.GetFontPath() + "\nmaybe bespoke can't find your resources directory?";
 }
 
+//adds buffers up to the given counts. this can be called again if the device opens more channels later (on android,
+//the input is opened once the user allows microphone access), but not while the audio callback is running
 void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
 {
-   for (int i = 0; i < inputChannelCount; ++i)
+   while ((int)mInputBuffers.size() < inputChannelCount)
       mInputBuffers.push_back(new float[gBufferSize]);
-   for (int i = 0; i < outputChannelCount; ++i)
+   while ((int)mOutputBuffers.size() < outputChannelCount)
       mOutputBuffers.push_back(new float[gBufferSize]);
 }
 

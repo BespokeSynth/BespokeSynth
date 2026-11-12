@@ -419,7 +419,7 @@ public:
             mSynth.SetFatalError("error setting output device to '" + outputDevice + "', fix this in userprefs.json (use \"auto\" for default device)" +
                                  "\n\n\nvalid devices:\n" + GetAudioDevices());
          }
-         else if (inputDevice != kAutoDevice && inputDevice != kNoneDevice &&
+         else if (inputDevice != kAutoDevice && inputDevice != kNoneDevice && HasMicrophonePermission() &&
                   loadedSetup.inputDeviceName.toStdString() != inputDevice)
          {
             mSynth.SetFatalError("error setting input device to '" + inputDevice + "', fix this in userprefs.json (use \"auto\" for default device, or \"none\" for no device)" +
@@ -445,16 +445,7 @@ public:
                ofLog() << "safe area insets: left " << display->safeAreaInsets.getLeft() << "  right " << display->safeAreaInsets.getRight() << "  top " << display->safeAreaInsets.getTop() << "  bottom " << display->safeAreaInsets.getBottom();
 #endif
 
-            int numInputChannels = loadedSetup.inputChannels.countNumberOfSetBits();
-            int numOutputChannels = loadedSetup.outputChannels.countNumberOfSetBits();
-
-            mSynth.InitIOBuffers(numInputChannels, numOutputChannels);
-            {
-               //the device is already running, so don't let the audio callback see a half-prepared adapter
-               const juce::ScopedLock lock(mGlobalManagers.mDeviceManager.getAudioCallbackLock());
-               mBlockAdapter.Prepare(numInputChannels, numOutputChannels, gBufferSize / UserPrefs.oversampling.Get(), 8192);
-               UpdateBlockAdapterSampleRate(loadedSetup.sampleRate);
-            }
+            PrepareForAudioSetup(loadedSetup);
 #if BESPOKE_IOS
             IOSAudioSession::RequestExactBufferSize(loadedSetup.sampleRate, gBufferSize / UserPrefs.oversampling.Get());
 #endif
@@ -591,6 +582,14 @@ public:
       if (outputDevice == kNoneDevice)
          outputChannels = 0;
 
+      //opening the input fails without the user's permission, so until there is permission, open just the output,
+      //and ask for it. if the user allows it, the device is reopened with the input
+      if (inputChannels > 0 && !HasMicrophonePermission())
+      {
+         inputChannels = 0;
+         RequestMicrophonePermission();
+      }
+
       String audioError = mGlobalManagers.mDeviceManager.initialise(inputChannels,
                                                                     outputChannels,
                                                                     nullptr,
@@ -600,6 +599,69 @@ public:
 
       return audioError;
    }
+
+   //sets bespoke up for the channels and sample rate the audio device opened with. the device is already running
+   void PrepareForAudioSetup(const AudioDeviceManager::AudioDeviceSetup& setup)
+   {
+      int numInputChannels = setup.inputChannels.countNumberOfSetBits();
+      int numOutputChannels = setup.outputChannels.countNumberOfSetBits();
+
+      //don't let the audio callback see half-prepared buffers or adapter
+      const juce::ScopedLock lock(mGlobalManagers.mDeviceManager.getAudioCallbackLock());
+      mSynth.InitIOBuffers(numInputChannels, numOutputChannels);
+      mBlockAdapter.Prepare(numInputChannels, numOutputChannels, gBufferSize / UserPrefs.oversampling.Get(), 8192);
+      UpdateBlockAdapterSampleRate(setup.sampleRate);
+   }
+
+   bool HasMicrophonePermission() const
+   {
+#if BESPOKE_ANDROID
+      return RuntimePermissions::isGranted(RuntimePermissions::recordAudio);
+#else
+      return true; //ios asks by itself when the input is opened, and desktops don't need permission
+#endif
+   }
+
+   void RequestMicrophonePermission()
+   {
+#if BESPOKE_ANDROID
+      if (mHasRequestedMicrophonePermission)
+         return; //only ask once per launch. after a denial, the user can allow it in android's app settings
+      mHasRequestedMicrophonePermission = true;
+
+      //the device can be opened from the GL thread, so ask from the message thread
+      MessageManager::callAsync([safeThis = Component::SafePointer<MainContentComponent>(this)]
+                                {
+                                   RuntimePermissions::request(RuntimePermissions::recordAudio, [safeThis](bool granted)
+                                                               {
+                                                                  if (safeThis != nullptr)
+                                                                     safeThis->OnMicrophonePermissionResult(granted);
+                                                               });
+                                });
+#endif
+   }
+
+#if BESPOKE_ANDROID
+   void OnMicrophonePermissionResult(bool granted)
+   {
+      if (!granted)
+      {
+         ofLog() << "microphone access wasn't allowed, so there's no audio input";
+         return;
+      }
+
+      String audioError = InitializeAudioDevice();
+      if (audioError.isNotEmpty())
+      {
+         ofLog() << "couldn't open the audio input: " << audioError;
+         return;
+      }
+
+      auto setup = mGlobalManagers.mDeviceManager.getAudioDeviceSetup();
+      PrepareForAudioSetup(setup);
+      ofLog() << "output: " << setup.outputDeviceName << "   input: " << setup.inputDeviceName;
+   }
+#endif
 
    bool HasDesiredAudioDevice()
    {
@@ -1097,6 +1159,7 @@ private:
 #if BESPOKE_ANDROID
    int mAndroidDeviceBufferSize{ 0 }; //see ChooseAndroidDeviceBufferSize()
    double mDeviceSampleRate{ 0 }; //for mAudioPerformanceHint, set in audioDeviceAboutToStart()
+   bool mHasRequestedMicrophonePermission{ false };
    AndroidSupport::AudioThreadPerformanceHint mAudioPerformanceHint;
 #endif
 #if BESPOKE_IOS
