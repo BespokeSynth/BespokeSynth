@@ -20,6 +20,9 @@ using namespace juce;
 #include "IOSDiagnostics.h"
 #include "IOSPointerInput.h"
 #endif
+#if BESPOKE_ANDROID
+#include "AndroidSupport.h"
+#endif
 
 #ifdef JUCE_WINDOWS
 #include <windows.h>
@@ -111,12 +114,19 @@ public:
       setWantsKeyboardFocus(true);
       Desktop::setScreenSaverEnabled(false);
       mGlobalManagers.mDeviceManager.getAvailableDeviceTypes(); //scans for device types ("Windows Audio", "DirectSound", etc)
+
+#if BESPOKE_ANDROID
+      AndroidSupport::StartAudioService(); //keeps the audio going while bespoke isn't in front
+#endif
    }
 
    ~MainContentComponent()
    {
       shutdownOpenGL();
       shutdownAudio();
+#if BESPOKE_ANDROID
+      AndroidSupport::StopAudioService();
+#endif
    }
 
    void timerCallback() override
@@ -234,6 +244,9 @@ public:
       // but be careful - it will be called on the audio thread, not the GUI thread.
 
       ofLog() << "audioDeviceAboutToStart()" << (device ? "   rate: " + juce::String(device->getCurrentSampleRate()) + "   buffer: " + juce::String(device->getCurrentBufferSizeSamples()) : juce::String());
+#if BESPOKE_ANDROID
+      mDeviceSampleRate = device ? device->getCurrentSampleRate() : 0;
+#endif
 
       //the device's sample rate can change mid-session (e.g. on iOS, when plugging into a 44.1k-only usb interface).
       //bespoke's rate is fixed once modules exist, so resample to the device's rate when they differ.
@@ -263,6 +276,14 @@ public:
 #if BESPOKE_IOS
       ++mAudioCallbackCount;
       mLastCallbackSize = numSamples;
+#endif
+#if BESPOKE_ANDROID
+      mAudioPerformanceHint.BeginCallback(numSamples, mDeviceSampleRate);
+      struct EndHint
+      {
+         AndroidSupport::AudioThreadPerformanceHint& hint;
+         ~EndHint() { hint.EndCallback(); }
+      } endHint{ mAudioPerformanceHint }; //at every return below
 #endif
 
       //when the device delivers a block size other than what we asked for, or runs at a different sample rate,
@@ -603,8 +624,16 @@ public:
 
    void shutdown() override
    {
+      //this also happens while the app runs, whenever the GL context is destroyed (on android, every time the app
+      //goes to the background, including while a file picker is up). the message thread keeps polling meanwhile, so
+      //clear the contexts out rather than leave them dangling, until initialise() recreates them
       for (int i = 0; i < (int)NanoVGRenderContext::Num; ++i)
-         nvgDeleteGLES2(gNanoVGRenderContexts[i]);
+      {
+         if (gNanoVGRenderContexts[i] != nullptr)
+            nvgDeleteGLES2(gNanoVGRenderContexts[i]);
+         gNanoVGRenderContexts[i] = nullptr;
+      }
+      gNanoVG = nullptr;
    }
 
    void SetStartupSaveStateFile(const juce::String& bskPath)
@@ -1067,6 +1096,8 @@ private:
    bool mHasInitialized{ false }; //initialise() has run once, see there
 #if BESPOKE_ANDROID
    int mAndroidDeviceBufferSize{ 0 }; //see ChooseAndroidDeviceBufferSize()
+   double mDeviceSampleRate{ 0 }; //for mAudioPerformanceHint, set in audioDeviceAboutToStart()
+   AndroidSupport::AudioThreadPerformanceHint mAudioPerformanceHint;
 #endif
 #if BESPOKE_IOS
    std::atomic<int> mAudioCallbackCount{ 0 };

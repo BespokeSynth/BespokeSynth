@@ -213,6 +213,7 @@ private:
    AbletonMoveLCD mLissajousLCD;
    std::vector<ControlSurfaceDisplayPanel> mDisplayPanels;
    std::array<int, (int)NanoVGRenderContext::Num> mLCDImages{}; //nanovg image of the lcd for each render context
+   int mLCDImagesContextGeneration{ -1 }; //gNanoVGContextGeneration that mLCDImages were made in
    std::vector<unsigned char> mLCDImagePixels;
    double mScreenOverrideTimeout{ 0.0 };
    std::string mTemporaryScreenMessage{};

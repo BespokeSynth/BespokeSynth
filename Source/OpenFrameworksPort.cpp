@@ -879,6 +879,9 @@ float RetinaTrueTypeFont::GetStringWidth(std::string str, float size)
       handle = mFontBoundsHandle;
    }
 
+   if (vg == nullptr) //the GL context is gone for now (see MainContentComponent::shutdown())
+      return str.size() * 12;
+
    nvgFontFaceId(vg, handle);
    nvgFontSize(vg, size);
    float bounds[4];
@@ -904,6 +907,9 @@ float RetinaTrueTypeFont::GetStringHeight(std::string str, float size)
       vg = gNanoVGRenderContexts[(int)NanoVGRenderContext::FontBounds];
       handle = mFontBoundsHandle;
    }
+
+   if (vg == nullptr) //the GL context is gone for now (see MainContentComponent::shutdown())
+      return size;
 
    nvgFontFaceId(vg, handle);
    nvgFontSize(vg, size);

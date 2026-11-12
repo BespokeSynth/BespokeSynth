@@ -65,6 +65,7 @@ namespace
    //recycled by the next module that needs one rather than deleted
    std::mutex sFreeLCDImagesMutex;
    std::vector<std::pair<NVGcontext*, int>> sFreeLCDImages;
+   int sFreeLCDImagesContextGeneration{ -1 };
 }
 
 ControlSurface::ControlSurface()
@@ -88,6 +89,9 @@ ControlSurface::ControlSurface()
 
 ControlSurface::~ControlSurface()
 {
+   if (mLCDImagesContextGeneration != gNanoVGContextGeneration)
+      return; //they went with the old GL context
+
    std::lock_guard<std::mutex> lock(sFreeLCDImagesMutex);
    for (int i = 0; i < (int)mLCDImages.size(); ++i)
    {
@@ -427,10 +431,22 @@ void ControlSurface::DrawLCDImage(float x, float y, float width, float height, f
       }
    }
 
+   //images don't survive the GL context being recreated (see MainContentComponent::initialise()), so start over
+   if (mLCDImagesContextGeneration != gNanoVGContextGeneration)
+   {
+      mLCDImages.fill(-1);
+      mLCDImagesContextGeneration = gNanoVGContextGeneration;
+   }
+
    int& image = mLCDImages[contextIndex];
    if (image == -1)
    {
       std::lock_guard<std::mutex> lock(sFreeLCDImagesMutex);
+      if (sFreeLCDImagesContextGeneration != gNanoVGContextGeneration)
+      {
+         sFreeLCDImages.clear();
+         sFreeLCDImagesContextGeneration = gNanoVGContextGeneration;
+      }
       for (auto it = sFreeLCDImages.begin(); it != sFreeLCDImages.end(); ++it)
       {
          if (it->first == gNanoVG)

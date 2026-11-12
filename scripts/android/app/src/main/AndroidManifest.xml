@@ -9,6 +9,9 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!-- lets ableton link receive multicast, which many devices filter out unless a MulticastLock is held -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <!-- BespokeAudioService, which keeps the audio running at full speed while bespoke isn't in front -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <uses-feature android:glEsVersion="0x00030000" android:required="true" />
     <uses-feature android:name="android.software.midi" android:required="false" />
@@ -50,5 +53,12 @@
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/usb_device_filter" />
         </activity>
+
+        <!-- stopWithTask: swiping bespoke away in recents stops the service, so it doesn't keep the audio running -->
+        <service
+            android:name="com.ryanchallinor.bespokesynth.BespokeAudioService"
+            android:foregroundServiceType="mediaPlayback"
+            android:stopWithTask="true"
+            android:exported="false" />
     </application>
 </manifest>

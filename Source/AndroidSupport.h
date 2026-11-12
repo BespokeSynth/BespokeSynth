@@ -48,6 +48,32 @@ namespace AndroidSupport
    juce::Result CopyDocumentToMirror(const juce::URL& document);
    //replaces the document's contents with the source file's
    juce::Result WriteToDocument(const juce::URL& document, const juce::File& source);
+
+   //runs a foreground service (BespokeAudioService.java) while bespoke is open. otherwise android counts bespoke as
+   //a background app whenever something else is in front, such as the file picker, and the audio can't keep up.
+   //it has to be started while bespoke is in front
+   void StartAudioService();
+   void StopAudioService();
+
+   //tells android how long each audio callback takes compared to its deadline (a "performance hint session"), so it
+   //can raise the cpu clock in time. android does this by itself for whatever is in front, but not for apps running
+   //behind something else, like the file picker, where the audio otherwise drops out now and then
+   class AudioThreadPerformanceHint
+   {
+   public:
+      ~AudioThreadPerformanceHint();
+      //call these at the start and end of each audio callback, on the audio thread
+      void BeginCallback(int numSamples, double sampleRate);
+      void EndCallback();
+
+   private:
+      void CloseSession();
+
+      void* mSession{ nullptr }; //APerformanceHintSession
+      int mThreadId{ 0 }; //that mSession was made for, or that making one failed for
+      int64_t mTargetNanos{ 0 };
+      int64_t mCallbackStartNanos{ 0 };
+   };
 }
 
 //USB access for the libraries that drive the Ableton Move and Push 2 displays (libs/abletonmove, libs/push2), which

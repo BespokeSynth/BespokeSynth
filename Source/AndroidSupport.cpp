@@ -28,6 +28,9 @@
 #include <android/log.h>
 #include <cstdio>
 #include <cstring>
+#include <dlfcn.h>
+#include <time.h>
+#include <unistd.h>
 
 namespace
 {
@@ -284,23 +287,145 @@ juce::Result AndroidSupport::WriteToDocument(const juce::URL& document, const ju
 
 namespace
 {
-   //calls a static method of com.ryanchallinor.bespokesynth.BespokeUsb. app classes have to be loaded through the
+   //loads one of bespoke's java classes (com.ryanchallinor.bespokesynth.*). app classes have to be loaded through the
    //app's class loader, since JNI's FindClass only sees system classes on threads that java didn't start
-   jclass GetBespokeUsbClass(JNIEnv* env, jobject context)
+   jclass GetAppClass(JNIEnv* env, jobject context, const char* className)
    {
       juce::LocalRef<jclass> contextClass(env->GetObjectClass(context));
       jmethodID getClassLoader = env->GetMethodID(contextClass.get(), "getClassLoader", "()Ljava/lang/ClassLoader;");
       juce::LocalRef<jobject> classLoader(env->CallObjectMethod(context, getClassLoader));
       juce::LocalRef<jclass> classLoaderClass(env->GetObjectClass(classLoader.get()));
       jmethodID loadClass = env->GetMethodID(classLoaderClass.get(), "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
-      auto usbClass = (jclass)env->CallObjectMethod(classLoader.get(), loadClass, juce::javaString("com.ryanchallinor.bespokesynth.BespokeUsb").get());
+      auto appClass = (jclass)env->CallObjectMethod(classLoader.get(), loadClass, juce::javaString(className).get());
       if (env->ExceptionCheck())
       {
          env->ExceptionClear();
          return nullptr;
       }
-      return usbClass;
+      return appClass;
    }
+
+   void CallAudioService(const char* methodName)
+   {
+      auto* env = juce::getEnv();
+      auto context = juce::getAppContext();
+      if (env == nullptr || context.get() == nullptr)
+         return;
+
+      juce::LocalRef<jclass> serviceClass(GetAppClass(env, context.get(), "com.ryanchallinor.bespokesynth.BespokeAudioService"));
+      if (serviceClass.get() == nullptr)
+      {
+         AndroidSupport::Log("couldn't load BespokeAudioService");
+         return;
+      }
+
+      jmethodID method = env->GetStaticMethodID(serviceClass.get(), methodName, "(Landroid/content/Context;)V");
+      env->CallStaticVoidMethod(serviceClass.get(), method, context.get());
+      if (env->ExceptionCheck())
+      {
+         env->ExceptionDescribe(); //goes to logcat
+         env->ExceptionClear();
+         AndroidSupport::Log((juce::String("BespokeAudioService.") + methodName + "() failed").toRawUTF8());
+      }
+   }
+}
+
+void AndroidSupport::StartAudioService()
+{
+   CallAudioService("start");
+}
+
+void AndroidSupport::StopAudioService()
+{
+   CallAudioService("stop");
+}
+
+namespace
+{
+   //the performance hint api is android 13+ (bespoke supports older versions), so it's looked up at runtime
+   struct PerformanceHintApi
+   {
+      void* (*getManager)() = nullptr;
+      void* (*createSession)(void* manager, const int32_t* threadIds, size_t size, int64_t targetNanos) = nullptr;
+      int (*updateTargetWorkDuration)(void* session, int64_t targetNanos) = nullptr;
+      int (*reportActualWorkDuration)(void* session, int64_t actualNanos) = nullptr;
+      void (*closeSession)(void* session) = nullptr;
+
+      bool IsAvailable() const { return getManager && createSession && updateTargetWorkDuration && reportActualWorkDuration && closeSession; }
+   };
+
+   const PerformanceHintApi& GetPerformanceHintApi()
+   {
+      static PerformanceHintApi sApi = []
+      {
+         PerformanceHintApi api;
+         if (void* lib = dlopen("libandroid.so", RTLD_NOW | RTLD_NODELETE))
+         {
+            api.getManager = (decltype(api.getManager))dlsym(lib, "APerformanceHint_getManager");
+            api.createSession = (decltype(api.createSession))dlsym(lib, "APerformanceHint_createSession");
+            api.updateTargetWorkDuration = (decltype(api.updateTargetWorkDuration))dlsym(lib, "APerformanceHint_updateTargetWorkDuration");
+            api.reportActualWorkDuration = (decltype(api.reportActualWorkDuration))dlsym(lib, "APerformanceHint_reportActualWorkDuration");
+            api.closeSession = (decltype(api.closeSession))dlsym(lib, "APerformanceHint_closeSession");
+         }
+         return api;
+      }();
+      return sApi;
+   }
+
+   int64_t GetMonotonicNanos()
+   {
+      timespec now;
+      clock_gettime(CLOCK_MONOTONIC, &now);
+      return (int64_t)now.tv_sec * 1000000000 + now.tv_nsec;
+   }
+}
+
+AndroidSupport::AudioThreadPerformanceHint::~AudioThreadPerformanceHint()
+{
+   CloseSession();
+}
+
+void AndroidSupport::AudioThreadPerformanceHint::BeginCallback(int numSamples, double sampleRate)
+{
+   mCallbackStartNanos = GetMonotonicNanos();
+
+   const auto& api = GetPerformanceHintApi();
+   if (!api.IsAvailable() || numSamples <= 0 || sampleRate <= 0)
+      return;
+
+   const int64_t targetNanos = (int64_t)(numSamples * 1e9 / sampleRate);
+   const int threadId = gettid();
+   if (threadId != mThreadId) //first callback, or the audio device was restarted on a new thread
+   {
+      //this is a call to the system, which is slow for an audio callback, but only happens once per thread (the
+      //same as what oboe does when its own version of this is turned on)
+      CloseSession();
+      mThreadId = threadId;
+      if (void* manager = api.getManager())
+      {
+         int32_t threadIds[] = { threadId };
+         mSession = api.createSession(manager, threadIds, 1, targetNanos);
+      }
+      mTargetNanos = targetNanos;
+   }
+   else if (mSession != nullptr && targetNanos != mTargetNanos)
+   {
+      api.updateTargetWorkDuration(mSession, targetNanos);
+      mTargetNanos = targetNanos;
+   }
+}
+
+void AndroidSupport::AudioThreadPerformanceHint::EndCallback()
+{
+   if (mSession != nullptr)
+      GetPerformanceHintApi().reportActualWorkDuration(mSession, std::max<int64_t>(1, GetMonotonicNanos() - mCallbackStartNanos));
+}
+
+void AndroidSupport::AudioThreadPerformanceHint::CloseSession()
+{
+   if (mSession != nullptr)
+      GetPerformanceHintApi().closeSession(mSession);
+   mSession = nullptr;
 }
 
 int BespokeAndroidUsbOpen(int vendorId, int productId, char* error, int errorSize)
@@ -319,7 +444,7 @@ int BespokeAndroidUsbOpen(int vendorId, int productId, char* error, int errorSiz
       return -1;
    }
 
-   juce::LocalRef<jclass> usbClass(GetBespokeUsbClass(env, context.get()));
+   juce::LocalRef<jclass> usbClass(GetAppClass(env, context.get(), "com.ryanchallinor.bespokesynth.BespokeUsb"));
    if (usbClass.get() == nullptr)
    {
       setError("couldn't load BespokeUsb");
