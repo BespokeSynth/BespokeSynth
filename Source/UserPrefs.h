@@ -316,7 +316,12 @@ public:
    UserPrefBool show_tooltips_on_load{ "show_tooltips_on_load", true, UserPrefCategory::General };
    UserPrefBool show_welcome_screen{ "show_welcome_screen", true, UserPrefCategory::General };
    UserPrefBool show_minimap{ "show_minimap", false, UserPrefCategory::General };
+#if BESPOKE_MOBILE
+   //the buffer takes about 11MB per minute, which is a lot of a phone or tablet's memory
+   UserPrefTextEntryFloat record_buffer_length_minutes{ "record_buffer_length_minutes", 10, 1, 120, 5, UserPrefCategory::General };
+#else
    UserPrefTextEntryFloat record_buffer_length_minutes{ "record_buffer_length_minutes", 30, 1, 120, 5, UserPrefCategory::General };
+#endif
 
    UserPrefBool draw_background_lissajous{ "draw_background_lissajous", true, UserPrefCategory::Graphics };
    UserPrefBool background_lissajous_autocorrelate{ "background_lissajous_autocorrelate", true, UserPrefCategory::Graphics };

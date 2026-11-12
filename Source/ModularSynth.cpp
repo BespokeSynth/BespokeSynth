@@ -251,6 +251,10 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
 
    mGlobalRecordBuffer = new RollingBuffer(UserPrefs.record_buffer_length_minutes.Get() * 60 * gSampleRate);
    mGlobalRecordBuffer->SetNumChannels(2);
+   //channels are allocated (and zeroed) when they're first used, which would otherwise be in the first audio
+   //callback. at the default length that's hundreds of MB, so do it now, before the audio device starts
+   for (int ch = 0; ch < mGlobalRecordBuffer->GetRawBuffer()->NumActiveChannels(); ++ch)
+      mGlobalRecordBuffer->GetRawBuffer()->GetChannel(ch);
 
    juce::File(ofToDataPath("savestate")).createDirectory();
    juce::File(ofToDataPath("savestate/autosave")).createDirectory();
