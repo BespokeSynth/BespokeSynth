@@ -48,6 +48,8 @@ namespace AndroidSupport
    juce::Result CopyDocumentToMirror(const juce::URL& document);
    //replaces the document's contents with the source file's
    juce::Result WriteToDocument(const juce::URL& document, const juce::File& source);
+   //a document another app opened with bespoke (see BespokeActivity.java), each one only once. empty if there's no new one
+   juce::URL TakeOpenedDocument();
 
    //runs a foreground service (BespokeAudioService.java) while bespoke is open. otherwise android counts bespoke as
    //a background app whenever something else is in front, such as the file picker, and the audio can't keep up.

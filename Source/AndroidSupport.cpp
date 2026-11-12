@@ -186,9 +186,84 @@ bool AndroidSupport::IsDocument(const juce::URL& url)
    return url.getScheme() == "content";
 }
 
+namespace
+{
+   //documents are read and written through android's ContentResolver rather than JUCE's AndroidDocument, which only
+   //handles document urls from the system file picker, not the other content:// urls that apps open bespoke with
+   //(eg from the files app's downloads, or google drive). this looks up the resolver and the document's Uri
+   struct ContentAccess
+   {
+      ContentAccess(const juce::URL& document)
+      : env(juce::getEnv())
+      {
+         auto context = juce::getAppContext();
+         if (env == nullptr || context.get() == nullptr)
+            return;
+
+         juce::LocalRef<jclass> contextClass(env->GetObjectClass(context.get()));
+         jmethodID getContentResolver = env->GetMethodID(contextClass.get(), "getContentResolver", "()Landroid/content/ContentResolver;");
+         resolver = juce::LocalRef<jobject>(env->CallObjectMethod(context.get(), getContentResolver));
+         if (CheckException())
+            return;
+
+         juce::LocalRef<jclass> uriClass(env->FindClass("android/net/Uri"));
+         jmethodID parse = env->GetStaticMethodID(uriClass.get(), "parse", "(Ljava/lang/String;)Landroid/net/Uri;");
+         uri = juce::LocalRef<jobject>(env->CallStaticObjectMethod(uriClass.get(), parse, juce::javaString(document.toString(true)).get()));
+         CheckException();
+      }
+
+      bool IsValid() const { return env != nullptr && resolver.get() != nullptr && uri.get() != nullptr; }
+
+      //clears a pending java exception, returning whether there was one
+      bool CheckException() const
+      {
+         if (!env->ExceptionCheck())
+            return false;
+         env->ExceptionClear();
+         return true;
+      }
+
+      JNIEnv* env;
+      juce::LocalRef<jobject> resolver;
+      juce::LocalRef<jobject> uri;
+   };
+
+   //the document's name, as the app that has it reports it (OpenableColumns.DISPLAY_NAME)
+   juce::String QueryDisplayName(const juce::URL& document)
+   {
+      ContentAccess access(document);
+      if (!access.IsValid())
+         return {};
+      auto* env = access.env;
+
+      juce::LocalRef<jclass> stringClass(env->FindClass("java/lang/String"));
+      juce::LocalRef<jobjectArray> columns(env->NewObjectArray(1, stringClass.get(), juce::javaString("_display_name").get()));
+      juce::LocalRef<jclass> resolverClass(env->GetObjectClass(access.resolver.get()));
+      jmethodID query = env->GetMethodID(resolverClass.get(), "query", "(Landroid/net/Uri;[Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;)Landroid/database/Cursor;");
+      juce::LocalRef<jobject> cursor(env->CallObjectMethod(access.resolver.get(), query, access.uri.get(), columns.get(), nullptr, nullptr, nullptr));
+      if (access.CheckException() || cursor.get() == nullptr)
+         return {};
+
+      juce::String name;
+      juce::LocalRef<jclass> cursorClass(env->GetObjectClass(cursor.get()));
+      jmethodID moveToFirst = env->GetMethodID(cursorClass.get(), "moveToFirst", "()Z");
+      jmethodID getString = env->GetMethodID(cursorClass.get(), "getString", "(I)Ljava/lang/String;");
+      jmethodID close = env->GetMethodID(cursorClass.get(), "close", "()V");
+      if (env->CallBooleanMethod(cursor.get(), moveToFirst) && !access.CheckException())
+      {
+         juce::LocalRef<jstring> value((jstring)env->CallObjectMethod(cursor.get(), getString, 0));
+         if (!access.CheckException() && value.get() != nullptr)
+            name = juce::juceString(value.get());
+      }
+      env->CallVoidMethod(cursor.get(), close);
+      access.CheckException();
+      return name;
+   }
+}
+
 juce::String AndroidSupport::GetDocumentName(const juce::URL& document)
 {
-   auto name = juce::AndroidDocument::fromDocument(document).getInfo().getName();
+   auto name = QueryDisplayName(document);
    if (name.isEmpty()) //document ids usually end with the file name, eg primary%3ADocuments%2Fsong.bsk
       name = juce::URL::removeEscapeChars(document.getFileName()).fromLastOccurrenceOf("/", false, false).fromLastOccurrenceOf(":", false, false);
    if (name.isEmpty())
@@ -205,20 +280,55 @@ juce::Result AndroidSupport::CopyDocumentToMirror(const juce::URL& document)
 {
    //rather than URL::createInputStream(), which first tries to look the document up as a file, and asserts when that
    //needs storage permissions
-   auto input = juce::AndroidDocument::fromDocument(document).createInputStream();
-   if (input == nullptr)
+   ContentAccess access(document);
+   if (!access.IsValid())
+      return juce::Result::fail("no content resolver");
+   auto* env = access.env;
+
+   juce::LocalRef<jclass> resolverClass(env->GetObjectClass(access.resolver.get()));
+   jmethodID openInputStream = env->GetMethodID(resolverClass.get(), "openInputStream", "(Landroid/net/Uri;)Ljava/io/InputStream;");
+   juce::LocalRef<jobject> stream(env->CallObjectMethod(access.resolver.get(), openInputStream, access.uri.get()));
+   if (access.CheckException() || stream.get() == nullptr)
       return juce::Result::fail("couldn't open " + document.toString(false));
 
    auto mirror = GetDocumentMirror(document);
    mirror.getParentDirectory().createDirectory();
    juce::FileOutputStream output(mirror);
-   if (!output.openedOk())
-      return output.getStatus();
-   output.setPosition(0);
-   output.truncate();
-   output.writeFromInputStream(*input, -1);
+   bool ok = output.openedOk();
+   if (ok)
+   {
+      output.setPosition(0);
+      output.truncate();
+   }
+
+   juce::LocalRef<jclass> streamClass(env->GetObjectClass(stream.get()));
+   jmethodID read = env->GetMethodID(streamClass.get(), "read", "([B)I");
+   jmethodID close = env->GetMethodID(streamClass.get(), "close", "()V");
+
+   constexpr int kChunkSize = 65536;
+   juce::HeapBlock<jbyte> buffer(kChunkSize);
+   juce::LocalRef<jbyteArray> javaBuffer(env->NewByteArray(kChunkSize));
+   while (ok)
+   {
+      jint bytesRead = env->CallIntMethod(stream.get(), read, javaBuffer.get());
+      if (access.CheckException())
+      {
+         ok = false;
+         break;
+      }
+      if (bytesRead < 0) //end of the stream
+         break;
+      env->GetByteArrayRegion(javaBuffer.get(), 0, bytesRead, buffer.get());
+      ok = output.write(buffer.get(), (size_t)bytesRead);
+   }
+
+   env->CallVoidMethod(stream.get(), close);
+   access.CheckException();
+
    output.flush();
-   return output.getStatus();
+   if (!output.getStatus().wasOk())
+      return output.getStatus();
+   return ok ? juce::Result::ok() : juce::Result::fail("couldn't read " + document.toString(false));
 }
 
 juce::Result AndroidSupport::WriteToDocument(const juce::URL& document, const juce::File& source)
@@ -227,37 +337,21 @@ juce::Result AndroidSupport::WriteToDocument(const juce::URL& document, const ju
    if (!input.openedOk())
       return input.getStatus();
 
-   auto* env = juce::getEnv();
-   auto context = juce::getAppContext();
-   if (env == nullptr || context.get() == nullptr)
-      return juce::Result::fail("no android context");
-
-   auto checkException = [env]()
+   ContentAccess access(document);
+   if (!access.IsValid())
+      return juce::Result::fail("no content resolver");
+   auto* env = access.env;
+   auto checkException = [&access]()
    {
-      if (!env->ExceptionCheck())
-         return false;
-      env->ExceptionClear();
-      return true;
+      return access.CheckException();
    };
 
    //opened with ContentResolver.openOutputStream(uri, "wt") rather than JUCE's URL::createOutputStream(), which uses
    //mode "w": some document providers don't truncate in that mode, which would leave the end of a longer previous
    //version of the file in place
-   juce::LocalRef<jclass> contextClass(env->GetObjectClass(context.get()));
-   jmethodID getContentResolver = env->GetMethodID(contextClass.get(), "getContentResolver", "()Landroid/content/ContentResolver;");
-   juce::LocalRef<jobject> resolver(env->CallObjectMethod(context.get(), getContentResolver));
-   if (checkException() || resolver.get() == nullptr)
-      return juce::Result::fail("no content resolver");
-
-   juce::LocalRef<jclass> uriClass(env->FindClass("android/net/Uri"));
-   jmethodID parse = env->GetStaticMethodID(uriClass.get(), "parse", "(Ljava/lang/String;)Landroid/net/Uri;");
-   juce::LocalRef<jobject> uri(env->CallStaticObjectMethod(uriClass.get(), parse, juce::javaString(document.toString(true)).get()));
-   if (checkException() || uri.get() == nullptr)
-      return juce::Result::fail("bad document url");
-
-   juce::LocalRef<jclass> resolverClass(env->GetObjectClass(resolver.get()));
+   juce::LocalRef<jclass> resolverClass(env->GetObjectClass(access.resolver.get()));
    jmethodID openOutputStream = env->GetMethodID(resolverClass.get(), "openOutputStream", "(Landroid/net/Uri;Ljava/lang/String;)Ljava/io/OutputStream;");
-   juce::LocalRef<jobject> stream(env->CallObjectMethod(resolver.get(), openOutputStream, uri.get(), juce::javaString("wt").get()));
+   juce::LocalRef<jobject> stream(env->CallObjectMethod(access.resolver.get(), openOutputStream, access.uri.get(), juce::javaString("wt").get()));
    if (checkException() || stream.get() == nullptr)
       return juce::Result::fail("couldn't open the document for writing");
 
@@ -328,6 +422,29 @@ namespace
          AndroidSupport::Log((juce::String("BespokeAudioService.") + methodName + "() failed").toRawUTF8());
       }
    }
+}
+
+juce::URL AndroidSupport::TakeOpenedDocument()
+{
+   auto* env = juce::getEnv();
+   auto context = juce::getAppContext();
+   if (env == nullptr || context.get() == nullptr)
+      return {};
+
+   juce::LocalRef<jclass> activityClass(GetAppClass(env, context.get(), "com.ryanchallinor.bespokesynth.BespokeActivity"));
+   if (activityClass.get() == nullptr)
+      return {};
+
+   jmethodID take = env->GetStaticMethodID(activityClass.get(), "takeOpenedDocument", "()Ljava/lang/String;");
+   juce::LocalRef<jstring> document((jstring)env->CallStaticObjectMethod(activityClass.get(), take));
+   if (env->ExceptionCheck())
+   {
+      env->ExceptionClear();
+      return {};
+   }
+   if (document.get() == nullptr)
+      return {};
+   return juce::URL(juce::juceString(document.get()));
 }
 
 void AndroidSupport::StartAudioService()

@@ -28,12 +28,13 @@
         android:hardwareAccelerated="false"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 
-        <!-- a plain Activity is what Projucer uses: JUCE drives it through JuceApp's lifecycle callbacks. (JUCE's
-             JuceActivity only works with JUCE_PUSH_NOTIFICATIONS_ACTIVITY defined, which registers its natives)
+        <!-- BespokeActivity is a plain Activity (what Projucer uses, which JUCE drives through JuceApp's lifecycle
+             callbacks) that also catches opened documents. (JUCE's JuceActivity only works with
+             JUCE_PUSH_NOTIFICATIONS_ACTIVITY defined, which registers its natives)
              configChanges: handle rotation, keyboard etc ourselves instead of android recreating the activity,
              which would tear down the audio device and gl context -->
         <activity
-            android:name="android.app.Activity"
+            android:name="com.ryanchallinor.bespokesynth.BespokeActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|navigation|uiMode|density"
             android:screenOrientation="sensorLandscape"
             android:launchMode="singleTask"
@@ -52,6 +53,24 @@
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/usb_device_filter" />
+        </activity>
+
+        <!-- opens .bsk files from file managers, email, drive etc, by passing them on to BespokeActivity (see
+             BespokeOpenActivity.java for why it doesn't receive them itself). android has no type for .bsk, so apps
+             hand them over as generic binary files, which means bespoke is offered for other unknown files too -->
+        <activity
+            android:name="com.ryanchallinor.bespokesynth.BespokeOpenActivity"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/octet-stream" />
+            </intent-filter>
         </activity>
 
         <!-- stopWithTask: swiping bespoke away in recents stops the service, so it doesn't keep the audio running -->
