@@ -104,3 +104,37 @@ To be able to build you will need a few things, depending on your OS
 * On Linux you probably already have everything (gcc, git, etc...), but you will need to install required packages. The full list we
   install on a fresh ubuntu 20 box are listed in the azure-pipelines.yml
     * Some distributions may have slightly different package names like for instance Debian bookworm: You need to replace `alsa` and `alsa-tools` with `alsa-utils`
+
+#### Building for iOS
+
+Bespoke also runs on iPhone and iPad. You can open, play, edit and save patches. Python script modules
+and plugin hosting aren't available on iOS.
+
+You'll need a Mac with Xcode, an Apple account signed in to Xcode (Xcode > Settings > Accounts) and a device running
+iOS 13 or later. A free account works, but apps it installs stop launching after 7 days until you reinstall them.
+On iOS 16 and later, turn on Developer Mode on the device (Settings > Privacy & Security > Developer Mode).
+
+Find your team id in Xcode > Settings > Accounts, or under Membership in the Apple developer portal, then:
+
+```shell
+cmake -Bignore/build-ios -GXcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=<your team id>
+open ignore/build-ios/BespokeSynth.xcodeproj
+```
+
+In Xcode, pick the BespokeSynth scheme and your connected device, then run. Or build from the command line, and
+install with `xcrun devicectl device install app --device <device> <path to BespokeSynth.app>`:
+
+```shell
+xcodebuild -project ignore/build-ios/BespokeSynth.xcodeproj -scheme BespokeSynth -configuration Release \
+    -destination "platform=iOS,id=<device id>" -allowProvisioningUpdates build
+```
+
+iOS-specific options for the first cmake command:
+
+* `-DBESPOKE_IOS_BUNDLE_ID=com.yourname.bespokesynth` sets the app's bundle id. It defaults to one derived from your
+  team id, since a bundle id can only be registered to one team.
+* `-DBESPOKE_IOS_LINK_MULTICAST=ON` requests the multicast networking entitlement, which Ableton Link needs to find
+  peers on the network. Apple has to grant it to your team first, and then it has to be enabled on your App ID, or
+  signing fails. Without it, the `abletonlink` module never sees any peers. If you don't need `abletonlink`, you can
+  ignore this.
+* `-DBESPOKE_IOS_BUILD_NUMBER=...` sets the build number. It defaults to the time cmake was configured.

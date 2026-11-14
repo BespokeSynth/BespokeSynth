@@ -36,6 +36,14 @@
 
 static ableton::link::HostTimeFilter<ableton::link::platform::Clock> sHostTimeFilter;
 
+//iOS only lets apps use multicast, which link needs to find peers, with an entitlement that Apple grants per developer
+//team. builds signed without it (see BESPOKE_IOS_LINK_MULTICAST in Source/CMakeLists.txt) can't see any peers
+#if BESPOKE_IOS && !BESPOKE_IOS_LINK_MULTICAST
+static constexpr bool kCanFindPeers = false;
+#else
+static constexpr bool kCanFindPeers = true;
+#endif
+
 AbletonLink::AbletonLink()
 : IDrawableModule(200, 20)
 {
@@ -114,6 +122,14 @@ void AbletonLink::OnTransportAdvanced(float amount)
          auto sampleRate = device->getCurrentSampleRate();
          auto bufferSize = device->getCurrentBufferSizeSamples();
 
+         //the filter fits sample time against wall clock time over its last 512 calls. a gap in the calls (audio
+         //paused, or the device stopping) leaves sample time behind the clock, which skews the fit until those
+         //points age out: link's beat runs several times too fast and then too slow. start the fit over instead
+         const auto nowUs = mLink->clock().micros();
+         if (mLastAdvanceTimeUs.count() != 0 && nowUs - mLastAdvanceTimeUs > kMaxAdvanceGap)
+            sHostTimeFilter.reset();
+         mLastAdvanceTimeUs = nowUs;
+
          const auto hostTimeUs = sHostTimeFilter.sampleTimeToHostTime(mSampleTime);
          const auto outputLatencyUs = std::chrono::microseconds{ std::llround(1.0e6 * bufferSize / sampleRate) };
          auto offsetUs = std::chrono::microseconds{ llround(mOffsetMs * 1000) };
@@ -160,7 +176,17 @@ void AbletonLink::DrawModule()
    mShiftBeatBackwardButton->Draw();
    mShiftBeatForwardButton->Draw();
 
-   DrawTextNormal("peers: " + ofToString(mNumPeers) + "\ntempo: " + ofToString(mTempo) + "\nbeat: " + ofToString(mLastReceivedBeat), 3, mHeight - 30);
+   if constexpr (!kCanFindPeers)
+   {
+      ofPushStyle();
+      ofSetColor(255, 180, 0);
+      DrawTextNormal("can't find peers:\nthis build lacks\nmulticast support", 3, mHeight - 30);
+      ofPopStyle();
+   }
+   else
+   {
+      DrawTextNormal("peers: " + ofToString(mNumPeers) + "\ntempo: " + ofToString(mTempo) + "\nbeat: " + ofToString(mLastReceivedBeat), 3, mHeight - 30);
+   }
 }
 
 void AbletonLink::CheckboxUpdated(Checkbox* checkbox, double time)

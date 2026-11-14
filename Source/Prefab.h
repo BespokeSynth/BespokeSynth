@@ -32,6 +32,7 @@
 #include "ModuleContainer.h"
 
 class PatchCableSource;
+class SaveTarget;
 
 class Prefab : public IDrawableModule, public IButtonListener
 {
@@ -50,7 +51,7 @@ public:
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
    void Disband();
    void AddModule(IDrawableModule* module);
-   void SavePrefab(std::string savePath);
+   void SavePrefab(const SaveTarget& target);
 
    void Poll() override;
    bool ShouldClipContents() override { return false; }

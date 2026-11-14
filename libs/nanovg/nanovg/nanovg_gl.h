@@ -763,11 +763,25 @@ static int glnvg__renderCreateTexture(void* uptr, int type, int w, int h, int im
 #define GL_LUMINANCE GL_RED
 #endif
 
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#endif
+
+// iOS implements GLES on top of Metal, where luminance textures don't sample correctly.
+// Bespoke always gets a GLES3 context there, so use the GLES3 single-channel format instead.
+#if defined(NANOVG_GLES2) && defined(__APPLE__) && TARGET_OS_IPHONE
+#define NANOVG_GLES2_ALPHA_FORMAT GL_R8
+#define NANOVG_GLES2_ALPHA_DATA_FORMAT GL_RED
+#else
+#define NANOVG_GLES2_ALPHA_FORMAT GL_LUMINANCE
+#define NANOVG_GLES2_ALPHA_DATA_FORMAT GL_LUMINANCE
+#endif
+
 	if (type == NVG_TEXTURE_RGBA)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	else
 #if defined(NANOVG_GLES2) || defined (NANOVG_GL2)
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, NANOVG_GLES2_ALPHA_FORMAT, w, h, 0, NANOVG_GLES2_ALPHA_DATA_FORMAT, GL_UNSIGNED_BYTE, data);
 #elif defined(NANOVG_GLES3)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, data);
 #else
@@ -859,7 +873,7 @@ static int glnvg__renderUpdateTexture(void* uptr, int image, int x, int y, int w
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	else
 #if defined(NANOVG_GLES2) || defined(NANOVG_GL2)
-		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, NANOVG_GLES2_ALPHA_DATA_FORMAT, GL_UNSIGNED_BYTE, data);
 #else
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x,y, w,h, GL_RED, GL_UNSIGNED_BYTE, data);
 #endif

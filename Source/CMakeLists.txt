@@ -6,19 +6,120 @@ else()
     include(../libs/ableton-link/AbletonLinkConfig.cmake)
 endif()
 
+set(BESPOKE_PLIST_TO_MERGE "")
+set(BESPOKE_APP_ICON ${CMAKE_SOURCE_DIR}/bespoke_icon.png)
+set(BESPOKE_DOCUMENT_EXTENSIONS .bsk)
+set(BESPOKE_BUNDLE_ID com.ryanchallinor.bespokesynth)
+if(BESPOKE_IOS)
+    # an App ID can only belong to one Apple developer team, so builds signed by other teams need their own.
+    # the default is derived from the team id, which makes it unique to whoever is building
+    set(BESPOKE_IOS_BUNDLE_ID "" CACHE STRING "Bundle identifier for the iOS app. Defaults to com.<team id>.bespokesynth")
+    option(BESPOKE_IOS_LINK_MULTICAST "Request the multicast networking entitlement, which Ableton Link needs to find peers. Apple must grant it to your team first, or signing fails" OFF)
+    if(BESPOKE_IOS_BUNDLE_ID)
+        set(BESPOKE_BUNDLE_ID ${BESPOKE_IOS_BUNDLE_ID})
+    elseif(CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM)
+        string(TOLOWER "${CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}" BESPOKE_TEAM_LOWER)
+        set(BESPOKE_BUNDLE_ID com.${BESPOKE_TEAM_LOWER}.bespokesynth)
+    else()
+        set(BESPOKE_BUNDLE_ID com.example.bespokesynth)
+        message(WARNING "No signing team set. Pass -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=<your team id> (or -DBESPOKE_IOS_BUNDLE_ID) so the app can be signed")
+    endif()
+    message(STATUS "iOS bundle id: ${BESPOKE_BUNDLE_ID}")
+
+    # iOS needs document types declared by type rather than extension, so that's done in the plist below instead
+    set(BESPOKE_DOCUMENT_EXTENSIONS "")
+    # our own asset catalog instead of icons generated from ICON_BIG: JUCE writes its icons through CoreGraphics,
+    # which always adds an alpha channel, and App Store Connect rejects a 1024px icon with one.
+    # AppIcon.png is rendered from scripts/ios/bespoke_icon_ios.svg; Xcode derives the smaller sizes from it
+    set(BESPOKE_IOS_XCASSETS ${CMAKE_SOURCE_DIR}/scripts/ios/Images.xcassets)
+    # CFBundleVersion. App Store Connect needs it to increase with every upload of the same version, so default to the
+    # configure time (up to 3 dot-separated integers allowed). Reconfigure before archiving, or pass -DBESPOKE_IOS_BUILD_NUMBER
+    if(NOT BESPOKE_IOS_BUILD_NUMBER)
+        string(TIMESTAMP BESPOKE_IOS_BUILD_NUMBER "%Y.%m%d.%H%M" UTC)
+    endif()
+    # CFBundleDisplayName: name shown under the home screen icon
+    # UTExportedTypeDeclarations: iOS file pickers filter by type, not extension, so without declaring
+    # types for our extensions, .bsk/.bskt files show up greyed out in the load dialog
+    # CFBundleDocumentTypes + LSSupportsOpeningDocumentsInPlace: lets .bsk files be opened in bespoke from other apps
+    # UIApplicationSupportsIndirectInputEvents: makes mouse and trackpad clicks identifiable, rather than looking like finger touches
+    # NSLocalNetworkUsageDescription: shown when iOS asks for local network access, which Ableton Link uses to find peers
+    # ITSAppUsesNonExemptEncryption: only OS-provided encryption (HTTPS) is used, which is exempt; without this key
+    # App Store Connect holds every build until the export compliance question is answered
+    set(BESPOKE_PLIST_TO_MERGE "<plist><dict>
+        <key>CFBundleDisplayName</key><string>bespoke</string>
+        <key>ITSAppUsesNonExemptEncryption</key><false/>
+        <key>UIApplicationSupportsIndirectInputEvents</key><true/>
+        <key>NSLocalNetworkUsageDescription</key><string>bespoke uses the local network to sync tempo with other devices over Ableton Link.</string>
+        <key>LSSupportsOpeningDocumentsInPlace</key><true/>
+        <key>CFBundleDocumentTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleTypeName</key><string>bespoke savestate</string>
+                <key>CFBundleTypeRole</key><string>Editor</string>
+                <key>LSHandlerRank</key><string>Owner</string>
+                <key>LSItemContentTypes</key><array><string>com.ryanchallinor.bespokesynth.bsk</string></array>
+            </dict>
+        </array>
+        <key>UTExportedTypeDeclarations</key>
+        <array>
+            <dict>
+                <key>UTTypeIdentifier</key><string>com.ryanchallinor.bespokesynth.bsk</string>
+                <key>UTTypeDescription</key><string>bespoke savestate</string>
+                <key>UTTypeConformsTo</key><array><string>public.data</string></array>
+                <key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>bsk</string></array></dict>
+            </dict>
+            <dict>
+                <key>UTTypeIdentifier</key><string>com.ryanchallinor.bespokesynth.bskt</string>
+                <key>UTTypeDescription</key><string>bespoke template</string>
+                <key>UTTypeConformsTo</key><array><string>public.data</string></array>
+                <key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>bskt</string></array></dict>
+            </dict>
+        </array>
+    </dict></plist>")
+endif()
+
 juce_add_gui_app(BespokeSynth
     PRODUCT_NAME BespokeSynth
-    ICON_BIG ${CMAKE_SOURCE_DIR}/bespoke_icon.png
+    ICON_BIG ${BESPOKE_APP_ICON}
     MICROPHONE_PERMISSION_ENABLED TRUE
     CAMERA_PERMISSION_ENABLED     TRUE
     BLUETOOTH_PERMISSION_ENABLED  TRUE
     FILE_SHARING_ENABLED          TRUE
     DOCUMENT_BROWSER_ENABLED      TRUE
-    DOCUMENT_EXTENSIONS           .bsk
-    BUNDLE_ID                     com.ryanchallinor.bespokesynth
-    PLUGINHOST_AU                 TRUE
+    DOCUMENT_EXTENSIONS           ${BESPOKE_DOCUMENT_EXTENSIONS}
+    BUNDLE_ID                     ${BESPOKE_BUNDLE_ID}
+    PLUGINHOST_AU                 ${BESPOKE_ENABLE_PLUGIN_HOSTING}
+
+    # iOS only
+    BACKGROUND_AUDIO_ENABLED      TRUE
+    STATUS_BAR_HIDDEN             TRUE
+    REQUIRES_FULL_SCREEN          TRUE
+    IPHONE_SCREEN_ORIENTATIONS    UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+    PLIST_TO_MERGE                "${BESPOKE_PLIST_TO_MERGE}"
+    CUSTOM_XCASSETS_FOLDER        "${BESPOKE_IOS_XCASSETS}"
+    BUILD_VERSION                 "${BESPOKE_IOS_BUILD_NUMBER}"
     )
 
+if(BESPOKE_IOS)
+    # replaces the empty file that juce generates. Ableton Link finds peers over multicast, which iOS blocks without
+    # this entitlement. Apple grants it per team, so it also has to be enabled on the App ID for signing to succeed.
+    # without it, everything else works, but link never sees any peers
+    if(BESPOKE_IOS_LINK_MULTICAST)
+        set_target_properties(BespokeSynth PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_SOURCE_DIR}/scripts/ios/entitlements.plist")
+        # lets the abletonlink module know peers can be found, so it doesn't show its warning
+        target_compile_definitions(BespokeSynth PRIVATE BESPOKE_IOS_LINK_MULTICAST=1)
+    endif()
+
+    # App Store privacy manifest, copied to the bundle root by Xcode's resources phase
+    set(BESPOKE_PRIVACY_MANIFEST "${CMAKE_SOURCE_DIR}/scripts/ios/PrivacyInfo.xcprivacy")
+    target_sources(BespokeSynth PRIVATE "${BESPOKE_PRIVACY_MANIFEST}")
+    set_source_files_properties("${BESPOKE_PRIVACY_MANIFEST}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+endif()
+
+if(NOT BESPOKE_ENABLE_PYTHON)
+    set(Python_VERSION "disabled")
+endif()
 bespoke_buildtime_version_info(BespokeSynth)
 
 if(MSVC)
@@ -322,6 +423,7 @@ target_sources(BespokeSynth PRIVATE
     LocationZoomer.cpp
     LocationZoomer.h
     LockFreeQueue.h
+    FixedBlockAudioAdapter.h
     LoopStorer.cpp
     LoopStorer.h
     Looper.cpp
@@ -661,6 +763,8 @@ target_sources(BespokeSynth PRIVATE
     SamplerGrid.h
     SaveStateLoader.cpp
     SaveStateLoader.h
+    SaveTarget.cpp
+    SaveTarget.h
     Scale.cpp
     Scale.h
     ScaleDegree.cpp
@@ -815,7 +919,7 @@ if(BESPOKE_NIGHTLY)
         )
 endif()
 
-if(BESPOKE_PORTABLE)
+if(BESPOKE_PORTABLE AND BESPOKE_ENABLE_PYTHON)
     set_source_files_properties(ScriptModule.cpp PROPERTIES
         COMPILE_DEFINITIONS BESPOKE_PORTABLE_PYTHON="$<IF:$<BOOL:${WIN32}>,python.exe,bin/python>"
         )
@@ -848,15 +952,26 @@ target_compile_definitions(BespokeSynth PRIVATE
     JUCE_WASAPI=1
     JUCE_DIRECTSOUND=1
 
-    JUCE_PLUGINHOST_VST3=1
-    JUCE_PLUGINHOST_VST=$<BOOL:${BESPOKE_VST2_SDK_LOCATION}>
-    JUCE_PLUGINHOST_LV2=1
+    JUCE_PLUGINHOST_VST3=$<BOOL:${BESPOKE_ENABLE_PLUGIN_HOSTING}>
+    JUCE_PLUGINHOST_VST=$<AND:$<BOOL:${BESPOKE_ENABLE_PLUGIN_HOSTING}>,$<BOOL:${BESPOKE_VST2_SDK_LOCATION}>>
+    JUCE_PLUGINHOST_LV2=$<BOOL:${BESPOKE_ENABLE_PLUGIN_HOSTING}>
     JUCE_PLUGINHOST_LADSPA=0
 
     JUCE_CATCH_UNHANDLED_EXCEPTIONS=0
+
+    BESPOKE_PYTHON_SUPPORT=$<BOOL:${BESPOKE_ENABLE_PYTHON}>
+    BESPOKE_PLUGIN_HOSTING_SUPPORT=$<BOOL:${BESPOKE_ENABLE_PLUGIN_HOSTING}>
     )
 
-if (APPLE)
+if (BESPOKE_IOS)
+    target_compile_definitions(BespokeSynth PRIVATE
+        BESPOKE_IOS=1
+        )
+    target_sources(BespokeSynth PRIVATE IOSAudioSession.h IOSAudioSession.mm IOSDocuments.h IOSDocuments.mm IOSDiagnostics.h IOSDiagnostics.mm IOSPointerInput.h IOSPointerInput.mm)
+    # the asio bundled with Link reads uninitialized memory in thread_info_base's constructor. recent clang treats that
+    # as unreachable when optimizing and deletes io_context::run()'s event loop, so Link silently never starts discovery
+    set_source_files_properties(AbletonLink.cpp PROPERTIES COMPILE_OPTIONS "-ftrivial-auto-var-init=zero")
+elseif (APPLE)
     target_compile_definitions(BespokeSynth PRIVATE
         BESPOKE_MAC=1
         )
@@ -939,7 +1054,6 @@ target_link_libraries(BespokeSynth PRIVATE
     bespoke::nanovg
     bespoke::psmove
     bespoke::push2
-    bespoke::pybind11
     bespoke::xwax
     bespoke::scalable-font2
 
@@ -963,9 +1077,15 @@ target_link_libraries(BespokeSynth PRIVATE
     $<$<BOOL:${BESPOKE_DEVENDORED_SYSTEM_JUCE}>:vorbisenc>
     $<$<BOOL:${BESPOKE_DEVENDORED_SYSTEM_JUCE}>:vorbisfile>
 
-    ${Python_LIBRARIES}
     $<$<BOOL:${MINGW}>:dbghelp>
     )
+
+if(BESPOKE_ENABLE_PYTHON)
+    target_link_libraries(BespokeSynth PRIVATE
+        bespoke::pybind11
+        ${Python_LIBRARIES}
+        )
+endif()
 
 bespoke_copy_resource_dir(BespokeSynth)
 bespoke_make_portable(BespokeSynth)

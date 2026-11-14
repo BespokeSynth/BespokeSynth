@@ -1,7 +1,7 @@
 project(push2)
 
 set(DOC_STRING "Enable Ableton Push 2 support. When off, the push2control module is present but non-functional.")
-option(BESPOKE_PUSH2_SUPPORT "${DOC_STRING}" ON)
+option(BESPOKE_PUSH2_SUPPORT "${DOC_STRING}" ${BESPOKE_DESKTOP})
 
 add_library(${PROJECT_NAME}
     JuceToPush2DisplayBridge.cpp

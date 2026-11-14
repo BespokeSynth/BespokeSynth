@@ -2262,6 +2262,20 @@ void ControlSurface::SendLeds(bool force)
          surface->SendLed(mDevice, index, state);
       }
    }
+
+   if (surface->NeedsLedKeepAlive() && gTime - mLastLedKeepAliveTime > 500)
+   {
+      //resend one lit led, redundantly, to keep the device awake
+      mLastLedKeepAliveTime = gTime;
+      for (int index = 0; index < (int)mControlState.size(); ++index)
+      {
+         if (surface->HasLed(index) && mControlState[index].mLedState.color >= 0)
+         {
+            surface->SendLed(mDevice, index, mControlState[index].mLedState);
+            break;
+         }
+      }
+   }
 }
 
 bool ControlSurface::GetButtonState(int index) const

@@ -3,7 +3,7 @@ function(bespoke_copy_resource_dir TARGET)
     add_custom_command(TARGET ${TARGET} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_LIST_DIR}/cmake/install-quiet.cmake"
         "${CMAKE_SOURCE_DIR}/resource"
-        "$<TARGET_FILE_DIR:${TARGET}>$<$<BOOL:${APPLE}>:/../Resources>"
+        "$<TARGET_FILE_DIR:${TARGET}>$<$<AND:$<BOOL:${APPLE}>,$<NOT:$<BOOL:${BESPOKE_IOS}>>>:/../Resources>"
         QUIET
         VERBATIM
         )
@@ -11,7 +11,7 @@ endfunction()
 
 # Install dependencies to the output directory and fix up binaries
 function(bespoke_make_portable TARGET)
-    if(NOT BESPOKE_PORTABLE)
+    if(NOT BESPOKE_PORTABLE OR NOT BESPOKE_ENABLE_PYTHON)
         return()
     endif()
     get_target_property(pyDirDst ${TARGET} RUNTIME_OUTPUT_DIRECTORY)

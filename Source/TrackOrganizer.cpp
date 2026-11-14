@@ -34,7 +34,6 @@
 #include "AudioSend.h"
 #include "UIControlMacros.h"
 #include "Prefab.h"
-#include "pybind11/pybind11.h"
 
 #include <cstring>
 
@@ -481,7 +480,7 @@ void TrackOrganizer::ButtonClicked(ClickButton* button, double time)
       juce::FileChooser chooser("Save trackorganizer as...", juce::File(ofToDataPath("trackorganizer/" + mTrackName + ".pfb")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
-         std::string savePath = chooser.getResult().getFullPathName().toStdString();
+         SaveTarget target(chooser);
 
          ofRectangle boundingRect = GetBoundingRect();
          ModuleFactory::Spawnable spawnable;
@@ -494,7 +493,7 @@ void TrackOrganizer::ButtonClicked(ClickButton* button, double time)
                spawnedPrefab->AddModule(module);
          }
 
-         spawnedPrefab->SavePrefab(savePath);
+         spawnedPrefab->SavePrefab(target);
 
          spawnedPrefab->Disband();
       }

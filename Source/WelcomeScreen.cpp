@@ -242,6 +242,7 @@ void WelcomeScreen::DrawModule()
          int screenshotSize = 0;
          std::string jsonLayoutString;
          ModularSynth::LoadStateHeader(in, screenshotData, screenshotSize, jsonLayoutString);
+         FileStreamIn::s32BitMode = false;
          if (screenshotData != nullptr)
             mRecentFiles[i].mScreenshotImageHandle = nvgCreateImageMem(gNanoVG, 0, screenshotData, screenshotSize);
          else

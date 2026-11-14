@@ -173,6 +173,7 @@ public:
    virtual bool SupportsLedFlashing() const { return true; } //if false, controlsurface will blink leds itself
    virtual bool SupportsLedBrightness() const { return false; }
    virtual void SendLed(MidiDevice& device, int layoutIndex, const ControlSurfaceLedState& state);
+   virtual bool NeedsLedKeepAlive() const { return false; } //if true, an led is periodically resent so the device doesn't turn its leds off from inactivity
 
    //display
    virtual bool HasDisplay() const { return true; }
@@ -219,6 +220,7 @@ public:
    int GetGridNumRows() const override { return 4; }
 
    bool IsDisplayConnected() const override;
+   bool NeedsLedKeepAlive() const override { return !IsDisplayConnected(); } //without display frames coming in, the move turns its leds off after ~1 second
    void SendDisplay(MidiDevice& device, const AbletonMoveLCD& lcd) override;
    void ClearDisplay(MidiDevice& device) override;
 

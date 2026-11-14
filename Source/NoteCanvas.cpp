@@ -1439,10 +1439,13 @@ void NoteCanvas::SaveMidi()
          track1.addEvent(messageOff);
       }
       midifile.addTrack(track1);
-      std::string savePath = chooser.getResult().getFullPathName().toStdString();
-      File f(savePath);
-      FileOutputStream out(f);
-      midifile.writeTo(out);
+      SaveTarget target(chooser);
+      {
+         File f(target.GetWritePath());
+         FileOutputStream out(f);
+         midifile.writeTo(out);
+      }
+      target.Commit();
    }
 }
 
