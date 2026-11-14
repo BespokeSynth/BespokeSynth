@@ -27,13 +27,25 @@
 #include "SynthGlobals.h"
 #include "Profiler.h"
 
+void PeakTracker::UpdateDecayScalar()
+{
+   mDecayScalar = powf(0.5f, 1.0f / (mDecayTime * gSampleRate));
+   mDecayScalarDirty = false;
+   mCachedSampleRate = gSampleRate;
+}
+
 void PeakTracker::Process(float* buffer, int bufferSize)
 {
    PROFILER(PeakTracker);
 
+   // Optimization: Cache decay scalar so powf() is not re-evaluated for every sample in the audio buffer.
+   if (mDecayScalarDirty || mCachedSampleRate != gSampleRate)
+      UpdateDecayScalar();
+
+   const float scalar = mDecayScalar;
+
    for (int j = 0; j < bufferSize; ++j)
    {
-      float scalar = powf(0.5f, 1.0f / (mDecayTime * gSampleRate));
       float input = fabsf(buffer[j]);
 
       if (input >= mPeak)

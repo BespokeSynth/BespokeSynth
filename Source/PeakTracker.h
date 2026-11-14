@@ -30,15 +30,24 @@ class PeakTracker
 public:
    void Process(float* buffer, int bufferSize);
    float GetPeak() const { return mPeak; }
-   void SetDecayTime(float time) { mDecayTime = time; }
+   void SetDecayTime(float time)
+   {
+      mDecayTime = time;
+      mDecayScalarDirty = true;
+   }
    void SetLimit(float limit) { mLimit = limit; }
    float GetLimit() const { return mLimit; }
    void Reset() { mPeak = 0; }
    double GetLastHitLimitTime() const { return mHitLimitTime; }
 
 private:
+   void UpdateDecayScalar();
+
    float mPeak{ 0 };
    float mDecayTime{ .01 };
    float mLimit{ -1 };
    double mHitLimitTime{ -9999 };
+   float mDecayScalar{ 0 };
+   float mCachedSampleRate{ 0 };
+   bool mDecayScalarDirty{ true };
 };
