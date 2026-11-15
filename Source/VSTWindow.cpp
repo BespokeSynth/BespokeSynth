@@ -89,18 +89,26 @@ bool VSTWindow::IsAUv3(juce::AudioProcessor* processor)
 //static
 VSTWindow* VSTWindow::CreateVSTWindow(VSTPlugin* vst, WindowFormatType type)
 {
+   if (juce::AudioProcessorEditor* ui = CreateEditor(vst->GetAudioProcessor(), type))
+      return new VSTWindow(vst, ui, type);
+   return nullptr;
+}
+
+//static
+juce::AudioProcessorEditor* VSTWindow::CreateEditor(juce::AudioProcessor* processor, WindowFormatType& type)
+{
    juce::AudioProcessorEditor* ui = nullptr;
 
 #if BESPOKE_IOS
    //on iOS only AUv3s bring their own UI. apple's built-in (v2) units claim a view controller but never deliver one, which
    //leaves a blank window, so show those with the generic editor
-   if (type == Normal && !IsAUv3(vst->GetAudioProcessor()))
+   if (type == Normal && !IsAUv3(processor))
       type = Generic;
 #endif
 
    if (type == Normal)
    {
-      ui = vst->GetAudioProcessor()->createEditorIfNeeded();
+      ui = processor->createEditorIfNeeded();
 
       if (ui == nullptr)
          type = Generic;
@@ -109,20 +117,18 @@ VSTWindow* VSTWindow::CreateVSTWindow(VSTPlugin* vst, WindowFormatType type)
    if (ui == nullptr)
    {
       if (type == Generic || type == Parameters)
-         ui = new juce::GenericAudioProcessorEditor(*vst->GetAudioProcessor());
+         ui = new juce::GenericAudioProcessorEditor(*processor);
       else if (type == Programs)
-         ui = new ProgramAudioProcessorEditor(vst->GetAudioProcessor());
+         ui = new ProgramAudioProcessorEditor(processor);
    }
 
    if (ui != nullptr)
    {
-      if (juce::AudioPluginInstance* const plugin = dynamic_cast<juce::AudioPluginInstance*>(vst->GetAudioProcessor()))
+      if (juce::AudioPluginInstance* const plugin = dynamic_cast<juce::AudioPluginInstance*>(processor))
          ui->setName(plugin->getName());
-
-      return new VSTWindow(vst, ui, type);
    }
 
-   return nullptr;
+   return ui;
 }
 
 VSTWindow::~VSTWindow()

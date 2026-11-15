@@ -139,6 +139,7 @@ public:
    bool IsVisible();
    std::vector<IDrawableModule*> GetChildren() const { return mChildren; }
    virtual bool IsResizable() const { return false; }
+   virtual bool ShouldSaveSize() const { return IsResizable(); }
    virtual void Resize(float width, float height)
    {
       mWidth = width;

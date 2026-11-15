@@ -59,6 +59,13 @@ namespace VSTLookup
    void GetRecentPlugins(std::vector<juce::PluginDescription>& recentPlugins, int num);
 }
 
+//how an embedded plugin UI fits the module, for plugins that can't take every size
+enum class PluginEmbedSizeMode
+{
+   ResizeModuleToFit, //ask the plugin for the module's size at the current zoom, and let the module follow the size it takes
+   Clip //the module keeps the size it was set to, and the plugin's UI is clipped or padded if it can't take that size
+};
+
 class VSTPlugin : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IButtonListener, public juce::AudioProcessorListener
 {
 public:
@@ -110,9 +117,10 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 5; }
-   //embedded plugin UIs can be resized. the base module saves its size only when resizable, so this must not change
-   //between saving and loading: it depends only on mEmbedUI, which LoadState reads before the base module's state
-   bool IsResizable() const override { return mEmbedUI; }
+   //embedded plugin UIs can be resized, unless the plugin's editor has a fixed size
+   bool IsResizable() const override { return mEmbedUI && !EmbeddedSizeIsFixed(); }
+   //the editor doesn't exist yet at load time, so this depends only on mEmbedUI, which LoadState reads before the base state
+   bool ShouldSaveSize() const override { return mEmbedUI; }
    void Resize(float width, float height) override;
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
@@ -129,6 +137,14 @@ private:
    void ApplyPendingState();
    void ProcessBypass(ChannelBuffer* buffer);
    void UpdateEmbeddedView();
+   bool HasEmbeddedView() const;
+   ofVec2f GetEmbedWantedSize() const; //from the module size (mWidth/mHeight) when it's been resized, otherwise the plugin's natural size scaled down
+   void FitEmbedSizeToEditor();
+   void SetModuleSizeForEmbedSize(ofVec2f embedSize);
+   void SetEmbeddedSize(ofVec2f size); //and moves the cables if it changed
+   bool EmbeddedSizeIsFixed() const; //the plugin's editor can't be resized, so neither can the module
+   void UpdateControlsForEmbed(); //an embedded view hides everything but the top row of controls
+   bool CreateEmbeddedView(void* nativeParentView);
    void DestroyEmbeddedView();
    void LoadVSTFromSaveData(FileStreamIn& in, int rev);
    void GetVSTFileDesc(std::string vstName, juce::PluginDescription& desc);
@@ -265,11 +281,14 @@ private:
    Checkbox* mEmbedUICheckbox{ nullptr };
    float mEmbedTop{ 0 }; //where the embedded UI starts, below the module's controls
    ofVec2f mEmbeddedSize{ 0, 0 }; //size of the embedded UI on the canvas, once the plugin's view has arrived
-   bool mEmbedUserSized{ false }; //resized by hand, so mEmbedUserSize is used instead of the plugin's natural size
-   ofVec2f mEmbedUserSize{ 0, 0 };
+   PluginEmbedSizeMode mSizeMode{ PluginEmbedSizeMode::Clip };
+   bool mEmbedUserSized{ false }; //resized by hand, so the module's mWidth/mHeight set the size instead of the plugin's natural size
+   ofVec2f mEmbedNaturalSize{ 0, 0 }; //the plugin view's own size, once it has arrived
    bool mIgnoreResize{ false };
+   bool mControlsHiddenForEmbed{ false };
+   bool mEmbedFitOnCreate{ false };
    ofVec2f mLastEmbedSize{ 0, 0 };
-   static constexpr float kEmbeddedUIScale{ .6f }; //of the plugin's natural size: about 35% of its area
+   static constexpr float kDefaultEmbeddedUIScale{ .4f };
    static constexpr float kEmbedBottomMargin{ 12 }; //keeps the resize handle below the plugin's view, which would take its touches
    //the plugin's view is hidden while the canvas or module moves (resizing it every frame is slow and glitchy),
    //and a black square is drawn in its place
@@ -278,5 +297,10 @@ private:
    double mLastEmbedMoveTimeMs{ 0 };
 #if BESPOKE_IOS
    IOSPluginViewHost::Overlay* mEmbeddedView{ nullptr };
+#else
+   std::unique_ptr<juce::Component> mEmbeddedHolder; //native view over the canvas that holds and clips the editor
+   std::unique_ptr<juce::AudioProcessorEditor> mEmbeddedEditor;
+   bool mEmbeddedEditorResizable{ false };
+   juce::Point<int> mEmbedEditorRequest{ -1, -1 }; //last size asked of the editor, in pixels
 #endif
 };

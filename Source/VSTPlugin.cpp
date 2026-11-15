@@ -355,17 +355,17 @@ void VSTPlugin::CreateUIControls()
 
    mVolSlider = new FloatSlider(this, "vol", 3, 3, 80, 15, &mVol, 0, 4);
    mOpenEditorButton = new ClickButton(this, "open", mVolSlider, kAnchor_Right_Padded);
+   mEmbedUICheckbox = new Checkbox(this, "embed", mOpenEditorButton, kAnchor_Right, &mEmbedUI);
+   mPanicButton = new ClickButton(this, "panic", mEmbedUICheckbox, kAnchor_Right);
    mPresetFileSelector = new DropdownList(this, "preset", 3, 21, &mPresetFileIndex, 142);
    mSavePresetFileButton = new ClickButton(this, "save as", -1, -1);
    mShowParameterDropdown = new DropdownList(this, "show parameter", 3, 56, &mShowParameterIndex, 190);
    mLoadParameterButton = new ClickButton(this, "load parameter", mShowParameterDropdown, kAnchor_Right);
-   mPanicButton = new ClickButton(this, "panic", mOpenEditorButton, kAnchor_Right_Padded);
    mRemoveExtraOutputButton = new ClickButton(this, "  -  ", 83, 38);
    mAddExtraOutputButton = new ClickButton(this, " + ", mRemoveExtraOutputButton, kAnchor_Right);
    mResetPresetButton = new ClickButton(this, "reset", -1, -1);
-   mEmbedUICheckbox = new Checkbox(this, "embed", mAddExtraOutputButton, kAnchor_Right_Padded, &mEmbedUI);
-#if !BESPOKE_IOS
-   mEmbedUICheckbox->SetShowing(false); //not supported on desktop yet, but the control exists so patches load everywhere
+#if !BESPOKE_IOS && !BESPOKE_MAC
+   mEmbedUICheckbox->SetShowing(false); //not supported on this platform yet, but the control exists so patches load everywhere
 #endif
 
    mPresetFileSelector->DrawLabel(true);
@@ -395,9 +395,10 @@ void VSTPlugin::RecreateUIOutputCables()
    {
       if (slider.mSlider)
       {
-         slider.mSlider->SetShowing(slider.mShowing);
-         slider.mRemoveButton->SetShowing(slider.mShowing);
-         if (slider.mShowing)
+         const bool showing = slider.mShowing && !mEmbedUI; //an embedded view takes their place
+         slider.mSlider->SetShowing(showing);
+         slider.mRemoveButton->SetShowing(showing);
+         if (showing)
          {
             slider.mSlider->SetPosition(
             3 + (slider.mSlider->GetRect().width + slider.mRemoveButton->GetRect().width + 9) * (sliderCount / kRows),
@@ -601,6 +602,10 @@ void VSTPlugin::UnloadPlugin()
       std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
       std::lock_guard<ofMutex> lock(mVSTMutex);
       oldPlugin = std::move(mPlugin);
+      //the sliders stay until the next plugin's CreateParameterSliders replaces them, but their parameters go with
+      //this plugin. a new plugin arrives asynchronously, and Poll() or a slider change in between would use them
+      for (auto& parameter : mParameterSliders)
+         parameter.mParameter = nullptr;
       mPendingState = PendingPluginState();
       for (auto& slider : mPendingSliders)
       {
@@ -723,7 +728,7 @@ void VSTPlugin::ApplyPendingState()
    //control values loaded before the plugin existed are applied on top of its state, matching the order of a synchronous load
    for (auto& parameter : mParameterSliders)
    {
-      if (parameter.mHasPendingValue)
+      if (parameter.mHasPendingValue && parameter.mParameter != nullptr)
       {
          parameter.mParameter->setValue(*parameter.mValue);
          parameter.mHasPendingValue = false;
@@ -911,18 +916,49 @@ void VSTPlugin::Poll()
    }
 
    for (auto& parameterSlider : mParameterSliders)
-      *parameterSlider.mValue = parameterSlider.mParameter->getValue();
+   {
+      if (parameterSlider.mParameter != nullptr) //null between unloading a plugin and the next one arriving
+         *parameterSlider.mValue = parameterSlider.mParameter->getValue();
+   }
 
    UpdateEmbeddedView();
+   UpdateControlsForEmbed();
+}
+
+void VSTPlugin::UpdateControlsForEmbed()
+{
+   if (mEmbedUI == mControlsHiddenForEmbed)
+      return;
+   mControlsHiddenForEmbed = mEmbedUI;
+
+   const bool show = !mEmbedUI;
+   mPresetFileSelector->SetShowing(show);
+   mSavePresetFileButton->SetShowing(show);
+   mResetPresetButton->SetShowing(show);
+   mShowParameterDropdown->SetShowing(show);
+   mLoadParameterButton->SetShowing(show);
+   mRemoveExtraOutputButton->SetShowing(show);
+   mAddExtraOutputButton->SetShowing(show);
+   RecreateUIOutputCables(); //shows or hides the parameter sliders, and moves the cables to the new module size
+}
+
+bool VSTPlugin::EmbeddedSizeIsFixed() const
+{
+#if BESPOKE_IOS
+   return false;
+#else
+   //in clip mode the module can be any size, and a fixed-size editor is clipped or padded to fit
+   return mSizeMode == PluginEmbedSizeMode::ResizeModuleToFit && mEmbeddedEditor != nullptr && !mEmbeddedEditorResizable;
+#endif
 }
 
 void VSTPlugin::UpdateEmbeddedView()
 {
-#if BESPOKE_IOS
+#if BESPOKE_IOS || BESPOKE_MAC
    const bool wantEmbedded = mEmbedUI && mPluginReady && mPlugin != nullptr;
    if (!wantEmbedded)
    {
-      if (mEmbeddedView != nullptr || mEmbeddedSize.x > 0)
+      if (HasEmbeddedView() || mEmbeddedSize.x > 0)
       {
          DestroyEmbeddedView();
          RecreateUIOutputCables();
@@ -930,48 +966,43 @@ void VSTPlugin::UpdateEmbeddedView()
       return;
    }
 
-   if (mEmbeddedView == nullptr)
-   {
-      auto* instance = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get());
-      if (instance != nullptr && VSTWindow::IsAUv3(instance))
-      {
-         std::weak_ptr<bool> alive = mAliveToken;
-         mEmbeddedView = IOSPluginViewHost::Create(instance->getPlatformSpecificData(), [this, alive](float width, float height)
-                                                   {
-                                                      if (alive.expired())
-                                                         return;
-                                                      if (mEmbedUserSized)
-                                                         mEmbeddedSize = mEmbedUserSize;
-                                                      else
-                                                         mEmbeddedSize.set(width * kEmbeddedUIScale, height * kEmbeddedUIScale);
-                                                      RecreateUIOutputCables();
-                                                   });
-      }
+   auto* mainComponent = TheSynth->GetMainComponent();
+   auto* peer = mainComponent->getPeer();
+   if (peer == nullptr)
+      return;
 
-      if (mEmbeddedView == nullptr)
-      {
-         TheSynth->LogEvent("can't embed " + GetPluginName() + ": only plugins with their own UI (AUv3) can be embedded", kLogEventType_Warning);
-         mEmbedUI = false;
-         return;
-      }
+   if (!HasEmbeddedView() && !CreateEmbeddedView(peer->getNativeHandle()))
+   {
+      mEmbedUI = false;
+      return;
    }
 
    if (mEmbeddedSize.x <= 0)
       return; //view hasn't arrived yet
 
    auto* container = GetOwningContainer();
-   auto* peer = TheSynth->GetMainComponent()->getPeer();
-   if (container == nullptr || peer == nullptr)
+   if (container == nullptr)
       return;
 
-   //canvas to screen: (canvas position + container offset) * container scale, in the same points UIKit uses
+   //canvas to screen: (canvas position + container offset) * container scale, in the main component's points
    const float scale = container->GetDrawScale();
    const ofVec2f offset = container->GetDrawOffset();
    const ofVec2f pos = GetPosition();
    const float x = (pos.x + 3 + offset.x) * scale;
    const float y = (pos.y + mEmbedTop + offset.y) * scale;
 
-   //hide while the canvas pans/zooms or the module moves, and show again once it settles
+#if !BESPOKE_IOS
+   if (mSizeMode == PluginEmbedSizeMode::Clip)
+      SetEmbeddedSize(GetEmbedWantedSize()); //the module keeps its size, and the editor is clipped or padded to fit it below
+   else if (!mEmbeddedEditorResizable && scale > 0)
+      //native plugin views can't be scaled, only resized. a fixed-size editor keeps its size on screen whatever the
+      //zoom, so the module's area for it grows and shrinks on the canvas instead. this also follows the plugin
+      //resizing its own UI
+      SetEmbeddedSize(ofVec2f(mEmbeddedEditor->getWidth() / scale, mEmbeddedEditor->getHeight() / scale));
+#endif
+
+   //hide while the canvas pans/zooms or the module moves/resizes, and show again once it settles. moving and resizing
+   //a plugin's native view every frame is slow and glitchy
    const double nowMs = juce::Time::getMillisecondCounterHiRes();
    const ofVec2f canvasPos(x, y);
    if (scale != mLastEmbedScale || canvasPos.x != mLastEmbedCanvasPos.x || canvasPos.y != mLastEmbedCanvasPos.y ||
@@ -988,7 +1019,120 @@ void VSTPlugin::UpdateEmbeddedView()
    const bool visible = settled && IsShowing() && !Minimized() && TheSynth->GetTopModalFocusItem() == nullptr && TheSynth->GetMoveModule() == nullptr;
    const float clipTop = TheTitleBar != nullptr ? TheTitleBar->GetRect().getMaxY() * TheSynth->GetUIScale() : 0;
 
+#if BESPOKE_IOS
    IOSPluginViewHost::Update(mEmbeddedView, peer->getNativeHandle(), clipTop, x, y, mEmbeddedSize.x * scale, mEmbeddedSize.y * scale, visible);
+#else
+   auto* editor = mEmbeddedEditor.get();
+
+   if (!visible)
+   {
+      mEmbeddedHolder->setVisible(false);
+      return;
+   }
+
+   if (mEmbeddedEditorResizable) //resizable editors are resized to follow the canvas zoom
+   {
+      //always ask for the size that was set, not the size the editor last took, so that a size it refused at one zoom
+      //(below its minimum, say) comes back at another
+      const ofVec2f wanted = GetEmbedWantedSize();
+      const juce::Point<int> request(juce::roundToInt(wanted.x * scale), juce::roundToInt(wanted.y * scale));
+      if (request != mEmbedEditorRequest)
+      {
+         mEmbedEditorRequest = request;
+         editor->setSize(request.x, request.y);
+      }
+
+      //the editor may hold its own aspect ratio or limits: let the module follow what it actually took
+      if (mSizeMode == PluginEmbedSizeMode::ResizeModuleToFit &&
+          (std::abs(editor->getWidth() - juce::roundToInt(mEmbeddedSize.x * scale)) > 1 ||
+           std::abs(editor->getHeight() - juce::roundToInt(mEmbeddedSize.y * scale)) > 1))
+      {
+         SetEmbeddedSize(ofVec2f(editor->getWidth() / scale, editor->getHeight() / scale));
+         mLastEmbedSize = mEmbeddedSize; //the editor already has this size, so don't hide it as if it were moving
+      }
+   }
+
+   //the holder is a native view attached to the window, so it works in the top level component's coordinates. it clips
+   //the editor to the module's area for it (an editor bigger than that is cut off; a smaller one leaves the module's
+   //black background showing around it), and to the canvas area below the title bar
+   auto* topLevel = mainComponent->getTopLevelComponent();
+   auto editorArea = topLevel->getLocalArea(mainComponent, juce::Rectangle<float>(x, y, (float)editor->getWidth(), (float)editor->getHeight())).toNearestInt();
+   auto moduleArea = topLevel->getLocalArea(mainComponent, juce::Rectangle<float>(x, y, mEmbeddedSize.x * scale, mEmbeddedSize.y * scale)).toNearestInt();
+   auto canvasArea = topLevel->getLocalArea(mainComponent, juce::Rectangle<float>(0, clipTop, (float)mainComponent->getWidth(), (float)mainComponent->getHeight() - clipTop)).toNearestInt();
+   auto shownArea = editorArea.getIntersection(moduleArea).getIntersection(canvasArea);
+   if (shownArea.isEmpty())
+   {
+      mEmbeddedHolder->setVisible(false);
+      return;
+   }
+
+   if (mEmbeddedHolder->getBounds() != shownArea)
+      mEmbeddedHolder->setBounds(shownArea);
+   const auto editorPos = editorArea.getPosition() - shownArea.getPosition();
+   if (editor->getPosition() != editorPos)
+      editor->setTopLeftPosition(editorPos);
+   if (!mEmbeddedHolder->isVisible())
+      mEmbeddedHolder->setVisible(true);
+#endif
+#endif
+}
+
+bool VSTPlugin::HasEmbeddedView() const
+{
+#if BESPOKE_IOS
+   return mEmbeddedView != nullptr;
+#else
+   return mEmbeddedEditor != nullptr;
+#endif
+}
+
+bool VSTPlugin::CreateEmbeddedView(void* nativeParentView)
+{
+#if BESPOKE_IOS
+   auto* instance = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get());
+   if (instance != nullptr && VSTWindow::IsAUv3(instance))
+   {
+      std::weak_ptr<bool> alive = mAliveToken;
+      mEmbeddedView = IOSPluginViewHost::Create(instance->getPlatformSpecificData(), [this, alive](float width, float height)
+                                                {
+                                                   if (alive.expired())
+                                                      return;
+                                                   mEmbedNaturalSize.set(width, height);
+                                                   mEmbeddedSize = GetEmbedWantedSize();
+                                                   RecreateUIOutputCables();
+                                                });
+   }
+
+   if (mEmbeddedView == nullptr)
+   {
+      TheSynth->LogEvent("can't embed " + GetPluginName() + ": only plugins with their own UI (AUv3) can be embedded", kLogEventType_Warning);
+      return false;
+   }
+   return true;
+#else
+   auto type = VSTWindow::Normal;
+   juce::AudioProcessorEditor* editor = VSTWindow::CreateEditor(mPlugin.get(), type); //falls back to a generic editor
+   if (editor == nullptr)
+      return false;
+   mEmbeddedEditor.reset(editor);
+   mEmbeddedEditorResizable = editor->isResizable();
+
+   //a component with its own native view, attached to the window: it layers above the GL canvas, clips the editor, and is
+   //painted by juce normally (the canvas has juce's component painting turned off)
+   mEmbeddedHolder = std::make_unique<juce::Component>();
+   mEmbeddedHolder->addAndMakeVisible(editor);
+   mEmbeddedHolder->setVisible(false);
+   mEmbeddedHolder->addToDesktop(0, nativeParentView);
+
+   mEmbedNaturalSize.set((float)editor->getWidth(), (float)editor->getHeight());
+   if (mEmbedFitOnCreate) //embed was just turned on (not loaded with a patch, which keeps the size it was saved with)
+   {
+      mEmbedFitOnCreate = false;
+      FitEmbedSizeToEditor();
+   }
+   mEmbeddedSize = GetEmbedWantedSize(); //UpdateEmbeddedView adjusts it to the size mode
+   RecreateUIOutputCables();
+   return true;
 #endif
 }
 
@@ -996,14 +1140,82 @@ void VSTPlugin::Resize(float width, float height)
 {
    if (mIgnoreResize || !mEmbedUI)
       return; //the embed size is saved separately (see SaveState), since it can't be worked out from the module size at load time
+   if (EmbeddedSizeIsFixed())
+      return; //the plugin's editor has one fixed size, which sets the module's size
+
+   //the module size is the size that was set. the plugin's editor may not take it at every zoom (it may have a minimum
+   //size, say), so the module can show bigger for a while, but this is what it goes back to
+   IDrawableModule::Resize(width, height);
+   mEmbedUserSized = true;
+   float w, h;
+   GetModuleDimensions(w, h); //updates mEmbedTop, used by GetEmbedWantedSize
+
+   if (mSizeMode == PluginEmbedSizeMode::ResizeModuleToFit)
+      FitEmbedSizeToEditor();
+
+   if (mEmbeddedSize.x > 0)
+      mEmbeddedSize = GetEmbedWantedSize();
+   RecreateUIOutputCables();
+}
+
+//moves the module size (mWidth/mHeight) to the closest size the editor allows at the current zoom: VST3 editors ask the
+//plugin (minimum and maximum sizes, aspect ratio, steps), and a fixed-size editor allows only its own size. zooming
+//later can still take the editor outside those, and then the size mode decides what happens
+void VSTPlugin::FitEmbedSizeToEditor()
+{
+#if !BESPOKE_IOS
+   auto* container = GetOwningContainer();
+   const float scale = container != nullptr ? container->GetDrawScale() : 1;
+   if (mEmbeddedEditor == nullptr || scale <= 0)
+      return;
 
    float w, h;
    GetModuleDimensions(w, h); //updates mEmbedTop
-   mEmbedUserSized = true;
-   mEmbedUserSize.set(std::max(width - 6, 60.0f), std::max(height - mEmbedTop - kEmbedBottomMargin, 40.0f));
-   if (mEmbeddedSize.x > 0)
-      mEmbeddedSize = mEmbedUserSize;
-   RecreateUIOutputCables();
+
+   juce::Rectangle<int> bounds;
+   if (!mEmbeddedEditorResizable)
+   {
+      bounds = mEmbeddedEditor->getLocalBounds();
+   }
+   else if (auto* constrainer = mEmbeddedEditor->getConstrainer())
+   {
+      const ofVec2f wanted = GetEmbedWantedSize();
+      bounds.setSize(juce::roundToInt(wanted.x * scale), juce::roundToInt(wanted.y * scale));
+      constrainer->checkBounds(bounds, mEmbeddedEditor->getLocalBounds(), { 1 << 20, 1 << 20 }, false, false, true, true);
+   }
+
+   if (bounds.getWidth() > 0 && bounds.getHeight() > 0)
+   {
+      SetModuleSizeForEmbedSize(ofVec2f(bounds.getWidth() / scale, bounds.getHeight() / scale));
+      mEmbedUserSized = true;
+   }
+#endif
+}
+
+//the module size (mWidth/mHeight) that holds an embedded UI of this size. GetEmbedWantedSize does the reverse
+void VSTPlugin::SetModuleSizeForEmbedSize(ofVec2f embedSize)
+{
+   IDrawableModule::Resize(embedSize.x + 6, mEmbedTop + embedSize.y + kEmbedBottomMargin);
+}
+
+void VSTPlugin::SetEmbeddedSize(ofVec2f size)
+{
+   if (std::abs(size.x - mEmbeddedSize.x) > .01f || std::abs(size.y - mEmbeddedSize.y) > .01f)
+   {
+      mEmbeddedSize = size;
+      RecreateUIOutputCables();
+   }
+}
+
+ofVec2f VSTPlugin::GetEmbedWantedSize() const
+{
+   if (mEmbedUserSized)
+      return ofVec2f(std::max(mWidth - 6, 60.0f), std::max(mHeight - mEmbedTop - kEmbedBottomMargin, 40.0f));
+#if !BESPOKE_IOS
+   if (!mEmbeddedEditorResizable)
+      return mEmbedNaturalSize; //can't be scaled, so start with all of it showing at 100% zoom
+#endif
+   return ofVec2f(mEmbedNaturalSize.x * kDefaultEmbeddedUIScale, mEmbedNaturalSize.y * kDefaultEmbeddedUIScale); //start smaller than the plugin's natural size
 }
 
 void VSTPlugin::DestroyEmbeddedView()
@@ -1011,6 +1223,11 @@ void VSTPlugin::DestroyEmbeddedView()
 #if BESPOKE_IOS
    IOSPluginViewHost::Destroy(mEmbeddedView);
    mEmbeddedView = nullptr;
+#else
+   mEmbeddedEditor.reset(); //before the holder it sits in, and before the plugin
+   mEmbeddedHolder.reset();
+   mEmbeddedEditorResizable = false;
+   mEmbedEditorRequest = { -1, -1 };
 #endif
    mEmbeddedSize.set(0, 0);
 }
@@ -1416,40 +1633,49 @@ void VSTPlugin::DrawModule()
       ofPopStyle();
    }
 
-   ofPushStyle();
+   /*ofPushStyle();
    ofSetColor(IDrawableModule::GetColor(kModuleCategory_Note));
    DrawTextRightJustify("midi out:", GetRect().width - 15, 14);
-   ofPopStyle();
+   ofPopStyle();*/
 
-   ofPushStyle();
-   ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth));
-   DrawTextNormal("extra outputs:", 3, 50);
-   ofPopStyle();
+   if (!mEmbedUI) //an embedded view takes the place of everything below the top row
+   {
+      ofPushStyle();
+      ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth));
+      DrawTextNormal("extra outputs:", 3, 50);
+      ofPopStyle();
 
-   ofPushStyle();
-   ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth), 75);
-   DrawTextRightJustify(ofToString(mParameterSliders.size()), GetRect().width - 3, 67);
-   ofPopStyle();
+      ofPushStyle();
+      ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth), 75);
+      DrawTextRightJustify(ofToString(mParameterSliders.size()), GetRect().width - 3, 67);
+      ofPopStyle();
+   }
 
-   for (const auto& slider : mParameterSliders)
-      if (slider.mSlider && slider.mShowing)
-      {
-         slider.mSlider->Draw();
-         slider.mRemoveButton->Draw();
-      }
+   if (!mEmbedUI)
+   {
+      for (const auto& slider : mParameterSliders)
+         if (slider.mSlider && slider.mShowing)
+         {
+            slider.mSlider->Draw();
+            slider.mRemoveButton->Draw();
+         }
+   }
 }
 
 
 void VSTPlugin::GetModuleDimensions(float& width, float& height)
 {
    width = 236;
-   height = 76;
-   for (auto& slider : mParameterSliders)
+   height = mEmbedUI ? 21 : 76; //an embedded view goes right below the top row, in place of the other controls
+   if (!mEmbedUI) //an embedded view hides the parameter sliders
    {
-      if (slider.mSlider && slider.mShowing)
+      for (auto& slider : mParameterSliders)
       {
-         width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 23);
-         height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
+         if (slider.mSlider && slider.mShowing)
+         {
+            width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 23);
+            height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
+         }
       }
    }
 
@@ -1497,7 +1723,8 @@ void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal, double tim
    {
       if (parameterSlider.mSlider == slider)
       {
-         parameterSlider.mParameter->setValue(*parameterSlider.mValue);
+         if (parameterSlider.mParameter != nullptr)
+            parameterSlider.mParameter->setValue(*parameterSlider.mValue);
          return;
       }
    }
@@ -1518,11 +1745,16 @@ void VSTPlugin::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 
 void VSTPlugin::CheckboxUpdated(Checkbox* checkbox, double time)
 {
-   if (checkbox == mEmbedUICheckbox && mEmbedUI && mWindow != nullptr)
+   if (checkbox == mEmbedUICheckbox)
    {
-      //the plugin's view can only be in one place
-      VSTWindow* window = mWindow.release();
-      delete window;
+      mEmbedFitOnCreate = mEmbedUI; //size the module to fit the plugin once its view exists (the plugin may still be loading)
+
+      if (mEmbedUI && mWindow != nullptr)
+      {
+         //the plugin's view can only be in one place
+         VSTWindow* window = mWindow.release();
+         delete window;
+      }
    }
 }
 
@@ -1703,6 +1935,11 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 
    mModuleSaveData.LoadBool("preset_file_sets_params", moduleInfo, true);
 
+   EnumMap sizeModeMap;
+   sizeModeMap["clip"] = (int)PluginEmbedSizeMode::Clip;
+   sizeModeMap["resize module to fit"] = (int)PluginEmbedSizeMode::ResizeModuleToFit;
+   mModuleSaveData.LoadEnum<PluginEmbedSizeMode>("embed_size_mode", moduleInfo, (int)PluginEmbedSizeMode::Clip, nullptr, &sizeModeMap);
+
    if (!moduleInfo["vst"].isNull())
       mOldVstPath = moduleInfo["vst"].asString();
    else
@@ -1741,16 +1978,26 @@ void VSTPlugin::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 
    // Add VST output pins
+   //this runs again whenever a setting changes, so match the count rather than adding more
    int numAdditionalStereoOutputs = mModuleSaveData.GetInt("numAdditionalStereoOutputs");
-   for (int newOutputCount = 0; newOutputCount < numAdditionalStereoOutputs; newOutputCount++)
-   {
+   while ((int)mAdditionalOutCables.size() < numAdditionalStereoOutputs)
       AddExtraOutputCable();
-   }
+   while ((int)mAdditionalOutCables.size() > numAdditionalStereoOutputs)
+      RemoveExtraOutputCable();
 
    mChannel = mModuleSaveData.GetInt("channel");
    mUseVoiceAsChannel = mModuleSaveData.GetBool("usevoiceaschannel");
    mPitchBendRange = mModuleSaveData.GetFloat("pitchbendrange");
    mModwheelCC = mModuleSaveData.GetInt("modwheelcc(1or74)");
+
+   const auto sizeMode = mModuleSaveData.GetEnum<PluginEmbedSizeMode>("embed_size_mode");
+   if (sizeMode != mSizeMode)
+   {
+      mSizeMode = sizeMode;
+#if !BESPOKE_IOS
+      mEmbedEditorRequest = { -1, -1 }; //ask the editor for its size again
+#endif
+   }
 }
 
 void VSTPlugin::SaveState(FileStreamOut& out)
@@ -1799,11 +2046,12 @@ void VSTPlugin::SaveState(FileStreamOut& out)
       out << false;
    }
 
-   //before the base state, which saves the module size only if IsResizable(), and that depends on mEmbedUI
+   //before the base state, which saves the module size only if ShouldSaveSize(), and that depends on mEmbedUI
    out << mEmbedUI;
    out << mEmbedUserSized;
-   out << mEmbedUserSize.x;
-   out << mEmbedUserSize.y;
+   const ofVec2f wantedSize = mEmbedUserSized ? GetEmbedWantedSize() : ofVec2f(0, 0);
+   out << wantedSize.x;
+   out << wantedSize.y;
 
    IDrawableModule::SaveState(out);
 
@@ -1817,12 +2065,13 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
       LoadVSTFromSaveData(in, rev);
    }
 
+   ofVec2f embedSize(0, 0);
    if (rev >= 5)
    {
       in >> mEmbedUI;
       in >> mEmbedUserSized;
-      in >> mEmbedUserSize.x;
-      in >> mEmbedUserSize.y;
+      in >> embedSize.x;
+      in >> embedSize.y;
    }
    else
    {
@@ -1834,9 +2083,16 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
       }
    }
 
-   mIgnoreResize = true; //the base state restores the module size, but the embed size was loaded above
+   mIgnoreResize = true; //the base state restores the module size, but it's set from the embed size below instead
    IDrawableModule::LoadState(in, rev);
    mIgnoreResize = false;
+
+   if (mEmbedUserSized) //the module size, from the embed size, which doesn't depend on the layout of the controls above it
+   {
+      float w, h;
+      GetModuleDimensions(w, h); //updates mEmbedTop
+      SetModuleSizeForEmbedSize(embedSize);
+   }
 
    if (ModularSynth::sLoadingFileSaveStateRev < 423)
       in >> rev;
