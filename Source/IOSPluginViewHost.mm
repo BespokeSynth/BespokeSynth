@@ -104,6 +104,8 @@ IOSPluginViewHost::Overlay* IOSPluginViewHost::Create(void* audioUnit, ReadyHand
                                              container.clipsToBounds = YES;
                                              container.hidden = YES; //until the first Update places it
                                              UIView* view = controller.view;
+                                             [view removeFromSuperview];
+                                             view.hidden = NO; //an AUv3 hands out the same view every time, and juce hides it when a plugin window closes
                                              view.transform = CGAffineTransformIdentity;
                                              view.frame = CGRectMake(0, 0, state->mSize.width, state->mSize.height);
                                              [container addSubview:view];
@@ -187,6 +189,13 @@ void IOSPluginViewHost::Update(Overlay* overlay, void* parentView, float clipTop
    //size the plugin's view by its frame, like other AUv3 hosts do, and let the plugin lay itself out. scaling it with a
    //transform instead double-scales plugins that fit their content to the size they're shown at
    UIView* view = state.mController.view;
+   if (view.superview != state.mContainer) //the plugin's one view was taken by a plugin window, so take it back
+   {
+      [view removeFromSuperview];
+      [state.mContainer addSubview:view];
+   }
+   if (view.hidden)
+      view.hidden = NO;
    CGRect viewFrame = CGRectMake(0, 0, containerFrame.size.width, containerFrame.size.height);
    if (!CGRectEqualToRect(view.frame, viewFrame))
       view.frame = viewFrame;
