@@ -51,11 +51,45 @@ namespace
       bool mDestroyed{ false };
       UIViewController* mController{ nil };
       UIView* mContainer{ nil }; //clips the plugin view to the module's area
+      UIViewController* mParentController{ nil }; //the view controller the plugin's controller is a child of, not retained
       CGSize mSize{ 0, 0 };
       IOSPluginViewHost::ReadyHandler mOnReady;
    };
 
    using ViewControllerCallback = void (^)(UIViewController*);
+
+   UIViewController* FindViewController(UIView* view)
+   {
+      for (UIResponder* responder = view; responder != nil; responder = responder.nextResponder)
+      {
+         if ([responder isKindOfClass:[UIViewController class]])
+            return (UIViewController*)responder;
+      }
+      return view.window.rootViewController;
+   }
+
+   //makes the plugin's view controller a child of the canvas's, so it gets trait and appearance updates like any view
+   //controller shown inside an app
+   void AdoptController(State& state, UIView* parentView)
+   {
+      if (state.mParentController != nil)
+         return;
+      UIViewController* parentController = FindViewController(parentView);
+      if (parentController == nil || state.mController.parentViewController != nil)
+         return;
+      [parentController addChildViewController:state.mController];
+      [state.mController didMoveToParentViewController:parentController];
+      state.mParentController = parentController;
+   }
+
+   void ReleaseController(State& state)
+   {
+      if (state.mParentController == nil)
+         return;
+      [state.mController willMoveToParentViewController:nil];
+      [state.mController removeFromParentViewController];
+      state.mParentController = nil;
+   }
 
    CGSize GetNaturalSize(UIViewController* controller)
    {
@@ -135,6 +169,7 @@ void IOSPluginViewHost::Destroy(Overlay* overlay)
    state.mOnReady = nullptr;
    if (state.mController != nil)
    {
+      ReleaseController(state);
       [state.mController.view removeFromSuperview];
       [state.mController release];
       state.mController = nil;
@@ -177,6 +212,7 @@ void IOSPluginViewHost::Update(Overlay* overlay, void* parentView, float clipTop
 
    if (state.mContainer.superview != sRoot)
       [sRoot addSubview:state.mContainer];
+   AdoptController(state, parent);
 
    state.mContainer.hidden = !visible;
    if (!visible)
