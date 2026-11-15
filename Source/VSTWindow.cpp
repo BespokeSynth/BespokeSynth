@@ -70,27 +70,32 @@ VSTWindow::VSTWindow(VSTPlugin* vst,
 }
 
 //static
+bool VSTWindow::IsAUv3(juce::AudioProcessor* processor)
+{
+   auto* instance = dynamic_cast<juce::AudioPluginInstance*>(processor);
+   if (instance == nullptr)
+      return false;
+   auto desc = instance->getPluginDescription();
+   auto& formatManager = TheSynth->GetAudioPluginFormatManager();
+   for (int i = 0; i < formatManager.getNumFormats(); ++i)
+   {
+      auto* format = formatManager.getFormat(i);
+      if (format->getName() == desc.pluginFormatName)
+         return format->requiresUnblockedMessageThreadDuringCreation(desc);
+   }
+   return false;
+}
+
+//static
 VSTWindow* VSTWindow::CreateVSTWindow(VSTPlugin* vst, WindowFormatType type)
 {
    juce::AudioProcessorEditor* ui = nullptr;
 
 #if BESPOKE_IOS
    //on iOS only AUv3s bring their own UI. apple's built-in (v2) units claim a view controller but never deliver one, which
-   //leaves a blank window, so show those with the generic editor. juce marks AUv3 as the ones needing async creation
-   if (type == Normal)
-   {
-      if (auto* instance = dynamic_cast<juce::AudioPluginInstance*>(vst->GetAudioProcessor()))
-      {
-         auto desc = instance->getPluginDescription();
-         auto& formatManager = TheSynth->GetAudioPluginFormatManager();
-         for (int i = 0; i < formatManager.getNumFormats(); ++i)
-         {
-            auto* format = formatManager.getFormat(i);
-            if (format->getName() == desc.pluginFormatName && !format->requiresUnblockedMessageThreadDuringCreation(desc))
-               type = Generic;
-         }
-      }
-   }
+   //leaves a blank window, so show those with the generic editor
+   if (type == Normal && !IsAUv3(vst->GetAudioProcessor()))
+      type = Generic;
 #endif
 
    if (type == Normal)

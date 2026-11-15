@@ -35,6 +35,10 @@
 #include "Ramp.h"
 #include "VSTPlayhead.h"
 #include "VSTWindow.h"
+#include "Checkbox.h"
+#if BESPOKE_IOS
+#include "IOSPluginViewHost.h"
+#endif
 
 #include <atomic>
 #include <list>
@@ -105,7 +109,11 @@ public:
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 4; }
+   int GetModuleSaveStateRev() const override { return 5; }
+   //embedded plugin UIs can be resized. the base module saves its size only when resizable, so this must not change
+   //between saving and loading: it depends only on mEmbedUI, which LoadState reads before the base module's state
+   bool IsResizable() const override { return mEmbedUI; }
+   void Resize(float width, float height) override;
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
    bool IsEnabled() const override { return mEnabled; }
@@ -120,6 +128,8 @@ private:
    void BindPendingSliders();
    void ApplyPendingState();
    void ProcessBypass(ChannelBuffer* buffer);
+   void UpdateEmbeddedView();
+   void DestroyEmbeddedView();
    void LoadVSTFromSaveData(FileStreamIn& in, int rev);
    void GetVSTFileDesc(std::string vstName, juce::PluginDescription& desc);
 
@@ -249,4 +259,24 @@ private:
    AdditionalNoteCable* mMidiOutCable{ nullptr };
 
    bool mWantOpenVstWindow{ false };
+
+   //"embed": show the plugin's own UI inside the module on the canvas, instead of in a window. iOS (AUv3) only for now
+   bool mEmbedUI{ false };
+   Checkbox* mEmbedUICheckbox{ nullptr };
+   float mEmbedTop{ 0 }; //where the embedded UI starts, below the module's controls
+   ofVec2f mEmbeddedSize{ 0, 0 }; //size of the embedded UI on the canvas, once the plugin's view has arrived
+   bool mEmbedUserSized{ false }; //resized by hand, so mEmbedUserSize is used instead of the plugin's natural size
+   ofVec2f mEmbedUserSize{ 0, 0 };
+   bool mIgnoreResize{ false };
+   ofVec2f mLastEmbedSize{ 0, 0 };
+   static constexpr float kEmbeddedUIScale{ .6f }; //of the plugin's natural size: about 35% of its area
+   static constexpr float kEmbedBottomMargin{ 12 }; //keeps the resize handle below the plugin's view, which would take its touches
+   //the plugin's view is hidden while the canvas or module moves (resizing it every frame is slow and glitchy),
+   //and a black square is drawn in its place
+   float mLastEmbedScale{ 0 };
+   ofVec2f mLastEmbedCanvasPos{ 0, 0 };
+   double mLastEmbedMoveTimeMs{ 0 };
+#if BESPOKE_IOS
+   IOSPluginViewHost::Overlay* mEmbeddedView{ nullptr };
+#endif
 };

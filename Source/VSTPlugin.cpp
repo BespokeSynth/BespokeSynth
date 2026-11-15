@@ -29,6 +29,7 @@
 #include "IAudioReceiver.h"
 #include "ofxJSONElement.h"
 #include "ModularSynth.h"
+#include "TitleBar.h"
 #include "Profiler.h"
 #include "Scale.h"
 #include "ModulationChain.h"
@@ -362,6 +363,10 @@ void VSTPlugin::CreateUIControls()
    mRemoveExtraOutputButton = new ClickButton(this, "  -  ", 83, 38);
    mAddExtraOutputButton = new ClickButton(this, " + ", mRemoveExtraOutputButton, kAnchor_Right);
    mResetPresetButton = new ClickButton(this, "reset", -1, -1);
+   mEmbedUICheckbox = new Checkbox(this, "embed", mAddExtraOutputButton, kAnchor_Right_Padded, &mEmbedUI);
+#if !BESPOKE_IOS
+   mEmbedUICheckbox->SetShowing(false); //not supported on desktop yet, but the control exists so patches load everywhere
+#endif
 
    mPresetFileSelector->DrawLabel(true);
    mSavePresetFileButton->PositionTo(mPresetFileSelector, kAnchor_Right);
@@ -437,6 +442,7 @@ void VSTPlugin::Exit()
    IDrawableModule::Exit();
    ++mLoadRequestId; //drop any creation still in flight
    mAliveToken.reset();
+   DestroyEmbeddedView();
    if (mWindow)
    {
       mWindow.reset();
@@ -579,6 +585,7 @@ void VSTPlugin::UnloadPlugin()
 {
    mPluginReady = false;
    mPluginLoading = false;
+   DestroyEmbeddedView();
 
    if (mWindow != nullptr)
    {
@@ -818,6 +825,12 @@ void VSTPlugin::Poll()
    if (mWantOpenVstWindow)
    {
       mWantOpenVstWindow = false;
+      if (mEmbedUI) //the plugin's view can only be in one place
+      {
+         mEmbedUI = false;
+         DestroyEmbeddedView();
+         RecreateUIOutputCables();
+      }
       if (mPlugin != nullptr)
       {
          if (mWindow == nullptr)
@@ -899,6 +912,107 @@ void VSTPlugin::Poll()
 
    for (auto& parameterSlider : mParameterSliders)
       *parameterSlider.mValue = parameterSlider.mParameter->getValue();
+
+   UpdateEmbeddedView();
+}
+
+void VSTPlugin::UpdateEmbeddedView()
+{
+#if BESPOKE_IOS
+   const bool wantEmbedded = mEmbedUI && mPluginReady && mPlugin != nullptr;
+   if (!wantEmbedded)
+   {
+      if (mEmbeddedView != nullptr || mEmbeddedSize.x > 0)
+      {
+         DestroyEmbeddedView();
+         RecreateUIOutputCables();
+      }
+      return;
+   }
+
+   if (mEmbeddedView == nullptr)
+   {
+      auto* instance = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get());
+      if (instance != nullptr && VSTWindow::IsAUv3(instance))
+      {
+         std::weak_ptr<bool> alive = mAliveToken;
+         mEmbeddedView = IOSPluginViewHost::Create(instance->getPlatformSpecificData(), [this, alive](float width, float height)
+                                                   {
+                                                      if (alive.expired())
+                                                         return;
+                                                      if (mEmbedUserSized)
+                                                         mEmbeddedSize = mEmbedUserSize;
+                                                      else
+                                                         mEmbeddedSize.set(width * kEmbeddedUIScale, height * kEmbeddedUIScale);
+                                                      RecreateUIOutputCables();
+                                                   });
+      }
+
+      if (mEmbeddedView == nullptr)
+      {
+         TheSynth->LogEvent("can't embed " + GetPluginName() + ": only plugins with their own UI (AUv3) can be embedded", kLogEventType_Warning);
+         mEmbedUI = false;
+         return;
+      }
+   }
+
+   if (mEmbeddedSize.x <= 0)
+      return; //view hasn't arrived yet
+
+   auto* container = GetOwningContainer();
+   auto* peer = TheSynth->GetMainComponent()->getPeer();
+   if (container == nullptr || peer == nullptr)
+      return;
+
+   //canvas to screen: (canvas position + container offset) * container scale, in the same points UIKit uses
+   const float scale = container->GetDrawScale();
+   const ofVec2f offset = container->GetDrawOffset();
+   const ofVec2f pos = GetPosition();
+   const float x = (pos.x + 3 + offset.x) * scale;
+   const float y = (pos.y + mEmbedTop + offset.y) * scale;
+
+   //hide while the canvas pans/zooms or the module moves, and show again once it settles
+   const double nowMs = juce::Time::getMillisecondCounterHiRes();
+   const ofVec2f canvasPos(x, y);
+   if (scale != mLastEmbedScale || canvasPos.x != mLastEmbedCanvasPos.x || canvasPos.y != mLastEmbedCanvasPos.y ||
+       mEmbeddedSize.x != mLastEmbedSize.x || mEmbeddedSize.y != mLastEmbedSize.y)
+   {
+      mLastEmbedScale = scale;
+      mLastEmbedCanvasPos = canvasPos;
+      mLastEmbedSize = mEmbeddedSize;
+      mLastEmbedMoveTimeMs = nowMs;
+   }
+   const bool settled = nowMs - mLastEmbedMoveTimeMs > 150;
+
+   //a native view always sits above the canvas, so get out of the way of anything that should draw on top of it
+   const bool visible = settled && IsShowing() && !Minimized() && TheSynth->GetTopModalFocusItem() == nullptr && TheSynth->GetMoveModule() == nullptr;
+   const float clipTop = TheTitleBar != nullptr ? TheTitleBar->GetRect().getMaxY() * TheSynth->GetUIScale() : 0;
+
+   IOSPluginViewHost::Update(mEmbeddedView, peer->getNativeHandle(), clipTop, x, y, mEmbeddedSize.x * scale, mEmbeddedSize.y * scale, visible);
+#endif
+}
+
+void VSTPlugin::Resize(float width, float height)
+{
+   if (mIgnoreResize || !mEmbedUI)
+      return; //the embed size is saved separately (see SaveState), since it can't be worked out from the module size at load time
+
+   float w, h;
+   GetModuleDimensions(w, h); //updates mEmbedTop
+   mEmbedUserSized = true;
+   mEmbedUserSize.set(std::max(width - 6, 60.0f), std::max(height - mEmbedTop - kEmbedBottomMargin, 40.0f));
+   if (mEmbeddedSize.x > 0)
+      mEmbeddedSize = mEmbedUserSize;
+   RecreateUIOutputCables();
+}
+
+void VSTPlugin::DestroyEmbeddedView()
+{
+#if BESPOKE_IOS
+   IOSPluginViewHost::Destroy(mEmbeddedView);
+   mEmbeddedView = nullptr;
+#endif
+   mEmbeddedSize.set(0, 0);
 }
 void VSTPlugin::audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details)
 {
@@ -1289,7 +1403,18 @@ void VSTPlugin::DrawModule()
    mRemoveExtraOutputButton->Draw();
    mAddExtraOutputButton->Draw();
    mResetPresetButton->Draw();
+   mEmbedUICheckbox->Draw();
    mShowParameterDropdown->Draw();
+
+   if (mEmbedUI && mEmbeddedSize.x > 0)
+   {
+      //the plugin's own view covers this when it's showing. it's hidden while the canvas moves, so this stands in for it
+      ofPushStyle();
+      ofFill();
+      ofSetColor(0, 0, 0);
+      ofRect(3, mEmbedTop, mEmbeddedSize.x, mEmbeddedSize.y);
+      ofPopStyle();
+   }
 
    ofPushStyle();
    ofSetColor(IDrawableModule::GetColor(kModuleCategory_Note));
@@ -1326,6 +1451,13 @@ void VSTPlugin::GetModuleDimensions(float& width, float& height)
          width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 23);
          height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
       }
+   }
+
+   mEmbedTop = height;
+   if (mEmbedUI && mEmbeddedSize.x > 0)
+   {
+      width = MAX(width, mEmbeddedSize.x + 6);
+      height += mEmbeddedSize.y + kEmbedBottomMargin;
    }
 }
 
@@ -1386,6 +1518,12 @@ void VSTPlugin::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 
 void VSTPlugin::CheckboxUpdated(Checkbox* checkbox, double time)
 {
+   if (checkbox == mEmbedUICheckbox && mEmbedUI && mWindow != nullptr)
+   {
+      //the plugin's view can only be in one place
+      VSTWindow* window = mWindow.release();
+      delete window;
+   }
 }
 
 void VSTPlugin::ButtonClicked(ClickButton* button, double time)
@@ -1661,6 +1799,12 @@ void VSTPlugin::SaveState(FileStreamOut& out)
       out << false;
    }
 
+   //before the base state, which saves the module size only if IsResizable(), and that depends on mEmbedUI
+   out << mEmbedUI;
+   out << mEmbedUserSized;
+   out << mEmbedUserSize.x;
+   out << mEmbedUserSize.y;
+
    IDrawableModule::SaveState(out);
 
    out << mLastLoadedPresetFilePath;
@@ -1672,6 +1816,14 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
    {
       LoadVSTFromSaveData(in, rev);
    }
+
+   if (rev >= 5)
+   {
+      in >> mEmbedUI;
+      in >> mEmbedUserSized;
+      in >> mEmbedUserSize.x;
+      in >> mEmbedUserSize.y;
+   }
    else
    {
       //make all sliders, like we used to, so that the controls can load correctly
@@ -1682,7 +1834,9 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
       }
    }
 
+   mIgnoreResize = true; //the base state restores the module size, but the embed size was loaded above
    IDrawableModule::LoadState(in, rev);
+   mIgnoreResize = false;
 
    if (ModularSynth::sLoadingFileSaveStateRev < 423)
       in >> rev;

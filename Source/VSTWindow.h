@@ -65,6 +65,9 @@ public:
    void ShowWindow();
 
    static VSTWindow* CreateVSTWindow(VSTPlugin* vst, WindowFormatType);
+   //whether this is an AUv3, which on iOS is the only kind of plugin with its own UI. juce marks AUv3 as the plugins that
+   //need asynchronous creation
+   static bool IsAUv3(juce::AudioProcessor* processor);
 
    void moved() override;
    void closeButtonPressed() override;

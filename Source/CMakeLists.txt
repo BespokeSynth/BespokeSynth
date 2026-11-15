@@ -979,7 +979,7 @@ if (BESPOKE_IOS)
         BESPOKE_IOS=1
         BESPOKE_MOBILE=1 # phone/tablet behavior shared with android: touch navigation, full screen window, etc
         )
-    target_sources(BespokeSynth PRIVATE IOSAudioSession.h IOSAudioSession.mm IOSDocuments.h IOSDocuments.mm IOSDiagnostics.h IOSDiagnostics.mm IOSPointerInput.h IOSPointerInput.mm)
+    target_sources(BespokeSynth PRIVATE IOSAudioSession.h IOSAudioSession.mm IOSDocuments.h IOSDocuments.mm IOSDiagnostics.h IOSDiagnostics.mm IOSPointerInput.h IOSPointerInput.mm IOSPluginViewHost.h IOSPluginViewHost.mm)
     # the asio bundled with Link reads uninitialized memory in thread_info_base's constructor. recent clang treats that
     # as unreachable when optimizing and deletes io_context::run()'s event loop, so Link silently never starts discovery
     set_source_files_properties(AbletonLink.cpp PROPERTIES COMPILE_OPTIONS "-ftrivial-auto-var-init=zero")
