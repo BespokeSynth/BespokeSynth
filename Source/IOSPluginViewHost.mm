@@ -51,6 +51,7 @@ namespace
       bool mDestroyed{ false };
       UIViewController* mController{ nil };
       UIView* mContainer{ nil }; //clips the plugin view to the module's area
+      UIView* mScaler{ nil }; //inside mContainer, holds the plugin view, scaled down when the module is smaller than the plugin's natural size
       UIViewController* mParentController{ nil }; //the view controller the plugin's controller is a child of, not retained
       CGSize mSize{ 0, 0 };
       IOSPluginViewHost::ReadyHandler mOnReady;
@@ -142,8 +143,11 @@ IOSPluginViewHost::Overlay* IOSPluginViewHost::Create(void* audioUnit, ReadyHand
                                              view.hidden = NO; //an AUv3 hands out the same view every time, and juce hides it when a plugin window closes
                                              view.transform = CGAffineTransformIdentity;
                                              view.frame = CGRectMake(0, 0, state->mSize.width, state->mSize.height);
-                                             [container addSubview:view];
+                                             UIView* scaler = [[UIView alloc] initWithFrame:CGRectZero];
+                                             [scaler addSubview:view];
+                                             [container addSubview:scaler];
                                              state->mContainer = container;
+                                             state->mScaler = scaler;
 
                                              if (state->mOnReady)
                                                 state->mOnReady((float)state->mSize.width, (float)state->mSize.height);
@@ -173,6 +177,11 @@ void IOSPluginViewHost::Destroy(Overlay* overlay)
       [state.mController.view removeFromSuperview];
       [state.mController release];
       state.mController = nil;
+   }
+   if (state.mScaler != nil)
+   {
+      [state.mScaler release];
+      state.mScaler = nil;
    }
    if (state.mContainer != nil)
    {
@@ -214,6 +223,8 @@ void IOSPluginViewHost::Update(Overlay* overlay, void* parentView, float clipTop
       [sRoot addSubview:state.mContainer];
    AdoptController(state, parent);
 
+   if (width < 1 || height < 1)
+      visible = false;
    state.mContainer.hidden = !visible;
    if (!visible)
       return;
@@ -222,17 +233,34 @@ void IOSPluginViewHost::Update(Overlay* overlay, void* parentView, float clipTop
    if (!CGRectEqualToRect(state.mContainer.frame, containerFrame))
       state.mContainer.frame = containerFrame;
 
-   //size the plugin's view by its frame, like other AUv3 hosts do, and let the plugin lay itself out. scaling it with a
-   //transform instead double-scales plugins that fit their content to the size they're shown at
+   //the plugin lays itself out to its view's frame. below its natural size, many plugins don't shrink everything (some
+   //keep their controls at a fixed size, so they overlap), so the view is laid out at least as big as the natural size
+   //and the scaler shrinks it to fit. the transform is on the scaler, never the plugin's own view: the plugin sees only
+   //its frame, so a plugin that fits its content to its frame isn't scaled twice
+   const CGSize natural = state.mSize;
+   const CGFloat scale = std::min({ (CGFloat)1, width / natural.width, height / natural.height });
+   const CGRect layoutBounds = CGRectMake(0, 0, width / scale, height / scale);
+
+   UIView* scaler = state.mScaler;
+   const CGAffineTransform transform = CGAffineTransformMakeScale(scale, scale);
+   if (!CGRectEqualToRect(scaler.bounds, layoutBounds))
+      scaler.bounds = layoutBounds;
+   if (!CGAffineTransformEqualToTransform(scaler.transform, transform))
+      scaler.transform = transform;
+   const CGPoint center = CGPointMake(width / 2, height / 2);
+   if (!CGPointEqualToPoint(scaler.center, center))
+      scaler.center = center;
+
    UIView* view = state.mController.view;
-   if (view.superview != state.mContainer) //the plugin's one view was taken by a plugin window, so take it back
+   if (view.superview != scaler) //the plugin's one view was taken by a plugin window, so take it back
    {
       [view removeFromSuperview];
-      [state.mContainer addSubview:view];
+      [scaler addSubview:view];
    }
    if (view.hidden)
       view.hidden = NO;
-   CGRect viewFrame = CGRectMake(0, 0, containerFrame.size.width, containerFrame.size.height);
-   if (!CGRectEqualToRect(view.frame, viewFrame))
-      view.frame = viewFrame;
+   if (!CGAffineTransformIsIdentity(view.transform))
+      view.transform = CGAffineTransformIdentity;
+   if (!CGRectEqualToRect(view.frame, layoutBounds))
+      view.frame = layoutBounds;
 }
