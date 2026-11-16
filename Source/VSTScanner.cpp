@@ -25,6 +25,7 @@
 
 #include "VSTScanner.h"
 #include "VSTPlugin.h"
+#include "VSTWindow.h"
 #include "ModularSynth.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -177,6 +178,12 @@ CustomPluginListComponent::CustomPluginListComponent(juce::AudioPluginFormatMana
       getAppProperties().getUserSettings()->setValue(kScanModeKey, validationModeBox.getSelectedItemIndex());
    };
 
+#if BESPOKE_IOS
+   //always in-process on iOS, there's no choice to make
+   validationModeLabel.setVisible(false);
+   validationModeBox.setVisible(false);
+#endif
+
    OnResize();
 }
 
@@ -198,7 +205,13 @@ PluginListWindow::PluginListWindow(juce::AudioPluginFormatManager& pluginFormatM
 {
    auto deadMansPedalFile(juce::File(ofToDataPath("vst/deadmanspedal.txt")));
 
+#if BESPOKE_IOS
+   //apps can't launch child processes on iOS, so scan in-process. juce scans on a background thread here (async allowed), which
+   //AUv3 needs: it can't be created while the message thread is blocked
+   TheSynth->GetKnownPluginList().setCustomScanner(nullptr);
+#else
    TheSynth->GetKnownPluginList().setCustomScanner(std::make_unique<CustomPluginScanner>());
+#endif
 
    mComponent = new CustomPluginListComponent(pluginFormatManager,
                                               TheSynth->GetKnownPluginList(),
@@ -219,7 +232,12 @@ PluginListWindow::PluginListWindow(juce::AudioPluginFormatManager& pluginFormatM
                          mainMon.getY() + mainMon.getHeight() / 4);
    }
 
+#if BESPOKE_IOS
+   setResizable(false, false);
+   setBounds(GetIOSSafeWindowBounds()); //full screen would put the close button under a rounded corner
+#else
    restoreWindowStateFromString(getAppProperties().getUserSettings()->getValue("listWindowPos"));
+#endif
    setVisible(true);
 }
 

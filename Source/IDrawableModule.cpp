@@ -1412,6 +1412,12 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
             auto* control = FindUIControl(uicontrolname.c_str(), false);
 
             if (control == nullptr)
+            {
+               OnUIControlRequested(uicontrolname.c_str()); //some modules create controls on demand (e.g. plugin parameters)
+               control = FindUIControl(uicontrolname.c_str(), false);
+            }
+
+            if (control == nullptr)
                throw UnknownUIControlException();
 
             bool setValue = true;

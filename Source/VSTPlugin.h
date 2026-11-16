@@ -37,6 +37,8 @@
 #include "VSTWindow.h"
 
 #include <atomic>
+#include <list>
+#include <memory>
 
 #include "juce_audio_processors/juce_audio_processors.h"
 
@@ -113,6 +115,11 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    void LoadVST(juce::PluginDescription desc);
+   void UnloadPlugin();
+   void OnPluginCreated(std::unique_ptr<juce::AudioPluginInstance> instance, const juce::String& error, const juce::PluginDescription& desc);
+   void BindPendingSliders();
+   void ApplyPendingState();
+   void ProcessBypass(ChannelBuffer* buffer);
    void LoadVSTFromSaveData(FileStreamIn& in, int rev);
    void GetVSTFileDesc(std::string vstName, juce::PluginDescription& desc);
 
@@ -149,8 +156,23 @@ private:
    std::atomic<bool> mWantRemoveSlider{ false };
    std::atomic<int> mWantRemoveSliderIndex{ -1 };
 
-   bool mPluginReady{ false };
+   std::atomic<bool> mPluginReady{ false };
    std::unique_ptr<juce::AudioProcessor> mPlugin;
+
+   //plugins are created asynchronously (AUv3 requires it). until the instance arrives, state loaded from a save file waits here
+   bool mPluginLoading{ false };
+   juce::String mLoadingPluginId;
+   int mLoadRequestId{ 0 };
+   std::shared_ptr<bool> mAliveToken{ std::make_shared<bool>(true) }; //lets a late creation callback know this module is gone
+   struct PendingPluginState
+   {
+      bool mHasState{ false };
+      juce::MemoryBlock mState;
+      juce::MemoryBlock mProgramState;
+      bool mHasExposedParams{ false };
+      std::vector<int> mExposedParams;
+   };
+   PendingPluginState mPendingState;
    std::string mPluginName;
    std::string mPluginFormatName;
    std::string mPluginId;
@@ -169,18 +191,23 @@ private:
    struct ParameterSlider
    {
       VSTPlugin* mOwner{ nullptr };
-      float mValue{ 0 };
+      //heap allocated so its address never moves: sliders, and other modules (e.g. interface) hold pointers to it
+      std::shared_ptr<float> mValue{ std::make_shared<float>(0.0f) };
       FloatSlider* mSlider{ nullptr };
       ClickButton* mRemoveButton{ nullptr };
       juce::AudioProcessorParameter* mParameter{ nullptr };
       bool mShowing{ false };
       bool mInSelectorList{ true };
+      bool mHasPendingValue{ false }; //value was set before the plugin existed, push it to the parameter once bound
       std::string mDisplayName;
       std::string mID;
       void MakeSlider();
    };
 
    std::vector<ParameterSlider> mParameterSliders;
+   //sliders requested by name (by cables, saved control values, etc) before the plugin exists. bound to real parameters by id once it's
+   //created, sharing their value storage so pointers to it stay valid
+   std::list<ParameterSlider> mPendingSliders;
    int mChangeGestureParameterIndex{ -1 };
 
    int mChannel{ 1 };

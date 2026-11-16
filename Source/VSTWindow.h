@@ -35,6 +35,17 @@ namespace juce
    class NSViewComponent;
 }
 
+#if BESPOKE_IOS
+//the screen minus its safe area insets, so a window's title bar (and close button) stays clear of rounded corners and notches
+inline juce::Rectangle<int> GetIOSSafeWindowBounds()
+{
+   auto* display = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay();
+   if (display == nullptr)
+      return {};
+   return display->safeAreaInsets.subtractedFrom(display->totalArea);
+}
+#endif
+
 //==============================================================================
 class VSTWindow : public juce::DocumentWindow
 {

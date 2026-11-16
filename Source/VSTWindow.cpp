@@ -38,6 +38,13 @@ VSTWindow::VSTWindow(VSTPlugin* vst,
 , mType(t)
 , mOwner(vst)
 {
+#if BESPOKE_IOS
+   setContentOwned(pluginEditor, true);
+
+   //no free-floating windows on iOS: cover the safe part of the screen, and the title bar's close button brings the patch back
+   setResizable(false, false);
+   setBounds(GetIOSSafeWindowBounds());
+#else
    setSize(400, 300);
    setResizable(true, true);
 
@@ -49,6 +56,7 @@ VSTWindow::VSTWindow(VSTPlugin* vst,
       setTopLeftPosition(mainMon.getX() + mainMon.getWidth() / 4,
                          mainMon.getY() + mainMon.getHeight() / 4);
    }
+#endif
 
    setVisible(true);
 #if BESPOKE_LINUX
@@ -65,6 +73,25 @@ VSTWindow::VSTWindow(VSTPlugin* vst,
 VSTWindow* VSTWindow::CreateVSTWindow(VSTPlugin* vst, WindowFormatType type)
 {
    juce::AudioProcessorEditor* ui = nullptr;
+
+#if BESPOKE_IOS
+   //on iOS only AUv3s bring their own UI. apple's built-in (v2) units claim a view controller but never deliver one, which
+   //leaves a blank window, so show those with the generic editor. juce marks AUv3 as the ones needing async creation
+   if (type == Normal)
+   {
+      if (auto* instance = dynamic_cast<juce::AudioPluginInstance*>(vst->GetAudioProcessor()))
+      {
+         auto desc = instance->getPluginDescription();
+         auto& formatManager = TheSynth->GetAudioPluginFormatManager();
+         for (int i = 0; i < formatManager.getNumFormats(); ++i)
+         {
+            auto* format = formatManager.getFormat(i);
+            if (format->getName() == desc.pluginFormatName && !format->requiresUnblockedMessageThreadDuringCreation(desc))
+               type = Generic;
+         }
+      }
+   }
+#endif
 
    if (type == Normal)
    {
@@ -100,7 +127,7 @@ VSTWindow::~VSTWindow()
 
 void VSTWindow::ShowWindow()
 {
-#if !BESPOKE_LINUX
+#if !BESPOKE_LINUX && !BESPOKE_IOS
    setAlwaysOnTop(UserPrefs.vst_always_on_top.Get());
 #endif
    toFront(true);

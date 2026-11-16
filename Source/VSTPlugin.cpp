@@ -435,6 +435,8 @@ VSTPlugin::~VSTPlugin()
 void VSTPlugin::Exit()
 {
    IDrawableModule::Exit();
+   ++mLoadRequestId; //drop any creation still in flight
+   mAliveToken.reset();
    if (mWindow)
    {
       mWindow.reset();
@@ -509,8 +511,9 @@ void VSTPlugin::SetVST(juce::PluginDescription pluginDesc)
 
    if (strPluginId != kInvalidPluginId)
       mModuleSaveData.SetString("pluginId", strPluginId);
-   else
+   else if (!mModuleSaveData.HasProperty("pluginId") || mModuleSaveData.GetString("pluginId").empty())
       mModuleSaveData.SetString("pluginId", "none");
+   //otherwise a saved plugin that isn't installed here keeps its id, so the patch still finds it once it is
 
    //mark VST as used
    if (strPluginId != kInvalidPluginId)
@@ -527,58 +530,200 @@ void VSTPlugin::SetVST(juce::PluginDescription pluginDesc)
    if (mPlugin != nullptr && dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription().matchesIdentifierString(pluginId))
       return; //this VST is already loaded! we're all set
 
-   if (mPlugin != nullptr && mWindow != nullptr)
-   {
-      VSTWindow* window = mWindow.release();
-      delete window;
-   }
+   if (mPluginLoading && mLoadingPluginId == pluginId)
+      return; //already on its way
 
    LoadVST(pluginDesc);
 }
 
 void VSTPlugin::LoadVST(juce::PluginDescription desc)
 {
+   UnloadPlugin();
+
+   const int requestId = ++mLoadRequestId;
+   mPluginLoading = true;
+   mLoadingPluginId = desc.createIdentifierString();
+   mPluginName = desc.name.isNotEmpty() ? desc.name.toStdString() + " (loading)" : "loading";
+
+   //plugins always come in through the async path, so that formats which can only be created that way (AUv3) behave like the rest.
+   //juce runs creation on the message thread a moment later, so this doesn't move loading work off of it
+   struct InstanceHolder
+   {
+      std::unique_ptr<juce::AudioPluginInstance> mInstance;
+   };
+   std::weak_ptr<bool> alive = mAliveToken;
+   auto deliver = [this, alive, requestId, desc](std::shared_ptr<InstanceHolder> holder, juce::String error)
+   {
+      if (alive.expired() || requestId != mLoadRequestId)
+         return; //module was deleted, or a different plugin was requested since. the holder deletes the stale instance
+      OnPluginCreated(std::move(holder->mInstance), error, desc);
+   };
+
+   TheSynth->GetAudioPluginFormatManager().createPluginInstanceAsync(desc, gSampleRate, gBufferSize,
+                                                                     [deliver](std::unique_ptr<juce::AudioPluginInstance> instance, const juce::String& error)
+                                                                     {
+                                                                        auto holder = std::make_shared<InstanceHolder>();
+                                                                        holder->mInstance = std::move(instance);
+                                                                        //AUv3 creation can complete on a background thread
+                                                                        if (juce::MessageManager::existsAndIsCurrentThread())
+                                                                           deliver(holder, error);
+                                                                        else
+                                                                           juce::MessageManager::callAsync([deliver, holder, error]()
+                                                                                                           {
+                                                                                                              deliver(holder, error);
+                                                                                                           });
+                                                                     });
+}
+
+void VSTPlugin::UnloadPlugin()
+{
    mPluginReady = false;
+   mPluginLoading = false;
 
-   mVSTMutex.lock();
-   juce::String errorMessage;
-   mPlugin = TheSynth->GetAudioPluginFormatManager().createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
-   if (mPlugin != nullptr)
+   if (mWindow != nullptr)
    {
-      mPlugin->enableAllBuses();
-      mPlugin->addListener(this);
-
-      mNumInputChannels = mPlugin->getTotalNumInputChannels();
-      mNumOutputChannels = mPlugin->getTotalNumOutputChannels();
-      ofLog() << "vst channel - inputs: " << mNumInputChannels << " x outputs: " << mNumOutputChannels;
-
-      auto layouts = mPlugin->getBusesLayout();
-      mNumInBuses = layouts.inputBuses.size();
-      mNumOutBuses = layouts.outputBuses.size();
-      mPlugin->enableAllBuses();
-      ofLog() << "vst layout  - inputs: " << layouts.inputBuses.size() << " x outputs: " << layouts.outputBuses.size();
-
-      mPlugin->prepareToPlay(gSampleRate, gBufferSize);
-      mPlugin->setPlayHead(&mPlayhead);
-
-      mPluginName = mPlugin->getName().toStdString();
-      mPluginFormatName = ofToString(desc.pluginFormatName.toLowerCase());
-      mPluginId = GetPluginName() + "_" + ofToString(desc.uniqueId);
-
-      CreateParameterSliders();
-
-      RefreshPresetFiles();
-
-      mPluginReady = true;
+      VSTWindow* window = mWindow.release();
+      delete window;
    }
-   else
-   {
-      TheSynth->LogEvent("error loading VST: " + errorMessage.toStdString(), kLogEventType_Error);
 
+   if (mPlugin == nullptr)
+      return; //nothing loaded. keep pending state and placeholder sliders, they're for the plugin about to be requested
+
+   std::unique_ptr<juce::AudioProcessor> oldPlugin;
+   {
+      std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
+      std::lock_guard<ofMutex> lock(mVSTMutex);
+      oldPlugin = std::move(mPlugin);
+      mPendingState = PendingPluginState();
+      for (auto& slider : mPendingSliders)
+      {
+         RemoveUIControl(slider.mSlider);
+         RemoveUIControl(slider.mRemoveButton);
+         slider.mSlider->Delete();
+         slider.mRemoveButton->Delete();
+      }
+      mPendingSliders.clear();
+   }
+   oldPlugin.reset(); //outside the lock, plugin teardown can be slow
+}
+
+void VSTPlugin::OnPluginCreated(std::unique_ptr<juce::AudioPluginInstance> instance, const juce::String& error, const juce::PluginDescription& desc)
+{
+   mPluginLoading = false;
+
+   if (instance == nullptr)
+   {
+      TheSynth->LogEvent("error loading VST: " + error.toStdString(), kLogEventType_Error);
+
+      //any pending state and placeholder sliders stay, so saving this patch again doesn't lose them
       if (mModuleSaveData.HasProperty("pluginId") && mModuleSaveData.GetString("pluginId").length() > 0)
          mPluginName = mModuleSaveData.GetString("pluginId") + " (not loaded)";
+      else
+         mPluginName = "no plugin loaded";
+      return;
    }
-   mVSTMutex.unlock();
+
+   //prepare the instance before it's visible to the audio thread
+   instance->enableAllBuses();
+   instance->addListener(this);
+
+   mNumInputChannels = instance->getTotalNumInputChannels();
+   mNumOutputChannels = instance->getTotalNumOutputChannels();
+   ofLog() << "vst channel - inputs: " << mNumInputChannels << " x outputs: " << mNumOutputChannels;
+
+   auto layouts = instance->getBusesLayout();
+   mNumInBuses = layouts.inputBuses.size();
+   mNumOutBuses = layouts.outputBuses.size();
+   instance->enableAllBuses();
+   ofLog() << "vst layout  - inputs: " << layouts.inputBuses.size() << " x outputs: " << layouts.outputBuses.size();
+
+   instance->prepareToPlay(gSampleRate, gBufferSize);
+   instance->setPlayHead(&mPlayhead);
+
+   std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
+   std::lock_guard<ofMutex> lock(mVSTMutex);
+
+   mPlugin = std::move(instance);
+   mPluginName = mPlugin->getName().toStdString();
+   mPluginFormatName = ofToString(desc.pluginFormatName.toLowerCase());
+   mPluginId = GetPluginName() + "_" + ofToString(desc.uniqueId);
+
+   CreateParameterSliders();
+   BindPendingSliders();
+   ApplyPendingState();
+
+   RefreshPresetFiles();
+   RecreateUIOutputCables();
+
+   mPluginReady = true;
+}
+
+void VSTPlugin::BindPendingSliders()
+{
+   for (auto it = mPendingSliders.begin(); it != mPendingSliders.end();)
+   {
+      bool bound = false;
+      for (auto& parameter : mParameterSliders)
+      {
+         const std::string& key = (mParameterVersion == 0) ? parameter.mDisplayName : parameter.mID;
+         if (key == it->mID && parameter.mSlider == nullptr)
+         {
+            parameter.mSlider = it->mSlider;
+            parameter.mRemoveButton = it->mRemoveButton;
+            parameter.mHasPendingValue = it->mHasPendingValue;
+            if (!parameter.mHasPendingValue)
+               *it->mValue = *parameter.mValue; //nothing was loaded into it, start from the plugin's value
+            parameter.mValue = it->mValue; //keep the storage the slider (and anything else) already points at
+            parameter.mSlider->SetOverrideDisplayName(parameter.mDisplayName);
+            parameter.mInSelectorList = true;
+            bound = true;
+            break;
+         }
+      }
+
+      if (bound)
+         it = mPendingSliders.erase(it);
+      else
+         ++it; //no such parameter (plugin version changed?). leave it be, other modules may still point at it
+   }
+}
+
+void VSTPlugin::ApplyPendingState()
+{
+   if (mPendingState.mHasState)
+   {
+      ofLog() << "loading vst state for " << mPlugin->getName();
+      mPlugin->setStateInformation(mPendingState.mState.getData(), (int)mPendingState.mState.getSize());
+      if (mPendingState.mProgramState.getSize() > 0)
+         mPlugin->setCurrentProgramStateInformation(mPendingState.mProgramState.getData(), (int)mPendingState.mProgramState.getSize());
+   }
+
+   if (mPendingState.mHasExposedParams)
+   {
+      for (auto& param : mParameterSliders)
+         param.mShowing = false;
+      for (int index : mPendingState.mExposedParams)
+      {
+         if (index >= 0 && index < (int)mParameterSliders.size())
+         {
+            mParameterSliders[index].mShowing = true;
+            if (mParameterSliders[index].mSlider == nullptr)
+               mParameterSliders[index].MakeSlider();
+         }
+      }
+   }
+
+   //control values loaded before the plugin existed are applied on top of its state, matching the order of a synchronous load
+   for (auto& parameter : mParameterSliders)
+   {
+      if (parameter.mHasPendingValue)
+      {
+         parameter.mParameter->setValue(*parameter.mValue);
+         parameter.mHasPendingValue = false;
+      }
+   }
+
+   mPendingState = PendingPluginState();
 }
 
 void VSTPlugin::CreateParameterSliders()
@@ -611,7 +756,7 @@ void VSTPlugin::CreateParameterSliders()
    {
 
       mParameterSliders[i].mOwner = this;
-      mParameterSliders[i].mValue = parameters[i]->getValue();
+      *mParameterSliders[i].mValue = parameters[i]->getValue();
       mParameterSliders[i].mParameter = parameters[i];
       mParameterSliders[i].mDisplayName = parameters[i]->getName(64).toStdString();
       HostedAudioProcessorParameter* parameterWithId = dynamic_cast<HostedAudioProcessorParameter*>(parameters[i]);
@@ -636,7 +781,7 @@ void VSTPlugin::CreateParameterSliders()
 
 void VSTPlugin::Poll()
 {
-   if (mRescanParameterNames)
+   if (mRescanParameterNames && mPlugin != nullptr)
    {
       mRescanParameterNames = false;
       const auto& parameters = mPlugin->getParameters();
@@ -686,6 +831,9 @@ void VSTPlugin::Poll()
       mPresetFileUpdateQueued = false;
       mPresetFileLoadCountdown = 2; //load twice: some plugins need a second setStateInformation call for JUCE's parameter cache to fully sync
    }
+
+   if (mPresetFileLoadCountdown > 0 && mPlugin == nullptr)
+      mPresetFileLoadCountdown = 0;
 
    if (mPresetFileLoadCountdown > 0)
    {
@@ -750,7 +898,7 @@ void VSTPlugin::Poll()
    }
 
    for (auto& parameterSlider : mParameterSliders)
-      parameterSlider.mValue = parameterSlider.mParameter->getValue();
+      *parameterSlider.mValue = parameterSlider.mParameter->getValue();
 }
 void VSTPlugin::audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details)
 {
@@ -770,23 +918,18 @@ void VSTPlugin::Process(double time)
 {
    if (!mPluginReady)
    {
-      //bypass
-      GetBuffer()->SetNumActiveChannels(2);
-      SyncBuffers();
-      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
-      {
-         if (GetTarget())
-            Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
-      }
-
-      GetBuffer()->Clear();
+      ProcessBypass(GetBuffer());
+      return;
    }
 
-#if BESPOKE_LINUX //HACK: weird race condition, which this seems to fix for now
+   //held for the whole block, so the plugin can't be swapped out from under us
+   std::lock_guard<ofMutex> vstLock(mVSTMutex);
+
    if (mPlugin == nullptr)
+   {
+      ProcessBypass(GetBuffer());
       return;
-#endif
+   }
 
    PROFILER(VSTPlugin);
 
@@ -861,10 +1004,8 @@ void VSTPlugin::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
-   if (mEnabled && mPlugin != nullptr)
+   if (mEnabled)
    {
-      mVSTMutex.lock();
-
       ComputeSliders(0);
 
       if (mWantRemoveSlider)
@@ -964,7 +1105,6 @@ void VSTPlugin::Process(double time)
 
          mMidiBuffer.clear();
       }
-      mVSTMutex.unlock();
 
       AllChannelsBuffer->Clear();
 
@@ -1050,6 +1190,20 @@ void VSTPlugin::Process(double time)
    }
 
    AllChannelsBuffer->Clear();
+}
+
+void VSTPlugin::ProcessBypass(ChannelBuffer* buffer)
+{
+   buffer->SetNumActiveChannels(2);
+   SyncBuffers();
+   for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
+   {
+      if (GetTarget())
+         Add(GetTarget()->GetBuffer()->GetChannel(ch), buffer->GetChannel(ch), buffer->BufferSize());
+      GetVizBuffer()->WriteChunk(buffer->GetChannel(ch), buffer->BufferSize(), ch);
+   }
+
+   buffer->Clear();
 }
 
 void VSTPlugin::PlayNote(NoteMessage note)
@@ -1211,8 +1365,17 @@ void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal, double tim
    {
       if (parameterSlider.mSlider == slider)
       {
-         parameterSlider.mParameter->setValue(parameterSlider.mValue);
-         break;
+         parameterSlider.mParameter->setValue(*parameterSlider.mValue);
+         return;
+      }
+   }
+
+   for (auto& pendingSlider : mPendingSliders)
+   {
+      if (pendingSlider.mSlider == slider)
+      {
+         pendingSlider.mHasPendingValue = true; //mValue already holds it, applied once the plugin is created
+         return;
       }
    }
 }
@@ -1255,7 +1418,8 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
    {
       if (GetKeyModifiers() & kModifier_Command)
       {
-         CreateParameterSliders();
+         if (mPlugin != nullptr)
+            CreateParameterSliders();
          return;
       }
       mWantLoadParameters = true;
@@ -1424,7 +1588,7 @@ void VSTPlugin::SetUpFromSaveData()
    if (mModuleSaveData.HasProperty("pluginId") && mModuleSaveData.GetString("pluginId") != "")
    {
       auto pluginId = juce::String(mModuleSaveData.GetString("pluginId"));
-      if (VSTLookup::GetPluginDesc(pluginDesc, pluginId))
+      if (!VSTLookup::GetPluginDesc(pluginDesc, pluginId))
       {
          TheSynth->LogEvent("Plugin with " + pluginId.toStdString() + " id not found", kLogEventType_Error);
       }
@@ -1479,6 +1643,19 @@ void VSTPlugin::SaveState(FileStreamOut& out)
       for (auto& i : exposedParams)
          out << i;
    }
+   else if (mPendingState.mHasState)
+   {
+      //plugin hasn't arrived (still loading, or couldn't be created). write back what we loaded so it isn't lost
+      out << true;
+      out << (int)mPendingState.mState.getSize();
+      out.WriteGeneric(mPendingState.mState.getData(), (int)mPendingState.mState.getSize());
+      out << (int)mPendingState.mProgramState.getSize();
+      if (mPendingState.mProgramState.getSize() > 0)
+         out.WriteGeneric(mPendingState.mProgramState.getData(), (int)mPendingState.mProgramState.getSize());
+      out << (int)mPendingState.mExposedParams.size();
+      for (auto& i : mPendingState.mExposedParams)
+         out << i;
+   }
    else
    {
       out << false;
@@ -1529,46 +1706,67 @@ void VSTPlugin::LoadVSTFromSaveData(FileStreamIn& in, int rev)
    {
       int vstStateSize;
       in >> vstStateSize;
-      char* vstState = new char[vstStateSize];
-      in.ReadGeneric(vstState, vstStateSize);
+      juce::MemoryBlock vstState((size_t)std::max(0, vstStateSize));
+      if (vstStateSize > 0)
+         in.ReadGeneric(vstState.getData(), vstStateSize);
 
       int vstProgramStateSize = 0;
       if (rev >= 1)
          in >> vstProgramStateSize;
-      char* vstProgramState = new char[vstProgramStateSize];
+      juce::MemoryBlock vstProgramState;
       if (rev >= 1 && vstProgramStateSize > 0)
-         in.ReadGeneric(vstProgramState, vstProgramStateSize);
+      {
+         vstProgramState.setSize((size_t)vstProgramStateSize);
+         in.ReadGeneric(vstProgramState.getData(), vstProgramStateSize);
+      }
+
+      std::vector<int> exposedParams;
+      if (rev >= 2)
+      {
+         int numParamsShowing;
+         in >> numParamsShowing;
+         for (int i = 0; i < numParamsShowing; ++i)
+         {
+            int index;
+            in >> index;
+            exposedParams.push_back(index);
+         }
+      }
 
       if (mPlugin != nullptr)
       {
          ofLog() << "loading vst state for " << mPlugin->getName();
 
-         mPlugin->setStateInformation(vstState, vstStateSize);
-         if (rev >= 1 && vstProgramStateSize > 0)
-            mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
+         mPlugin->setStateInformation(vstState.getData(), (int)vstState.getSize());
+         if (vstProgramState.getSize() > 0)
+            mPlugin->setCurrentProgramStateInformation(vstProgramState.getData(), (int)vstProgramState.getSize());
+
+         if (rev >= 2)
+         {
+            for (auto& param : mParameterSliders)
+               param.mShowing = false;
+            for (int index : exposedParams)
+            {
+               if (index >= 0 && index < (int)mParameterSliders.size())
+               {
+                  mParameterSliders[index].mShowing = true;
+                  if (mParameterSliders[index].mSlider == nullptr)
+                     mParameterSliders[index].MakeSlider();
+               }
+            }
+         }
       }
       else
       {
-         TheSynth->LogEvent("Couldn't instantiate plugin to load state for " + mModuleSaveData.GetString("pluginId"), kLogEventType_Error);
-      }
+         //plugin is still being created (or failed to be). hold onto this until it arrives
+         mPendingState.mHasState = true;
+         mPendingState.mState = std::move(vstState);
+         mPendingState.mProgramState = std::move(vstProgramState);
+         mPendingState.mHasExposedParams = rev >= 2;
+         mPendingState.mExposedParams = std::move(exposedParams);
 
-      if (rev >= 2)
-      {
-         int numParamsShowing;
-         in >> numParamsShowing;
-         for (auto& param : mParameterSliders)
-            param.mShowing = false;
-         for (int i = 0; i < numParamsShowing; ++i)
-         {
-            int index;
-            in >> index;
-            if (index < mParameterSliders.size())
-            {
-               mParameterSliders[index].mShowing = true;
-               if (mParameterSliders[index].mSlider == nullptr)
-                  mParameterSliders[index].MakeSlider();
-            }
-         }
+         if (!mPluginLoading)
+            TheSynth->LogEvent("Couldn't instantiate plugin to load state for " + mModuleSaveData.GetString("pluginId"), kLogEventType_Error);
       }
    }
 }
@@ -1580,13 +1778,37 @@ void VSTPlugin::ParameterSlider::MakeSlider()
       sliderID = mDisplayName.c_str(); //old save files used unstable parameters names
    else
       sliderID = mID.c_str(); //now we use parameter IDs for more stability
-   mSlider = new FloatSlider(mOwner, sliderID, -1, -1, 210, 15, &mValue, 0, 1);
+   mSlider = new FloatSlider(mOwner, sliderID, -1, -1, 210, 15, mValue.get(), 0, 1);
    mSlider->SetOverrideDisplayName(mDisplayName);
    mRemoveButton = new ClickButton(mOwner, " X ", -1, -1);
 }
 
 void VSTPlugin::OnUIControlRequested(const char* name)
 {
+   if (mPlugin == nullptr)
+   {
+      //no plugin yet. stand in a slider for parameter ids, so cables and saved values have something to attach to.
+      //legacy (version 0) names are plain parameter names, which can't be told apart from other controls, so they're skipped
+      std::string controlName = name;
+      if (mParameterVersion == 0 || (controlName.rfind("paramid_", 0) != 0 && controlName.rfind("param_", 0) != 0))
+         return;
+      for (auto& pending : mPendingSliders)
+      {
+         if (pending.mID == controlName)
+            return;
+      }
+      ParameterSlider& pending = mPendingSliders.emplace_back();
+      pending.mOwner = this;
+      pending.mID = controlName;
+      pending.mDisplayName = controlName;
+      pending.mShowing = false;
+      pending.mInSelectorList = false;
+      pending.MakeSlider();
+      pending.mSlider->SetShowing(false);
+      pending.mRemoveButton->SetShowing(false);
+      return;
+   }
+
    if (mParameterVersion == 0) //legacy path
    {
       for (auto& parameter : mParameterSliders)
