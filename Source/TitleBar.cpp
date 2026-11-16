@@ -399,6 +399,8 @@ void TitleBar::DrawModule()
    DrawTextRightJustify(info, pixelWidth - 140, 32);
 
    mMenuButton->SetShowing(!hideElements);
+   if (mTouchNavigationButton != nullptr)
+      mTouchNavigationButton->SetShowing(!hideElements);
    mPlayPauseButton->SetShowing(!hideElements);
    mDisplayHelpButton->SetShowing(!hideElements);
    for (auto* spawnList : mSpawnLists.GetDropdowns())
@@ -464,15 +466,19 @@ void TitleBar::DrawModule()
    }
    mModuleCategory = type;
 
-   float usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
-   std::string stats;
-   stats += "fps:" + ofToString(ofGetFrameRate(), 0);
-   stats += "  audio cpu:" + ofToString(usage * 100, 1);
-   if (usage > 1)
-      ofSetColor(255, 150, 150);
-   else
-      ofSetColor(255, 255, 255);
-   DrawTextRightJustify(stats, pixelWidth - 5, 33);
+   if (!hideElements)
+   {
+      float usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
+      std::string stats;
+      stats += "fps:" + ofToString(ofGetFrameRate(), 0);
+      stats += "  audio cpu:" + ofToString(usage * 100, 1);
+      if (usage > 1)
+         ofSetColor(255, 150, 150);
+      else
+         ofSetColor(255, 255, 255);
+      DrawTextRightJustify(stats, pixelWidth - 5, 33);
+   }
+
    mDisplayHelpButton->SetPosition(pixelWidth - 20, 4);
    mDisplayHelpButton->Draw();
    if (TheSynth->IsAudioPaused())
@@ -485,11 +491,11 @@ void TitleBar::DrawModule()
    if (mSpecifiedHeight != -1 || mNumDropdownRows >= 3)
    {
       ofPushStyle();
-      ofSetColor(ofColor::grey);
+      ofSetColor(255, 255, 255, 64);
       ofFill();
       float w, h;
       GetDimensions(w, h);
-      ofRect(w - kResizeHandleWidth, h - kResizeHandleHeight + kResizeHandleMarginY, kResizeHandleWidth - 10, kResizeHandleHeight - kResizeHandleMarginY * 2, kResizeHandleHeight - kResizeHandleMarginY * 2 - 1);
+      ofRect(w - kResizeHandleWidth - GetSideMargin(), h - kResizeHandleHeight + kResizeHandleMarginY, kResizeHandleWidth - 10, kResizeHandleHeight - kResizeHandleMarginY * 2, kResizeHandleHeight - kResizeHandleMarginY * 2 - 1);
       ofPopStyle();
    }
 }
