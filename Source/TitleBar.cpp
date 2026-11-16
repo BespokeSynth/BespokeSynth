@@ -149,7 +149,6 @@ void TitleBar::CreateUIControls()
 #endif
 
    mDisplayHelpButton = new ClickButton(this, " ? ", 380, 1);
-   mDisplayUserPrefsEditorButton = new ClickButton(this, "settings", 330, 1);
    mPlayPauseButton = new ClickButton(this, "play/pause", 300, 1, ButtonDisplayStyle::kPause);
    mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 20, &mLoadLayoutIndex);
    mSaveLayoutButton = new ClickButton(this, "save layout", 280, 19);
@@ -439,13 +438,11 @@ void TitleBar::DrawModule()
    DrawTextRightJustify(stats, pixelWidth - 5, 33);
    mDisplayHelpButton->SetPosition(pixelWidth - 20, 4);
    mDisplayHelpButton->Draw();
-   mDisplayUserPrefsEditorButton->SetPosition(mDisplayHelpButton->GetPosition(true).x - mDisplayUserPrefsEditorButton->GetRect().width - 5, 4);
-   mDisplayUserPrefsEditorButton->Draw();
    if (TheSynth->IsAudioPaused())
       mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPlay);
    else
       mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPause);
-   mPlayPauseButton->SetPosition(mDisplayUserPrefsEditorButton->GetPosition(true).x - mPlayPauseButton->GetRect().width - 5, 4);
+   mPlayPauseButton->SetPosition(mDisplayHelpButton->GetPosition(true).x - mPlayPauseButton->GetRect().width - 5, 4);
    mPlayPauseButton->Draw();
 }
 
@@ -609,13 +606,12 @@ void TitleBar::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mDisplayHelpButton)
       ShowHelp();
-   if (button == mDisplayUserPrefsEditorButton)
-      TheSynth->GetUserPrefsEditor()->Show();
    if (button == mMenuButton)
    {
       auto buttonRect = mMenuButton->GetRect();
       mMenuPopup.SetOwningContainer(GetOwningContainer());
       mMenuPopup.SetPosition(buttonRect.x, buttonRect.y + buttonRect.height + 2);
+      mMenuPopup.UpdateLayout();
       TheSynth->PushModalFocusItem(&mMenuPopup);
    }
    if (button == mPlayPauseButton)
@@ -682,23 +678,67 @@ void MenuPopup::CreateUIControls()
    BUTTON_SIZE(mSaveStateButton, "save", kButtonWidth, 32);
    BUTTON_SIZE(mSaveStateAsButton, "save as", kButtonWidth, 32);
    BUTTON_SIZE(mWriteAudioButton, "write audio", kButtonWidth, 32);
+   BUTTON_SIZE(mSettingsButton, "settings", kButtonWidth, 32);
    BUTTON_SIZE(mHomeButton, "move canvas home", kButtonWidth, 32);
    CHECKBOX(mEventLookaheadCheckbox, "lookahead (exp.)", &Transport::sDoEventLookahead);
    CHECKBOX(mShouldAutosaveCheckbox, "autosave", &ModularSynth::sShouldAutosave);
    CHECKBOX(mShowTooltipsCheckbox, "show tooltips", &HelpDisplay::sShowTooltips);
    ENDUIBLOCK(mWidth, mHeight);
 
+   mControls = { mWelcomeScreenButton, mResetLayoutButton, mLoadStateButton, mSaveStateButton, mSaveStateAsButton, mWriteAudioButton, mSettingsButton, mHomeButton, mEventLookaheadCheckbox, mShouldAutosaveCheckbox, mShowTooltipsCheckbox };
+
    mNewPatchConfirmPopup.CreateUIControls();
+}
+
+//lay the controls out top-to-bottom, wrapping into additional columns when they would extend past the bottom of the window
+void MenuPopup::UpdateLayout()
+{
+   const float kMargin = 3;
+   const float kSpacingX = 3;
+   const float kSpacingY = 2;
+   const float kWindowBottomPadding = 5;
+
+   float maxHeight = 0;
+   if (GetOwningContainer() != nullptr)
+      maxHeight = ofGetHeight() / GetOwningContainer()->GetDrawScale() - GetPosition(true).y - kWindowBottomPadding;
+
+   float x = kMargin;
+   float y = kMargin;
+   float columnWidth = 0;
+   float xMax = 0;
+   float yMax = 0;
+   for (auto* control : mControls)
+   {
+      ofVec2f dimensions = control->GetDimensions();
+      //start a new column if this control would overflow, unless it's the first one in the column
+      if (y > kMargin && y + dimensions.y + kSpacingY > maxHeight)
+      {
+         x += columnWidth + kSpacingX;
+         y = kMargin;
+         columnWidth = 0;
+      }
+      control->SetPosition(x, y);
+      columnWidth = MAX(columnWidth, dimensions.x);
+      xMax = MAX(xMax, x + dimensions.x);
+      yMax = MAX(yMax, y + dimensions.y);
+      y += dimensions.y + kSpacingY;
+   }
+
+   mWidth = xMax + kMargin;
+   mHeight = yMax + kSpacingY;
 }
 
 void MenuPopup::DrawModule()
 {
+   UpdateLayout();
+
    mWelcomeScreenButton->Draw();
    mSaveStateButton->Draw();
    mSaveStateAsButton->Draw();
    mLoadStateButton->Draw();
    mResetLayoutButton->Draw();
    mWriteAudioButton->Draw();
+   mSettingsButton->Draw();
    mHomeButton->Draw();
    mEventLookaheadCheckbox->Draw();
    mShouldAutosaveCheckbox->Draw();
@@ -725,6 +765,11 @@ void MenuPopup::ButtonClicked(ClickButton* button, double time)
    if (button == mWriteAudioButton)
    {
       TheSynth->SaveOutput();
+      TheSynth->PopModalFocusItem();
+   }
+   if (button == mSettingsButton)
+   {
+      TheSynth->GetUserPrefsEditor()->Show();
       TheSynth->PopModalFocusItem();
    }
    if (button == mHomeButton)

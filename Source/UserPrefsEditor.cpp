@@ -53,13 +53,14 @@ void UserPrefsEditor::CreateUIControls()
    for (auto* pref : UserPrefs.mUserPrefs)
       pref->SetUpControl(this);
 
-   mCategorySelector = new RadioButton(this, "category", 5, 10, (int*)(&mCategory), kRadioHorizontal);
-   mSaveButton = new ClickButton(this, "save", -1, -1);
-   mCancelButton = new ClickButton(this, "cancel", -1, -1);
+   mSaveButton = new ClickButton(this, "save", 5, 3);
+   mCancelButton = new ClickButton(this, "cancel", mSaveButton, kAnchor_Right_Padded);
+   mCategorySelector = new RadioButton(this, "category", mSaveButton, kAnchor_Below_Padded, (int*)(&mCategory), kRadioHorizontal);
 
    mCategorySelector->AddLabel("general", (int)UserPrefCategory::General);
    mCategorySelector->AddLabel("graphics", (int)UserPrefCategory::Graphics);
    mCategorySelector->AddLabel("paths", (int)UserPrefCategory::Paths);
+   mCategorySelector->AddLabel("advanced", (int)UserPrefCategory::Advanced);
 
    std::array<int, 5> oversampleAmounts = { 1, 2, 4, 8, 16 };
    for (auto& oversample : oversampleAmounts)
@@ -340,9 +341,7 @@ void UserPrefsEditor::DrawModule()
          controlY += 17;
    }
    controlY += 17;
-   mSaveButton->SetPosition(controlX, controlY);
    mSaveButton->Draw();
-   mCancelButton->SetPosition(mSaveButton->GetRect(K(local)).getMaxX() + 10, controlY);
    mCancelButton->Draw();
    mWidth = 1150;
    mHeight = controlY + 20;

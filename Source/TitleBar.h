@@ -130,7 +130,10 @@ public:
 
    void ButtonClicked(ClickButton* button, double time) override;
 
+   void UpdateLayout();
+
 private:
+   std::vector<IUIControl*> mControls;
    ClickButton* mSaveLayoutButton{ nullptr };
    ClickButton* mResetLayoutButton{ nullptr };
    ClickButton* mWelcomeScreenButton{ nullptr };
@@ -138,6 +141,7 @@ private:
    ClickButton* mSaveStateAsButton{ nullptr };
    ClickButton* mLoadStateButton{ nullptr };
    ClickButton* mWriteAudioButton{ nullptr };
+   ClickButton* mSettingsButton{ nullptr };
    ClickButton* mHomeButton{ nullptr };
    Checkbox* mEventLookaheadCheckbox{ nullptr };
    Checkbox* mShouldAutosaveCheckbox{ nullptr };
@@ -198,7 +202,6 @@ private:
    ClickButton* mSaveLayoutButton{ nullptr };
    DropdownList* mLoadLayoutDropdown{ nullptr };
    ClickButton* mDisplayHelpButton{ nullptr };
-   ClickButton* mDisplayUserPrefsEditorButton{ nullptr };
    ClickButton* mTouchNavigationButton{ nullptr };
    int mLoadLayoutIndex{ -1 };
 

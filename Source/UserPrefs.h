@@ -42,7 +42,8 @@ enum class UserPrefCategory
 {
    General,
    Graphics,
-   Paths
+   Paths,
+   Advanced
 };
 
 class UserPref
@@ -295,13 +296,8 @@ public:
    UserPrefDropdownString audio_input_device{ "audio_input_device", "none", 350, UserPrefCategory::General };
    UserPrefDropdownInt samplerate{ "samplerate", 48000, 100, UserPrefCategory::General };
    UserPrefDropdownInt buffersize{ "buffersize", 256, 100, UserPrefCategory::General };
-   UserPrefDropdownInt oversampling{ "oversampling", 1, 100, UserPrefCategory::General };
-   UserPrefDropdownInt output_wav_bit_depth{ "output_wav_bit_depth", 16, 100, UserPrefCategory::General };
    UserPrefTextEntryInt width{ "width", 1700, 100, 10000, 5, UserPrefCategory::General };
    UserPrefTextEntryInt height{ "height", 1100, 100, 10000, 5, UserPrefCategory::General };
-   UserPrefBool set_manual_window_position{ "set_manual_window_position", false, UserPrefCategory::General };
-   UserPrefTextEntryInt position_x{ "position_x", 200, -10000, 10000, 5, UserPrefCategory::General };
-   UserPrefTextEntryInt position_y{ "position_y", 200, -10000, 10000, 5, UserPrefCategory::General };
    UserPrefFloat zoom{ "zoom", 1.3f, .25f, 2, UserPrefCategory::General };
    UserPrefFloat ui_scale
    {
@@ -314,28 +310,13 @@ public:
       ,
       .25f, 2, UserPrefCategory::General
    };
-   UserPrefFloat safe_area_margin{ "safe_area_margin", .6f, 0, 1.5f, UserPrefCategory::General }; //how much of the screen's safe area inset (e.g. for rounded corners on phones) to keep the title bar's contents out of
    UserPrefDropdownString cable_drop_behavior{ "cable_drop_behavior", "show quickspawn", 150, UserPrefCategory::General };
-   UserPrefDropdownString qwerty_to_pitch_mode{ "qwerty_to_pitch_mode", "Ableton", 150, UserPrefCategory::General };
-   UserPrefFloat grid_snap_size{ "grid_snap_size", 30, 5, 150, UserPrefCategory::General };
-   UserPrefFloat scroll_multiplier_vertical{ "scroll_multiplier_vertical", 1, -2, 2, UserPrefCategory::General };
-   UserPrefFloat scroll_multiplier_horizontal{ "scroll_multiplier_horizontal", 1, -2, 2, UserPrefCategory::General };
    UserPrefBool wrap_mouse_on_pan{ "wrap_mouse_on_pan", true, UserPrefCategory::General };
    UserPrefBool autosave{ "autosave", false, UserPrefCategory::General };
    UserPrefBool show_tooltips_on_load{ "show_tooltips_on_load", true, UserPrefCategory::General };
    UserPrefBool show_welcome_screen{ "show_welcome_screen", true, UserPrefCategory::General };
    UserPrefBool show_minimap{ "show_minimap", false, UserPrefCategory::General };
-   UserPrefFloat minimap_margin{ "minimap_margin", 10, 0, 50, UserPrefCategory::General };
-   UserPrefDropdownString minimap_corner{ "minimap_corner", "Top right", 150, UserPrefCategory::General };
-   UserPrefBool immediate_paste{ "immediate_paste", false, UserPrefCategory::General };
    UserPrefTextEntryFloat record_buffer_length_minutes{ "record_buffer_length_minutes", 30, 1, 120, 5, UserPrefCategory::General };
-#if !BESPOKE_LINUX
-   UserPrefBool vst_always_on_top{ "vst_always_on_top", true, UserPrefCategory::General };
-#endif
-   UserPrefTextEntryInt max_output_channels{ "max_output_channels", 16, 1, 1024, 5, UserPrefCategory::General };
-   UserPrefTextEntryInt max_input_channels{ "max_input_channels", 16, 1, 1024, 5, UserPrefCategory::General };
-   UserPrefString plugin_preference_order{ "plugin_preference_order", "VST3;VST;AudioUnit;LV2", 70, UserPrefCategory::General };
-   UserPrefBool force_juce_file_chooser{ "force_juce_file_chooser", false, UserPrefCategory::General };
 
    UserPrefBool draw_background_lissajous{ "draw_background_lissajous", true, UserPrefCategory::Graphics };
    UserPrefBool background_lissajous_autocorrelate{ "background_lissajous_autocorrelate", true, UserPrefCategory::Graphics };
@@ -349,7 +330,7 @@ public:
    UserPrefFloat background_g{ "background_g", 0.09f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat background_b{ "background_b", 0.09f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat target_framerate{ "target_framerate", 60, 30, 144, UserPrefCategory::Graphics };
-   UserPrefFloat motion_trails{ "motion_trails", 1, 0, 2, UserPrefCategory::Graphics };
+   UserPrefFloat motion_trails{ "motion_trails", 0.5f, 0, 2, UserPrefCategory::Graphics };
    UserPrefBool draw_module_highlights{ "draw_module_highlights", true, UserPrefCategory::Graphics };
    UserPrefTextEntryFloat mouse_offset_x{ "mouse_offset_x", 0, -100, 100, 5, UserPrefCategory::Graphics };
    UserPrefTextEntryFloat mouse_offset_y
@@ -369,6 +350,27 @@ public:
    UserPrefString layout{ "layout", "layouts/blank.json", 70, UserPrefCategory::Paths };
    UserPrefString youtube_dl_path{ "youtube_dl_path", kDefaultYoutubeDlPath, 70, UserPrefCategory::Paths };
    UserPrefString ffmpeg_path{ "ffmpeg_path", kDefaultFfmpegPath, 70, UserPrefCategory::Paths };
+
+   UserPrefTextEntryInt max_output_channels{ "max_output_channels", 16, 1, 1024, 5, UserPrefCategory::Advanced };
+   UserPrefTextEntryInt max_input_channels{ "max_input_channels", 16, 1, 1024, 5, UserPrefCategory::Advanced };
+   UserPrefDropdownInt oversampling{ "oversampling", 1, 100, UserPrefCategory::Advanced };
+   UserPrefDropdownInt output_wav_bit_depth{ "output_wav_bit_depth", 16, 100, UserPrefCategory::Advanced };
+   UserPrefFloat grid_snap_size{ "grid_snap_size", 30, 5, 150, UserPrefCategory::Advanced };
+   UserPrefFloat scroll_multiplier_vertical{ "scroll_multiplier_vertical", 1, -2, 2, UserPrefCategory::Advanced };
+   UserPrefFloat scroll_multiplier_horizontal{ "scroll_multiplier_horizontal", 1, -2, 2, UserPrefCategory::Advanced };
+   UserPrefBool set_manual_window_position{ "set_manual_window_position", false, UserPrefCategory::Advanced };
+   UserPrefTextEntryInt position_x{ "position_x", 200, -10000, 10000, 5, UserPrefCategory::Advanced };
+   UserPrefTextEntryInt position_y{ "position_y", 200, -10000, 10000, 5, UserPrefCategory::Advanced };
+   UserPrefFloat safe_area_margin{ "safe_area_margin", .6f, 0, 1.5f, UserPrefCategory::Advanced }; //how much of the screen's safe area inset (e.g. for rounded corners on phones) to keep the title bar's contents out of
+   UserPrefFloat minimap_margin{ "minimap_margin", 10, 0, 50, UserPrefCategory::Advanced };
+   UserPrefDropdownString minimap_corner{ "minimap_corner", "Top right", 150, UserPrefCategory::Advanced };
+   UserPrefDropdownString qwerty_to_pitch_mode{ "qwerty_to_pitch_mode", "Ableton", 150, UserPrefCategory::Advanced };
+   UserPrefBool immediate_paste{ "immediate_paste", false, UserPrefCategory::Advanced };
+   UserPrefBool force_juce_file_chooser{ "force_juce_file_chooser", false, UserPrefCategory::Advanced };
+   UserPrefString plugin_preference_order{ "plugin_preference_order", "VST3;VST;AudioUnit;LV2", 70, UserPrefCategory::Advanced };
+#if !BESPOKE_LINUX
+   UserPrefBool vst_always_on_top{ "vst_always_on_top", true, UserPrefCategory::Advanced };
+#endif
 };
 
 extern UserPrefsHolder UserPrefs;
