@@ -123,6 +123,10 @@ enum class NanoVGRenderContext
 };
 extern std::array<NVGcontext*, (int)NanoVGRenderContext::Num> gNanoVGRenderContexts;
 extern NVGcontext* gNanoVG;
+//incremented each time the nanovg contexts are created. anything that caches nanovg images or framebuffers should
+//recreate them when this changes, since they belong to the old contexts (android recreates the GL context whenever
+//the app returns to the foreground)
+extern int gNanoVGContextGeneration;
 
 extern std::random_device gRandomDevice;
 

@@ -32,12 +32,6 @@ namespace ableton
    *  Implements a bridge between juce::Graphics and push2 display format.
    */
 
-  enum class DeviceType
-  {
-     Push2,
-     Move
-  };
-
   class Push2DisplayBridge
   {
   public:
@@ -51,7 +45,7 @@ namespace ableton
      *  \return the result of the initialisation process
      */
 
-    NBase::Result Init(DeviceType deviceType);
+    NBase::Result Init();
 
     /*!
      *  \return true if this bridge is initialized
@@ -65,11 +59,6 @@ namespace ableton
      */
 
     void Flip(unsigned char* pixels);
-
-    Push2Display* GetDisplay()
-    {
-       return push2Display_.get();
-    }
 
   private:
     std::unique_ptr<Push2Display> push2Display_;    /*< The push display the bridge works on */

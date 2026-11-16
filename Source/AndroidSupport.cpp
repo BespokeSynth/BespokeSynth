@@ -1,0 +1,593 @@
+/**
+    bespoke synth, a software modular synthesizer
+    Copyright (C) 2026 Ryan Challinor (contact: awwbees@gmail.com)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+**/
+//
+//  AndroidSupport.cpp
+//  Bespoke
+//
+
+//exposes juce::getEnv(), juce::getAppContext() etc
+#define JUCE_CORE_INCLUDE_JNI_HELPERS 1
+
+#include "AndroidSupport.h"
+
+#include <android/log.h>
+#include <cstdio>
+#include <cstring>
+#include <dlfcn.h>
+#include <time.h>
+#include <unistd.h>
+
+namespace
+{
+   const char* kAssetPrefix = "assets/";
+   //the build adds this to .gz files, since the android packager would otherwise decompress them (see app/build.gradle)
+   const char* kKeptGzSuffix = ".gz.keep";
+
+   juce::File GetApkFile()
+   {
+      //on android, JUCE returns the apk path (ApplicationInfo.publicSourceDir) for this
+      return juce::File::getSpecialLocation(juce::File::currentApplicationFile);
+   }
+
+   bool ExtractAssets(const juce::File& apk, const juce::File& destination)
+   {
+      juce::ZipFile zip(apk);
+      if (zip.getNumEntries() == 0)
+         return false;
+
+      bool ok = true;
+      for (int i = 0; i < zip.getNumEntries(); ++i)
+      {
+         const auto* entry = zip.getEntry(i);
+         if (entry == nullptr || !entry->filename.startsWith(kAssetPrefix) || entry->filename.endsWithChar('/'))
+            continue;
+
+         auto relativePath = entry->filename.substring((int)strlen(kAssetPrefix));
+         if (relativePath.endsWith(kKeptGzSuffix))
+            relativePath = relativePath.dropLastCharacters((int)strlen(".keep"));
+         auto target = destination.getChildFile(relativePath);
+         target.getParentDirectory().createDirectory();
+
+         std::unique_ptr<juce::InputStream> in(zip.createStreamForEntry(i));
+         juce::FileOutputStream out(target);
+         if (in == nullptr || !out.openedOk() || !out.setPosition(0) || !out.truncate().wasOk())
+         {
+            ok = false;
+            continue;
+         }
+         out.writeFromInputStream(*in, -1);
+         out.flush();
+         if (out.getStatus().failed())
+            ok = false;
+      }
+      return ok;
+   }
+
+   juce::File GetExternalFilesDir()
+   {
+      auto* env = juce::getEnv();
+      if (env == nullptr)
+         return {};
+
+      auto context = juce::getAppContext();
+      if (context.get() == nullptr)
+         return {};
+
+      juce::LocalRef<jclass> contextClass(env->GetObjectClass(context.get()));
+      jmethodID getExternalFilesDir = env->GetMethodID(contextClass.get(), "getExternalFilesDir", "(Ljava/lang/String;)Ljava/io/File;");
+      if (getExternalFilesDir == nullptr)
+      {
+         env->ExceptionClear();
+         return {};
+      }
+
+      juce::LocalRef<jobject> dir(env->CallObjectMethod(context.get(), getExternalFilesDir, nullptr));
+      if (env->ExceptionCheck())
+      {
+         env->ExceptionClear();
+         return {};
+      }
+      if (dir.get() == nullptr) //no external storage mounted
+         return {};
+
+      juce::LocalRef<jclass> fileClass(env->GetObjectClass(dir.get()));
+      jmethodID getAbsolutePath = env->GetMethodID(fileClass.get(), "getAbsolutePath", "()Ljava/lang/String;");
+      juce::LocalRef<jstring> path((jstring)env->CallObjectMethod(dir.get(), getAbsolutePath));
+      if (env->ExceptionCheck() || path.get() == nullptr)
+      {
+         env->ExceptionClear();
+         return {};
+      }
+
+      return juce::File(juce::juceString(path.get()));
+   }
+}
+
+juce::File AndroidSupport::GetFactoryDir()
+{
+   static const juce::File sFactoryDir = []
+   {
+      auto dir = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile("factory");
+      auto apk = GetApkFile();
+
+      //the apk is rewritten by every install, so its timestamp and size identify which assets are unpacked
+      juce::String stamp = juce::String(apk.getLastModificationTime().toMilliseconds()) + " " + juce::String(apk.getSize());
+      auto stampFile = dir.getChildFile(".apk_stamp");
+      if (stampFile.existsAsFile() && stampFile.loadFileAsString() == stamp)
+         return dir;
+
+      Log(("unpacking factory files from " + apk.getFullPathName() + " to " + dir.getFullPathName()).toRawUTF8());
+      dir.deleteRecursively();
+      dir.createDirectory();
+      if (ExtractAssets(apk, dir))
+         stampFile.replaceWithText(stamp);
+      else
+         Log("failed to unpack factory files");
+      return dir;
+   }();
+   return sFactoryDir;
+}
+
+juce::File AndroidSupport::GetDataDir()
+{
+   static const juce::File sDataDir = []
+   {
+      auto external = GetExternalFilesDir();
+      if (external != juce::File())
+         return external.getChildFile("BespokeSynth");
+      return juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile("BespokeSynth");
+   }();
+   return sDataDir;
+}
+
+void AndroidSupport::Log(const char* message)
+{
+   __android_log_write(ANDROID_LOG_INFO, "bespoke", message);
+
+   //also keep it in a file, since logcat only holds recent messages, and isn't available while the device is unplugged
+   static juce::CriticalSection sLogFileLock;
+   static FILE* sLogFile = nullptr;
+   static bool sTriedOpening = false;
+   juce::ScopedLock lock(sLogFileLock);
+   if (!sTriedOpening)
+   {
+      sTriedOpening = true;
+      auto dataDir = GetDataDir();
+      dataDir.createDirectory();
+      auto logFile = dataDir.getChildFile("log.txt");
+      if (logFile.existsAsFile()) //keep the previous session's log around too
+         logFile.moveFileTo(dataDir.getChildFile("log_previous.txt"));
+      sLogFile = fopen(logFile.getFullPathName().toRawUTF8(), "w");
+   }
+   if (sLogFile != nullptr)
+   {
+      fprintf(sLogFile, "%s\n", message);
+      fflush(sLogFile);
+   }
+}
+
+bool AndroidSupport::IsDocument(const juce::URL& url)
+{
+   return url.getScheme() == "content";
+}
+
+namespace
+{
+   //documents are read and written through android's ContentResolver rather than JUCE's AndroidDocument, which only
+   //handles document urls from the system file picker, not the other content:// urls that apps open bespoke with
+   //(eg from the files app's downloads, or google drive). this looks up the resolver and the document's Uri
+   struct ContentAccess
+   {
+      ContentAccess(const juce::URL& document)
+      : env(juce::getEnv())
+      {
+         auto context = juce::getAppContext();
+         if (env == nullptr || context.get() == nullptr)
+            return;
+
+         juce::LocalRef<jclass> contextClass(env->GetObjectClass(context.get()));
+         jmethodID getContentResolver = env->GetMethodID(contextClass.get(), "getContentResolver", "()Landroid/content/ContentResolver;");
+         resolver = juce::LocalRef<jobject>(env->CallObjectMethod(context.get(), getContentResolver));
+         if (CheckException())
+            return;
+
+         juce::LocalRef<jclass> uriClass(env->FindClass("android/net/Uri"));
+         jmethodID parse = env->GetStaticMethodID(uriClass.get(), "parse", "(Ljava/lang/String;)Landroid/net/Uri;");
+         uri = juce::LocalRef<jobject>(env->CallStaticObjectMethod(uriClass.get(), parse, juce::javaString(document.toString(true)).get()));
+         CheckException();
+      }
+
+      bool IsValid() const { return env != nullptr && resolver.get() != nullptr && uri.get() != nullptr; }
+
+      //clears a pending java exception, returning whether there was one
+      bool CheckException() const
+      {
+         if (!env->ExceptionCheck())
+            return false;
+         env->ExceptionClear();
+         return true;
+      }
+
+      JNIEnv* env;
+      juce::LocalRef<jobject> resolver;
+      juce::LocalRef<jobject> uri;
+   };
+
+   //the document's name, as the app that has it reports it (OpenableColumns.DISPLAY_NAME)
+   juce::String QueryDisplayName(const juce::URL& document)
+   {
+      ContentAccess access(document);
+      if (!access.IsValid())
+         return {};
+      auto* env = access.env;
+
+      juce::LocalRef<jclass> stringClass(env->FindClass("java/lang/String"));
+      juce::LocalRef<jobjectArray> columns(env->NewObjectArray(1, stringClass.get(), juce::javaString("_display_name").get()));
+      juce::LocalRef<jclass> resolverClass(env->GetObjectClass(access.resolver.get()));
+      jmethodID query = env->GetMethodID(resolverClass.get(), "query", "(Landroid/net/Uri;[Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;)Landroid/database/Cursor;");
+      juce::LocalRef<jobject> cursor(env->CallObjectMethod(access.resolver.get(), query, access.uri.get(), columns.get(), nullptr, nullptr, nullptr));
+      if (access.CheckException() || cursor.get() == nullptr)
+         return {};
+
+      juce::String name;
+      juce::LocalRef<jclass> cursorClass(env->GetObjectClass(cursor.get()));
+      jmethodID moveToFirst = env->GetMethodID(cursorClass.get(), "moveToFirst", "()Z");
+      jmethodID getString = env->GetMethodID(cursorClass.get(), "getString", "(I)Ljava/lang/String;");
+      jmethodID close = env->GetMethodID(cursorClass.get(), "close", "()V");
+      if (env->CallBooleanMethod(cursor.get(), moveToFirst) && !access.CheckException())
+      {
+         juce::LocalRef<jstring> value((jstring)env->CallObjectMethod(cursor.get(), getString, 0));
+         if (!access.CheckException() && value.get() != nullptr)
+            name = juce::juceString(value.get());
+      }
+      env->CallVoidMethod(cursor.get(), close);
+      access.CheckException();
+      return name;
+   }
+}
+
+juce::String AndroidSupport::GetDocumentName(const juce::URL& document)
+{
+   auto name = QueryDisplayName(document);
+   if (name.isEmpty()) //document ids usually end with the file name, eg primary%3ADocuments%2Fsong.bsk
+      name = juce::URL::removeEscapeChars(document.getFileName()).fromLastOccurrenceOf("/", false, false).fromLastOccurrenceOf(":", false, false);
+   if (name.isEmpty())
+      name = "document";
+   return name;
+}
+
+juce::File AndroidSupport::GetDocumentMirror(const juce::URL& document)
+{
+   return juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory).getChildFile("documents").getChildFile(juce::File::createLegalFileName(GetDocumentName(document)));
+}
+
+juce::Result AndroidSupport::CopyDocumentToMirror(const juce::URL& document)
+{
+   //rather than URL::createInputStream(), which first tries to look the document up as a file, and asserts when that
+   //needs storage permissions
+   ContentAccess access(document);
+   if (!access.IsValid())
+      return juce::Result::fail("no content resolver");
+   auto* env = access.env;
+
+   juce::LocalRef<jclass> resolverClass(env->GetObjectClass(access.resolver.get()));
+   jmethodID openInputStream = env->GetMethodID(resolverClass.get(), "openInputStream", "(Landroid/net/Uri;)Ljava/io/InputStream;");
+   juce::LocalRef<jobject> stream(env->CallObjectMethod(access.resolver.get(), openInputStream, access.uri.get()));
+   if (access.CheckException() || stream.get() == nullptr)
+      return juce::Result::fail("couldn't open " + document.toString(false));
+
+   auto mirror = GetDocumentMirror(document);
+   mirror.getParentDirectory().createDirectory();
+   juce::FileOutputStream output(mirror);
+   bool ok = output.openedOk();
+   if (ok)
+   {
+      output.setPosition(0);
+      output.truncate();
+   }
+
+   juce::LocalRef<jclass> streamClass(env->GetObjectClass(stream.get()));
+   jmethodID read = env->GetMethodID(streamClass.get(), "read", "([B)I");
+   jmethodID close = env->GetMethodID(streamClass.get(), "close", "()V");
+
+   constexpr int kChunkSize = 65536;
+   juce::HeapBlock<jbyte> buffer(kChunkSize);
+   juce::LocalRef<jbyteArray> javaBuffer(env->NewByteArray(kChunkSize));
+   while (ok)
+   {
+      jint bytesRead = env->CallIntMethod(stream.get(), read, javaBuffer.get());
+      if (access.CheckException())
+      {
+         ok = false;
+         break;
+      }
+      if (bytesRead < 0) //end of the stream
+         break;
+      env->GetByteArrayRegion(javaBuffer.get(), 0, bytesRead, buffer.get());
+      ok = output.write(buffer.get(), (size_t)bytesRead);
+   }
+
+   env->CallVoidMethod(stream.get(), close);
+   access.CheckException();
+
+   output.flush();
+   if (!output.getStatus().wasOk())
+      return output.getStatus();
+   return ok ? juce::Result::ok() : juce::Result::fail("couldn't read " + document.toString(false));
+}
+
+juce::Result AndroidSupport::WriteToDocument(const juce::URL& document, const juce::File& source)
+{
+   juce::FileInputStream input(source);
+   if (!input.openedOk())
+      return input.getStatus();
+
+   ContentAccess access(document);
+   if (!access.IsValid())
+      return juce::Result::fail("no content resolver");
+   auto* env = access.env;
+   auto checkException = [&access]()
+   {
+      return access.CheckException();
+   };
+
+   //opened with ContentResolver.openOutputStream(uri, "wt") rather than JUCE's URL::createOutputStream(), which uses
+   //mode "w": some document providers don't truncate in that mode, which would leave the end of a longer previous
+   //version of the file in place
+   juce::LocalRef<jclass> resolverClass(env->GetObjectClass(access.resolver.get()));
+   jmethodID openOutputStream = env->GetMethodID(resolverClass.get(), "openOutputStream", "(Landroid/net/Uri;Ljava/lang/String;)Ljava/io/OutputStream;");
+   juce::LocalRef<jobject> stream(env->CallObjectMethod(access.resolver.get(), openOutputStream, access.uri.get(), juce::javaString("wt").get()));
+   if (checkException() || stream.get() == nullptr)
+      return juce::Result::fail("couldn't open the document for writing");
+
+   juce::LocalRef<jclass> streamClass(env->GetObjectClass(stream.get()));
+   jmethodID write = env->GetMethodID(streamClass.get(), "write", "([BII)V");
+   jmethodID close = env->GetMethodID(streamClass.get(), "close", "()V");
+
+   constexpr int kChunkSize = 65536;
+   juce::HeapBlock<char> buffer(kChunkSize);
+   juce::LocalRef<jbyteArray> javaBuffer(env->NewByteArray(kChunkSize));
+   bool ok = true;
+   while (ok && !input.isExhausted())
+   {
+      int bytesRead = input.read(buffer.get(), kChunkSize);
+      if (bytesRead <= 0)
+         break;
+      env->SetByteArrayRegion(javaBuffer.get(), 0, bytesRead, reinterpret_cast<const jbyte*>(buffer.get()));
+      env->CallVoidMethod(stream.get(), write, javaBuffer.get(), 0, bytesRead);
+      ok = !checkException();
+   }
+
+   env->CallVoidMethod(stream.get(), close); //flushes, so this can fail too
+   ok = !checkException() && ok;
+
+   return ok ? juce::Result::ok() : juce::Result::fail("couldn't write to the document");
+}
+
+namespace
+{
+   //loads one of bespoke's java classes (com.ryanchallinor.bespokesynth.*). app classes have to be loaded through the
+   //app's class loader, since JNI's FindClass only sees system classes on threads that java didn't start
+   jclass GetAppClass(JNIEnv* env, jobject context, const char* className)
+   {
+      juce::LocalRef<jclass> contextClass(env->GetObjectClass(context));
+      jmethodID getClassLoader = env->GetMethodID(contextClass.get(), "getClassLoader", "()Ljava/lang/ClassLoader;");
+      juce::LocalRef<jobject> classLoader(env->CallObjectMethod(context, getClassLoader));
+      juce::LocalRef<jclass> classLoaderClass(env->GetObjectClass(classLoader.get()));
+      jmethodID loadClass = env->GetMethodID(classLoaderClass.get(), "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+      auto appClass = (jclass)env->CallObjectMethod(classLoader.get(), loadClass, juce::javaString(className).get());
+      if (env->ExceptionCheck())
+      {
+         env->ExceptionClear();
+         return nullptr;
+      }
+      return appClass;
+   }
+
+   void CallAudioService(const char* methodName)
+   {
+      auto* env = juce::getEnv();
+      auto context = juce::getAppContext();
+      if (env == nullptr || context.get() == nullptr)
+         return;
+
+      juce::LocalRef<jclass> serviceClass(GetAppClass(env, context.get(), "com.ryanchallinor.bespokesynth.BespokeAudioService"));
+      if (serviceClass.get() == nullptr)
+      {
+         AndroidSupport::Log("couldn't load BespokeAudioService");
+         return;
+      }
+
+      jmethodID method = env->GetStaticMethodID(serviceClass.get(), methodName, "(Landroid/content/Context;)V");
+      env->CallStaticVoidMethod(serviceClass.get(), method, context.get());
+      if (env->ExceptionCheck())
+      {
+         env->ExceptionDescribe(); //goes to logcat
+         env->ExceptionClear();
+         AndroidSupport::Log((juce::String("BespokeAudioService.") + methodName + "() failed").toRawUTF8());
+      }
+   }
+}
+
+juce::URL AndroidSupport::TakeOpenedDocument()
+{
+   auto* env = juce::getEnv();
+   auto context = juce::getAppContext();
+   if (env == nullptr || context.get() == nullptr)
+      return {};
+
+   juce::LocalRef<jclass> activityClass(GetAppClass(env, context.get(), "com.ryanchallinor.bespokesynth.BespokeActivity"));
+   if (activityClass.get() == nullptr)
+      return {};
+
+   jmethodID take = env->GetStaticMethodID(activityClass.get(), "takeOpenedDocument", "()Ljava/lang/String;");
+   juce::LocalRef<jstring> document((jstring)env->CallStaticObjectMethod(activityClass.get(), take));
+   if (env->ExceptionCheck())
+   {
+      env->ExceptionClear();
+      return {};
+   }
+   if (document.get() == nullptr)
+      return {};
+   return juce::URL(juce::juceString(document.get()));
+}
+
+void AndroidSupport::StartAudioService()
+{
+   CallAudioService("start");
+}
+
+void AndroidSupport::StopAudioService()
+{
+   CallAudioService("stop");
+}
+
+namespace
+{
+   //the performance hint api is android 13+ (bespoke supports older versions), so it's looked up at runtime
+   struct PerformanceHintApi
+   {
+      void* (*getManager)() = nullptr;
+      void* (*createSession)(void* manager, const int32_t* threadIds, size_t size, int64_t targetNanos) = nullptr;
+      int (*updateTargetWorkDuration)(void* session, int64_t targetNanos) = nullptr;
+      int (*reportActualWorkDuration)(void* session, int64_t actualNanos) = nullptr;
+      void (*closeSession)(void* session) = nullptr;
+
+      bool IsAvailable() const { return getManager && createSession && updateTargetWorkDuration && reportActualWorkDuration && closeSession; }
+   };
+
+   const PerformanceHintApi& GetPerformanceHintApi()
+   {
+      static PerformanceHintApi sApi = []
+      {
+         PerformanceHintApi api;
+         if (void* lib = dlopen("libandroid.so", RTLD_NOW | RTLD_NODELETE))
+         {
+            api.getManager = (decltype(api.getManager))dlsym(lib, "APerformanceHint_getManager");
+            api.createSession = (decltype(api.createSession))dlsym(lib, "APerformanceHint_createSession");
+            api.updateTargetWorkDuration = (decltype(api.updateTargetWorkDuration))dlsym(lib, "APerformanceHint_updateTargetWorkDuration");
+            api.reportActualWorkDuration = (decltype(api.reportActualWorkDuration))dlsym(lib, "APerformanceHint_reportActualWorkDuration");
+            api.closeSession = (decltype(api.closeSession))dlsym(lib, "APerformanceHint_closeSession");
+         }
+         return api;
+      }();
+      return sApi;
+   }
+
+   int64_t GetMonotonicNanos()
+   {
+      timespec now;
+      clock_gettime(CLOCK_MONOTONIC, &now);
+      return (int64_t)now.tv_sec * 1000000000 + now.tv_nsec;
+   }
+}
+
+AndroidSupport::AudioThreadPerformanceHint::~AudioThreadPerformanceHint()
+{
+   CloseSession();
+}
+
+void AndroidSupport::AudioThreadPerformanceHint::BeginCallback(int numSamples, double sampleRate)
+{
+   mCallbackStartNanos = GetMonotonicNanos();
+
+   const auto& api = GetPerformanceHintApi();
+   if (!api.IsAvailable() || numSamples <= 0 || sampleRate <= 0)
+      return;
+
+   const int64_t targetNanos = (int64_t)(numSamples * 1e9 / sampleRate);
+   const int threadId = gettid();
+   if (threadId != mThreadId) //first callback, or the audio device was restarted on a new thread
+   {
+      //this is a call to the system, which is slow for an audio callback, but only happens once per thread (the
+      //same as what oboe does when its own version of this is turned on)
+      CloseSession();
+      mThreadId = threadId;
+      if (void* manager = api.getManager())
+      {
+         int32_t threadIds[] = { threadId };
+         mSession = api.createSession(manager, threadIds, 1, targetNanos);
+      }
+      mTargetNanos = targetNanos;
+   }
+   else if (mSession != nullptr && targetNanos != mTargetNanos)
+   {
+      api.updateTargetWorkDuration(mSession, targetNanos);
+      mTargetNanos = targetNanos;
+   }
+}
+
+void AndroidSupport::AudioThreadPerformanceHint::EndCallback()
+{
+   if (mSession != nullptr)
+      GetPerformanceHintApi().reportActualWorkDuration(mSession, std::max<int64_t>(1, GetMonotonicNanos() - mCallbackStartNanos));
+}
+
+void AndroidSupport::AudioThreadPerformanceHint::CloseSession()
+{
+   if (mSession != nullptr)
+      GetPerformanceHintApi().closeSession(mSession);
+   mSession = nullptr;
+}
+
+int BespokeAndroidUsbOpen(int vendorId, int productId, char* error, int errorSize)
+{
+   auto setError = [error, errorSize](const char* message)
+   {
+      if (error != nullptr && errorSize > 0)
+         snprintf(error, errorSize, "%s", message);
+   };
+
+   auto* env = juce::getEnv();
+   auto context = juce::getAppContext();
+   if (env == nullptr || context.get() == nullptr)
+   {
+      setError("no android context");
+      return -1;
+   }
+
+   juce::LocalRef<jclass> usbClass(GetAppClass(env, context.get(), "com.ryanchallinor.bespokesynth.BespokeUsb"));
+   if (usbClass.get() == nullptr)
+   {
+      setError("couldn't load BespokeUsb");
+      return -1;
+   }
+
+   jmethodID open = env->GetStaticMethodID(usbClass.get(), "open", "(Landroid/content/Context;II)I");
+   int result = env->CallStaticIntMethod(usbClass.get(), open, context.get(), vendorId, productId);
+   if (env->ExceptionCheck())
+   {
+      env->ExceptionClear();
+      setError("usb error");
+      return -1;
+   }
+
+   if (result >= 0)
+      return result;
+
+   //see the error codes in BespokeUsb.java
+   switch (result)
+   {
+      case -1: setError("device not found"); break;
+      case -2: setError("waiting for usb permission"); break;
+      case -3: setError("usb access denied, reconnect to ask again"); break;
+      case -4: setError("couldn't open usb device"); break;
+      default: setError("usb error"); break;
+   }
+   return -1;
+}

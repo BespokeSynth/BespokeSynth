@@ -3,11 +3,16 @@ cmake_policy(SET CMP0091 NEW)
 
 # Global build parameters. Optional features are configurable via additional
 # BESPOKE_* variables defined in their respective subdirs.
+set(BESPOKE_IOS FALSE)
+set(BESPOKE_ANDROID FALSE)
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     set(BESPOKE_IOS TRUE)
     set(BESPOKE_DESKTOP FALSE)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
+    # configured by gradle (scripts/android), not directly
+    set(BESPOKE_ANDROID TRUE)
+    set(BESPOKE_DESKTOP FALSE)
 else()
-    set(BESPOKE_IOS FALSE)
     set(BESPOKE_DESKTOP TRUE)
 endif()
 

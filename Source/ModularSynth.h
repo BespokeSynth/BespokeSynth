@@ -506,6 +506,7 @@ private:
    std::unique_ptr<juce::KnownPluginList> mKnownPluginList;
 
    NVGLUframebuffer* mScreenshotFrameBuffer{ nullptr };
+   int mScreenshotFrameBufferContextGeneration{ -1 }; //see gNanoVGContextGeneration
    unsigned char* mScreenshotPixels{ nullptr };
 
    ofxJSONElement mWorkspaceData;

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- usb devices bespoke talks to directly (rather than over midi): the Ableton Move and Push 2 displays.
+     when one is plugged in, android offers to open bespoke for it, which also grants access to it -->
+<resources>
+    <usb-device vendor-id="10626" product-id="6488" /> <!-- Ableton Move (0x2982, 0x1958) -->
+    <usb-device vendor-id="10626" product-id="6503" /> <!-- Ableton Push 2 (0x2982, 0x1967) -->
+</resources>

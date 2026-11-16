@@ -28,6 +28,9 @@
 #ifdef BESPOKE_WINDOWS
 #include <windows.h>
 #endif
+#if BESPOKE_ANDROID
+#include "AndroidSupport.h"
+#endif
 
 #include "UserPrefs.h"
 #include "juce_opengl/juce_opengl.h"
@@ -89,7 +92,12 @@ std::string ofToDataPath(const std::string& path)
 
    static const auto sDataDir = []
    {
+#if BESPOKE_ANDROID
+      //userDocumentsDirectory is the shared Documents folder on android, which apps can't write to without extra permissions
+      auto defaultDataDir = AndroidSupport::GetDataDir().getFullPathName().toStdString();
+#else
       auto defaultDataDir = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
+#endif
       auto dataDir = juce::SystemStats::getEnvironmentVariable("BESPOKE_DATA_DIR", defaultDataDir).toStdString();
 #if BESPOKE_WINDOWS
       std::replace(begin(dataDir), end(dataDir), '\\', '/');
@@ -109,6 +117,8 @@ std::string ofToFactoryPath(const std::string& subdir)
    auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getChildFile("Contents/Resources").getChildFile(subdir);
 #elif BESPOKE_IOS
    auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getChildFile(subdir);
+#elif BESPOKE_ANDROID
+   auto resDir = AndroidSupport::GetFactoryDir().getChildFile(subdir);
 #else
    auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentExecutableFile).getSiblingFile(subdir);
 #if BESPOKE_LINUX
@@ -219,8 +229,12 @@ void ofSetColor(float r, float g, float b, float a)
       return;
    }
    static int sImage = -1;
-   if (sImage == -1)
+   static int sImageContextGeneration = -1;
+   if (sImage == -1 || sImageContextGeneration != gNanoVGContextGeneration)
+   {
+      sImageContextGeneration = gNanoVGContextGeneration;
       sImage = nvgCreateImage(gNanoVG, ofToResourcePath("noise.jpg").c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+   }
    NVGpaint pattern = nvgImagePattern(gNanoVG, ofRandom(0, 10), ofRandom(0, 10), 300 / gDrawScale / TheSynth->GetPixelRatio(), 300 / gDrawScale / TheSynth->GetPixelRatio(), ofRandom(0, 10), sImage, a);
    pattern.innerColor = nvgRGBA(r, g, b, a);
    pattern.outerColor = nvgRGBA(r, g, b, a);
@@ -865,6 +879,9 @@ float RetinaTrueTypeFont::GetStringWidth(std::string str, float size)
       handle = mFontBoundsHandle;
    }
 
+   if (vg == nullptr) //the GL context is gone for now (see MainContentComponent::shutdown())
+      return str.size() * 12;
+
    nvgFontFaceId(vg, handle);
    nvgFontSize(vg, size);
    float bounds[4];
@@ -890,6 +907,9 @@ float RetinaTrueTypeFont::GetStringHeight(std::string str, float size)
       vg = gNanoVGRenderContexts[(int)NanoVGRenderContext::FontBounds];
       handle = mFontBoundsHandle;
    }
+
+   if (vg == nullptr) //the GL context is gone for now (see MainContentComponent::shutdown())
+      return size;
 
    nvgFontFaceId(vg, handle);
    nvgFontSize(vg, size);

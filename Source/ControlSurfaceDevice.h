@@ -143,6 +143,7 @@ public:
    bool IsPresent() const; //are this device's midi ports available?
    bool Connect(MidiDevice& device, std::string& statusMessage);
    void Disconnect(MidiDevice& device);
+   void RetryDisplay(std::string& statusMessage); //if the display couldn't be opened when connecting, try again
 
    //layout
    virtual int GetNumMainEncoders() const { return 8; }

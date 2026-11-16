@@ -251,6 +251,10 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
 
    mGlobalRecordBuffer = new RollingBuffer(UserPrefs.record_buffer_length_minutes.Get() * 60 * gSampleRate);
    mGlobalRecordBuffer->SetNumChannels(2);
+   //channels are allocated (and zeroed) when they're first used, which would otherwise be in the first audio
+   //callback. at the default length that's hundreds of MB, so do it now, before the audio device starts
+   for (int ch = 0; ch < mGlobalRecordBuffer->GetRawBuffer()->NumActiveChannels(); ++ch)
+      mGlobalRecordBuffer->GetRawBuffer()->GetChannel(ch);
 
    juce::File(ofToDataPath("savestate")).createDirectory();
    juce::File(ofToDataPath("savestate/autosave")).createDirectory();
@@ -305,11 +309,13 @@ void ModularSynth::LoadResources()
       mFatalError = "couldn't load font from " + gFont.GetFontPath() + "\nmaybe bespoke can't find your resources directory?";
 }
 
+//adds buffers up to the given counts. this can be called again if the device opens more channels later (on android,
+//the input is opened once the user allows microphone access), but not while the audio callback is running
 void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
 {
-   for (int i = 0; i < inputChannelCount; ++i)
+   while ((int)mInputBuffers.size() < inputChannelCount)
       mInputBuffers.push_back(new float[gBufferSize]);
-   for (int i = 0; i < outputChannelCount; ++i)
+   while ((int)mOutputBuffers.size() < outputChannelCount)
       mOutputBuffers.push_back(new float[gBufferSize]);
 }
 
@@ -789,7 +795,7 @@ void ModularSynth::Draw()
       tooltipContainer = &mModuleContainer;
    }
    else if (HelpDisplay::sShowTooltips &&
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
             mShowTouchTooltips &&
 #endif
             !mHideTooltipsUntilMouseMove &&
@@ -980,12 +986,21 @@ void ModularSynth::PostRender()
 
    if (mQueuedSaveStateInfo.mQueued && mQueuedSaveStateInfo.mWaitingForScreenshot)
    {
+      if (mScreenshotFrameBuffer != nullptr && mScreenshotFrameBufferContextGeneration != gNanoVGContextGeneration)
+      {
+         //its GL objects went away with the old context, so just free the struct
+         free(mScreenshotFrameBuffer);
+         mScreenshotFrameBuffer = nullptr;
+      }
+
       if (mScreenshotFrameBuffer == nullptr)
       {
          mScreenshotFrameBuffer = nvgluCreateFramebuffer(gNanoVGRenderContexts[(int)NanoVGRenderContext::Screenshot], WelcomeScreen::kScreenshotWidth, WelcomeScreen::kScreenshotHeight, 0);
          assert(mScreenshotFrameBuffer);
+         mScreenshotFrameBufferContextGeneration = gNanoVGContextGeneration;
 
-         mScreenshotPixels = new unsigned char[WelcomeScreen::kScreenshotWidth * WelcomeScreen::kScreenshotHeight * 3];
+         if (mScreenshotPixels == nullptr)
+            mScreenshotPixels = new unsigned char[WelcomeScreen::kScreenshotWidth * WelcomeScreen::kScreenshotHeight * 3];
       }
 
       if (mScreenshotFrameBuffer != nullptr)
@@ -1156,7 +1171,7 @@ void ModularSynth::Exit()
 
 void ModularSynth::Focus()
 {
-#if !BESPOKE_IOS //iOS shows a permission prompt when an app reads the clipboard, so there it waits for an actual paste
+#if !BESPOKE_MOBILE //iOS shows a permission prompt when an app reads the clipboard, so there it waits for an actual paste
    ReadClipboardTextFromSystem();
 #endif
 }
@@ -3257,11 +3272,11 @@ void ModularSynth::SaveLayout(const SaveTarget& target, bool makeDefaultLayout /
 
 void ModularSynth::SaveLayoutAsPopup()
 {
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-
-   FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", isNativeFileChooser, false, GetFileChooserParent());
-   if (chooser.browseForFileToSave(true))
+   auto onChosen = [this](const juce::FileChooser& chooser)
+   {
       SaveLayout(SaveTarget(chooser));
+   };
+   BrowseForFileToSave("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", onChosen);
 }
 
 void ModularSynth::SaveCurrentState()
@@ -3303,11 +3318,11 @@ void ModularSynth::SaveStatePopup()
       ++counter;
    } while (targetFile.existsAsFile());
 
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-
-   FileChooser chooser("Save current state as...", targetFile, "*.bsk", isNativeFileChooser, false, GetFileChooserParent());
-   if (chooser.browseForFileToSave(true))
+   auto onChosen = [this](const juce::FileChooser& chooser)
+   {
       SaveState(SaveTarget(chooser), false);
+   };
+   BrowseForFileToSave("Save current state as...", targetFile, "*.bsk", onChosen);
 }
 
 void ModularSynth::LoadStatePopup()
@@ -3323,11 +3338,11 @@ void ModularSynth::LoadStatePopupImp()
    else
       defaultDirectoryOrFile = ofToDataPath("savestate/");
 
-   bool isNativeFileChooser = !UserPrefs.force_juce_file_chooser.Get();
-
-   FileChooser chooser("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", isNativeFileChooser, false, GetFileChooserParent());
-   if (chooser.browseForFileToOpen())
+   auto onChosen = [this](const juce::FileChooser& chooser)
+   {
       LoadState(SaveTarget(chooser));
+   };
+   BrowseForFileToOpen("Load state", File(defaultDirectoryOrFile), "*.bsk;*.bskt", onChosen);
 }
 
 void ModularSynth::SaveState(std::string file, bool autosave)
@@ -4027,7 +4042,7 @@ void ModularSynth::SaveOutput()
 
 const String& ModularSynth::GetTextFromClipboard()
 {
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
    ReadClipboardTextFromSystem();
 #endif
    return TheClipboard;

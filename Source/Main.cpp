@@ -19,6 +19,9 @@
 #include "IOSDocuments.h"
 #include "IOSDiagnostics.h"
 #endif
+#if BESPOKE_ANDROID
+#include "AndroidSupport.h"
+#endif
 
 #if BESPOKE_WINDOWS
 #include <dwmapi.h>
@@ -126,6 +129,9 @@ public:
                                           OpenDocumentFromOtherApp(file);
                                        });
 #endif
+#if BESPOKE_ANDROID
+      mOpenedDocumentChecker.startTimer(500);
+#endif
 
 #if BESPOKE_WINDOWS
       HWND hwnd = (HWND)this->mainWindow.get()->getWindowHandle();
@@ -136,12 +142,15 @@ public:
 #endif
    }
 
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
    //files opened from other apps may only be readable temporarily, so copy them into our savestate folder, then open the copy
    static void OpenDocumentFromOtherApp(const juce::File& source)
    {
       if (!source.hasFileExtension(".bsk") || TheSynth == nullptr)
+      {
+         ofLog() << "can't open " << source.getFileName() << ", bespoke can only open .bsk files";
          return;
+      }
 
       juce::File savestateDir(ofToDataPath("savestate"));
       juce::File dest = source;
@@ -154,10 +163,12 @@ public:
          if (!dest.existsAsFile() && !source.copyFileTo(dest))
             return;
 
+#if BESPOKE_IOS
          //iOS puts some opened files in Documents/Inbox for us to take, so clean those up
          juce::File inbox = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("Inbox");
          if (source.isAChildOf(inbox))
             source.deleteFile();
+#endif
       }
 
       TheSynth->OpenSaveStateFile(dest.getFullPathName().toStdString());
@@ -175,6 +186,9 @@ public:
    void shutdown() override
    {
       // Add your application's shutdown code here..
+#if BESPOKE_ANDROID
+      mOpenedDocumentChecker.stopTimer();
+#endif
       mainWindow.reset();
       appProperties.reset();
    }
@@ -213,7 +227,7 @@ public:
       {
          setUsingNativeTitleBar(true);
          setContentOwned(createMainContentComponent(), true);
-#if BESPOKE_IOS
+#if BESPOKE_MOBILE
          setFullScreen(true);
 #else
          setResizable(true, true);
@@ -243,6 +257,49 @@ public:
    };
 
 private:
+#if BESPOKE_ANDROID
+   //other apps open documents with bespoke through BespokeActivity.java, which holds on to them until this collects them
+   struct OpenedDocumentChecker : public juce::Timer
+   {
+      void timerCallback() override
+      {
+         if (TheSynth == nullptr)
+            return; //leave it waiting until there's a synth to open it in
+
+         juce::URL document = AndroidSupport::TakeOpenedDocument();
+         if (document.isEmpty())
+            return;
+
+         //content:// documents can only be read while bespoke has the permission that came with them, so copy it now
+         auto result = AndroidSupport::CopyDocumentToMirror(document);
+         if (result.failed())
+         {
+            ofLog() << "couldn't open document: " << result.getErrorMessage();
+            return;
+         }
+         OpenDocumentFromOtherApp(WithBskExtension(AndroidSupport::GetDocumentMirror(document)));
+      }
+
+      //the user chose to open this with bespoke, so treat it as a .bsk even if its name doesn't say so. android's
+      //downloads name duplicates like "song.bsk (1)", which becomes "song (1).bsk"
+      static juce::File WithBskExtension(const juce::File& file)
+      {
+         juce::String name = file.getFileName();
+         if (name.endsWithIgnoreCase(".bsk"))
+            return file;
+
+         if (name.containsIgnoreCase(".bsk"))
+            name = name.upToLastOccurrenceOf(".bsk", false, true) + name.fromLastOccurrenceOf(".bsk", false, true) + ".bsk";
+         else
+            name += ".bsk";
+
+         juce::File renamed = file.getSiblingFile(juce::File::createLegalFileName(name));
+         return file.moveFileTo(renamed) ? renamed : file;
+      }
+   };
+   OpenedDocumentChecker mOpenedDocumentChecker;
+#endif
+
    std::unique_ptr<MainWindow> mainWindow;
    std::unique_ptr<PluginScannerSubprocess> storedScannerSubprocess;
 };

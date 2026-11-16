@@ -35,6 +35,12 @@
 
 #include "libusb.h"
 
+#ifdef __ANDROID__
+// android apps can't list usb devices, so bespoke's java side opens the device through android's usb api, asking the
+// user for permission, and libusb is given the file descriptor (see BespokeAndroidUsbOpen in Source/AndroidSupport.cpp)
+extern "C" int BespokeAndroidUsbOpen(int vendorId, int productId, char* error, int errorSize);
+#endif
+
 //------------------------------------------------------------------------------
 
 namespace
@@ -51,6 +57,10 @@ namespace
 
     int errorCode;
 
+#ifdef __ANDROID__
+    libusb_set_option(NULL, LIBUSB_OPTION_NO_DEVICE_DISCOVERY); // must be set before libusb_init()
+#endif
+
     // Initialises the library
     if ((errorCode = libusb_init(NULL)) < 0)
     {
@@ -61,6 +71,25 @@ namespace
     libusb_set_option(NULL, LIBUSB_OPTION_LOG_LEVEL, LIBUSB_LOG_LEVEL_ERROR);
 #else
     libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_ERROR);
+#endif
+
+#ifdef __ANDROID__
+    char androidError[256] = "";
+    int fd = BespokeAndroidUsbOpen(0x2982, 0x1958, androidError, sizeof(androidError));
+    if (fd < 0)
+      return Result(androidError);
+
+    libusb_device_handle* androidHandle = NULL;
+    if ((errorCode = libusb_wrap_sys_device(NULL, (intptr_t)fd, &androidHandle)) < 0)
+      return Result(std::string("could not open device, error: ") + libusb_error_name(errorCode));
+    if ((errorCode = libusb_claim_interface(androidHandle, 0)) < 0)
+    {
+      libusb_close(androidHandle);
+      return Result(std::string("could not claim device with interface 0, error: ") + libusb_error_name(errorCode));
+    }
+
+    *pHandle = androidHandle;
+    return Result::NoError;
 #endif
 
     // Get a list of connected devices

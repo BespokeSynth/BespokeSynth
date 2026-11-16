@@ -22,7 +22,6 @@
 
 #include "push2/Result.h"
 #include "push2/Push2-Bitmap.h"
-#include "push2/JuceToPush2DisplayBridge.h"
 
 #include <thread>
 #include <assert.h>
@@ -77,7 +76,7 @@ namespace ableton
      *  \return the result of the initialisation
      */
 
-    NBase::Result Init(const pixel_t* dataSource, DeviceType deviceType);
+    NBase::Result Init(const pixel_t* dataSource);
 
     /*!
      *  Callback for when a transfer is finished and the next one needs to be

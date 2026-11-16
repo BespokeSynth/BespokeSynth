@@ -38,22 +38,19 @@ Push2DisplayBridge::~Push2DisplayBridge() = default;
 
 //------------------------------------------------------------------------------
 
-NBase::Result Push2DisplayBridge::Init(DeviceType deviceType)
+NBase::Result Push2DisplayBridge::Init()
 {
    std::unique_ptr<Push2Display> display{Push2Display::create()};
    if (!display)
-   {
-     if (deviceType == DeviceType::Move)
-        return {"no LCD support"};
-     return {"no push 2 support"};
-   }
-
-   auto result{display->Init(deviceType)};
+     return {"no LCD support"}; // display support isn't compiled in (BESPOKE_PUSH2_SUPPORT)
+   auto result{display->Init()};
    if (result.Failed())
    {
-      if (deviceType == DeviceType::Move)
-         return {"no move found"};
-      return {"no push 2 found"};
+#ifdef __ANDROID__
+     return result; // says why, eg that it's waiting for the user to allow usb access
+#else
+     return {"no push 2 found"};
+#endif
    }
    push2Display_ = std::move(display);
    return result;

@@ -123,6 +123,9 @@ std::vector<std::string> AbletonPush2Surface::GetInputPortNames() const
 {
 #if JUCE_WINDOWS
    return { "Ableton Push 2" };
+#elif JUCE_ANDROID
+   //android names every port after the device, and JUCE numbers the duplicates in port order. the live port is first
+   return { "Ableton AG Ableton Push 2" };
 #else
    return { "Ableton Push 2 Live Port" };
 #endif
@@ -137,7 +140,7 @@ bool AbletonPush2Surface::InitDisplay(std::string& errorMessage)
 {
    if (!sPush2Bridge.IsInitialized())
    {
-      if (auto result = sPush2Bridge.Init(ableton::DeviceType::Push2); result.Failed())
+      if (auto result = sPush2Bridge.Init(); result.Failed())
       {
          errorMessage = result.GetDescription();
          return false;

@@ -332,7 +332,7 @@ bool Push2Control::Initialize()
 {
    if (!ThePushBridge.IsInitialized())
    {
-      if (auto result = ThePushBridge.Init(ableton::DeviceType::Push2); result.Failed())
+      if (auto result = ThePushBridge.Init(); result.Failed())
       {
          mPushBridgeInitErrMsg = result.GetDescription();
          ofLog() << mPushBridgeInitErrMsg;

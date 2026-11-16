@@ -1,3 +1,5 @@
+# before abletonmove and push2, which use it
+add_subdirectory(libusb EXCLUDE_FROM_ALL)
 add_subdirectory(abletonmove EXCLUDE_FROM_ALL)
 add_subdirectory(exprtk EXCLUDE_FROM_ALL)
 add_subdirectory(freeverb EXCLUDE_FROM_ALL)

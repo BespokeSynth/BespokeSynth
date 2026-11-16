@@ -219,6 +219,14 @@ void WelcomeScreen::DrawModule()
 
    DrawTextBold("recent files:", kSaveStateButtonStartX, kSaveStateButtonStartY);
 
+   if (mScreenshotContextGeneration != gNanoVGContextGeneration)
+   {
+      //the screenshots belonged to the old nanovg context
+      mScreenshotContextGeneration = gNanoVGContextGeneration;
+      for (auto& recentFile : mRecentFiles)
+         recentFile.mScreenshotImageHandle = -1;
+   }
+
    for (int i = 0; i < (int)mRecentFiles.size(); ++i)
    {
       if (mRecentFiles[i].mButton == nullptr)

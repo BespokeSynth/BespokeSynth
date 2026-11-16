@@ -258,6 +258,23 @@ bool ControlSurfaceDevice::Connect(MidiDevice& device, std::string& statusMessag
    return true;
 }
 
+void ControlSurfaceDevice::RetryDisplay(std::string& statusMessage)
+{
+   if (!HasDisplay() || IsDisplayConnected())
+      return;
+
+   std::string displayError;
+   if (InitDisplay(displayError))
+   {
+      statusMessage = "";
+      ofLog() << GetName() << " display connected";
+   }
+   else
+   {
+      statusMessage = displayError;
+   }
+}
+
 void ControlSurfaceDevice::Disconnect(MidiDevice& device)
 {
    OnDisconnecting(device);
@@ -325,6 +342,9 @@ std::vector<std::string> AbletonMoveSurface::GetInputPortNames() const
 {
 #if JUCE_WINDOWS
    return { "Ableton Move MIDI" };
+#elif JUCE_ANDROID
+   //android names every port after the device, and JUCE numbers the duplicates in port order. the live port is first
+   return { "Ableton Ableton Move" };
 #else
    return { "Ableton Move Live Port" };
 #endif
@@ -447,12 +467,21 @@ int NovationLaunchControl3Surface::GetGridStartIndex() const
 
 std::vector<std::string> NovationLaunchControl3Surface::GetInputPortNames() const
 {
+#if JUCE_ANDROID
+   //android names every port after the device, and JUCE numbers the duplicates in port order. the daw port is second
+   return { "Focusrite - Novation LC3 1-2" };
+#else
    return { "LC3 1 DAW Out" };
+#endif
 }
 
 std::vector<std::string> NovationLaunchControl3Surface::GetOutputPortNames() const
 {
+#if JUCE_ANDROID
+   return { "Focusrite - Novation LC3 1-2" };
+#else
    return { "LC3 1 DAW In" };
+#endif
 }
 
 void NovationLaunchControl3Surface::OnConnected(MidiDevice& device)
