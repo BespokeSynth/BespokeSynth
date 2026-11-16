@@ -49,6 +49,9 @@ namespace
 {
    const std::string kManagePluginsLabel = "manage plugins...";
    const std::string kPluginsDropdownLabel = "plugins:";
+   constexpr float kResizeHandleWidth = 100;
+   constexpr float kResizeHandleHeight = 13;
+   constexpr float kResizeHandleMarginY = 5;
 }
 
 SpawnList::SpawnList(IDropdownListener* owner, int x, int y, std::string label, ModuleCategory moduleCategory, bool showDecorators)
@@ -299,8 +302,24 @@ void TitleBar::OnClicked(float x, float y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
 
+   if (right)
+      return;
+
    if (mLeftCornerHovered)
       TheSynth->GetLocationZoomer()->EnterVanityPanningMode();
+
+   float w, h;
+   GetModuleDimensions(w, h);
+   if (x > w - GetSideMargin() - kResizeHandleWidth && y > h - kResizeHandleHeight)
+   {
+      mIsDraggingSize = true;
+      mDragEdgeYOffset = h - y;
+   }
+}
+
+void TitleBar::MouseReleased()
+{
+   mIsDraggingSize = false;
 }
 
 bool TitleBar::MouseMoved(float x, float y)
@@ -311,6 +330,17 @@ bool TitleBar::MouseMoved(float x, float y)
       mLeftCornerHovered = true;
    else
       mLeftCornerHovered = false;
+
+   if (mIsDraggingSize)
+   {
+      if (mSpecifiedHeight == -1)
+         mSpecifiedHeight = GetFullHeight();
+
+      mSpecifiedHeight = y + mDragEdgeYOffset;
+
+      if (mSpecifiedHeight > GetFullHeight()) //maxed out
+         mSpecifiedHeight = -1;
+   }
 
    return false;
 }
@@ -334,28 +364,29 @@ float TitleBar::GetSideMargin() const
 
 void TitleBar::DrawModule()
 {
-   if (HiddenByZoom())
-      return;
-
    ofSetColor(255, 255, 255);
 
    const float margin = GetSideMargin();
+   bool hideElements = mSpecifiedHeight >= 0 && mSpecifiedHeight < 29;
 
-   ofPushStyle();
-   if (gHoveredModule == this && mLeftCornerHovered)
-      ofSetColor(ofColor::lerp(ofColor::black, ofColor::white, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, .7f, .9f)));
-   DrawTextBold("bespoke", 2 + margin, 28, 34);
+   if (!hideElements)
+   {
+      ofPushStyle();
+      if (gHoveredModule == this && mLeftCornerHovered)
+         ofSetColor(ofColor::lerp(ofColor::black, ofColor::white, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, .7f, .9f)));
+      DrawTextBold("bespoke", 2 + margin, 28, 34);
 #if BESPOKE_NIGHTLY && !BESPOKE_SUPPRESS_NIGHTLY_LABEL
-   DrawTextNormal("nightly", 90 + margin, 35, 8);
+      DrawTextNormal("nightly", 90 + margin, 35, 8);
 #endif
 #if DEBUG
-   ofFill();
-   ofSetColor(0, 0, 0, 180);
-   ofRect(13 + margin, 12, 90, 17);
-   ofSetColor(255, 0, 0);
-   DrawTextBold("debug build", 17 + margin, 25, 17);
+      ofFill();
+      ofSetColor(0, 0, 0, 180);
+      ofRect(13 + margin, 12, 90, 17);
+      ofSetColor(255, 0, 0);
+      DrawTextBold("debug build", 17 + margin, 25, 17);
 #endif
-   ofPopStyle();
+      ofPopStyle();
+   }
 
    std::string info;
    if (TheSynth->GetMoveModule())
@@ -366,6 +397,12 @@ void TitleBar::DrawModule()
    float pixelWidth = GetPixelWidth() - margin; //the right edge to lay out against
 
    DrawTextRightJustify(info, pixelWidth - 140, 32);
+
+   mMenuButton->SetShowing(!hideElements);
+   mPlayPauseButton->SetShowing(!hideElements);
+   mDisplayHelpButton->SetShowing(!hideElements);
+   for (auto* spawnList : mSpawnLists.GetDropdowns())
+      spawnList->GetList()->SetShowing(!hideElements);
 
    mMenuButton->SetPosition(140 + margin, 1);
    mLoadLayoutDropdown->SetPosition(140 + margin, 20);
@@ -444,6 +481,17 @@ void TitleBar::DrawModule()
       mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPause);
    mPlayPauseButton->SetPosition(mDisplayHelpButton->GetPosition(true).x - mPlayPauseButton->GetRect().width - 5, 4);
    mPlayPauseButton->Draw();
+
+   if (mSpecifiedHeight != -1 || mNumDropdownRows >= 3)
+   {
+      ofPushStyle();
+      ofSetColor(ofColor::grey);
+      ofFill();
+      float w, h;
+      GetDimensions(w, h);
+      ofRect(w - kResizeHandleWidth, h - kResizeHandleHeight + kResizeHandleMarginY, kResizeHandleWidth - 10, kResizeHandleHeight - kResizeHandleMarginY * 2, kResizeHandleHeight - kResizeHandleMarginY * 2 - 1);
+      ofPopStyle();
+   }
 }
 
 void TitleBar::DrawModuleUnclipped()
@@ -473,9 +521,6 @@ void TitleBar::DrawModuleUnclipped()
       gFontBold.DrawString(mDisplayMessage, 48, x, y);
       ofPopStyle();
    }
-
-   if (HiddenByZoom())
-      return;
 
    if (int deviceRate = TheSynth->GetResamplingDeviceSampleRate(); deviceRate > 0)
    {
@@ -551,22 +596,18 @@ void TitleBar::DisplayTemporaryMessage(std::string message)
    mDisplayMessageTime = gTime;
 }
 
-bool TitleBar::HiddenByZoom() const
+float TitleBar::GetFullHeight() const
 {
-   return false; //ofGetWidth() / GetOwningContainer()->GetDrawScale() < 620;
+   return std::max(mNumDropdownRows, 2) * 18;
 }
 
 void TitleBar::GetModuleDimensions(float& width, float& height)
 {
-   if (HiddenByZoom())
-   {
-      width = 0;
-      height = 0;
-      return;
-   }
-
    width = ofGetWidth() / GetOwningContainer()->GetDrawScale() + 5;
-   height = std::max(mNumDropdownRows, 2) * 18;
+   if (mSpecifiedHeight > 0)
+      height = std::min(mSpecifiedHeight, GetFullHeight());
+   else
+      height = GetFullHeight();
 }
 
 void TitleBar::CheckboxUpdated(Checkbox* checkbox, double time)
