@@ -915,9 +915,11 @@ void VSTPlugin::Poll()
       }
    }
 
+   //only parameters with a slider need their value kept up to date. reading a value can be slow: for an AUv3 it's a
+   //blocking round trip to the plugin's process, so reading every parameter every frame starved the main thread
    for (auto& parameterSlider : mParameterSliders)
    {
-      if (parameterSlider.mParameter != nullptr) //null between unloading a plugin and the next one arriving
+      if (parameterSlider.mSlider != nullptr && parameterSlider.mParameter != nullptr) //null between unloading a plugin and the next one arriving
          *parameterSlider.mValue = parameterSlider.mParameter->getValue();
    }
 
@@ -2188,6 +2190,8 @@ void VSTPlugin::ParameterSlider::MakeSlider()
       sliderID = mDisplayName.c_str(); //old save files used unstable parameters names
    else
       sliderID = mID.c_str(); //now we use parameter IDs for more stability
+   if (mParameter != nullptr)
+      *mValue = mParameter->getValue();
    mSlider = new FloatSlider(mOwner, sliderID, -1, -1, 210, 15, mValue.get(), 0, 1);
    mSlider->SetOverrideDisplayName(mDisplayName);
    mRemoveButton = new ClickButton(mOwner, " X ", -1, -1);
