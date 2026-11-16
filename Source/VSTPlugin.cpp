@@ -444,6 +444,10 @@ void VSTPlugin::Exit()
    ++mLoadRequestId; //drop any creation still in flight
    mAliveToken.reset();
    DestroyEmbeddedView();
+#if BESPOKE_IOS
+   IOSAUParameterEvents::Destroy(mParameterEvents);
+   mParameterEvents = nullptr;
+#endif
    if (mWindow)
    {
       mWindow.reset();
@@ -597,6 +601,11 @@ void VSTPlugin::UnloadPlugin()
    if (mPlugin == nullptr)
       return; //nothing loaded. keep pending state and placeholder sliders, they're for the plugin about to be requested
 
+#if BESPOKE_IOS
+   IOSAUParameterEvents::Destroy(mParameterEvents); //before the AudioUnit goes away
+   mParameterEvents = nullptr;
+#endif
+
    std::unique_ptr<juce::AudioProcessor> oldPlugin;
    {
       std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
@@ -663,6 +672,38 @@ void VSTPlugin::OnPluginCreated(std::unique_ptr<juce::AudioPluginInstance> insta
    CreateParameterSliders();
    BindPendingSliders();
    ApplyPendingState();
+
+#if BESPOKE_IOS
+   //juce 7 only listens for AU parameter events on macOS. juce fixed that on develop in 4b8454a20c ("AU Host: Unify macOS
+   //and iOS parameter listener behaviour"), and with both listening every gesture arrives twice
+   //once we have juce's fix, we can delete this block, and delete IOSAUParameterEvents.mm
+   static_assert(JUCE_MAJOR_VERSION == 7, "check whether this juce listens for AU parameter events on iOS. if it does, delete IOSAUParameterEvents.mm");
+   if (mPluginFormatName == "audiounit")
+   {
+      //turn the AU's gesture events into juce's, as juce does itself on macOS, so audioProcessorParameterChangeGestureBegin() hears them
+      std::vector<unsigned int> paramIDs;
+      std::unordered_map<unsigned int, juce::AudioProcessorParameter*> paramsByID;
+      for (auto* parameter : mPlugin->getParameters())
+      {
+         if (auto* withID = dynamic_cast<juce::HostedAudioProcessorParameter*>(parameter))
+         {
+            const unsigned int paramID = (unsigned int)withID->getParameterID().getLargeIntValue();
+            paramIDs.push_back(paramID);
+            paramsByID[paramID] = parameter;
+         }
+      }
+      mParameterEvents = IOSAUParameterEvents::Create(static_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPlatformSpecificData(), paramIDs, [paramsByID](unsigned int paramID, IOSAUParameterEvents::EventType type)
+                                                      {
+                                                         auto it = paramsByID.find(paramID);
+                                                         if (it == paramsByID.end())
+                                                            return;
+                                                         if (type == IOSAUParameterEvents::EventType::BeginGesture)
+                                                            it->second->beginChangeGesture();
+                                                         else if (type == IOSAUParameterEvents::EventType::EndGesture)
+                                                            it->second->endChangeGesture();
+                                                      });
+   }
+#endif
 
    RefreshPresetFiles();
    RecreateUIOutputCables();

@@ -38,6 +38,7 @@
 #include "Checkbox.h"
 #if BESPOKE_IOS
 #include "IOSPluginViewHost.h"
+#include "IOSAUParameterEvents.h"
 #endif
 
 #include <atomic>
@@ -297,6 +298,7 @@ private:
    double mLastEmbedMoveTimeMs{ 0 };
 #if BESPOKE_IOS
    IOSPluginViewHost::Overlay* mEmbeddedView{ nullptr };
+   IOSAUParameterEvents::Listener* mParameterEvents{ nullptr }; //juce doesn't listen for AU parameter events on iOS, so we do
 #else
    std::unique_ptr<juce::Component> mEmbeddedHolder; //native view over the canvas that holds and clips the editor
    std::unique_ptr<juce::AudioProcessorEditor> mEmbeddedEditor;
