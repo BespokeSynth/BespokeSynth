@@ -343,17 +343,13 @@ public:
    void audioDeviceError(const String& errorMessage) override
    {
       ofLog() << "audioDeviceError(): " << errorMessage.toStdString();
+      mSynth.LogEvent("audio device error: " + errorMessage.toStdString(), kLogEventType_Error);
    }
 
    void audioDeviceStopped() override
    {
       ofLog() << "audioDeviceStopped()";
       mAudioDeviceConnectionState = AudioDeviceConnectionState::CheckForDisconnection;
-   }
-
-   void audioDeviceError(const String& errorMessage) override
-   {
-      mSynth.LogEvent("audio device error: " + errorMessage.toStdString(), kLogEventType_Error);
    }
 
    void shutdownAudio()
