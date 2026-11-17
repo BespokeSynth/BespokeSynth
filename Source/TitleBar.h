@@ -191,11 +191,12 @@ private:
    void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(float x, float y, bool right) override;
+   void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
-   bool HiddenByZoom() const;
    float GetPixelWidth() const;
    float GetSideMargin() const;
+   float GetFullHeight() const;
 
    ClickButton* mPlayPauseButton{ nullptr };
    ClickButton* mMenuButton{ nullptr };
@@ -210,6 +211,8 @@ private:
    SpawnListManager mSpawnLists;
 
    bool mLeftCornerHovered{ false };
+   bool mIsDraggingSize{ false };
+   float mDragEdgeYOffset{ 0.0f };
 
    std::unique_ptr<PluginListWindow> mPluginListWindow;
 
@@ -219,6 +222,7 @@ private:
    double mDisplayMessageTime;
 
    int mNumDropdownRows{ 2 };
+   float mSpecifiedHeight{ -1 };
 };
 
 extern TitleBar* TheTitleBar;
