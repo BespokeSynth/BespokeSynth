@@ -175,9 +175,12 @@ bool SaveTarget::CommitFrom(const juce::File& source) const
    return false;
 }
 
+//iOS permits modal loops, but a file chooser's modal loop runs inside the touch handler that opened it, and that touch's release never arrives
+#define BESPOKE_ASYNC_FILE_CHOOSER (!JUCE_MODAL_LOOPS_PERMITTED || BESPOKE_IOS)
+
 namespace
 {
-#if !JUCE_MODAL_LOOPS_PERMITTED
+#if BESPOKE_ASYNC_FILE_CHOOSER
    //only one chooser can be open at a time. it has to outlive launchAsync(), and is replaced by the next one
    std::unique_ptr<juce::FileChooser> sActiveChooser;
 #endif
@@ -187,7 +190,7 @@ namespace
       bool useNativeChooser = alwaysUseNativeChooser || !UserPrefs.force_juce_file_chooser.Get();
       auto chooser = std::make_unique<juce::FileChooser>(title, initialFileOrDirectory, filePatterns, useNativeChooser, false, TheSynth->GetFileChooserParent());
 
-#if JUCE_MODAL_LOOPS_PERMITTED
+#if !BESPOKE_ASYNC_FILE_CHOOSER
       if (save ? chooser->browseForFileToSave(true) : chooser->browseForFileToOpen())
          onChosen(*chooser);
 #else
