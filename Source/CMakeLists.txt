@@ -101,14 +101,25 @@ juce_add_gui_app(BespokeSynth
     )
 
 if(BESPOKE_IOS)
-    # replaces the empty file that juce generates. Ableton Link finds peers over multicast, which iOS blocks without
-    # this entitlement. Apple grants it per team, so it also has to be enabled on the App ID for signing to succeed.
-    # without it, everything else works, but link never sees any peers
+    # replaces the empty entitlements file that juce generates.
+    # inter-app-audio: without it, iOS hides third-party AUv3 extensions from the app (AudioComponentFindNext only returns
+    # apple's built-in units), so plugin hosting finds nothing useful.
+    # multicast: Ableton Link finds peers over multicast, which iOS blocks without this entitlement. Apple grants it per
+    # team, so it also has to be enabled on the App ID for signing to succeed. without it, everything else works, but link
+    # never sees any peers
+    set(BESPOKE_IOS_ENTITLEMENTS "")
+    if(BESPOKE_ENABLE_PLUGIN_HOSTING)
+        string(APPEND BESPOKE_IOS_ENTITLEMENTS "    <key>inter-app-audio</key>\n    <true/>\n")
+    endif()
     if(BESPOKE_IOS_LINK_MULTICAST)
-        set_target_properties(BespokeSynth PROPERTIES
-            XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_SOURCE_DIR}/scripts/ios/entitlements.plist")
+        string(APPEND BESPOKE_IOS_ENTITLEMENTS "    <key>com.apple.developer.networking.multicast</key>\n    <true/>\n")
         # lets the abletonlink module know peers can be found, so it doesn't show its warning
         target_compile_definitions(BespokeSynth PRIVATE BESPOKE_IOS_LINK_MULTICAST=1)
+    endif()
+    if(BESPOKE_IOS_ENTITLEMENTS)
+        configure_file("${CMAKE_SOURCE_DIR}/scripts/ios/entitlements.plist.in" "${CMAKE_CURRENT_BINARY_DIR}/BespokeSynth.entitlements" @ONLY)
+        set_target_properties(BespokeSynth PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/BespokeSynth.entitlements")
     endif()
 
     # App Store privacy manifest, copied to the bundle root by Xcode's resources phase
@@ -952,9 +963,9 @@ target_compile_definitions(BespokeSynth PRIVATE
     JUCE_WASAPI=1
     JUCE_DIRECTSOUND=1
 
-    JUCE_PLUGINHOST_VST3=$<BOOL:${BESPOKE_ENABLE_PLUGIN_HOSTING}>
-    JUCE_PLUGINHOST_VST=$<AND:$<BOOL:${BESPOKE_ENABLE_PLUGIN_HOSTING}>,$<BOOL:${BESPOKE_VST2_SDK_LOCATION}>>
-    JUCE_PLUGINHOST_LV2=$<BOOL:${BESPOKE_ENABLE_PLUGIN_HOSTING}>
+    JUCE_PLUGINHOST_VST3=$<BOOL:${BESPOKE_HOST_DESKTOP_PLUGIN_FORMATS}>
+    JUCE_PLUGINHOST_VST=$<AND:$<BOOL:${BESPOKE_HOST_DESKTOP_PLUGIN_FORMATS}>,$<BOOL:${BESPOKE_VST2_SDK_LOCATION}>>
+    JUCE_PLUGINHOST_LV2=$<BOOL:${BESPOKE_HOST_DESKTOP_PLUGIN_FORMATS}>
     JUCE_PLUGINHOST_LADSPA=0
 
     JUCE_CATCH_UNHANDLED_EXCEPTIONS=0
@@ -968,7 +979,7 @@ if (BESPOKE_IOS)
         BESPOKE_IOS=1
         BESPOKE_MOBILE=1 # phone/tablet behavior shared with android: touch navigation, full screen window, etc
         )
-    target_sources(BespokeSynth PRIVATE IOSAudioSession.h IOSAudioSession.mm IOSDocuments.h IOSDocuments.mm IOSDiagnostics.h IOSDiagnostics.mm IOSPointerInput.h IOSPointerInput.mm)
+    target_sources(BespokeSynth PRIVATE IOSAudioSession.h IOSAudioSession.mm IOSDocuments.h IOSDocuments.mm IOSDiagnostics.h IOSDiagnostics.mm IOSPointerInput.h IOSPointerInput.mm IOSPluginViewHost.h IOSPluginViewHost.mm IOSAUParameterEvents.h IOSAUParameterEvents.mm)
     # the asio bundled with Link reads uninitialized memory in thread_info_base's constructor. recent clang treats that
     # as unreachable when optimizing and deletes io_context::run()'s event loop, so Link silently never starts discovery
     set_source_files_properties(AbletonLink.cpp PROPERTIES COMPILE_OPTIONS "-ftrivial-auto-var-init=zero")

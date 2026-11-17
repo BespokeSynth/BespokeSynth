@@ -38,6 +38,13 @@ VSTWindow::VSTWindow(VSTPlugin* vst,
 , mType(t)
 , mOwner(vst)
 {
+#if BESPOKE_IOS
+   setContentOwned(pluginEditor, true);
+
+   //no free-floating windows on iOS: cover the safe part of the screen, and the title bar's close button brings the patch back
+   setResizable(false, false);
+   setBounds(GetIOSSafeWindowBounds());
+#else
    setSize(400, 300);
    setResizable(true, true);
 
@@ -49,6 +56,7 @@ VSTWindow::VSTWindow(VSTPlugin* vst,
       setTopLeftPosition(mainMon.getX() + mainMon.getWidth() / 4,
                          mainMon.getY() + mainMon.getHeight() / 4);
    }
+#endif
 
    setVisible(true);
 #if BESPOKE_LINUX
@@ -62,13 +70,45 @@ VSTWindow::VSTWindow(VSTPlugin* vst,
 }
 
 //static
+bool VSTWindow::IsAUv3(juce::AudioProcessor* processor)
+{
+   auto* instance = dynamic_cast<juce::AudioPluginInstance*>(processor);
+   if (instance == nullptr)
+      return false;
+   auto desc = instance->getPluginDescription();
+   auto& formatManager = TheSynth->GetAudioPluginFormatManager();
+   for (int i = 0; i < formatManager.getNumFormats(); ++i)
+   {
+      auto* format = formatManager.getFormat(i);
+      if (format->getName() == desc.pluginFormatName)
+         return format->requiresUnblockedMessageThreadDuringCreation(desc);
+   }
+   return false;
+}
+
+//static
 VSTWindow* VSTWindow::CreateVSTWindow(VSTPlugin* vst, WindowFormatType type)
+{
+   if (juce::AudioProcessorEditor* ui = CreateEditor(vst->GetAudioProcessor(), type))
+      return new VSTWindow(vst, ui, type);
+   return nullptr;
+}
+
+//static
+juce::AudioProcessorEditor* VSTWindow::CreateEditor(juce::AudioProcessor* processor, WindowFormatType& type)
 {
    juce::AudioProcessorEditor* ui = nullptr;
 
+#if BESPOKE_IOS
+   //on iOS only AUv3s bring their own UI. apple's built-in (v2) units claim a view controller but never deliver one, which
+   //leaves a blank window, so show those with the generic editor
+   if (type == Normal && !IsAUv3(processor))
+      type = Generic;
+#endif
+
    if (type == Normal)
    {
-      ui = vst->GetAudioProcessor()->createEditorIfNeeded();
+      ui = processor->createEditorIfNeeded();
 
       if (ui == nullptr)
          type = Generic;
@@ -77,20 +117,18 @@ VSTWindow* VSTWindow::CreateVSTWindow(VSTPlugin* vst, WindowFormatType type)
    if (ui == nullptr)
    {
       if (type == Generic || type == Parameters)
-         ui = new juce::GenericAudioProcessorEditor(*vst->GetAudioProcessor());
+         ui = new juce::GenericAudioProcessorEditor(*processor);
       else if (type == Programs)
-         ui = new ProgramAudioProcessorEditor(vst->GetAudioProcessor());
+         ui = new ProgramAudioProcessorEditor(processor);
    }
 
    if (ui != nullptr)
    {
-      if (juce::AudioPluginInstance* const plugin = dynamic_cast<juce::AudioPluginInstance*>(vst->GetAudioProcessor()))
+      if (juce::AudioPluginInstance* const plugin = dynamic_cast<juce::AudioPluginInstance*>(processor))
          ui->setName(plugin->getName());
-
-      return new VSTWindow(vst, ui, type);
    }
 
-   return nullptr;
+   return ui;
 }
 
 VSTWindow::~VSTWindow()
@@ -100,7 +138,7 @@ VSTWindow::~VSTWindow()
 
 void VSTWindow::ShowWindow()
 {
-#if !BESPOKE_LINUX
+#if !BESPOKE_LINUX && !BESPOKE_IOS
    setAlwaysOnTop(UserPrefs.vst_always_on_top.Get());
 #endif
    toFront(true);

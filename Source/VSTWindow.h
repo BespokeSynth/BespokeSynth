@@ -35,6 +35,17 @@ namespace juce
    class NSViewComponent;
 }
 
+#if BESPOKE_IOS
+//the screen minus its safe area insets, so a window's title bar (and close button) stays clear of rounded corners and notches
+inline juce::Rectangle<int> GetIOSSafeWindowBounds()
+{
+   auto* display = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay();
+   if (display == nullptr)
+      return {};
+   return display->safeAreaInsets.subtractedFrom(display->totalArea);
+}
+#endif
+
 //==============================================================================
 class VSTWindow : public juce::DocumentWindow
 {
@@ -54,6 +65,11 @@ public:
    void ShowWindow();
 
    static VSTWindow* CreateVSTWindow(VSTPlugin* vst, WindowFormatType);
+   //the plugin's own editor, or one of ours when it has none (type is updated to the kind that was made)
+   static juce::AudioProcessorEditor* CreateEditor(juce::AudioProcessor* processor, WindowFormatType& type);
+   //whether this is an AUv3, which on iOS is the only kind of plugin with its own UI. juce marks AUv3 as the plugins that
+   //need asynchronous creation
+   static bool IsAUv3(juce::AudioProcessor* processor);
 
    void moved() override;
    void closeButtonPressed() override;

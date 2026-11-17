@@ -1292,7 +1292,7 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    out << mPinnedPosition.x;
    out << mPinnedPosition.y;
 
-   if (IsResizable())
+   if (ShouldSaveSize())
    {
       out << mWidth;
       out << mHeight;
@@ -1376,7 +1376,7 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
       in >> mPinnedPosition.y;
    }
 
-   if (baseRev >= 4 && IsResizable())
+   if (baseRev >= 4 && ShouldSaveSize())
    {
       float width, height;
       in >> width;
@@ -1410,6 +1410,12 @@ void IDrawableModule::LoadState(FileStreamIn& in, int rev)
          {
             //ofLog() << "loading control " << uicontrolname;
             auto* control = FindUIControl(uicontrolname.c_str(), false);
+
+            if (control == nullptr)
+            {
+               OnUIControlRequested(uicontrolname.c_str()); //some modules create controls on demand (e.g. plugin parameters)
+               control = FindUIControl(uicontrolname.c_str(), false);
+            }
 
             if (control == nullptr)
                throw UnknownUIControlException();

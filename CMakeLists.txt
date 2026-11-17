@@ -32,7 +32,13 @@ option(BESPOKE_SYSTEM_ABLETONLINK "Use system installation of abletonlink" OFF)
 option(BESPOKE_SYSTEM_READERWRITERQUEUE "Use system installation of readerwriterqueue" OFF)
 option(BESPOKE_USE_ASAN "Build with ASAN" OFF)
 option(BESPOKE_ENABLE_PYTHON "Embed Python for the script module. When off, script modules load but don't run." ${BESPOKE_DESKTOP})
-option(BESPOKE_ENABLE_PLUGIN_HOSTING "Enable hosting VST/VST3/LV2/AU plugins" ${BESPOKE_DESKTOP})
+# on iOS only AUv3 (and Apple's built-in AUs) can be hosted, so VST/VST3/LV2 stay desktop only
+option(BESPOKE_ENABLE_PLUGIN_HOSTING "Enable hosting VST/VST3/LV2/AU plugins (AU only on iOS)" ON)
+if(BESPOKE_ENABLE_PLUGIN_HOSTING AND BESPOKE_DESKTOP)
+    set(BESPOKE_HOST_DESKTOP_PLUGIN_FORMATS TRUE)
+else()
+    set(BESPOKE_HOST_DESKTOP_PLUGIN_FORMATS FALSE)
+endif()
 
 # Global CMake options
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # clangd/LSP support

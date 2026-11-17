@@ -29,6 +29,7 @@
 #include "IAudioReceiver.h"
 #include "ofxJSONElement.h"
 #include "ModularSynth.h"
+#include "TitleBar.h"
 #include "Profiler.h"
 #include "Scale.h"
 #include "ModulationChain.h"
@@ -354,14 +355,18 @@ void VSTPlugin::CreateUIControls()
 
    mVolSlider = new FloatSlider(this, "vol", 3, 3, 80, 15, &mVol, 0, 4);
    mOpenEditorButton = new ClickButton(this, "open", mVolSlider, kAnchor_Right_Padded);
+   mEmbedUICheckbox = new Checkbox(this, "embed", mOpenEditorButton, kAnchor_Right, &mEmbedUI);
+   mPanicButton = new ClickButton(this, "panic", mEmbedUICheckbox, kAnchor_Right);
    mPresetFileSelector = new DropdownList(this, "preset", 3, 21, &mPresetFileIndex, 142);
    mSavePresetFileButton = new ClickButton(this, "save as", -1, -1);
    mShowParameterDropdown = new DropdownList(this, "show parameter", 3, 56, &mShowParameterIndex, 190);
    mLoadParameterButton = new ClickButton(this, "load parameter", mShowParameterDropdown, kAnchor_Right);
-   mPanicButton = new ClickButton(this, "panic", mOpenEditorButton, kAnchor_Right_Padded);
    mRemoveExtraOutputButton = new ClickButton(this, "  -  ", 83, 38);
    mAddExtraOutputButton = new ClickButton(this, " + ", mRemoveExtraOutputButton, kAnchor_Right);
    mResetPresetButton = new ClickButton(this, "reset", -1, -1);
+#if !BESPOKE_IOS && !BESPOKE_MAC
+   mEmbedUICheckbox->SetShowing(false); //not supported on this platform yet, but the control exists so patches load everywhere
+#endif
 
    mPresetFileSelector->DrawLabel(true);
    mSavePresetFileButton->PositionTo(mPresetFileSelector, kAnchor_Right);
@@ -390,9 +395,10 @@ void VSTPlugin::RecreateUIOutputCables()
    {
       if (slider.mSlider)
       {
-         slider.mSlider->SetShowing(slider.mShowing);
-         slider.mRemoveButton->SetShowing(slider.mShowing);
-         if (slider.mShowing)
+         const bool showing = slider.mShowing && !mEmbedUI; //an embedded view takes their place
+         slider.mSlider->SetShowing(showing);
+         slider.mRemoveButton->SetShowing(showing);
+         if (showing)
          {
             slider.mSlider->SetPosition(
             3 + (slider.mSlider->GetRect().width + slider.mRemoveButton->GetRect().width + 9) * (sliderCount / kRows),
@@ -435,6 +441,13 @@ VSTPlugin::~VSTPlugin()
 void VSTPlugin::Exit()
 {
    IDrawableModule::Exit();
+   ++mLoadRequestId; //drop any creation still in flight
+   mAliveToken.reset();
+   DestroyEmbeddedView();
+#if BESPOKE_IOS
+   IOSAUParameterEvents::Destroy(mParameterEvents);
+   mParameterEvents = nullptr;
+#endif
    if (mWindow)
    {
       mWindow.reset();
@@ -509,8 +522,9 @@ void VSTPlugin::SetVST(juce::PluginDescription pluginDesc)
 
    if (strPluginId != kInvalidPluginId)
       mModuleSaveData.SetString("pluginId", strPluginId);
-   else
+   else if (!mModuleSaveData.HasProperty("pluginId") || mModuleSaveData.GetString("pluginId").empty())
       mModuleSaveData.SetString("pluginId", "none");
+   //otherwise a saved plugin that isn't installed here keeps its id, so the patch still finds it once it is
 
    //mark VST as used
    if (strPluginId != kInvalidPluginId)
@@ -527,58 +541,242 @@ void VSTPlugin::SetVST(juce::PluginDescription pluginDesc)
    if (mPlugin != nullptr && dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription().matchesIdentifierString(pluginId))
       return; //this VST is already loaded! we're all set
 
-   if (mPlugin != nullptr && mWindow != nullptr)
-   {
-      VSTWindow* window = mWindow.release();
-      delete window;
-   }
+   if (mPluginLoading && mLoadingPluginId == pluginId)
+      return; //already on its way
 
    LoadVST(pluginDesc);
 }
 
 void VSTPlugin::LoadVST(juce::PluginDescription desc)
 {
+   UnloadPlugin();
+
+   const int requestId = ++mLoadRequestId;
+   mPluginLoading = true;
+   mLoadingPluginId = desc.createIdentifierString();
+   mPluginName = desc.name.isNotEmpty() ? desc.name.toStdString() + " (loading)" : "loading";
+
+   //plugins always come in through the async path, so that formats which can only be created that way (AUv3) behave like the rest.
+   //juce runs creation on the message thread a moment later, so this doesn't move loading work off of it
+   struct InstanceHolder
+   {
+      std::unique_ptr<juce::AudioPluginInstance> mInstance;
+   };
+   std::weak_ptr<bool> alive = mAliveToken;
+   auto deliver = [this, alive, requestId, desc](std::shared_ptr<InstanceHolder> holder, juce::String error)
+   {
+      if (alive.expired() || requestId != mLoadRequestId)
+         return; //module was deleted, or a different plugin was requested since. the holder deletes the stale instance
+      OnPluginCreated(std::move(holder->mInstance), error, desc);
+   };
+
+   TheSynth->GetAudioPluginFormatManager().createPluginInstanceAsync(desc, gSampleRate, gBufferSize,
+                                                                     [deliver](std::unique_ptr<juce::AudioPluginInstance> instance, const juce::String& error)
+                                                                     {
+                                                                        auto holder = std::make_shared<InstanceHolder>();
+                                                                        holder->mInstance = std::move(instance);
+                                                                        //AUv3 creation can complete on a background thread
+                                                                        if (juce::MessageManager::existsAndIsCurrentThread())
+                                                                           deliver(holder, error);
+                                                                        else
+                                                                           juce::MessageManager::callAsync([deliver, holder, error]()
+                                                                                                           {
+                                                                                                              deliver(holder, error);
+                                                                                                           });
+                                                                     });
+}
+
+void VSTPlugin::UnloadPlugin()
+{
    mPluginReady = false;
+   mPluginLoading = false;
+   DestroyEmbeddedView();
 
-   mVSTMutex.lock();
-   juce::String errorMessage;
-   mPlugin = TheSynth->GetAudioPluginFormatManager().createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
-   if (mPlugin != nullptr)
+   if (mWindow != nullptr)
    {
-      mPlugin->enableAllBuses();
-      mPlugin->addListener(this);
-
-      mNumInputChannels = mPlugin->getTotalNumInputChannels();
-      mNumOutputChannels = mPlugin->getTotalNumOutputChannels();
-      ofLog() << "vst channel - inputs: " << mNumInputChannels << " x outputs: " << mNumOutputChannels;
-
-      auto layouts = mPlugin->getBusesLayout();
-      mNumInBuses = layouts.inputBuses.size();
-      mNumOutBuses = layouts.outputBuses.size();
-      mPlugin->enableAllBuses();
-      ofLog() << "vst layout  - inputs: " << layouts.inputBuses.size() << " x outputs: " << layouts.outputBuses.size();
-
-      mPlugin->prepareToPlay(gSampleRate, gBufferSize);
-      mPlugin->setPlayHead(&mPlayhead);
-
-      mPluginName = mPlugin->getName().toStdString();
-      mPluginFormatName = ofToString(desc.pluginFormatName.toLowerCase());
-      mPluginId = GetPluginName() + "_" + ofToString(desc.uniqueId);
-
-      CreateParameterSliders();
-
-      RefreshPresetFiles();
-
-      mPluginReady = true;
+      VSTWindow* window = mWindow.release();
+      delete window;
    }
-   else
-   {
-      TheSynth->LogEvent("error loading VST: " + errorMessage.toStdString(), kLogEventType_Error);
 
+   if (mPlugin == nullptr)
+      return; //nothing loaded. keep pending state and placeholder sliders, they're for the plugin about to be requested
+
+#if BESPOKE_IOS
+   IOSAUParameterEvents::Destroy(mParameterEvents); //before the AudioUnit goes away
+   mParameterEvents = nullptr;
+#endif
+
+   std::unique_ptr<juce::AudioProcessor> oldPlugin;
+   {
+      std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
+      std::lock_guard<ofMutex> lock(mVSTMutex);
+      oldPlugin = std::move(mPlugin);
+      //the sliders stay until the next plugin's CreateParameterSliders replaces them, but their parameters go with
+      //this plugin. a new plugin arrives asynchronously, and Poll() or a slider change in between would use them
+      for (auto& parameter : mParameterSliders)
+         parameter.mParameter = nullptr;
+      mPendingState = PendingPluginState();
+      for (auto& slider : mPendingSliders)
+      {
+         RemoveUIControl(slider.mSlider);
+         RemoveUIControl(slider.mRemoveButton);
+         slider.mSlider->Delete();
+         slider.mRemoveButton->Delete();
+      }
+      mPendingSliders.clear();
+   }
+   oldPlugin.reset(); //outside the lock, plugin teardown can be slow
+}
+
+void VSTPlugin::OnPluginCreated(std::unique_ptr<juce::AudioPluginInstance> instance, const juce::String& error, const juce::PluginDescription& desc)
+{
+   mPluginLoading = false;
+
+   if (instance == nullptr)
+   {
+      TheSynth->LogEvent("error loading VST: " + error.toStdString(), kLogEventType_Error);
+
+      //any pending state and placeholder sliders stay, so saving this patch again doesn't lose them
       if (mModuleSaveData.HasProperty("pluginId") && mModuleSaveData.GetString("pluginId").length() > 0)
          mPluginName = mModuleSaveData.GetString("pluginId") + " (not loaded)";
+      else
+         mPluginName = "no plugin loaded";
+      return;
    }
-   mVSTMutex.unlock();
+
+   //prepare the instance before it's visible to the audio thread
+   instance->enableAllBuses();
+   instance->addListener(this);
+
+   mNumInputChannels = instance->getTotalNumInputChannels();
+   mNumOutputChannels = instance->getTotalNumOutputChannels();
+   ofLog() << "vst channel - inputs: " << mNumInputChannels << " x outputs: " << mNumOutputChannels;
+
+   auto layouts = instance->getBusesLayout();
+   mNumInBuses = layouts.inputBuses.size();
+   mNumOutBuses = layouts.outputBuses.size();
+   instance->enableAllBuses();
+   ofLog() << "vst layout  - inputs: " << layouts.inputBuses.size() << " x outputs: " << layouts.outputBuses.size();
+
+   instance->prepareToPlay(gSampleRate, gBufferSize);
+   instance->setPlayHead(&mPlayhead);
+
+   std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
+   std::lock_guard<ofMutex> lock(mVSTMutex);
+
+   mPlugin = std::move(instance);
+   mPluginName = mPlugin->getName().toStdString();
+   mPluginFormatName = ofToString(desc.pluginFormatName.toLowerCase());
+   mPluginId = GetPluginName() + "_" + ofToString(desc.uniqueId);
+
+   CreateParameterSliders();
+   BindPendingSliders();
+   ApplyPendingState();
+
+#if BESPOKE_IOS
+   //juce 7 only listens for AU parameter events on macOS. juce fixed that on develop in 4b8454a20c ("AU Host: Unify macOS
+   //and iOS parameter listener behaviour"), and with both listening every gesture arrives twice
+   //once we have juce's fix, we can delete this block, and delete IOSAUParameterEvents.mm
+   static_assert(JUCE_MAJOR_VERSION == 7, "check whether this juce listens for AU parameter events on iOS. if it does, delete IOSAUParameterEvents.mm");
+   if (mPluginFormatName == "audiounit")
+   {
+      //turn the AU's gesture events into juce's, as juce does itself on macOS, so audioProcessorParameterChangeGestureBegin() hears them
+      std::vector<unsigned int> paramIDs;
+      std::unordered_map<unsigned int, juce::AudioProcessorParameter*> paramsByID;
+      for (auto* parameter : mPlugin->getParameters())
+      {
+         if (auto* withID = dynamic_cast<juce::HostedAudioProcessorParameter*>(parameter))
+         {
+            const unsigned int paramID = (unsigned int)withID->getParameterID().getLargeIntValue();
+            paramIDs.push_back(paramID);
+            paramsByID[paramID] = parameter;
+         }
+      }
+      mParameterEvents = IOSAUParameterEvents::Create(static_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPlatformSpecificData(), paramIDs, [paramsByID](unsigned int paramID, IOSAUParameterEvents::EventType type)
+                                                      {
+                                                         auto it = paramsByID.find(paramID);
+                                                         if (it == paramsByID.end())
+                                                            return;
+                                                         if (type == IOSAUParameterEvents::EventType::BeginGesture)
+                                                            it->second->beginChangeGesture();
+                                                         else if (type == IOSAUParameterEvents::EventType::EndGesture)
+                                                            it->second->endChangeGesture();
+                                                      });
+   }
+#endif
+
+   RefreshPresetFiles();
+   RecreateUIOutputCables();
+
+   mPluginReady = true;
+}
+
+void VSTPlugin::BindPendingSliders()
+{
+   for (auto it = mPendingSliders.begin(); it != mPendingSliders.end();)
+   {
+      bool bound = false;
+      for (auto& parameter : mParameterSliders)
+      {
+         const std::string& key = (mParameterVersion == 0) ? parameter.mDisplayName : parameter.mID;
+         if (key == it->mID && parameter.mSlider == nullptr)
+         {
+            parameter.mSlider = it->mSlider;
+            parameter.mRemoveButton = it->mRemoveButton;
+            parameter.mHasPendingValue = it->mHasPendingValue;
+            if (!parameter.mHasPendingValue)
+               *it->mValue = *parameter.mValue; //nothing was loaded into it, start from the plugin's value
+            parameter.mValue = it->mValue; //keep the storage the slider (and anything else) already points at
+            parameter.mSlider->SetOverrideDisplayName(parameter.mDisplayName);
+            parameter.mInSelectorList = true;
+            bound = true;
+            break;
+         }
+      }
+
+      if (bound)
+         it = mPendingSliders.erase(it);
+      else
+         ++it; //no such parameter (plugin version changed?). leave it be, other modules may still point at it
+   }
+}
+
+void VSTPlugin::ApplyPendingState()
+{
+   if (mPendingState.mHasState)
+   {
+      ofLog() << "loading vst state for " << mPlugin->getName();
+      mPlugin->setStateInformation(mPendingState.mState.getData(), (int)mPendingState.mState.getSize());
+      if (mPendingState.mProgramState.getSize() > 0)
+         mPlugin->setCurrentProgramStateInformation(mPendingState.mProgramState.getData(), (int)mPendingState.mProgramState.getSize());
+   }
+
+   if (mPendingState.mHasExposedParams)
+   {
+      for (auto& param : mParameterSliders)
+         param.mShowing = false;
+      for (int index : mPendingState.mExposedParams)
+      {
+         if (index >= 0 && index < (int)mParameterSliders.size())
+         {
+            mParameterSliders[index].mShowing = true;
+            if (mParameterSliders[index].mSlider == nullptr)
+               mParameterSliders[index].MakeSlider();
+         }
+      }
+   }
+
+   //control values loaded before the plugin existed are applied on top of its state, matching the order of a synchronous load
+   for (auto& parameter : mParameterSliders)
+   {
+      if (parameter.mHasPendingValue && parameter.mParameter != nullptr)
+      {
+         parameter.mParameter->setValue(*parameter.mValue);
+         parameter.mHasPendingValue = false;
+      }
+   }
+
+   mPendingState = PendingPluginState();
 }
 
 void VSTPlugin::CreateParameterSliders()
@@ -611,7 +809,7 @@ void VSTPlugin::CreateParameterSliders()
    {
 
       mParameterSliders[i].mOwner = this;
-      mParameterSliders[i].mValue = parameters[i]->getValue();
+      *mParameterSliders[i].mValue = parameters[i]->getValue();
       mParameterSliders[i].mParameter = parameters[i];
       mParameterSliders[i].mDisplayName = parameters[i]->getName(64).toStdString();
       HostedAudioProcessorParameter* parameterWithId = dynamic_cast<HostedAudioProcessorParameter*>(parameters[i]);
@@ -636,7 +834,7 @@ void VSTPlugin::CreateParameterSliders()
 
 void VSTPlugin::Poll()
 {
-   if (mRescanParameterNames)
+   if (mRescanParameterNames && mPlugin != nullptr)
    {
       mRescanParameterNames = false;
       const auto& parameters = mPlugin->getParameters();
@@ -673,6 +871,12 @@ void VSTPlugin::Poll()
    if (mWantOpenVstWindow)
    {
       mWantOpenVstWindow = false;
+      if (mEmbedUI) //the plugin's view can only be in one place
+      {
+         mEmbedUI = false;
+         DestroyEmbeddedView();
+         RecreateUIOutputCables();
+      }
       if (mPlugin != nullptr)
       {
          if (mWindow == nullptr)
@@ -686,6 +890,9 @@ void VSTPlugin::Poll()
       mPresetFileUpdateQueued = false;
       mPresetFileLoadCountdown = 2; //load twice: some plugins need a second setStateInformation call for JUCE's parameter cache to fully sync
    }
+
+   if (mPresetFileLoadCountdown > 0 && mPlugin == nullptr)
+      mPresetFileLoadCountdown = 0;
 
    if (mPresetFileLoadCountdown > 0)
    {
@@ -749,8 +956,323 @@ void VSTPlugin::Poll()
       }
    }
 
+   //only parameters with a slider need their value kept up to date. reading a value can be slow: for an AUv3 it's a
+   //blocking round trip to the plugin's process, so reading every parameter every frame starved the main thread
    for (auto& parameterSlider : mParameterSliders)
-      parameterSlider.mValue = parameterSlider.mParameter->getValue();
+   {
+      if (parameterSlider.mSlider != nullptr && parameterSlider.mParameter != nullptr) //null between unloading a plugin and the next one arriving
+         *parameterSlider.mValue = parameterSlider.mParameter->getValue();
+   }
+
+   UpdateEmbeddedView();
+   UpdateControlsForEmbed();
+}
+
+void VSTPlugin::UpdateControlsForEmbed()
+{
+   if (mEmbedUI == mControlsHiddenForEmbed)
+      return;
+   mControlsHiddenForEmbed = mEmbedUI;
+
+   const bool show = !mEmbedUI;
+   mPresetFileSelector->SetShowing(show);
+   mSavePresetFileButton->SetShowing(show);
+   mResetPresetButton->SetShowing(show);
+   mShowParameterDropdown->SetShowing(show);
+   mLoadParameterButton->SetShowing(show);
+   mRemoveExtraOutputButton->SetShowing(show);
+   mAddExtraOutputButton->SetShowing(show);
+   RecreateUIOutputCables(); //shows or hides the parameter sliders, and moves the cables to the new module size
+}
+
+bool VSTPlugin::EmbeddedSizeIsFixed() const
+{
+#if BESPOKE_IOS
+   return false;
+#else
+   //in clip mode the module can be any size, and a fixed-size editor is clipped or padded to fit
+   return mSizeMode == PluginEmbedSizeMode::ResizeModuleToFit && mEmbeddedEditor != nullptr && !mEmbeddedEditorResizable;
+#endif
+}
+
+void VSTPlugin::UpdateEmbeddedView()
+{
+#if BESPOKE_IOS || BESPOKE_MAC
+   const bool wantEmbedded = mEmbedUI && mPluginReady && mPlugin != nullptr;
+   if (!wantEmbedded)
+   {
+      if (HasEmbeddedView() || mEmbeddedSize.x > 0)
+      {
+         DestroyEmbeddedView();
+         RecreateUIOutputCables();
+      }
+      return;
+   }
+
+   auto* mainComponent = TheSynth->GetMainComponent();
+   auto* peer = mainComponent->getPeer();
+   if (peer == nullptr)
+      return;
+
+   if (!HasEmbeddedView() && !CreateEmbeddedView(peer->getNativeHandle()))
+   {
+      mEmbedUI = false;
+      return;
+   }
+
+   if (mEmbeddedSize.x <= 0)
+      return; //view hasn't arrived yet
+
+   auto* container = GetOwningContainer();
+   if (container == nullptr)
+      return;
+
+   //canvas to screen: (canvas position + container offset) * container scale, in the main component's points
+   const float scale = container->GetDrawScale();
+   const ofVec2f offset = container->GetDrawOffset();
+   const ofVec2f pos = GetPosition();
+   const float x = (pos.x + 3 + offset.x) * scale;
+   const float y = (pos.y + mEmbedTop + offset.y) * scale;
+
+#if !BESPOKE_IOS
+   if (mSizeMode == PluginEmbedSizeMode::Clip)
+      SetEmbeddedSize(GetEmbedWantedSize()); //the module keeps its size, and the editor is clipped or padded to fit it below
+   else if (!mEmbeddedEditorResizable && scale > 0)
+      //native plugin views can't be scaled, only resized. a fixed-size editor keeps its size on screen whatever the
+      //zoom, so the module's area for it grows and shrinks on the canvas instead. this also follows the plugin
+      //resizing its own UI
+      SetEmbeddedSize(ofVec2f(mEmbeddedEditor->getWidth() / scale, mEmbeddedEditor->getHeight() / scale));
+#endif
+
+   //hide while the canvas pans/zooms or the module moves/resizes, and show again once it settles. moving and resizing
+   //a plugin's native view every frame is slow and glitchy
+   const double nowMs = juce::Time::getMillisecondCounterHiRes();
+   const ofVec2f canvasPos(x, y);
+   if (scale != mLastEmbedScale || canvasPos.x != mLastEmbedCanvasPos.x || canvasPos.y != mLastEmbedCanvasPos.y ||
+       mEmbeddedSize.x != mLastEmbedSize.x || mEmbeddedSize.y != mLastEmbedSize.y)
+   {
+      mLastEmbedScale = scale;
+      mLastEmbedCanvasPos = canvasPos;
+      mLastEmbedSize = mEmbeddedSize;
+      mLastEmbedMoveTimeMs = nowMs;
+   }
+   const bool settled = nowMs - mLastEmbedMoveTimeMs > 150;
+
+   //a native view always sits above the canvas, so get out of the way of anything that should draw on top of it
+   const bool visible = settled && IsShowing() && !Minimized() && TheSynth->GetTopModalFocusItem() == nullptr && TheSynth->GetMoveModule() == nullptr;
+   const float clipTop = TheTitleBar != nullptr ? TheTitleBar->GetRect().getMaxY() * TheSynth->GetUIScale() : 0;
+
+#if BESPOKE_IOS
+   IOSPluginViewHost::Update(mEmbeddedView, peer->getNativeHandle(), clipTop, x, y, mEmbeddedSize.x * scale, mEmbeddedSize.y * scale, visible);
+#else
+   auto* editor = mEmbeddedEditor.get();
+
+   if (!visible)
+   {
+      mEmbeddedHolder->setVisible(false);
+      return;
+   }
+
+   if (mEmbeddedEditorResizable) //resizable editors are resized to follow the canvas zoom
+   {
+      //always ask for the size that was set, not the size the editor last took, so that a size it refused at one zoom
+      //(below its minimum, say) comes back at another
+      const ofVec2f wanted = GetEmbedWantedSize();
+      const juce::Point<int> request(juce::roundToInt(wanted.x * scale), juce::roundToInt(wanted.y * scale));
+      if (request != mEmbedEditorRequest)
+      {
+         mEmbedEditorRequest = request;
+         editor->setSize(request.x, request.y);
+      }
+
+      //the editor may hold its own aspect ratio or limits: let the module follow what it actually took
+      if (mSizeMode == PluginEmbedSizeMode::ResizeModuleToFit &&
+          (std::abs(editor->getWidth() - juce::roundToInt(mEmbeddedSize.x * scale)) > 1 ||
+           std::abs(editor->getHeight() - juce::roundToInt(mEmbeddedSize.y * scale)) > 1))
+      {
+         SetEmbeddedSize(ofVec2f(editor->getWidth() / scale, editor->getHeight() / scale));
+         mLastEmbedSize = mEmbeddedSize; //the editor already has this size, so don't hide it as if it were moving
+      }
+   }
+
+   //the holder is a native view attached to the window, so it works in the top level component's coordinates. it clips
+   //the editor to the module's area for it (an editor bigger than that is cut off; a smaller one leaves the module's
+   //black background showing around it), and to the canvas area below the title bar
+   auto* topLevel = mainComponent->getTopLevelComponent();
+   auto editorArea = topLevel->getLocalArea(mainComponent, juce::Rectangle<float>(x, y, (float)editor->getWidth(), (float)editor->getHeight())).toNearestInt();
+   auto moduleArea = topLevel->getLocalArea(mainComponent, juce::Rectangle<float>(x, y, mEmbeddedSize.x * scale, mEmbeddedSize.y * scale)).toNearestInt();
+   auto canvasArea = topLevel->getLocalArea(mainComponent, juce::Rectangle<float>(0, clipTop, (float)mainComponent->getWidth(), (float)mainComponent->getHeight() - clipTop)).toNearestInt();
+   auto shownArea = editorArea.getIntersection(moduleArea).getIntersection(canvasArea);
+   if (shownArea.isEmpty())
+   {
+      mEmbeddedHolder->setVisible(false);
+      return;
+   }
+
+   if (mEmbeddedHolder->getBounds() != shownArea)
+      mEmbeddedHolder->setBounds(shownArea);
+   const auto editorPos = editorArea.getPosition() - shownArea.getPosition();
+   if (editor->getPosition() != editorPos)
+      editor->setTopLeftPosition(editorPos);
+   if (!mEmbeddedHolder->isVisible())
+      mEmbeddedHolder->setVisible(true);
+#endif
+#endif
+}
+
+bool VSTPlugin::HasEmbeddedView() const
+{
+#if BESPOKE_IOS
+   return mEmbeddedView != nullptr;
+#else
+   return mEmbeddedEditor != nullptr;
+#endif
+}
+
+bool VSTPlugin::CreateEmbeddedView(void* nativeParentView)
+{
+#if BESPOKE_IOS
+   auto* instance = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get());
+   if (instance != nullptr && VSTWindow::IsAUv3(instance))
+   {
+      std::weak_ptr<bool> alive = mAliveToken;
+      mEmbeddedView = IOSPluginViewHost::Create(instance->getPlatformSpecificData(), [this, alive](float width, float height)
+                                                {
+                                                   if (alive.expired())
+                                                      return;
+                                                   mEmbedNaturalSize.set(width, height);
+                                                   mEmbeddedSize = GetEmbedWantedSize();
+                                                   RecreateUIOutputCables();
+                                                });
+   }
+
+   if (mEmbeddedView == nullptr)
+   {
+      TheSynth->LogEvent("can't embed " + GetPluginName() + ": only plugins with their own UI (AUv3) can be embedded", kLogEventType_Warning);
+      return false;
+   }
+   return true;
+#else
+   auto type = VSTWindow::Normal;
+   juce::AudioProcessorEditor* editor = VSTWindow::CreateEditor(mPlugin.get(), type); //falls back to a generic editor
+   if (editor == nullptr)
+      return false;
+   mEmbeddedEditor.reset(editor);
+   mEmbeddedEditorResizable = editor->isResizable();
+
+   //a component with its own native view, attached to the window: it layers above the GL canvas, clips the editor, and is
+   //painted by juce normally (the canvas has juce's component painting turned off)
+   mEmbeddedHolder = std::make_unique<juce::Component>();
+   mEmbeddedHolder->addAndMakeVisible(editor);
+   mEmbeddedHolder->setVisible(false);
+   mEmbeddedHolder->addToDesktop(0, nativeParentView);
+
+   mEmbedNaturalSize.set((float)editor->getWidth(), (float)editor->getHeight());
+   if (mEmbedFitOnCreate) //embed was just turned on (not loaded with a patch, which keeps the size it was saved with)
+   {
+      mEmbedFitOnCreate = false;
+      FitEmbedSizeToEditor();
+   }
+   mEmbeddedSize = GetEmbedWantedSize(); //UpdateEmbeddedView adjusts it to the size mode
+   RecreateUIOutputCables();
+   return true;
+#endif
+}
+
+void VSTPlugin::Resize(float width, float height)
+{
+   if (mIgnoreResize || !mEmbedUI)
+      return; //the embed size is saved separately (see SaveState), since it can't be worked out from the module size at load time
+   if (EmbeddedSizeIsFixed())
+      return; //the plugin's editor has one fixed size, which sets the module's size
+
+   //the module size is the size that was set. the plugin's editor may not take it at every zoom (it may have a minimum
+   //size, say), so the module can show bigger for a while, but this is what it goes back to
+   IDrawableModule::Resize(width, height);
+   mEmbedUserSized = true;
+   float w, h;
+   GetModuleDimensions(w, h); //updates mEmbedTop, used by GetEmbedWantedSize
+
+   if (mSizeMode == PluginEmbedSizeMode::ResizeModuleToFit)
+      FitEmbedSizeToEditor();
+
+   if (mEmbeddedSize.x > 0)
+      mEmbeddedSize = GetEmbedWantedSize();
+   RecreateUIOutputCables();
+}
+
+//moves the module size (mWidth/mHeight) to the closest size the editor allows at the current zoom: VST3 editors ask the
+//plugin (minimum and maximum sizes, aspect ratio, steps), and a fixed-size editor allows only its own size. zooming
+//later can still take the editor outside those, and then the size mode decides what happens
+void VSTPlugin::FitEmbedSizeToEditor()
+{
+#if !BESPOKE_IOS
+   auto* container = GetOwningContainer();
+   const float scale = container != nullptr ? container->GetDrawScale() : 1;
+   if (mEmbeddedEditor == nullptr || scale <= 0)
+      return;
+
+   float w, h;
+   GetModuleDimensions(w, h); //updates mEmbedTop
+
+   juce::Rectangle<int> bounds;
+   if (!mEmbeddedEditorResizable)
+   {
+      bounds = mEmbeddedEditor->getLocalBounds();
+   }
+   else if (auto* constrainer = mEmbeddedEditor->getConstrainer())
+   {
+      const ofVec2f wanted = GetEmbedWantedSize();
+      bounds.setSize(juce::roundToInt(wanted.x * scale), juce::roundToInt(wanted.y * scale));
+      constrainer->checkBounds(bounds, mEmbeddedEditor->getLocalBounds(), { 1 << 20, 1 << 20 }, false, false, true, true);
+   }
+
+   if (bounds.getWidth() > 0 && bounds.getHeight() > 0)
+   {
+      SetModuleSizeForEmbedSize(ofVec2f(bounds.getWidth() / scale, bounds.getHeight() / scale));
+      mEmbedUserSized = true;
+   }
+#endif
+}
+
+//the module size (mWidth/mHeight) that holds an embedded UI of this size. GetEmbedWantedSize does the reverse
+void VSTPlugin::SetModuleSizeForEmbedSize(ofVec2f embedSize)
+{
+   IDrawableModule::Resize(embedSize.x + 6, mEmbedTop + embedSize.y + kEmbedBottomMargin);
+}
+
+void VSTPlugin::SetEmbeddedSize(ofVec2f size)
+{
+   if (std::abs(size.x - mEmbeddedSize.x) > .01f || std::abs(size.y - mEmbeddedSize.y) > .01f)
+   {
+      mEmbeddedSize = size;
+      RecreateUIOutputCables();
+   }
+}
+
+ofVec2f VSTPlugin::GetEmbedWantedSize() const
+{
+   if (mEmbedUserSized)
+      return ofVec2f(std::max(mWidth - 6, 60.0f), std::max(mHeight - mEmbedTop - kEmbedBottomMargin, 40.0f));
+#if !BESPOKE_IOS
+   if (!mEmbeddedEditorResizable)
+      return mEmbedNaturalSize; //can't be scaled, so start with all of it showing at 100% zoom
+#endif
+   return ofVec2f(mEmbedNaturalSize.x * kDefaultEmbeddedUIScale, mEmbedNaturalSize.y * kDefaultEmbeddedUIScale); //start smaller than the plugin's natural size
+}
+
+void VSTPlugin::DestroyEmbeddedView()
+{
+#if BESPOKE_IOS
+   IOSPluginViewHost::Destroy(mEmbeddedView);
+   mEmbeddedView = nullptr;
+#else
+   mEmbeddedEditor.reset(); //before the holder it sits in, and before the plugin
+   mEmbeddedHolder.reset();
+   mEmbeddedEditorResizable = false;
+   mEmbedEditorRequest = { -1, -1 };
+#endif
+   mEmbeddedSize.set(0, 0);
 }
 void VSTPlugin::audioProcessorChanged(juce::AudioProcessor* processor, const ChangeDetails& details)
 {
@@ -770,23 +1292,18 @@ void VSTPlugin::Process(double time)
 {
    if (!mPluginReady)
    {
-      //bypass
-      GetBuffer()->SetNumActiveChannels(2);
-      SyncBuffers();
-      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
-      {
-         if (GetTarget())
-            Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
-      }
-
-      GetBuffer()->Clear();
+      ProcessBypass(GetBuffer());
+      return;
    }
 
-#if BESPOKE_LINUX //HACK: weird race condition, which this seems to fix for now
+   //held for the whole block, so the plugin can't be swapped out from under us
+   std::lock_guard<ofMutex> vstLock(mVSTMutex);
+
    if (mPlugin == nullptr)
+   {
+      ProcessBypass(GetBuffer());
       return;
-#endif
+   }
 
    PROFILER(VSTPlugin);
 
@@ -861,10 +1378,8 @@ void VSTPlugin::Process(double time)
 
    IAudioReceiver* target = GetTarget();
 
-   if (mEnabled && mPlugin != nullptr)
+   if (mEnabled)
    {
-      mVSTMutex.lock();
-
       ComputeSliders(0);
 
       if (mWantRemoveSlider)
@@ -964,7 +1479,6 @@ void VSTPlugin::Process(double time)
 
          mMidiBuffer.clear();
       }
-      mVSTMutex.unlock();
 
       AllChannelsBuffer->Clear();
 
@@ -1052,6 +1566,20 @@ void VSTPlugin::Process(double time)
    AllChannelsBuffer->Clear();
 }
 
+void VSTPlugin::ProcessBypass(ChannelBuffer* buffer)
+{
+   buffer->SetNumActiveChannels(2);
+   SyncBuffers();
+   for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
+   {
+      if (GetTarget())
+         Add(GetTarget()->GetBuffer()->GetChannel(ch), buffer->GetChannel(ch), buffer->BufferSize());
+      GetVizBuffer()->WriteChunk(buffer->GetChannel(ch), buffer->BufferSize(), ch);
+   }
+
+   buffer->Clear();
+}
+
 void VSTPlugin::PlayNote(NoteMessage note)
 {
    if (!mPluginReady || mPlugin == nullptr)
@@ -1135,43 +1663,70 @@ void VSTPlugin::DrawModule()
    mRemoveExtraOutputButton->Draw();
    mAddExtraOutputButton->Draw();
    mResetPresetButton->Draw();
+   mEmbedUICheckbox->Draw();
    mShowParameterDropdown->Draw();
 
-   ofPushStyle();
+   if (mEmbedUI && mEmbeddedSize.x > 0)
+   {
+      //the plugin's own view covers this when it's showing. it's hidden while the canvas moves, so this stands in for it
+      ofPushStyle();
+      ofFill();
+      ofSetColor(0, 0, 0);
+      ofRect(3, mEmbedTop, mEmbeddedSize.x, mEmbeddedSize.y);
+      ofPopStyle();
+   }
+
+   /*ofPushStyle();
    ofSetColor(IDrawableModule::GetColor(kModuleCategory_Note));
    DrawTextRightJustify("midi out:", GetRect().width - 15, 14);
-   ofPopStyle();
+   ofPopStyle();*/
 
-   ofPushStyle();
-   ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth));
-   DrawTextNormal("extra outputs:", 3, 50);
-   ofPopStyle();
+   if (!mEmbedUI) //an embedded view takes the place of everything below the top row
+   {
+      ofPushStyle();
+      ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth));
+      DrawTextNormal("extra outputs:", 3, 50);
+      ofPopStyle();
 
-   ofPushStyle();
-   ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth), 75);
-   DrawTextRightJustify(ofToString(mParameterSliders.size()), GetRect().width - 3, 67);
-   ofPopStyle();
+      ofPushStyle();
+      ofSetColor(IDrawableModule::GetColor(kModuleCategory_Synth), 75);
+      DrawTextRightJustify(ofToString(mParameterSliders.size()), GetRect().width - 3, 67);
+      ofPopStyle();
+   }
 
-   for (const auto& slider : mParameterSliders)
-      if (slider.mSlider && slider.mShowing)
-      {
-         slider.mSlider->Draw();
-         slider.mRemoveButton->Draw();
-      }
+   if (!mEmbedUI)
+   {
+      for (const auto& slider : mParameterSliders)
+         if (slider.mSlider && slider.mShowing)
+         {
+            slider.mSlider->Draw();
+            slider.mRemoveButton->Draw();
+         }
+   }
 }
 
 
 void VSTPlugin::GetModuleDimensions(float& width, float& height)
 {
    width = 236;
-   height = 76;
-   for (auto& slider : mParameterSliders)
+   height = mEmbedUI ? 21 : 76; //an embedded view goes right below the top row, in place of the other controls
+   if (!mEmbedUI) //an embedded view hides the parameter sliders
    {
-      if (slider.mSlider && slider.mShowing)
+      for (auto& slider : mParameterSliders)
       {
-         width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 23);
-         height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
+         if (slider.mSlider && slider.mShowing)
+         {
+            width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 23);
+            height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
+         }
       }
+   }
+
+   mEmbedTop = height;
+   if (mEmbedUI && mEmbeddedSize.x > 0)
+   {
+      width = MAX(width, mEmbeddedSize.x + 6);
+      height += mEmbeddedSize.y + kEmbedBottomMargin;
    }
 }
 
@@ -1211,8 +1766,18 @@ void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal, double tim
    {
       if (parameterSlider.mSlider == slider)
       {
-         parameterSlider.mParameter->setValue(parameterSlider.mValue);
-         break;
+         if (parameterSlider.mParameter != nullptr)
+            parameterSlider.mParameter->setValue(*parameterSlider.mValue);
+         return;
+      }
+   }
+
+   for (auto& pendingSlider : mPendingSliders)
+   {
+      if (pendingSlider.mSlider == slider)
+      {
+         pendingSlider.mHasPendingValue = true; //mValue already holds it, applied once the plugin is created
+         return;
       }
    }
 }
@@ -1223,6 +1788,17 @@ void VSTPlugin::IntSliderUpdated(IntSlider* slider, int oldVal, double time)
 
 void VSTPlugin::CheckboxUpdated(Checkbox* checkbox, double time)
 {
+   if (checkbox == mEmbedUICheckbox)
+   {
+      mEmbedFitOnCreate = mEmbedUI; //size the module to fit the plugin once its view exists (the plugin may still be loading)
+
+      if (mEmbedUI && mWindow != nullptr)
+      {
+         //the plugin's view can only be in one place
+         VSTWindow* window = mWindow.release();
+         delete window;
+      }
+   }
 }
 
 void VSTPlugin::ButtonClicked(ClickButton* button, double time)
@@ -1255,7 +1831,8 @@ void VSTPlugin::ButtonClicked(ClickButton* button, double time)
    {
       if (GetKeyModifiers() & kModifier_Command)
       {
-         CreateParameterSliders();
+         if (mPlugin != nullptr)
+            CreateParameterSliders();
          return;
       }
       mWantLoadParameters = true;
@@ -1401,6 +1978,11 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 
    mModuleSaveData.LoadBool("preset_file_sets_params", moduleInfo, true);
 
+   EnumMap sizeModeMap;
+   sizeModeMap["clip"] = (int)PluginEmbedSizeMode::Clip;
+   sizeModeMap["resize module to fit"] = (int)PluginEmbedSizeMode::ResizeModuleToFit;
+   mModuleSaveData.LoadEnum<PluginEmbedSizeMode>("embed_size_mode", moduleInfo, (int)PluginEmbedSizeMode::Clip, nullptr, &sizeModeMap);
+
    if (!moduleInfo["vst"].isNull())
       mOldVstPath = moduleInfo["vst"].asString();
    else
@@ -1424,7 +2006,7 @@ void VSTPlugin::SetUpFromSaveData()
    if (mModuleSaveData.HasProperty("pluginId") && mModuleSaveData.GetString("pluginId") != "")
    {
       auto pluginId = juce::String(mModuleSaveData.GetString("pluginId"));
-      if (VSTLookup::GetPluginDesc(pluginDesc, pluginId))
+      if (!VSTLookup::GetPluginDesc(pluginDesc, pluginId))
       {
          TheSynth->LogEvent("Plugin with " + pluginId.toStdString() + " id not found", kLogEventType_Error);
       }
@@ -1439,16 +2021,26 @@ void VSTPlugin::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 
    // Add VST output pins
+   //this runs again whenever a setting changes, so match the count rather than adding more
    int numAdditionalStereoOutputs = mModuleSaveData.GetInt("numAdditionalStereoOutputs");
-   for (int newOutputCount = 0; newOutputCount < numAdditionalStereoOutputs; newOutputCount++)
-   {
+   while ((int)mAdditionalOutCables.size() < numAdditionalStereoOutputs)
       AddExtraOutputCable();
-   }
+   while ((int)mAdditionalOutCables.size() > numAdditionalStereoOutputs)
+      RemoveExtraOutputCable();
 
    mChannel = mModuleSaveData.GetInt("channel");
    mUseVoiceAsChannel = mModuleSaveData.GetBool("usevoiceaschannel");
    mPitchBendRange = mModuleSaveData.GetFloat("pitchbendrange");
    mModwheelCC = mModuleSaveData.GetInt("modwheelcc(1or74)");
+
+   const auto sizeMode = mModuleSaveData.GetEnum<PluginEmbedSizeMode>("embed_size_mode");
+   if (sizeMode != mSizeMode)
+   {
+      mSizeMode = sizeMode;
+#if !BESPOKE_IOS
+      mEmbedEditorRequest = { -1, -1 }; //ask the editor for its size again
+#endif
+   }
 }
 
 void VSTPlugin::SaveState(FileStreamOut& out)
@@ -1479,10 +2071,30 @@ void VSTPlugin::SaveState(FileStreamOut& out)
       for (auto& i : exposedParams)
          out << i;
    }
+   else if (mPendingState.mHasState)
+   {
+      //plugin hasn't arrived (still loading, or couldn't be created). write back what we loaded so it isn't lost
+      out << true;
+      out << (int)mPendingState.mState.getSize();
+      out.WriteGeneric(mPendingState.mState.getData(), (int)mPendingState.mState.getSize());
+      out << (int)mPendingState.mProgramState.getSize();
+      if (mPendingState.mProgramState.getSize() > 0)
+         out.WriteGeneric(mPendingState.mProgramState.getData(), (int)mPendingState.mProgramState.getSize());
+      out << (int)mPendingState.mExposedParams.size();
+      for (auto& i : mPendingState.mExposedParams)
+         out << i;
+   }
    else
    {
       out << false;
    }
+
+   //before the base state, which saves the module size only if ShouldSaveSize(), and that depends on mEmbedUI
+   out << mEmbedUI;
+   out << mEmbedUserSized;
+   const ofVec2f wantedSize = mEmbedUserSized ? GetEmbedWantedSize() : ofVec2f(0, 0);
+   out << wantedSize.x;
+   out << wantedSize.y;
 
    IDrawableModule::SaveState(out);
 
@@ -1495,6 +2107,15 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
    {
       LoadVSTFromSaveData(in, rev);
    }
+
+   ofVec2f embedSize(0, 0);
+   if (rev >= 5)
+   {
+      in >> mEmbedUI;
+      in >> mEmbedUserSized;
+      in >> embedSize.x;
+      in >> embedSize.y;
+   }
    else
    {
       //make all sliders, like we used to, so that the controls can load correctly
@@ -1505,7 +2126,16 @@ void VSTPlugin::LoadState(FileStreamIn& in, int rev)
       }
    }
 
+   mIgnoreResize = true; //the base state restores the module size, but it's set from the embed size below instead
    IDrawableModule::LoadState(in, rev);
+   mIgnoreResize = false;
+
+   if (mEmbedUserSized) //the module size, from the embed size, which doesn't depend on the layout of the controls above it
+   {
+      float w, h;
+      GetModuleDimensions(w, h); //updates mEmbedTop
+      SetModuleSizeForEmbedSize(embedSize);
+   }
 
    if (ModularSynth::sLoadingFileSaveStateRev < 423)
       in >> rev;
@@ -1529,46 +2159,67 @@ void VSTPlugin::LoadVSTFromSaveData(FileStreamIn& in, int rev)
    {
       int vstStateSize;
       in >> vstStateSize;
-      char* vstState = new char[vstStateSize];
-      in.ReadGeneric(vstState, vstStateSize);
+      juce::MemoryBlock vstState((size_t)std::max(0, vstStateSize));
+      if (vstStateSize > 0)
+         in.ReadGeneric(vstState.getData(), vstStateSize);
 
       int vstProgramStateSize = 0;
       if (rev >= 1)
          in >> vstProgramStateSize;
-      char* vstProgramState = new char[vstProgramStateSize];
+      juce::MemoryBlock vstProgramState;
       if (rev >= 1 && vstProgramStateSize > 0)
-         in.ReadGeneric(vstProgramState, vstProgramStateSize);
+      {
+         vstProgramState.setSize((size_t)vstProgramStateSize);
+         in.ReadGeneric(vstProgramState.getData(), vstProgramStateSize);
+      }
+
+      std::vector<int> exposedParams;
+      if (rev >= 2)
+      {
+         int numParamsShowing;
+         in >> numParamsShowing;
+         for (int i = 0; i < numParamsShowing; ++i)
+         {
+            int index;
+            in >> index;
+            exposedParams.push_back(index);
+         }
+      }
 
       if (mPlugin != nullptr)
       {
          ofLog() << "loading vst state for " << mPlugin->getName();
 
-         mPlugin->setStateInformation(vstState, vstStateSize);
-         if (rev >= 1 && vstProgramStateSize > 0)
-            mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
+         mPlugin->setStateInformation(vstState.getData(), (int)vstState.getSize());
+         if (vstProgramState.getSize() > 0)
+            mPlugin->setCurrentProgramStateInformation(vstProgramState.getData(), (int)vstProgramState.getSize());
+
+         if (rev >= 2)
+         {
+            for (auto& param : mParameterSliders)
+               param.mShowing = false;
+            for (int index : exposedParams)
+            {
+               if (index >= 0 && index < (int)mParameterSliders.size())
+               {
+                  mParameterSliders[index].mShowing = true;
+                  if (mParameterSliders[index].mSlider == nullptr)
+                     mParameterSliders[index].MakeSlider();
+               }
+            }
+         }
       }
       else
       {
-         TheSynth->LogEvent("Couldn't instantiate plugin to load state for " + mModuleSaveData.GetString("pluginId"), kLogEventType_Error);
-      }
+         //plugin is still being created (or failed to be). hold onto this until it arrives
+         mPendingState.mHasState = true;
+         mPendingState.mState = std::move(vstState);
+         mPendingState.mProgramState = std::move(vstProgramState);
+         mPendingState.mHasExposedParams = rev >= 2;
+         mPendingState.mExposedParams = std::move(exposedParams);
 
-      if (rev >= 2)
-      {
-         int numParamsShowing;
-         in >> numParamsShowing;
-         for (auto& param : mParameterSliders)
-            param.mShowing = false;
-         for (int i = 0; i < numParamsShowing; ++i)
-         {
-            int index;
-            in >> index;
-            if (index < mParameterSliders.size())
-            {
-               mParameterSliders[index].mShowing = true;
-               if (mParameterSliders[index].mSlider == nullptr)
-                  mParameterSliders[index].MakeSlider();
-            }
-         }
+         if (!mPluginLoading)
+            TheSynth->LogEvent("Couldn't instantiate plugin to load state for " + mModuleSaveData.GetString("pluginId"), kLogEventType_Error);
       }
    }
 }
@@ -1580,13 +2231,39 @@ void VSTPlugin::ParameterSlider::MakeSlider()
       sliderID = mDisplayName.c_str(); //old save files used unstable parameters names
    else
       sliderID = mID.c_str(); //now we use parameter IDs for more stability
-   mSlider = new FloatSlider(mOwner, sliderID, -1, -1, 210, 15, &mValue, 0, 1);
+   if (mParameter != nullptr)
+      *mValue = mParameter->getValue();
+   mSlider = new FloatSlider(mOwner, sliderID, -1, -1, 210, 15, mValue.get(), 0, 1);
    mSlider->SetOverrideDisplayName(mDisplayName);
    mRemoveButton = new ClickButton(mOwner, " X ", -1, -1);
 }
 
 void VSTPlugin::OnUIControlRequested(const char* name)
 {
+   if (mPlugin == nullptr)
+   {
+      //no plugin yet. stand in a slider for parameter ids, so cables and saved values have something to attach to.
+      //legacy (version 0) names are plain parameter names, which can't be told apart from other controls, so they're skipped
+      std::string controlName = name;
+      if (mParameterVersion == 0 || (controlName.rfind("paramid_", 0) != 0 && controlName.rfind("param_", 0) != 0))
+         return;
+      for (auto& pending : mPendingSliders)
+      {
+         if (pending.mID == controlName)
+            return;
+      }
+      ParameterSlider& pending = mPendingSliders.emplace_back();
+      pending.mOwner = this;
+      pending.mID = controlName;
+      pending.mDisplayName = controlName;
+      pending.mShowing = false;
+      pending.mInSelectorList = false;
+      pending.MakeSlider();
+      pending.mSlider->SetShowing(false);
+      pending.mRemoveButton->SetShowing(false);
+      return;
+   }
+
    if (mParameterVersion == 0) //legacy path
    {
       for (auto& parameter : mParameterSliders)
