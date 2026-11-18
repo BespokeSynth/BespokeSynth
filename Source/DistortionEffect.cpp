@@ -35,6 +35,10 @@ DistortionEffect::DistortionEffect()
 
    for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
    {
+      mPreFilter[i].SetFilterParams(mPassFreq, sqrt(2) / 2);
+      mPreFilter[i].SetFilterType(kFilterType_Highpass);
+      mPreFilter[i].UpdateFilterCoeff();
+
       mDCRemover[i].SetFilterParams(10, sqrt(2) / 2);
       mDCRemover[i].SetFilterType(kFilterType_Highpass);
       mDCRemover[i].UpdateFilterCoeff();
@@ -46,12 +50,17 @@ DistortionEffect::DistortionEffect()
 void DistortionEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   UIBLOCK0();
+   UIBLOCK(120);
    DROPDOWN(mTypeDropdown, "type", (int*)(&mType), 50);
+   UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mPreFilterInputCheckbox, "pre-filter", &mPreFilterInput);
+   UIBLOCK_NEWLINE();
+   CHECKBOX(mRemoveInputDCCheckbox, "center input", &mRemoveInputDC);
+   UIBLOCK_SHIFTUP();
+   FLOATSLIDER(mPassFreqSlider, "passfreq", &mPassFreq, 10, 7000);
    FLOATSLIDER(mClipSlider, "clip", &mClip, 0.001f, 1);
    FLOATSLIDER(mPreampSlider, "preamp", &mPreamp, 1, 10);
    FLOATSLIDER(mFuzzAmountSlider, "fuzz", &mFuzzAmount, -1, 1);
-   CHECKBOX(mRemoveInputDCCheckbox, "center input", &mRemoveInputDC);
    ENDUIBLOCK(mWidth, mHeight);
 
    mTypeDropdown->AddLabel("clean", kClean);
@@ -61,6 +70,8 @@ void DistortionEffect::CreateUIControls()
    mTypeDropdown->AddLabel("asym", kAsymmetric);
    mTypeDropdown->AddLabel("fold", kFold);
    mTypeDropdown->AddLabel("grungy", kGrungy);
+
+   mPassFreqSlider->SetMode(FloatSlider::kSquare);
 }
 
 void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
@@ -74,17 +85,33 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 
    for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
    {
-      if (mRemoveInputDC)
-         mDCRemover[ch].Filter(buffer->GetChannel(ch), bufferSize);
+      float* channelData = buffer->GetChannel(ch);
 
-      mPeakTracker[ch].Process(buffer->GetChannel(ch), bufferSize);
+      if (mPreFilterInput)
+      {
+         BufferCopy(gWorkBuffer, channelData, bufferSize);
+         mPreFilter[ch].Filter(channelData, bufferSize);
+         Subtract(gWorkBuffer, channelData, bufferSize);
+
+         for (int i = 0; i < bufferSize; ++i)
+         {
+            mNoDistortionLevel = std::max(mNoDistortionLevel, fabsf(gWorkBuffer[i]));
+            mDistortionInputLevel = std::max(mDistortionInputLevel, fabsf(channelData[i]));
+         }
+      }
+      else if (mRemoveInputDC)
+      {
+         mDCRemover[ch].Filter(channelData, bufferSize);
+      }
+
+      mPeakTracker[ch].Process(channelData, bufferSize);
 
       if (mType == kDirty)
       {
          for (int i = 0; i < bufferSize; ++i)
          {
             ComputeSliders(i);
-            buffer->GetChannel(ch)[i] = (ofClamp((buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain, -1, 1)) / mGain;
+            channelData[i] = (ofClamp((channelData[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain, -1, 1)) / mGain;
          }
       }
       else if (mType == kClean)
@@ -92,7 +119,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
          for (int i = 0; i < bufferSize; ++i)
          {
             ComputeSliders(i);
-            buffer->GetChannel(ch)[i] = tanh((buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain) / mGain;
+            channelData[i] = tanh((channelData[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain) / mGain;
          }
       }
       else if (mType == kWarm)
@@ -100,7 +127,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
          for (int i = 0; i < bufferSize; ++i)
          {
             ComputeSliders(i);
-            buffer->GetChannel(ch)[i] = sin((buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain) / mGain;
+            channelData[i] = sin((channelData[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain) / mGain;
          }
       }
       else if (mType == kGrungy)
@@ -108,7 +135,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
          for (int i = 0; i < bufferSize; ++i)
          {
             ComputeSliders(i);
-            buffer->GetChannel(ch)[i] = asin(ofClamp((buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain, -1, 1)) / mGain;
+            channelData[i] = asin(ofClamp((channelData[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain, -1, 1)) / mGain;
          }
       }
       //soft and asymmetric from http://www.music.mcgill.ca/~gary/courses/projects/618_2009/NickDonaldson/#Distortion
@@ -117,14 +144,14 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
          for (int i = 0; i < bufferSize; ++i)
          {
             ComputeSliders(i);
-            float sample = (buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain;
+            float sample = (channelData[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain;
             if (sample > 1)
                sample = .66666f;
             else if (sample < -1)
                sample = -.66666f;
             else
                sample = sample - (sample * sample * sample) / 3.0f;
-            buffer->GetChannel(ch)[i] = sample / mGain;
+            channelData[i] = sample / mGain;
          }
       }
       else if (mType == kAsymmetric)
@@ -132,7 +159,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
          for (int i = 0; i < bufferSize; ++i)
          {
             ComputeSliders(i);
-            float sample = (buffer->GetChannel(ch)[i] * .5f + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain;
+            float sample = (channelData[i] * .5f + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain;
             if (sample >= .320018f)
                sample = .630035f;
             else if (sample >= -.08905f)
@@ -141,7 +168,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
                sample = -.75f * (1 - powf(1 - (fabsf(sample) - .032847f), 12) + .333f * (fabsf(sample) - .032847f)) + .01f;
             else
                sample = -.9818f;
-            buffer->GetChannel(ch)[i] = sample / mGain;
+            channelData[i] = sample / mGain;
          }
       }
       else if (mType == kFold)
@@ -149,7 +176,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
          for (int i = 0; i < bufferSize; ++i)
          {
             ComputeSliders(i);
-            float sample = ofClamp((buffer->GetChannel(ch)[i] * .5f + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain, -100, 100);
+            float sample = ofClamp((channelData[i] * .5f + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain, -100, 100);
             while (sample > 1 || sample < -1)
             {
                if (sample > 1)
@@ -157,9 +184,12 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
                if (sample < -1)
                   sample = -2 - sample;
             }
-            buffer->GetChannel(ch)[i] = sample / mGain;
+            channelData[i] = sample / mGain;
          }
       }
+
+      if (mPreFilterInput)
+         Add(channelData, gWorkBuffer, bufferSize);
    }
 }
 
@@ -174,11 +204,35 @@ void DistortionEffect::DrawModule()
    if (!IsEnabled())
       return;
 
+   mPreFilterInputCheckbox->Draw();
+   mPassFreqSlider->SetShowing(mPreFilterInput);
+   mPassFreqSlider->Draw();
+   mRemoveInputDCCheckbox->SetShowing(!mPreFilterInput);
+   mRemoveInputDCCheckbox->Draw();
    mClipSlider->Draw();
    mTypeDropdown->Draw();
    mPreampSlider->Draw();
-   mRemoveInputDCCheckbox->Draw();
    mFuzzAmountSlider->Draw();
+
+   if (mPreFilterInput)
+   {
+      ofRectangle passFreqRect = mPassFreqSlider->GetRect(K(local));
+
+      float span = passFreqRect.width - 4;
+      float xStart = passFreqRect.x + 2;
+      float xEnd = passFreqRect.x + passFreqRect.width - 2;
+
+      ofPushStyle();
+      ofSetLineWidth(2);
+      ofSetColor(ofColor::green);
+      ofLine(xStart, passFreqRect.y + 2, xStart + span * mNoDistortionLevel, passFreqRect.y + 2);
+      ofSetColor(ofColor::red);
+      ofLine(xEnd, passFreqRect.y + passFreqRect.height - 2, xEnd - span * mDistortionInputLevel, passFreqRect.y + passFreqRect.height - 2);
+      ofPopStyle();
+
+      mNoDistortionLevel = 0;
+      mDistortionInputLevel = 0;
+   }
 }
 
 float DistortionEffect::GetEffectAmount()
@@ -193,6 +247,8 @@ void DistortionEffect::CheckboxUpdated(Checkbox* checkbox, double time)
    if (checkbox == mEnabledCheckbox)
    {
       for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
+         mPreFilter[i].Clear();
+      for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
          mDCRemover[i].Clear();
    }
 }
@@ -201,4 +257,11 @@ void DistortionEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, dou
 {
    if (slider == mClipSlider)
       SetClip(mClip);
+   if (slider == mPassFreqSlider)
+   {
+      mPreFilter[0].SetFilterParams(mPassFreq, mPreFilter[0].mQ);
+      mPreFilter[0].UpdateFilterCoeff();
+      for (int i = 1; i < ChannelBuffer::kMaxNumChannels; ++i)
+         mPreFilter[i].CopyCoeffFrom(mPreFilter[0]);
+   }
 }
