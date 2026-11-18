@@ -1076,8 +1076,9 @@ distortion~waveshaping distortion
 ~clip~cutoff point of distortion, lower values result in more extreme distortion
 ~preamp~signal gain before feeding into distortion
 ~fuzz~push input signal off-center to distort asymmetrically
-~center input~remove dc offset from input signal to distort in a more controlled way
-~pre-filter~add splitting filter to control which part of the signal gets distorted
+~~remove dc offset from input signal to distort in a more controlled way
+~pre-filter~how we should filter before the distortion: "no pre-filter": none, "center input": remove DC offset before distorting, "distort lows": distort everything below passfreq, "distort highs": distort everything above passfreq
+~passfreq~frequency to split: send the lows (or highs) to the distortion, and pass the rest through untouched
 
 
 
