@@ -1077,6 +1077,8 @@ distortion~waveshaping distortion
 ~preamp~signal gain before feeding into distortion
 ~fuzz~push input signal off-center to distort asymmetrically
 ~center input~remove dc offset from input signal to distort in a more controlled way
+~pre-filter~add splitting filter to control which part of the signal gets distorted
+~passfreq~filters below this frequency pass through undistorted, frequencies above this frequency get distorted
 
 
 

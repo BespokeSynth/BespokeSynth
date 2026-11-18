@@ -71,6 +71,8 @@ private:
    //IDrawableModule
    void DrawModule() override;
 
+   bool mPreFilterInput{ false };
+   float mPassFreq{ 10 };
    DistortionType mType{ DistortionType::kClean };
    float mClip{ 1 };
    float mGain{ 1 };
@@ -78,11 +80,17 @@ private:
    float mFuzzAmount{ 0 };
    bool mRemoveInputDC{ false };
 
+   Checkbox* mPreFilterInputCheckbox{ nullptr };
+   FloatSlider* mPassFreqSlider{ nullptr };
    DropdownList* mTypeDropdown{ nullptr };
    FloatSlider* mClipSlider{ nullptr };
    FloatSlider* mPreampSlider{ nullptr };
    Checkbox* mRemoveInputDCCheckbox{ nullptr };
    FloatSlider* mFuzzAmountSlider{ nullptr };
+   BiquadFilter mPreFilter[ChannelBuffer::kMaxNumChannels]{};
    BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels]{};
    PeakTracker mPeakTracker[ChannelBuffer::kMaxNumChannels]{};
+
+   float mNoDistortionLevel{ 0.0f };
+   float mDistortionInputLevel{ 0.0f };
 };
