@@ -1078,7 +1078,13 @@ distortion~waveshaping distortion
 ~fuzz~push input signal off-center to distort asymmetrically
 ~center input~remove dc offset from input signal to distort in a more controlled way
 ~pre-filter~add splitting filter to control which part of the signal gets distorted
-~passfreq~filters below this frequency pass through undistorted, frequencies above this frequency get distorted
+
+
+
+freqsplitter~split a signal into low frequency and high frequency components
+~F~signal below this frequency goes to the left outlet, signal above this frequency goes to the right outlet
+~Q~resonance of filter
+~type~type of filter
 
 
 
