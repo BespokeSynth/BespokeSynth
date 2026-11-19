@@ -111,12 +111,8 @@ void NoteCanvas::PlayNote(NoteMessage note)
    if (!mEnabled || !mRecord)
       return;
 
-   double pos = GetCurPos(note.time);
-   if (mApplySwing)
-   {
-      // undo current swing amount, to record where this would have gone if played straight
-      pos = TheTransport->Swing(pos);
-   }
+   // with swing applied, this converts the real-time position to its straight-grid position
+   double pos = AdjustPos(GetCurPos(note.time));
 
    if (mInputNotes[note.pitch]) //handle note-offs or retriggers
    {
@@ -190,7 +186,8 @@ void NoteCanvas::OnTransportAdvanced(float amount)
    //   cursorPlayTime += Transport::sEventEarlyMs;
    //else
    cursorPlayTime += amount * TheTransport->MsPerBar();
-   double curPos = AdjustPos(GetCurPos(cursorPlayTime));
+   double realCurPos = GetCurPos(cursorPlayTime); //real-time position, for timing math
+   double curPos = AdjustPos(realCurPos); //straight-grid position, for looking up notes
 
    mCanvas->FillElementsAt(curPos, mNoteChecker);
    for (int i = 0; i < 128; ++i)
@@ -205,7 +202,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          //note off
          if (mCurrentNotes[pitch])
          {
-            double cursorAdvanceSinceEvent = curPos - AdjustPos(mCurrentNotes[pitch]->GetEnd());
+            double cursorAdvanceSinceEvent = realCurPos - UnadjustPos(mCurrentNotes[pitch]->GetEnd());
             if (cursorAdvanceSinceEvent < 0)
                cursorAdvanceSinceEvent += 1;
             double time = cursorPlayTime - cursorAdvanceSinceEvent * TheTransport->MsPerBar() * mNumMeasures;
@@ -220,11 +217,11 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          //note on
          NoteCanvasElement* note = static_cast<NoteCanvasElement*>(mNoteChecker[i]);
          assert(note);
-         double cursorAdvanceSinceEvent = curPos - AdjustPos(note->GetStart());
+         double cursorAdvanceSinceEvent = realCurPos - UnadjustPos(note->GetStart());
          if (cursorAdvanceSinceEvent < 0)
             cursorAdvanceSinceEvent += 1;
          double time = cursorPlayTime - cursorAdvanceSinceEvent * TheTransport->MsPerBar() * mNumMeasures;
-         //if (time > gTime)
+         if (time > gTime)
          {
             mCurrentNotes[pitch] = note;
             mNoteOutput.PlayNote(NoteMessage(time, pitch, note->GetVelocity() * 127, note->GetVoiceIdx(), ModulationParameters(note->GetPitchBend(), note->GetModWheel(), note->GetPressure(), note->GetPan())));
@@ -239,7 +236,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
       if (mInputNotes[pitch])
       {
          float endPos = curPos;
-         if (AdjustPos(mInputNotes[pitch]->GetStart()) > endPos)
+         if (mInputNotes[pitch]->GetStart() > endPos)
             endPos += 1; //wrap
          mInputNotes[pitch]->SetEnd(endPos);
 
@@ -280,6 +277,21 @@ double NoteCanvas::AdjustPos(double pos) const
       int measure = int(measureTime);
       double measurePos = measureTime - measure;
       return (measure + TheTransport->Swing(measurePos)) / mCanvas->GetLength();
+   }
+   else
+   {
+      return pos;
+   }
+}
+
+double NoteCanvas::UnadjustPos(double pos) const
+{
+   if (mApplySwing)
+   {
+      double measureTime = pos * mCanvas->GetLength();
+      int measure = int(measureTime);
+      double measurePos = measureTime - measure;
+      return (measure + TheTransport->Unswing(measurePos)) / mCanvas->GetLength();
    }
    else
    {
@@ -1580,6 +1592,13 @@ void NoteCanvas::SaveState(FileStreamOut& out)
 void NoteCanvas::LoadState(FileStreamIn& in, int rev)
 {
    IDrawableModule::LoadState(in, rev);
+
+   // don't enable swing by default in older saves
+   if (rev < 1)
+   {
+      mApplySwing = false;
+      mModuleSaveData.SetBool("apply_swing", false);
+   }
 
    mCanvas->LoadState(in);
 }

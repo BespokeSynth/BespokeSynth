@@ -189,10 +189,12 @@ float QuadraticBezier(float x, float a, float b)
 
 double Transport::Swing(double measurePos)
 {
-   double swingSlices = double(mSwingInterval) * mTimeSigTop / 4.0;
+   double swingSlices = double(mSwingInterval) * mTimeSigTop / mTimeSigBottom;
 
    double swingPos = measurePos * swingSlices;
    int swingBeat = int(swingPos);
+   if (swingBeat + 1 > swingSlices)
+      return measurePos; //partial slice at the end of an odd measure (e.g. 4n swing in 7/8), leave it straight
    swingPos -= swingBeat;
 
    double swung = SwingBeat(swingPos);
@@ -210,10 +212,12 @@ double Transport::SwingBeat(double pos)
 
 double Transport::Unswing(double measurePos)
 {
-   double swingSlices = double(mSwingInterval) * mTimeSigTop / 4.0;
+   double swingSlices = double(mSwingInterval) * mTimeSigTop / mTimeSigBottom;
 
    double swingPos = measurePos * swingSlices;
    int swingBeat = int(swingPos);
+   if (swingBeat + 1 > swingSlices)
+      return measurePos; //partial slice at the end of an odd measure (e.g. 4n swing in 7/8), leave it straight
    swingPos -= swingBeat;
 
    double unswung = UnswingBeat(swingPos);
