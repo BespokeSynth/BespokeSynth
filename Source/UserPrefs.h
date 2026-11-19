@@ -217,6 +217,7 @@ class UserPrefBool : public UserPref
 public:
    UserPrefBool(std::string name, bool defaultValue, UserPrefCategory category)
    : mValue(defaultValue)
+   , mDefault(defaultValue)
    {
       RegisterUserPref(this);
       mName = name;
@@ -294,6 +295,9 @@ public:
    UserPrefDropdownString devicetype{ "devicetype", "auto", 200, UserPrefCategory::General };
    UserPrefDropdownString audio_output_device{ "audio_output_device", "auto", 350, UserPrefCategory::General };
    UserPrefDropdownString audio_input_device{ "audio_input_device", "none", 350, UserPrefCategory::General };
+#if BESPOKE_LINUX
+   UserPrefBool jack_autoconnect{ "jack_autoconnect", true, UserPrefCategory::General };
+#endif
    UserPrefDropdownInt samplerate{ "samplerate", 48000, 100, UserPrefCategory::General };
    UserPrefDropdownInt buffersize{ "buffersize", 256, 100, UserPrefCategory::General };
    UserPrefTextEntryInt width{ "width", 1700, 100, 10000, 5, UserPrefCategory::General };

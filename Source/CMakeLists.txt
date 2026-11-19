@@ -399,6 +399,7 @@ target_sources(BespokeSynth PRIVATE
     InputChannel.h
     Inverter.cpp
     Inverter.h
+    JackAudioDeviceType.h
     JumpBlender.cpp
     JumpBlender.h
     KarplusStrong.cpp

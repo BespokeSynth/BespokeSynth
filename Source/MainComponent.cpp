@@ -24,6 +24,29 @@ using namespace juce;
 #include "AndroidSupport.h"
 #endif
 
+#if BESPOKE_LINUX
+#include "JackAudioDeviceType.h"
+
+class BespokeAudioDeviceManager : public AudioDeviceManager
+{
+public:
+   void createAudioDeviceTypes(OwnedArray<AudioIODeviceType>& types) override
+   {
+      AudioDeviceManager::createAudioDeviceTypes(types);
+      for (int i = 0; i < types.size(); ++i)
+      {
+         if (types[i]->getTypeName() == "JACK")
+         {
+            std::unique_ptr<AudioIODeviceType> type(types.removeAndReturn(i));
+            const int numInputs = UserPrefs.audio_input_device.Get() == "none" ? 0 : UserPrefs.max_input_channels.Get();
+            const int numOutputs = UserPrefs.audio_output_device.Get() == "none" ? 0 : UserPrefs.max_output_channels.Get();
+            types.insert(i, new JackAudioDeviceType(std::move(type), numInputs, numOutputs, UserPrefs.jack_autoconnect.Get()));
+         }
+      }
+   }
+};
+#endif
+
 #ifdef JUCE_WINDOWS
 #include <windows.h>
 #endif
@@ -320,6 +343,7 @@ public:
    void audioDeviceError(const String& errorMessage) override
    {
       ofLog() << "audioDeviceError(): " << errorMessage.toStdString();
+      mSynth.LogEvent("audio device error: " + errorMessage.toStdString(), kLogEventType_Error);
    }
 
    void audioDeviceStopped() override
@@ -488,6 +512,10 @@ public:
    std::string GetInputDeviceName() const
    {
       std::string inputDevice = UserPrefs.audio_input_device.Get();
+#if BESPOKE_LINUX
+      if (inputDevice == "BespokeSynth")
+         inputDevice = kAutoDevice;
+#endif
 #if BESPOKE_MOBILE
       //iOS also has a single combined device, but keep "none" so we don't open (and prompt for) the microphone
       if (inputDevice != kNoneDevice && !mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
@@ -500,6 +528,10 @@ public:
 
    std::string GetOutputDeviceName() const
    {
+#if BESPOKE_LINUX
+      if (UserPrefs.audio_output_device.Get() == "BespokeSynth")
+         return kAutoDevice;
+#endif
       return UserPrefs.audio_output_device.Get();
    }
 
@@ -1129,7 +1161,11 @@ private:
 
    struct
    {
+#if BESPOKE_LINUX
+      BespokeAudioDeviceManager mDeviceManager;
+#else
       juce::AudioDeviceManager mDeviceManager;
+#endif
       juce::AudioFormatManager mAudioFormatManager;
    } mGlobalManagers;
 
