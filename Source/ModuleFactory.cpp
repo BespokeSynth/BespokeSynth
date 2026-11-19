@@ -285,6 +285,7 @@
 #include "TapeLooper.h"
 #include "DiscontinuitySmoother.h"
 #include "ControlSurface.h"
+#include "FreqSplitter.h"
 
 #include <juce_core/juce_core.h>
 
@@ -525,6 +526,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(TapeLooper, tapelooper, kModuleCategory_Audio);
    REGISTER(DiscontinuitySmoother, discontinuitysmoother, kModuleCategory_Audio)
    REGISTER(ControlSurface, controlsurface, kModuleCategory_Other);
+   REGISTER(FreqSplitter, freqsplitter, kModuleCategory_Audio);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleCategory_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleCategory_Audio);

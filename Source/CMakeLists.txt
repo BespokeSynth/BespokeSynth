@@ -342,6 +342,8 @@ target_sources(BespokeSynth PRIVATE
     FreqDelay.h
     FreqDomainBoilerplate.cpp
     FreqDomainBoilerplate.h
+    FreqSplitter.cpp
+    FreqSplitter.h
     FubbleModule.cpp
     FubbleModule.h
     GainStageEffect.cpp
