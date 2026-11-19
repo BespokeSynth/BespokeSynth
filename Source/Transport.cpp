@@ -204,8 +204,32 @@ double Transport::SwingBeat(double pos)
 {
    double swingDouble = mSwing;
    double term = (.5 - swingDouble) / (swingDouble * swingDouble - swingDouble);
-   pos = term * pos * pos + (1 - term) * pos;
-   return pos;
+   double swungPos = term * pos * pos + (1 - term) * pos;
+   return swungPos;
+}
+
+double Transport::Unswing(double measurePos)
+{
+   double swingSlices = double(mSwingInterval) * mTimeSigTop / 4.0;
+
+   double swingPos = measurePos * swingSlices;
+   int swingBeat = int(swingPos);
+   swingPos -= swingBeat;
+
+   double unswung = UnswingBeat(swingPos);
+
+   return (swingBeat + unswung) / swingSlices;
+}
+
+double Transport::UnswingBeat(double swungPos)
+{
+   double swingDouble = mSwing;
+   double a = (.5 - swingDouble) / (swingDouble * swingDouble - swingDouble);
+   double b = 1 - a;
+   double root = sqrt(b * b + 4 * a * swungPos);
+   if (b >= 0)
+      return 2 * swungPos / (b + root);
+   return (root - b) / (2 * a);
 }
 
 void Transport::Nudge(double amount)
@@ -426,15 +450,15 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
       case kInterval_32nt:
       case kInterval_64n:
       {
-         pos *= double(mTimeSigTop) / mTimeSigBottom;
-         double ret = pos * CountInStandardMeasure(interval);
+         double numSteps = double(mTimeSigTop) / mTimeSigBottom * CountInStandardMeasure(interval);
+         double ret = pos * numSteps;
          if (remainderMs != nullptr)
          {
             double remainder = ret - (int)ret;
             if (mSwing == .5f)
                *remainderMs = remainder * GetDuration(interval);
             else
-               *remainderMs = 0; //TODO(Ryan) this is incorrect, figure out how to properly calculate remainderMs when swing is applied
+               *remainderMs = (Unswing(pos) - Unswing(pos - remainder / numSteps)) * MsPerBar();
          }
          return (int)ret; //wraps around CountInStandardMeasure(interval) range
       }

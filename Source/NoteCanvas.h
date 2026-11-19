@@ -124,6 +124,7 @@ private:
    void DrawModule() override;
 
    double GetCurPos(double time) const;
+   double AdjustPos(double pos) const;
    void UpdateNumColumns();
    void SetNumMeasures(int numMeasures);
    bool FreeRecordParityMatched();
@@ -168,6 +169,7 @@ private:
    Checkbox* mShowIntervalsCheckbox{ nullptr };
    LaunchpadKeyboard* mGridKeyboardInterface{ nullptr };
    IPitchContextInterface* mPitchContextInterface{ nullptr };
+   bool mApplySwing{ true };
 
    int mEditMeasureOffset{ 0 };
    float mEditMeasureOffsetSlider{ 0.0f };
