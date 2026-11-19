@@ -115,7 +115,7 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, int rev) override;
-   int GetModuleSaveStateRev() const override { return 0; }
+   int GetModuleSaveStateRev() const override { return 1; }
 
    bool IsEnabled() const override { return mEnabled; }
 
@@ -124,6 +124,8 @@ private:
    void DrawModule() override;
 
    double GetCurPos(double time) const;
+   double AdjustPos(double pos) const;
+   double UnadjustPos(double pos) const;
    void UpdateNumColumns();
    void SetNumMeasures(int numMeasures);
    bool FreeRecordParityMatched();
@@ -168,6 +170,7 @@ private:
    Checkbox* mShowIntervalsCheckbox{ nullptr };
    LaunchpadKeyboard* mGridKeyboardInterface{ nullptr };
    IPitchContextInterface* mPitchContextInterface{ nullptr };
+   bool mApplySwing{ true };
 
    int mEditMeasureOffset{ 0 };
    float mEditMeasureOffsetSlider{ 0.0f };

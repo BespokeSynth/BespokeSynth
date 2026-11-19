@@ -111,9 +111,12 @@ void NoteCanvas::PlayNote(NoteMessage note)
    if (!mEnabled || !mRecord)
       return;
 
+   // with swing applied, this converts the real-time position to its straight-grid position
+   double pos = AdjustPos(GetCurPos(note.time));
+
    if (mInputNotes[note.pitch]) //handle note-offs or retriggers
    {
-      double endPos = GetCurPos(note.time);
+      double endPos = pos;
       if (mInputNotes[note.pitch]->GetStart() > endPos)
          endPos += 1; //wrap
       mInputNotes[note.pitch]->SetEnd(endPos);
@@ -125,7 +128,7 @@ void NoteCanvas::PlayNote(NoteMessage note)
       if (mFreeRecord && mFreeRecordStartMeasure == -1)
          mFreeRecordStartMeasure = TheTransport->GetMeasure(note.time);
 
-      double measurePos = GetCurPos(note.time) * mNumMeasures;
+      double measurePos = pos * mNumMeasures;
       NoteCanvasElement* element = AddNote(measurePos, note.pitch, note.velocity, 1 / mCanvas->GetNumCols(), note.voiceIdx, note.modulation);
       mInputNotes[note.pitch] = element;
       FitNotes(false, true);
@@ -183,7 +186,8 @@ void NoteCanvas::OnTransportAdvanced(float amount)
    //   cursorPlayTime += Transport::sEventEarlyMs;
    //else
    cursorPlayTime += amount * TheTransport->MsPerBar();
-   double curPos = GetCurPos(cursorPlayTime);
+   double realCurPos = GetCurPos(cursorPlayTime); //real-time position, for timing math
+   double curPos = AdjustPos(realCurPos); //straight-grid position, for looking up notes
 
    mCanvas->FillElementsAt(curPos, mNoteChecker);
    for (int i = 0; i < 128; ++i)
@@ -198,7 +202,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          //note off
          if (mCurrentNotes[pitch])
          {
-            double cursorAdvanceSinceEvent = curPos - mCurrentNotes[pitch]->GetEnd();
+            double cursorAdvanceSinceEvent = realCurPos - UnadjustPos(mCurrentNotes[pitch]->GetEnd());
             if (cursorAdvanceSinceEvent < 0)
                cursorAdvanceSinceEvent += 1;
             double time = cursorPlayTime - cursorAdvanceSinceEvent * TheTransport->MsPerBar() * mNumMeasures;
@@ -213,7 +217,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          //note on
          NoteCanvasElement* note = static_cast<NoteCanvasElement*>(mNoteChecker[i]);
          assert(note);
-         double cursorAdvanceSinceEvent = curPos - note->GetStart();
+         double cursorAdvanceSinceEvent = realCurPos - UnadjustPos(note->GetStart());
          if (cursorAdvanceSinceEvent < 0)
             cursorAdvanceSinceEvent += 1;
          double time = cursorPlayTime - cursorAdvanceSinceEvent * TheTransport->MsPerBar() * mNumMeasures;
@@ -260,7 +264,39 @@ void NoteCanvas::OnTransportAdvanced(float amount)
 double NoteCanvas::GetCurPos(double time) const
 {
    int loopMeasures = MAX(1, int(mCanvas->mLoopEnd - mCanvas->mLoopStart));
-   return (((TheTransport->GetMeasure(time) % loopMeasures) + TheTransport->GetMeasurePos(time)) + mCanvas->mLoopStart) / mCanvas->GetLength();
+   int currentMeasure = TheTransport->GetMeasure(time) % loopMeasures;
+   double measurePos = TheTransport->GetMeasurePos(time);
+   return (currentMeasure + measurePos + mCanvas->mLoopStart) / mCanvas->GetLength();
+}
+
+double NoteCanvas::AdjustPos(double pos) const
+{
+   if (mApplySwing)
+   {
+      double measureTime = pos * mCanvas->GetLength();
+      int measure = int(measureTime);
+      double measurePos = measureTime - measure;
+      return (measure + TheTransport->Swing(measurePos)) / mCanvas->GetLength();
+   }
+   else
+   {
+      return pos;
+   }
+}
+
+double NoteCanvas::UnadjustPos(double pos) const
+{
+   if (mApplySwing)
+   {
+      double measureTime = pos * mCanvas->GetLength();
+      int measure = int(measureTime);
+      double measurePos = measureTime - measure;
+      return (measure + TheTransport->Unswing(measurePos)) / mCanvas->GetLength();
+   }
+   else
+   {
+      return pos;
+   }
 }
 
 void NoteCanvas::UpdateNumColumns()
@@ -914,7 +950,7 @@ void NoteCanvas::UpdateAbletonGridLeds(IAbletonGridDevice* abletonGrid)
 
    if (abletonGrid->GetAbletonDeviceType() == AbletonDeviceType::Move)
    {
-      float curPos = GetCurPos(gTime);
+      float curPos = AdjustPos(GetCurPos(gTime));
       const auto& elements = mCanvas->GetElements();
       int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
       int totalNumSteps = stepsPerMeasure * mNumMeasures;
@@ -1094,7 +1130,7 @@ void NoteCanvas::DrawModule()
    }
    ofPopStyle();
 
-   mCanvas->SetCursorPos(GetCurPos(gTime));
+   mCanvas->SetCursorPos(AdjustPos(GetCurPos(gTime)));
 
    mCanvas->Draw();
    mCanvasTimeline->Draw();
@@ -1519,6 +1555,7 @@ void NoteCanvas::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("canvasheight", moduleInfo, 200, 40, 99999, K(isTextField));
    mModuleSaveData.LoadString("grid_keyboard_interface", moduleInfo, "", FillDropdown<LaunchpadKeyboard*>);
    mModuleSaveData.LoadString("pitch_context_interface", moduleInfo, "", FillDropdown<IPitchContextInterface*>);
+   mModuleSaveData.LoadBool("apply_swing", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -1531,6 +1568,7 @@ void NoteCanvas::SetUpFromSaveData()
    mGridKeyboardInterface = dynamic_cast<LaunchpadKeyboard*>(gridKeyboardInterface);
    IDrawableModule* pitchContextInterface = TheSynth->FindModule(mModuleSaveData.GetString("pitch_context_interface"), false);
    mPitchContextInterface = dynamic_cast<IPitchContextInterface*>(pitchContextInterface);
+   mApplySwing = mModuleSaveData.GetBool("apply_swing");
 }
 
 void NoteCanvas::SaveLayout(ofxJSONElement& moduleInfo)
@@ -1554,6 +1592,13 @@ void NoteCanvas::SaveState(FileStreamOut& out)
 void NoteCanvas::LoadState(FileStreamIn& in, int rev)
 {
    IDrawableModule::LoadState(in, rev);
+
+   // don't enable swing by default in older saves
+   if (rev < 1)
+   {
+      mApplySwing = false;
+      mModuleSaveData.SetBool("apply_swing", false);
+   }
 
    mCanvas->LoadState(in);
 }

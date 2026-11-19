@@ -158,6 +158,10 @@ public:
    double GetMeasureFraction(NoteInterval interval);
    int GetStepsPerMeasure(ITimeListener* listener);
    int GetSyncedStep(double time, ITimeListener* listener, const TransportListenerInfo* listenerInfo, int length = -1);
+   double Swing(double measurePos);
+   double SwingBeat(double pos);
+   double Unswing(double measurePos);
+   double UnswingBeat(double pos);
 
    bool CheckNeedsDraw() override { return true; }
 
@@ -193,8 +197,6 @@ public:
 
 private:
    void UpdateListeners(double jumpMs);
-   double Swing(double measurePos);
-   double SwingBeat(double pos);
    void Nudge(double amount);
    void SetRandomTempo();
    double GetMeasureTimeInternal(double time) const;
