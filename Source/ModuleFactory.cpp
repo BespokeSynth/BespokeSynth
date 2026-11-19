@@ -157,6 +157,7 @@
 #include "Ramper.h"
 #include "NoteGate.h"
 #include "Prefab.h"
+#include "PrefabPort.h"
 #include "NoteHumanizer.h"
 #include "VolcaBeatsControl.h"
 #include "RadioSequencer.h"
@@ -395,6 +396,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(Ramper, ramper, kModuleCategory_Modulator);
    REGISTER(NoteGate, notegate, kModuleCategory_Note);
    REGISTER(Prefab, prefab, kModuleCategory_Other);
+   PrefabPort::RegisterAll(this);
    REGISTER(NoteHumanizer, notehumanizer, kModuleCategory_Note);
    REGISTER(VolcaBeatsControl, volcabeatscontrol, kModuleCategory_Note);
    REGISTER(RadioSequencer, radiosequencer, kModuleCategory_Other);

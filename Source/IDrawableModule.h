@@ -258,6 +258,8 @@ private:
    virtual void SaveLayout(ofxJSONElement& moduleInfo) {}
    virtual void SetUpFromSaveData() {}
    virtual bool ShouldSavePatchCableSources() const { return true; }
+   virtual bool ShouldShowTriangleMenu() const { return true; }
+   virtual bool ShouldShowReceiveIndicators() const { return true; }
    void ForcePosition();
 
    std::vector<IUIControl*> mUIControls;

@@ -24,6 +24,7 @@
 //
 
 #include "PatchCableSource.h"
+#include "Prefab.h"
 #include "ModularSynth.h"
 #include "TitleBar.h"
 #include "ADSRDisplay.h"
@@ -285,6 +286,22 @@ void PatchCableSource::Render()
                ModuleContainer* targetContainer = target->GetModuleParent()->GetOwningContainer();
                if (owningModuleContainer == targetContainer)
                   continue; //this is an internally-patched cable in a minimized module
+            }
+         }
+
+         if (mDrawPass == DrawPass::kCables)
+         {
+            //a prefab in presentation mode hides its internals, so hide cables to or from its hidden modules
+            if (Prefab::IsHiddenByPresentation(mOwner))
+               continue;
+            IClickable* target = mPatchCables[i]->GetTarget();
+            if (target != nullptr)
+            {
+               IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(target);
+               if (targetModule == nullptr)
+                  targetModule = dynamic_cast<IDrawableModule*>(target->GetParent());
+               if (targetModule != nullptr && targetModule->GetOwningContainer() == mOwner->GetOwningContainer() && Prefab::IsHiddenByPresentation(targetModule))
+                  continue;
             }
          }
       }

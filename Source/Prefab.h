@@ -29,12 +29,14 @@
 
 #include "IDrawableModule.h"
 #include "ClickButton.h"
+#include "Checkbox.h"
+#include "DropdownList.h"
 #include "ModuleContainer.h"
 
 class PatchCableSource;
 class SaveTarget;
 
-class Prefab : public IDrawableModule, public IButtonListener
+class Prefab : public IDrawableModule, public IButtonListener, public IDropdownListener
 {
 public:
    Prefab();
@@ -58,6 +60,7 @@ public:
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -77,6 +80,11 @@ public:
 
    bool IsEnabled() const override { return mEnabled; }
 
+   bool IsInPresentationMode() const { return mPresentationApplied; }
+   bool IsInterfaceModule(const IDrawableModule* module) const;
+   //true if this module is inside a prefab that's currently hiding it for presentation mode
+   static bool IsHiddenByPresentation(const IDrawableModule* module);
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -91,10 +99,36 @@ private:
 
    void UpdatePrefabName(std::string path);
 
+   std::vector<IDrawableModule*> GetInterfaceModules() const;
+   void SetPresentationApplied(bool apply);
+   void UpdateHeaderControls();
+   void LayOutPresentation();
+   float GetWidestPortWidth(bool inlets) const;
+   float GetPresentationLeftMargin() const;
+   void SpawnPort(int index);
+   void PruneInterfaceCables();
+   void BridgePortConnections();
+   ofxJSONElement WriteModulesWithEditPositions();
+   void SavePresentationSettings(ofxJSONElement& info);
+   void LoadPresentationSettings(const ofxJSONElement& info);
+   void AddInterfaceModulesByName(const ofxJSONElement& names);
+
    PatchCableSource* mRemoveModuleCable{ nullptr };
    ClickButton* mSaveButton{ nullptr };
    ClickButton* mLoadButton{ nullptr };
    ClickButton* mDisbandButton{ nullptr };
    ModuleContainer mModuleContainer;
    std::string mPrefabName{ "" };
+
+   PatchCableSource* mInterfaceCable{ nullptr };
+   Checkbox* mPresentationCheckbox{ nullptr };
+   bool mPresentationMode{ false };
+   DropdownList* mAddPortDropdown{ nullptr };
+   int mAddPortIndex{ -1 };
+
+   bool mPresentationApplied{ false };
+   std::map<std::string, ofVec2f> mEditPositions; //positions to restore when leaving presentation mode
+   std::map<std::string, ofVec2f> mPresentationPositions; //remembered interface module positions in presentation mode
+   float mPresentationWidth{ 120 };
+   float mPresentationHeight{ 40 };
 };

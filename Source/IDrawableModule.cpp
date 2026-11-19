@@ -318,7 +318,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
          }
       }
 
-      if (IsSaveable() && !Minimized())
+      if (IsSaveable() && !Minimized() && ShouldShowTriangleMenu())
       {
          ofSetColor(color.r, color.g, color.b, gModuleDrawAlpha);
          if (TheSaveDataPanel->GetModule() == this)
@@ -439,31 +439,34 @@ void IDrawableModule::Render()
    if (Minimized() || IsVisible() == false)
       DrawBeacon(30, -titleBarHeight / 2);
 
-   ofPushStyle();
-   const float kPipWidth = 8;
-   const float kPipSpacing = 2;
-   float receiveIndicatorX = w - (kPipWidth + kPipSpacing);
-   ofFill();
+   if (ShouldShowReceiveIndicators())
+   {
+      ofPushStyle();
+      const float kPipWidth = 8;
+      const float kPipSpacing = 2;
+      float receiveIndicatorX = w - (kPipWidth + kPipSpacing);
+      ofFill();
 
-   if (CanReceiveAudio())
-   {
-      ofSetColor(GetColor(kModuleCategory_Audio));
-      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
-      receiveIndicatorX -= kPipWidth + kPipSpacing;
+      if (CanReceiveAudio())
+      {
+         ofSetColor(GetColor(kModuleCategory_Audio));
+         ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+         receiveIndicatorX -= kPipWidth + kPipSpacing;
+      }
+      if (CanReceiveNotes())
+      {
+         ofSetColor(GetColor(kModuleCategory_Note));
+         ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+         receiveIndicatorX -= kPipWidth + kPipSpacing;
+      }
+      if (CanReceivePulses())
+      {
+         ofSetColor(GetColor(kModuleCategory_Pulse));
+         ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+         receiveIndicatorX -= kPipWidth + kPipSpacing;
+      }
+      ofPopStyle();
    }
-   if (CanReceiveNotes())
-   {
-      ofSetColor(GetColor(kModuleCategory_Note));
-      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
-      receiveIndicatorX -= kPipWidth + kPipSpacing;
-   }
-   if (CanReceivePulses())
-   {
-      ofSetColor(GetColor(kModuleCategory_Pulse));
-      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
-      receiveIndicatorX -= kPipWidth + kPipSpacing;
-   }
-   ofPopStyle();
 
    if (IsResizable() && !Minimized())
    {

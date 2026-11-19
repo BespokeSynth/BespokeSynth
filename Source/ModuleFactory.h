@@ -97,6 +97,12 @@ public:
    static void GetPresets(std::vector<Spawnable>& presets);
    static std::string FixUpTypeName(std::string typeName);
 
+   //hidden modules that are only spawned from within a prefab (see PrefabPort)
+   void RegisterPrefabPort(std::string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleCategory moduleCategory, bool canReceiveAudio, bool canReceiveNotes, bool canReceivePulses)
+   {
+      Register(type, creator, canCreate, moduleCategory, true, false, canReceiveAudio, canReceiveNotes, canReceivePulses);
+   }
+
    static constexpr const char* kPluginSuffix = "[plugin]";
    static constexpr const char* kPrefabSuffix = "[prefab]";
    static constexpr const char* kMidiControllerSuffix = "[midicontroller]";

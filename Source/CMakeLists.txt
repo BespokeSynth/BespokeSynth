@@ -684,6 +684,8 @@ target_sources(BespokeSynth PRIVATE
     Polyrhythms.h
     Prefab.cpp
     Prefab.h
+    PrefabPort.cpp
+    PrefabPort.h
     Pressure.cpp
     Pressure.h
     PressureToCV.cpp
