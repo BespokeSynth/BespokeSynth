@@ -1004,7 +1004,14 @@ private:
 #endif
 
       int keyCode = key.getTextCharacter();
-      if (keyCode < 32 || (key.getModifiers().isAltDown() && !key.getModifiers().isCtrlDown()))
+#if BESPOKE_WINDOWS
+      //on windows, AltGr is reported as Ctrl+Alt. layouts like german, spanish and french type characters such as
+      //~ \ @ [ ] with it, so in that case the typed character is what was meant, not the physical key
+      const bool isAltGr = key.getModifiers().isCtrlDown() && key.getModifiers().isAltDown();
+#else
+      const bool isAltGr = false;
+#endif
+      if (keyCode < 32 || (key.getModifiers().isAltDown() && !isAltGr))
          keyCode = key.getKeyCode();
       bool isRepeat = true;
       if (find(mPressedKeys.begin(), mPressedKeys.end(), keyCode) == mPressedKeys.end())
