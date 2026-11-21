@@ -28,10 +28,8 @@
 #include "PrefabPort.h"
 
 #include "ModularSynth.h"
-#include "ModuleContainer.h"
 #include "ModuleFactory.h"
 #include "PatchCableSource.h"
-#include "Prefab.h"
 #include "Profiler.h"
 #include "SynthGlobals.h"
 
@@ -47,13 +45,6 @@ void PrefabPort::CreateUIControls()
 
    if (PatchCableSource* cableSource = GetPatchCableSource())
       cableSource->SetOverrideCableDir(ofVec2f(1, 0), PatchCableSource::Side::kRight);
-}
-
-Prefab* PrefabPort::GetOwningPrefab() const
-{
-   if (GetOwningContainer() == nullptr)
-      return nullptr;
-   return dynamic_cast<Prefab*>(GetOwningContainer()->GetOwner());
 }
 
 void PrefabPort::SetCompact(bool compact)

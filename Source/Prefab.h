@@ -35,6 +35,7 @@
 
 class PatchCableSource;
 class SaveTarget;
+class PrefabModulationPort;
 
 enum class PrefabDisplayMode
 {
@@ -83,8 +84,7 @@ public:
 
    bool IsEnabled() const override { return mEnabled; }
 
-   bool IsInPresentationMode() const { return mPresentationApplied; }
-   PrefabDisplayMode GetDisplayMode() const { return (PrefabDisplayMode)mDisplayMode; }
+   PrefabDisplayMode GetDisplayMode() const { return mDisplayMode; }
    bool IsInterfaceModule(const IDrawableModule* module) const;
    void SetInterfaceModule(IDrawableModule* module, bool isInterface);
    //moves a module out of this prefab into the prefab's parent container. ports can't be removed, only deleted.
@@ -94,7 +94,7 @@ public:
    static Prefab* GetOwningPrefab(const IDrawableModule* module);
    //true if this module is inside a prefab that's currently hiding it for presentation mode
    static bool IsHiddenByPresentation(const IDrawableModule* module);
-   static bool SuppressesCableSourcesOf(const IDrawableModule* module);
+   static bool ShouldSuppressCableSource(const PatchCableSource* source);
    void OpenSaveDialog();
 
 private:
@@ -120,6 +120,7 @@ private:
    void SpawnPort(int index);
    void PruneInterfaceModules();
    void BridgePortConnections();
+   bool BridgeModulationPort(PrefabModulationPort* port, const std::vector<IDrawableModule*>& allModules);
    ofxJSONElement WriteModulesWithEditPositions();
    void SavePresentationSettings(ofxJSONElement& info);
    void LoadPresentationSettings(const ofxJSONElement& info);
@@ -138,8 +139,9 @@ private:
    int mAddPortIndex{ -1 };
 
    bool mPresentationApplied{ false };
-   std::map<std::string, ofVec2f> mEditPositions; //positions to restore when leaving presentation mode
-   std::map<std::string, ofVec2f> mPresentationPositions; //remembered interface module positions in presentation mode
+   //keyed by module rather than name, so renaming a module doesn't lose its positions. names are only used when saving.
+   std::map<IDrawableModule*, ofVec2f> mEditPositions; //positions to restore when leaving presentation mode
+   std::map<IDrawableModule*, ofVec2f> mPresentationPositions; //remembered interface module positions in presentation mode
    float mPresentationWidth{ 120 };
    float mPresentationHeight{ 40 };
 

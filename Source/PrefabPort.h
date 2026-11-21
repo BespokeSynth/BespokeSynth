@@ -39,7 +39,6 @@
 #include "IModulator.h"
 #include "Slider.h"
 
-class Prefab;
 class ModuleFactory;
 
 enum class PrefabPortType
@@ -58,12 +57,10 @@ public:
    void CreateUIControls() override;
    PrefabPortType GetPortType() const { return mPortType; }
    bool IsInlet() const { return mIsInlet; }
-   Prefab* GetOwningPrefab() const;
 
    //compact mode is used when the owning prefab is in presentation mode
    void SetCompact(bool compact);
    bool IsCompact() const { return mCompact; }
-   static constexpr float kCompactWidthPadding = 90;
 
    bool HasTitleBar() const override { return !mCompact; }
    bool IsEnabled() const override { return true; }
@@ -160,6 +157,9 @@ public:
    float Value(int samplesIn = 0) override;
    bool Active() const override { return true; }
    bool CanAdjustRange() const override { return false; }
+
+   //the patch target for incoming modulation
+   FloatSlider* GetValueSlider() const { return mValueSlider; }
 
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}

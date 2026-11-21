@@ -47,7 +47,7 @@ namespace
 {
    const float paddingX = 5;
    const float paddingY = 5;
-   const float kEditTopMargin = 50; //room for the two rows of header controls
+   const float kEditTopMargin = 51; //room for the two rows of header controls
    const float kPresentationTopMargin = 20; //presentation mode only shows the mode dropdown
    const float kLockedTopMargin = paddingY; //locked mode shows no header controls
    const float kEditMinWidth = 175;
@@ -232,7 +232,7 @@ void Prefab::DrawModuleUnclipped()
 {
    mModuleContainer.DrawUnclipped();
 
-   if (!mPresentationApplied)
+   if (!mPresentationApplied && !Minimized())
    {
       //outline the modules that make up the presentation-mode interface
       ofPushStyle();
@@ -298,7 +298,7 @@ void Prefab::RemoveModule(IDrawableModule* module)
       SetPresentationApplied(false);
 
    RemoveFromVector(module, mInterfaceModules);
-   mPresentationPositions.erase(module->Name());
+   mPresentationPositions.erase(module);
    GetOwningContainer()->TakeModule(module);
    GetOwningContainer()->MoveToFront(this);
 
@@ -323,24 +323,32 @@ bool Prefab::IsHiddenByPresentation(const IDrawableModule* module)
 {
    if (module == nullptr || module->IsShowing())
       return false;
-   ModuleContainer* container = module->GetOwningContainer();
-   if (container == nullptr)
-      return false;
-   Prefab* prefab = dynamic_cast<Prefab*>(container->GetOwner());
+   Prefab* prefab = GetOwningPrefab(module);
    return prefab != nullptr && prefab->mPresentationApplied;
 }
 
 //static
-bool Prefab::SuppressesCableSourcesOf(const IDrawableModule* module)
+bool Prefab::ShouldSuppressCableSource(const PatchCableSource* source)
 {
    //in presentation mode only the ports are patchable, everything else inside acts like its cable sources aren't showing
-   if (module == nullptr)
+   IDrawableModule* owner = source ? source->GetOwner() : nullptr;
+   Prefab* prefab = owner ? GetOwningPrefab(owner) : nullptr;
+   if (prefab == nullptr || prefab->mPresentationApplied == false)
       return false;
-   ModuleContainer* container = module->GetOwningContainer();
-   if (container == nullptr)
+   if (dynamic_cast<const PrefabPort*>(owner))
       return false;
-   Prefab* prefab = dynamic_cast<Prefab*>(container->GetOwner());
-   return prefab != nullptr && prefab->mPresentationApplied && dynamic_cast<const PrefabPort*>(module) == nullptr;
+   for (auto* cable : source->GetPatchCables())
+   {
+      auto* target = cable->GetTarget();
+      if (target != nullptr)
+      {
+         IDrawableModule* targetModule = target->GetModuleParent();
+         if (targetModule != nullptr && GetOwningPrefab(targetModule) != prefab)
+            return false;
+      }
+   }
+
+   return true;
 }
 
 void Prefab::PruneInterfaceModules()
@@ -351,6 +359,14 @@ void Prefab::PruneInterfaceModules()
    {
       if (!VectorContains(*iter, members) || (*iter)->IsDeleted())
          iter = mInterfaceModules.erase(iter);
+      else
+         ++iter;
+   }
+   for (auto iter = mPresentationPositions.begin(); iter != mPresentationPositions.end();)
+   {
+      auto* module = iter->first;
+      if (!VectorContains(module, members) || module->IsDeleted())
+         iter = mPresentationPositions.erase(iter);
       else
          ++iter;
    }
@@ -402,7 +418,7 @@ void Prefab::SetPresentationApplied(bool apply)
    {
       mEditPositions.clear();
       for (auto* module : modules)
-         mEditPositions[module->Name()] = module->GetPosition(true);
+         mEditPositions[module] = module->GetPosition(true);
 
       //modules that don't have a remembered presentation position keep their relative layout, packed into the corner
       std::vector<IDrawableModule*> interfaceModules = GetInterfaceModules();
@@ -427,7 +443,7 @@ void Prefab::SetPresentationApplied(bool apply)
          else if (VectorContains(module, interfaceModules))
          {
             module->SetShowing(true);
-            auto stored = mPresentationPositions.find(module->Name());
+            auto stored = mPresentationPositions.find(module);
             if (stored != mPresentationPositions.end())
                module->SetPosition(stored->second.x, stored->second.y);
             else
@@ -445,7 +461,7 @@ void Prefab::SetPresentationApplied(bool apply)
    else
    {
       for (auto* module : GetInterfaceModules())
-         mPresentationPositions[module->Name()] = module->GetPosition(true);
+         mPresentationPositions[module] = module->GetPosition(true);
 
       for (auto* module : modules)
       {
@@ -453,7 +469,7 @@ void Prefab::SetPresentationApplied(bool apply)
          PrefabPort* port = dynamic_cast<PrefabPort*>(module);
          if (port != nullptr)
             port->SetCompact(false);
-         auto edit = mEditPositions.find(module->Name());
+         auto edit = mEditPositions.find(module);
          if (edit != mEditPositions.end())
             module->SetPosition(edit->second.x, edit->second.y);
       }
@@ -461,8 +477,6 @@ void Prefab::SetPresentationApplied(bool apply)
       mEditPositions.clear();
       mPresentationApplied = false;
    }
-
-   UpdateHeaderControls();
 }
 
 void Prefab::LayOutPresentation(float topMargin)
@@ -514,8 +528,8 @@ void Prefab::LayOutPresentation(float topMargin)
    }
    auto editOrder = [this](PrefabPort* a, PrefabPort* b)
    {
-      ofVec2f posA = mEditPositions.count(a->Name()) ? mEditPositions[a->Name()] : a->GetPosition(true);
-      ofVec2f posB = mEditPositions.count(b->Name()) ? mEditPositions[b->Name()] : b->GetPosition(true);
+      ofVec2f posA = mEditPositions.count(a) ? mEditPositions[a] : a->GetPosition(true);
+      ofVec2f posB = mEditPositions.count(b) ? mEditPositions[b] : b->GetPosition(true);
       if (posA.y != posB.y)
          return posA.y < posB.y;
       return posA.x < posB.x;
@@ -532,7 +546,7 @@ void Prefab::LayOutPresentation(float topMargin)
 
    //inlets are left-justified against the left edge, outlets right-justified against the right edge
    float height = contentBottom + paddingY;
-   auto stackPorts = [&height](const std::vector<PrefabPort*>& ports, float edgeX, bool rightJustify, float topMargin)
+   auto stackPorts = [&height, topMargin](const std::vector<PrefabPort*>& ports, float edgeX, bool rightJustify)
    {
       float y = topMargin + 2;
       for (auto* port : ports)
@@ -544,8 +558,8 @@ void Prefab::LayOutPresentation(float topMargin)
       }
       height = MAX(height, y - kPortSpacing + paddingY);
    };
-   stackPorts(inlets, paddingX, false, topMargin);
-   stackPorts(outlets, width - paddingX, true, topMargin);
+   stackPorts(inlets, paddingX, false);
+   stackPorts(outlets, width - paddingX, true);
 
    mPresentationWidth = width;
    mPresentationHeight = MAX(height, 40);
@@ -588,11 +602,11 @@ void Prefab::SpawnPort(int index)
 
    std::string name = GetUniqueName(PrefabPort::GetDefaultName(type, isInlet), mModuleContainer.GetModules());
 
-   //drop it in below the current contents, inlets on the left and outlets on the right
+   //drop it in below the current contents, inlets on the left and outlets on the right (placed once we know its width)
    float w, h;
    GetDimensions(w, h);
    ofVec2f pos = GetPosition();
-   float x = pos.x + (isInlet ? paddingX : MAX(paddingX, w - paddingX - PrefabPort::kCompactWidthPadding));
+   float x = pos.x + paddingX;
    float y = pos.y + h + TitleBarHeight() + 5;
 
    ModuleFactory::Spawnable spawnable;
@@ -607,11 +621,81 @@ void Prefab::SpawnPort(int index)
    std::vector<IDrawableModule*> others = mModuleContainer.GetModules();
    RemoveFromVector(module, others);
    module->SetName(GetUniqueName(name, others).c_str());
+
+   if (!isInlet)
+   {
+      float portW, portH;
+      module->GetDimensions(portW, portH);
+      module->SetPosition(MAX(paddingX, w - paddingX - portW), module->GetPosition(true).y);
+   }
+}
+
+bool Prefab::BridgeModulationPort(PrefabModulationPort* port, const std::vector<IDrawableModule*>& allModules)
+{
+   //modulators patched into the port's value slider get retargeted to whatever the port was modulating
+   PatchCableSource* portOutput = port->GetPatchCableSource();
+   FloatSlider* portSlider = port->GetValueSlider();
+   if (portOutput == nullptr || portSlider == nullptr)
+      return false;
+
+   std::vector<IClickable*> downstream;
+   for (auto* cable : portOutput->GetPatchCables())
+   {
+      if (cable != nullptr && cable->GetTarget() != nullptr && cable->GetTarget() != portSlider)
+         downstream.push_back(cable->GetTarget());
+   }
+   if (downstream.empty())
+      return false;
+
+   std::vector<std::pair<PatchCableSource*, PatchCable*>> upstream;
+   for (auto* other : allModules)
+   {
+      if (other == port || other->IsDeleted())
+         continue;
+      for (auto* source : other->GetPatchCableSources())
+      {
+         for (auto* cable : source->GetPatchCables())
+         {
+            if (cable != nullptr && cable->GetTarget() == portSlider)
+               upstream.push_back(std::make_pair(source, cable));
+         }
+      }
+   }
+   if (upstream.empty())
+      return false;
+
+   //the incoming modulation's range lives on the port's slider, carry it over to the new targets
+   float modulatorMin = portSlider->GetModulatorMin();
+   float modulatorMax = portSlider->GetModulatorMax();
+
+   //release the downstream sliders first, so they're free to take on the upstream modulators
+   portOutput->Clear();
+
+   for (auto& entry : upstream)
+   {
+      PatchCableSource* source = entry.first;
+      source->SetPatchCableTarget(entry.second, downstream[0], false);
+      const size_t kMaxModulatorTargets = 10; //size of IModulator::mTargets
+      for (size_t i = 1; i < downstream.size() && source->GetPatchCables().size() < kMaxModulatorTargets; ++i)
+         source->AddPatchCable(downstream[i]);
+   }
+
+   for (auto* target : downstream)
+   {
+      FloatSlider* slider = dynamic_cast<FloatSlider*>(target);
+      if (slider != nullptr)
+      {
+         slider->GetModulatorMin() = modulatorMin;
+         slider->GetModulatorMax() = modulatorMax;
+      }
+   }
+
+   return true;
 }
 
 void Prefab::BridgePortConnections()
 {
-   //when disbanding, splice whatever was patched into an audio/note/pulse port straight through to the port's targets.
+   //when disbanding, splice whatever was patched into a port straight through to the port's targets.
    //multiple passes handle ports patched directly into other ports.
    for (int pass = 0; pass < 4; ++pass)
    {
@@ -622,8 +706,14 @@ void Prefab::BridgePortConnections()
       for (auto* module : mModuleContainer.GetModules())
       {
          PrefabPort* port = dynamic_cast<PrefabPort*>(module);
-         if (port == nullptr || port->GetPortType() == PrefabPortType::Modulation)
+         if (port == nullptr)
             continue;
+         if (port->GetPortType() == PrefabPortType::Modulation)
+         {
+            if (BridgeModulationPort(dynamic_cast<PrefabModulationPort*>(port), allModules))
+               changed = true;
+            continue;
+         }
          PatchCableSource* portOutput = port->GetPatchCableSource();
          if (portOutput == nullptr)
             continue;
@@ -741,10 +831,14 @@ ofxJSONElement Prefab::WriteModulesWithEditPositions()
    //always save the edit layout, presentation positions are stored separately
    if (mPresentationApplied)
    {
+      std::map<std::string, ofVec2f> editPositionsByName;
+      for (const auto& edit : mEditPositions)
+         editPositionsByName[edit.first->Name()] = edit.second;
+
       for (unsigned int i = 0; i < modules.size(); ++i)
       {
-         auto edit = mEditPositions.find(modules[i]["name"].asString());
-         if (edit != mEditPositions.end())
+         auto edit = editPositionsByName.find(modules[i]["name"].asString());
+         if (edit != editPositionsByName.end())
          {
             modules[i]["position"][0u] = edit->second.x;
             modules[i]["position"][1u] = edit->second.y;
@@ -757,20 +851,21 @@ ofxJSONElement Prefab::WriteModulesWithEditPositions()
 
 void Prefab::SavePresentationSettings(ofxJSONElement& info)
 {
-   std::map<std::string, ofVec2f> positions = mPresentationPositions;
+   std::map<IDrawableModule*, ofVec2f> positions = mPresentationPositions;
    if (mPresentationApplied)
    {
       for (auto* module : GetInterfaceModules())
-         positions[module->Name()] = module->GetPosition(true);
+         positions[module] = module->GetPosition(true);
    }
 
    ofxJSONElement positionsJson(Json::objectValue);
    for (const auto& entry : positions)
    {
-      if (mModuleContainer.FindModule(entry.first, false) == nullptr)
+      if (!VectorContains(entry.first, mModuleContainer.GetModules()) || entry.first->IsDeleted())
          continue;
-      positionsJson[entry.first][0u] = entry.second.x;
-      positionsJson[entry.first][1u] = entry.second.y;
+      std::string name = entry.first->Name();
+      positionsJson[name][0u] = entry.second.x;
+      positionsJson[name][1u] = entry.second.y;
    }
    info["presentation_positions"] = positionsJson;
 
@@ -787,7 +882,11 @@ void Prefab::LoadPresentationSettings(const ofxJSONElement& info)
    {
       const Json::Value& positions = info["presentation_positions"];
       for (const auto& name : positions.getMemberNames())
-         mPresentationPositions[name] = ofVec2f(positions[name][0u].asFloat(), positions[name][1u].asFloat());
+      {
+         IDrawableModule* module = mModuleContainer.FindModule(name, false);
+         if (module != nullptr && VectorContains(module, mModuleContainer.GetModules()))
+            mPresentationPositions[module] = ofVec2f(positions[name][0u].asFloat(), positions[name][1u].asFloat());
+      }
    }
 
    mInterfaceModules.clear();
