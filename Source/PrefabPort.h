@@ -39,8 +39,6 @@
 #include "IModulator.h"
 #include "Slider.h"
 
-class ModuleFactory;
-
 enum class PrefabPortType
 {
    Audio,
@@ -66,7 +64,6 @@ public:
    bool IsEnabled() const override { return true; }
    void SetEnabled(bool enabled) override {}
 
-   static void RegisterAll(ModuleFactory* factory);
    static std::string GetTypeName(PrefabPortType type, bool isInlet);
    static std::string GetDefaultName(PrefabPortType type, bool isInlet);
 
@@ -88,8 +85,10 @@ private:
 
 class PrefabAudioPort : public PrefabPort, public IAudioProcessor
 {
-public:
+protected:
    explicit PrefabAudioPort(bool isInlet);
+
+public:
    static bool AcceptsAudio() { return true; }
    static bool AcceptsNotes() { return false; }
    static bool AcceptsPulses() { return false; }
@@ -105,8 +104,10 @@ public:
 
 class PrefabNotePort : public PrefabPort, public NoteEffectBase
 {
-public:
+protected:
    explicit PrefabNotePort(bool isInlet);
+
+public:
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return true; }
    static bool AcceptsPulses() { return false; }
@@ -123,8 +124,10 @@ public:
 
 class PrefabPulsePort : public PrefabPort, public IPulseSource, public IPulseReceiver
 {
-public:
+protected:
    explicit PrefabPulsePort(bool isInlet);
+
+public:
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return false; }
    static bool AcceptsPulses() { return true; }
@@ -140,8 +143,10 @@ public:
 
 class PrefabModulationPort : public PrefabPort, public IModulator, public IFloatSliderListener
 {
-public:
+protected:
    explicit PrefabModulationPort(bool isInlet);
+
+public:
    ~PrefabModulationPort();
    static bool AcceptsAudio() { return false; }
    static bool AcceptsNotes() { return false; }
@@ -177,4 +182,78 @@ private:
 
    float mValue{ 0 };
    FloatSlider* mValueSlider{ nullptr };
+};
+
+//concrete inlet/outlet types, registered with the module factory as hidden modules (they're spawned via a prefab's "+ in/out" dropdown)
+
+class PrefabAudioInlet : public PrefabAudioPort
+{
+public:
+   PrefabAudioInlet()
+   : PrefabAudioPort(true)
+   {}
+   static IDrawableModule* Create() { return new PrefabAudioInlet(); }
+};
+
+class PrefabAudioOutlet : public PrefabAudioPort
+{
+public:
+   PrefabAudioOutlet()
+   : PrefabAudioPort(false)
+   {}
+   static IDrawableModule* Create() { return new PrefabAudioOutlet(); }
+};
+
+class PrefabNoteInlet : public PrefabNotePort
+{
+public:
+   PrefabNoteInlet()
+   : PrefabNotePort(true)
+   {}
+   static IDrawableModule* Create() { return new PrefabNoteInlet(); }
+};
+
+class PrefabNoteOutlet : public PrefabNotePort
+{
+public:
+   PrefabNoteOutlet()
+   : PrefabNotePort(false)
+   {}
+   static IDrawableModule* Create() { return new PrefabNoteOutlet(); }
+};
+
+class PrefabPulseInlet : public PrefabPulsePort
+{
+public:
+   PrefabPulseInlet()
+   : PrefabPulsePort(true)
+   {}
+   static IDrawableModule* Create() { return new PrefabPulseInlet(); }
+};
+
+class PrefabPulseOutlet : public PrefabPulsePort
+{
+public:
+   PrefabPulseOutlet()
+   : PrefabPulsePort(false)
+   {}
+   static IDrawableModule* Create() { return new PrefabPulseOutlet(); }
+};
+
+class PrefabModulationInlet : public PrefabModulationPort
+{
+public:
+   PrefabModulationInlet()
+   : PrefabModulationPort(true)
+   {}
+   static IDrawableModule* Create() { return new PrefabModulationInlet(); }
+};
+
+class PrefabModulationOutlet : public PrefabModulationPort
+{
+public:
+   PrefabModulationOutlet()
+   : PrefabModulationPort(false)
+   {}
+   static IDrawableModule* Create() { return new PrefabModulationOutlet(); }
 };

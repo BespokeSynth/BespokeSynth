@@ -396,7 +396,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(Ramper, ramper, kModuleCategory_Modulator);
    REGISTER(NoteGate, notegate, kModuleCategory_Note);
    REGISTER(Prefab, prefab, kModuleCategory_Other);
-   PrefabPort::RegisterAll(this);
    REGISTER(NoteHumanizer, notehumanizer, kModuleCategory_Note);
    REGISTER(VolcaBeatsControl, volcabeatscontrol, kModuleCategory_Note);
    REGISTER(RadioSequencer, radiosequencer, kModuleCategory_Other);
@@ -545,6 +544,14 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(PanicButton, panicbutton, kModuleCategory_Other);
    REGISTER_HIDDEN(DebugAudioSource, debugaudiosource, kModuleCategory_Synth);
    REGISTER_HIDDEN(FollowingSong, followingsong, kModuleCategory_Synth);
+   REGISTER_HIDDEN(PrefabAudioInlet, prefabaudioin, kModuleCategory_Audio);
+   REGISTER_HIDDEN(PrefabAudioOutlet, prefabaudioout, kModuleCategory_Audio);
+   REGISTER_HIDDEN(PrefabNoteInlet, prefabnotein, kModuleCategory_Note);
+   REGISTER_HIDDEN(PrefabNoteOutlet, prefabnoteout, kModuleCategory_Note);
+   REGISTER_HIDDEN(PrefabPulseInlet, prefabpulsein, kModuleCategory_Pulse);
+   REGISTER_HIDDEN(PrefabPulseOutlet, prefabpulseout, kModuleCategory_Pulse);
+   REGISTER_HIDDEN(PrefabModulationInlet, prefabmodin, kModuleCategory_Modulator);
+   REGISTER_HIDDEN(PrefabModulationOutlet, prefabmodout, kModuleCategory_Modulator);
    REGISTER_HIDDEN(BeatBloks, beatbloks, kModuleCategory_Synth);
    REGISTER_HIDDEN(FilterViz, filterviz, kModuleCategory_Other);
    REGISTER_HIDDEN(FreqDomainBoilerplate, freqdomainboilerplate, kModuleCategory_Audio);
