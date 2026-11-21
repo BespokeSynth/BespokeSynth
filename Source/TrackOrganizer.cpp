@@ -465,6 +465,36 @@ void TrackOrganizer::GatherModules(const std::vector<IDrawableModule*>& modulesT
    }
 }
 
+bool TrackOrganizer::HasTrackModule(const IDrawableModule* module)
+{
+   if (module == nullptr || module == this)
+      return false;
+   for (const auto* source : GetPatchCableSources())
+   {
+      for (const auto* cable : source->GetPatchCables())
+      {
+         if (cable != nullptr && cable->GetTarget() == static_cast<const IClickable*>(module))
+            return true;
+      }
+   }
+   return false;
+}
+
+void TrackOrganizer::RemoveTrackModule(IDrawableModule* module)
+{
+   for (auto* source : GetPatchCableSources())
+   {
+      std::vector<PatchCable*> toRemove;
+      for (auto* cable : source->GetPatchCables())
+      {
+         if (cable != nullptr && cable->GetTarget() == static_cast<IClickable*>(module))
+            toRemove.push_back(cable);
+      }
+      for (auto* cable : toRemove)
+         source->RemovePatchCable(cable, true);
+   }
+}
+
 void TrackOrganizer::ButtonClicked(ClickButton* button, double time)
 {
    if (button == mSelectModulesButton)

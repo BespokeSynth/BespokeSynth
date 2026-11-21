@@ -900,9 +900,13 @@ void IDrawableModule::GetDimensions(float& width, float& height)
       height = 1;
       return; //special case for repatch stub, let it be 1 pixel
    }
-   ofVec2f minimumDimensions = GetMinimumDimensions();
-   moduleWidth = MAX(moduleWidth, minimumDimensions.x);
-   moduleHeight = MAX(moduleHeight, minimumDimensions.y);
+
+   if (!ShouldForceExactDimensions())
+   {
+      ofVec2f minimumDimensions = GetMinimumDimensions();
+      moduleWidth = MAX(moduleWidth, minimumDimensions.x);
+      moduleHeight = MAX(moduleHeight, minimumDimensions.y);
+   }
 
    width = EaseIn(moduleWidth, minimizedWidth, mMinimizeAnimation);
    height = EaseOut(moduleHeight, minimizedHeight, mMinimizeAnimation);

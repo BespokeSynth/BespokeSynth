@@ -80,6 +80,8 @@ public:
    std::string GetTrackName() const { return mTrackName; }
    ofRectangle GetBoundingRect();
    void GatherModules(const std::vector<IDrawableModule*>& modulesToAdd);
+   bool HasTrackModule(const IDrawableModule* module);
+   void RemoveTrackModule(IDrawableModule* module);
 
    //IModuleDecorator
    void DrawModuleDecoration(IDrawableModule* module) override;

@@ -34,6 +34,7 @@
 #include "ModuleSaveData.h"
 
 class ModuleSaveDataPanel;
+class TrackOrganizer;
 
 extern ModuleSaveDataPanel* TheSaveDataPanel;
 
@@ -77,6 +78,8 @@ private:
    void ApplyChanges();
    void FillDropdownList(DropdownList* list, ModuleSaveData::SaveVal* save);
    void RefreshPresetFiles();
+   std::vector<TrackOrganizer*> GetTrackOrganizersOwning(IDrawableModule* module);
+   TrackOrganizer* GetTrackOrganizerSurrounding(IDrawableModule* module);
 
    //IDrawableModule
    void DrawModule() override;
@@ -92,6 +95,11 @@ private:
    ClickButton* mDeleteButton{ nullptr };
    Checkbox* mDrawDebugCheckbox{ nullptr };
    ClickButton* mResetSequencerButton{ nullptr };
+   ClickButton* mSavePrefabButton{ nullptr };
+   ClickButton* mPrefabPresentationButton{ nullptr };
+   ClickButton* mRemoveFromPrefabButton{ nullptr };
+   ClickButton* mRemoveFromTrackOrganizerButton{ nullptr };
+   ClickButton* mAddToTrackOrganizerButton{ nullptr };
    TextEntry* mTransportPriorityEntry{ nullptr };
    std::map<DropdownList*, ModuleSaveData::SaveVal*> mStringDropdowns;
 

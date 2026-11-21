@@ -618,6 +618,8 @@ int PatchCableSource::GetHoverIndex(float x, float y) const
 
 bool PatchCableSource::Enabled() const
 {
+   if (mEnabled && Prefab::SuppressesCableSourcesOf(mOwner))
+      return false;
    return mEnabled;
 }
 

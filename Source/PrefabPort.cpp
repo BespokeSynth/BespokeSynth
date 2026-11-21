@@ -80,13 +80,8 @@ void PrefabPort::DrawModule()
    if (!DrawsLabel())
       return;
 
-   float w, h;
-   GetDimensions(w, h);
    if (mCompact)
-   {
-      //in presentation mode the module's name is the only thing that identifies the port
-      DrawTextNormal(std::string(Name()), 4, 12, 11);
-   }
+      DrawTextNormal(std::string(Name()), 4, 12);
 }
 
 void PrefabPort::GetModuleDimensions(float& width, float& height)
@@ -98,7 +93,7 @@ void PrefabPort::GetModuleDimensions(float& width, float& height)
    }
    else
    {
-      width = 0;
+      width = GetStringWidth(Name()) + 8;
       height = 17;
    }
 }
@@ -293,14 +288,7 @@ void PrefabModulationPort::DrawModule()
       return;
 
    if (IsCompact())
-   {
-      float w, h;
-      GetDimensions(w, h);
-      if (IsInlet())
-         DrawTextNormal("> " + std::string(Name()), 4, 11, 11);
-      else
-         DrawTextRightJustify(std::string(Name()) + " >", w - 4, 11, 11);
-   }
+      DrawTextNormal(std::string(Name()), 4, 11);
 
    mValueSlider->Draw();
 }

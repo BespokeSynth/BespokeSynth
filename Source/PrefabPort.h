@@ -78,6 +78,7 @@ protected:
    void GetModuleDimensions(float& width, float& height) override;
    bool ShouldShowTriangleMenu() const override { return !mCompact; }
    bool ShouldShowReceiveIndicators() const override { return !mCompact || mIsInlet; }
+   bool ShouldForceExactDimensions() const override { return mCompact; }
 
    virtual void OnCompactChanged() {}
    virtual bool DrawsLabel() const { return true; }
