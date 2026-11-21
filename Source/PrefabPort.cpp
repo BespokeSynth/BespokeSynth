@@ -52,6 +52,11 @@ void PrefabPort::SetCompact(bool compact)
    if (compact == mCompact)
       return;
    mCompact = compact;
+
+   //in presentation mode an inlet's output only feeds the prefab's hidden internals, so hide it
+   if (PatchCableSource* cableSource = GetPatchCableSource())
+      cableSource->SetShowing(!(mIsInlet && mCompact));
+
    OnCompactChanged();
 }
 
@@ -59,14 +64,6 @@ void PrefabPort::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-
-   if (PatchCableSource* cableSource = GetPatchCableSource())
-   {
-      if (mIsInlet && mCompact)
-         cableSource->SetShowing(false);
-      else
-         cableSource->SetShowing(true);
-   }
 
    if (!DrawsLabel())
       return;
@@ -117,30 +114,54 @@ void PrefabPort::RegisterAll(ModuleFactory* factory)
    {
       return true;
    };
-   factory->RegisterPrefabPort(GetTypeName(PrefabPortType::Audio, true), []() -> IDrawableModule*
-                               { return new PrefabAudioPort(true); },
-                               canCreate, kModuleCategory_Audio, true, false, false);
-   factory->RegisterPrefabPort(GetTypeName(PrefabPortType::Audio, false), []() -> IDrawableModule*
-                               { return new PrefabAudioPort(false); },
-                               canCreate, kModuleCategory_Audio, true, false, false);
-   factory->RegisterPrefabPort(GetTypeName(PrefabPortType::Note, true), []() -> IDrawableModule*
-                               { return new PrefabNotePort(true); },
-                               canCreate, kModuleCategory_Note, false, true, false);
-   factory->RegisterPrefabPort(GetTypeName(PrefabPortType::Note, false), []() -> IDrawableModule*
-                               { return new PrefabNotePort(false); },
-                               canCreate, kModuleCategory_Note, false, true, false);
-   factory->RegisterPrefabPort(GetTypeName(PrefabPortType::Pulse, true), []() -> IDrawableModule*
-                               { return new PrefabPulsePort(true); },
-                               canCreate, kModuleCategory_Pulse, false, false, true);
-   factory->RegisterPrefabPort(GetTypeName(PrefabPortType::Pulse, false), []() -> IDrawableModule*
-                               { return new PrefabPulsePort(false); },
-                               canCreate, kModuleCategory_Pulse, false, false, true);
-   factory->RegisterPrefabPort(GetTypeName(PrefabPortType::Modulation, true), []() -> IDrawableModule*
-                               { return new PrefabModulationPort(true); },
-                               canCreate, kModuleCategory_Modulator, false, false, false);
-   factory->RegisterPrefabPort(GetTypeName(PrefabPortType::Modulation, false), []() -> IDrawableModule*
-                               { return new PrefabModulationPort(false); },
-                               canCreate, kModuleCategory_Modulator, false, false, false);
+   factory->RegisterPrefabPort(
+   GetTypeName(PrefabPortType::Audio, true), []() -> IDrawableModule*
+   {
+      return new PrefabAudioPort(true);
+   },
+   canCreate, kModuleCategory_Audio, true, false, false);
+   factory->RegisterPrefabPort(
+   GetTypeName(PrefabPortType::Audio, false), []() -> IDrawableModule*
+   {
+      return new PrefabAudioPort(false);
+   },
+   canCreate, kModuleCategory_Audio, true, false, false);
+   factory->RegisterPrefabPort(
+   GetTypeName(PrefabPortType::Note, true), []() -> IDrawableModule*
+   {
+      return new PrefabNotePort(true);
+   },
+   canCreate, kModuleCategory_Note, false, true, false);
+   factory->RegisterPrefabPort(
+   GetTypeName(PrefabPortType::Note, false), []() -> IDrawableModule*
+   {
+      return new PrefabNotePort(false);
+   },
+   canCreate, kModuleCategory_Note, false, true, false);
+   factory->RegisterPrefabPort(
+   GetTypeName(PrefabPortType::Pulse, true), []() -> IDrawableModule*
+   {
+      return new PrefabPulsePort(true);
+   },
+   canCreate, kModuleCategory_Pulse, false, false, true);
+   factory->RegisterPrefabPort(
+   GetTypeName(PrefabPortType::Pulse, false), []() -> IDrawableModule*
+   {
+      return new PrefabPulsePort(false);
+   },
+   canCreate, kModuleCategory_Pulse, false, false, true);
+   factory->RegisterPrefabPort(
+   GetTypeName(PrefabPortType::Modulation, true), []() -> IDrawableModule*
+   {
+      return new PrefabModulationPort(true);
+   },
+   canCreate, kModuleCategory_Modulator, false, false, false);
+   factory->RegisterPrefabPort(
+   GetTypeName(PrefabPortType::Modulation, false), []() -> IDrawableModule*
+   {
+      return new PrefabModulationPort(false);
+   },
+   canCreate, kModuleCategory_Modulator, false, false, false);
 }
 
 /////////////////////////////////////////////////////////////////////////////
