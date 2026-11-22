@@ -1003,17 +1003,46 @@ private:
       }
 #endif
 
+      const bool isComposedCharacter = IsComposedCharacter(key);
       int keyCode = key.getTextCharacter();
-      if (keyCode < 32 || key.getModifiers().isAltDown())
+      if (keyCode < 32 || (key.getModifiers().isAltDown() && !isComposedCharacter))
          keyCode = key.getKeyCode();
       bool isRepeat = true;
-      if (find(mPressedKeys.begin(), mPressedKeys.end(), keyCode) == mPressedKeys.end())
+      auto pressed = std::find_if(mPressedKeys.begin(), mPressedKeys.end(), [keyCode](const PressedKey& pressedKey)
+                                  {
+                                     return pressedKey.mKeyCode == keyCode;
+                                  });
+      if (pressed == mPressedKeys.end())
       {
-         mPressedKeys.push_back(keyCode);
+         //remember the physical key too, since a typed character like '@' doesn't map back to the key that is held
+         mPressedKeys.push_back({ keyCode, key.getKeyCode() });
          isRepeat = false;
       }
+      //the modifiers were used to type the character, so they shouldn't also be treated as a shortcut chord
+      SetIgnoreCharacterModifiers(isComposedCharacter);
       mSynth.KeyPressed(keyCode, isRepeat);
+      SetIgnoreCharacterModifiers(false);
       return true;
+   }
+
+   //many non-us layouts type characters such as ~ \ @ [ ] with a modifier. when that happens, the typed character is
+   //what was meant, not the physical key
+   static bool IsComposedCharacter(const KeyPress& key)
+   {
+      const ModifierKeys mods = key.getModifiers();
+      const juce_wchar typed = key.getTextCharacter();
+      if (!mods.isAltDown() || typed < 32)
+         return false;
+#if BESPOKE_WINDOWS
+      //windows reports AltGr as Ctrl+Alt
+      return mods.isCtrlDown();
+#elif BESPOKE_MAC
+      //option types non-ascii symbols on a us layout too, so only take plain ascii, so that alt+key shortcuts
+      //like hotbinding with alt+number keep working there
+      return !mods.isCommandDown() && !mods.isCtrlDown() && typed < 127;
+#else
+      return false;
+#endif
    }
 
 #if BESPOKE_MOBILE
@@ -1066,11 +1095,12 @@ private:
    {
       if (!isKeyDown)
       {
-         for (int keyCode : mPressedKeys)
+         for (auto iter = mPressedKeys.begin(); iter != mPressedKeys.end(); ++iter)
          {
-            if (!KeyPress::isKeyCurrentlyDown(keyCode))
+            if (!KeyPress::isKeyCurrentlyDown(iter->mPhysicalKeyCode))
             {
-               mPressedKeys.remove(keyCode);
+               int keyCode = iter->mKeyCode;
+               mPressedKeys.erase(iter);
                mSynth.KeyReleased(keyCode);
                break;
             }
@@ -1137,7 +1167,12 @@ private:
 
    int64 mLastFpsUpdateTime;
    int mFrameCountAccum;
-   std::list<int> mPressedKeys;
+   struct PressedKey
+   {
+      int mKeyCode{ 0 };
+      int mPhysicalKeyCode{ 0 };
+   };
+   std::list<PressedKey> mPressedKeys;
    double mPixelRatio;
    juce::Point<int> mScreenPosition;
    juce::Point<int> mDesiredInitialPosition;

@@ -434,7 +434,7 @@ void EQModule::KeyPressed(int key, bool isRepeat)
       {
          qSlider->Double();
       }
-      else if ((toupper(key) == 'C' || toupper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
+      else if ((KeyToUpper(key) == 'C' || KeyToUpper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
       {
          TheSynth->CopyTextToClipboard(ofToString(qSlider->GetValue()));
       }

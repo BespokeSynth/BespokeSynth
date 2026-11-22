@@ -958,7 +958,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
          AddString(tab);
       }
    }
-   else if (toupper(key) == 'V' && GetKeyModifiers() == kModifier_Command)
+   else if (KeyToUpper(key) == 'V' && GetKeyModifiers() == kModifier_Command)
    {
       if (mCaretPosition != mCaretPosition2)
          RemoveSelectedText();
@@ -966,7 +966,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       juce::String clipboard = TheSynth->GetTextFromClipboard();
       AddString(clipboard.toStdString());
    }
-   else if (toupper(key) == 'V' && (GetKeyModifiers() == (kModifier_Command | kModifier_Shift)))
+   else if (KeyToUpper(key) == 'V' && (GetKeyModifiers() == (kModifier_Command | kModifier_Shift)))
    {
       IClickable* pasteName = nullptr;
       if (gHoveredUIControl != nullptr)
@@ -982,7 +982,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
          AddString(insert);
       }
    }
-   else if ((toupper(key) == 'C' || toupper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
+   else if ((KeyToUpper(key) == 'C' || KeyToUpper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
    {
       if (mCaretPosition != mCaretPosition2)
       {
@@ -990,19 +990,19 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
          int caretEnd = MAX(mCaretPosition, mCaretPosition2);
          TheSynth->CopyTextToClipboard(mString.substr(caretStart, caretEnd - caretStart));
 
-         if (toupper(key) == 'X')
+         if (KeyToUpper(key) == 'X')
             RemoveSelectedText();
       }
    }
-   else if (toupper(key) == 'Z' && GetKeyModifiers() == kModifier_Command)
+   else if (KeyToUpper(key) == 'Z' && GetKeyModifiers() == kModifier_Command)
    {
       Undo();
    }
-   else if (toupper(key) == 'Z' && (GetKeyModifiers() == (kModifier_Command | kModifier_Shift)))
+   else if (KeyToUpper(key) == 'Z' && (GetKeyModifiers() == (kModifier_Command | kModifier_Shift)))
    {
       Redo();
    }
-   else if (toupper(key) == 'A' && GetKeyModifiers() == kModifier_Command)
+   else if (KeyToUpper(key) == 'A' && GetKeyModifiers() == kModifier_Command)
    {
       mCaretPosition = 0;
       mCaretPosition2 = (int)mString.size();
@@ -1015,12 +1015,12 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    {
       MoveCaretToStart();
    }
-   else if (toupper(key) == 'R' && GetKeyModifiers() == kModifier_Command)
+   else if (KeyToUpper(key) == 'R' && GetKeyModifiers() == kModifier_Command)
    {
       Publish();
       mListener->ExecuteCode();
    }
-   else if (toupper(key) == 'R' && GetKeyModifiers() == (kModifier_Command | kModifier_Shift))
+   else if (KeyToUpper(key) == 'R' && GetKeyModifiers() == (kModifier_Command | kModifier_Shift))
    {
       Publish();
       int lineStart = MIN(GetCaretCoords(mCaretPosition).y, GetCaretCoords(mCaretPosition2).y);
