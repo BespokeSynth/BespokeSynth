@@ -24,6 +24,7 @@
 //
 
 #include "PatchCableSource.h"
+#include "Prefab.h"
 #include "ModularSynth.h"
 #include "TitleBar.h"
 #include "ADSRDisplay.h"
@@ -156,88 +157,92 @@ void PatchCableSource::Clear()
 
 void PatchCableSource::UpdatePosition(bool parentMinimized)
 {
-   if (mOwner != nullptr && (mAutomaticPositioning || parentMinimized || mOwner->Minimized()))
+   if (mOwner != nullptr)
    {
-      float x, y, w, h;
-      mOwner->GetPosition(x, y);
-      mOwner->GetDimensions(w, h);
-
-      if (parentMinimized)
+      bool positionToParent = parentMinimized || Prefab::IsHiddenByPresentation(mOwner);
+      if (mAutomaticPositioning || mOwner->Minimized() || positionToParent)
       {
-         mOwner->GetParent()->GetPosition(x, y);
-         mOwner->GetParent()->GetDimensions(w, h);
-      }
+         float x, y, w, h;
+         mOwner->GetPosition(x, y);
+         mOwner->GetDimensions(w, h);
 
-      if (mManualSide == Side::kNone || parentMinimized)
-      {
-         ofVec2f centerOfMass;
-         int count = 0;
-         for (auto cable : mPatchCables)
+         if (positionToParent)
          {
-            if (cable != nullptr)
+            mOwner->GetParent()->GetPosition(x, y);
+            mOwner->GetParent()->GetDimensions(w, h);
+         }
+
+         if (mManualSide == Side::kNone || positionToParent)
+         {
+            ofVec2f centerOfMass;
+            int count = 0;
+            for (auto cable : mPatchCables)
             {
-               if (cable->IsDragging())
+               if (cable != nullptr)
                {
-                  centerOfMass.x += TheSynth->GetMouseX(mOwner->GetOwningContainer());
-                  centerOfMass.y += TheSynth->GetMouseY(mOwner->GetOwningContainer());
-                  ++count;
-               }
-               else if (cable->GetTarget())
-               {
-                  float targetX, targetY, targetW, targetH;
-                  cable->GetTarget()->GetPosition(targetX, targetY);
-                  cable->GetTarget()->GetDimensions(targetW, targetH);
-                  centerOfMass.x += targetX + targetW / 2;
-                  centerOfMass.y += targetY + targetH / 2;
-                  ++count;
+                  if (cable->IsDragging())
+                  {
+                     centerOfMass.x += TheSynth->GetMouseX(mOwner->GetOwningContainer());
+                     centerOfMass.y += TheSynth->GetMouseY(mOwner->GetOwningContainer());
+                     ++count;
+                  }
+                  else if (cable->GetTarget())
+                  {
+                     float targetX, targetY, targetW, targetH;
+                     cable->GetTarget()->GetPosition(targetX, targetY);
+                     cable->GetTarget()->GetDimensions(targetW, targetH);
+                     centerOfMass.x += targetX + targetW / 2;
+                     centerOfMass.y += targetY + targetH / 2;
+                     ++count;
+                  }
                }
             }
-         }
-         centerOfMass.x /= count;
-         centerOfMass.y /= count;
+            centerOfMass.x /= count;
+            centerOfMass.y /= count;
 
-         if (count > 0)
-         {
-            if (centerOfMass.y > y + h)
-               mSide = Side::kBottom;
-            else if (centerOfMass.x < x + w / 2)
-               mSide = Side::kLeft;
+            if (count > 0)
+            {
+               if (centerOfMass.y > y + h)
+                  mSide = Side::kBottom;
+               else if (centerOfMass.x < x + w / 2)
+                  mSide = Side::kLeft;
+               else
+                  mSide = Side::kRight;
+            }
             else
-               mSide = Side::kRight;
+            {
+               mSide = Side::kBottom;
+            }
          }
          else
          {
-            mSide = Side::kBottom;
+            mSide = mManualSide;
+         }
+
+         if (mSide == Side::kBottom)
+         {
+            mX = x + w / 2;
+            mY = y + h + 3;
+         }
+         else if (mSide == Side::kLeft)
+         {
+            mX = x - 3;
+            mY = y + h / 2;
+         }
+         else if (mSide == Side::kRight)
+         {
+            mX = x + w + 3;
+            mY = y + h / 2;
          }
       }
       else
       {
+         float x, y;
+         mOwner->GetPosition(x, y);
+         mX = mManualPositionX + x;
+         mY = mManualPositionY + y;
          mSide = mManualSide;
       }
-
-      if (mSide == Side::kBottom)
-      {
-         mX = x + w / 2;
-         mY = y + h + 3;
-      }
-      else if (mSide == Side::kLeft)
-      {
-         mX = x - 3;
-         mY = y + h / 2;
-      }
-      else if (mSide == Side::kRight)
-      {
-         mX = x + w + 3;
-         mY = y + h / 2;
-      }
-   }
-   else if (mOwner != nullptr)
-   {
-      float x, y;
-      mOwner->GetPosition(x, y);
-      mX = mManualPositionX + x;
-      mY = mManualPositionY + y;
-      mSide = mManualSide;
    }
 }
 
@@ -285,6 +290,21 @@ void PatchCableSource::Render()
                ModuleContainer* targetContainer = target->GetModuleParent()->GetOwningContainer();
                if (owningModuleContainer == targetContainer)
                   continue; //this is an internally-patched cable in a minimized module
+            }
+         }
+
+         if (mDrawPass == DrawPass::kCables)
+         {
+            //a prefab in presentation mode hides its internals, so hide cables to its hidden modules.
+            //(cables from them to other internal modules are already hidden, see Enabled())
+            IClickable* target = mPatchCables[i]->GetTarget();
+            if (target != nullptr)
+            {
+               IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(target);
+               if (targetModule == nullptr)
+                  targetModule = dynamic_cast<IDrawableModule*>(target->GetParent());
+               if (targetModule != nullptr && targetModule->GetOwningContainer() == mOwner->GetOwningContainer() && Prefab::IsHiddenByPresentation(targetModule))
+                  continue;
             }
          }
       }
@@ -601,6 +621,8 @@ int PatchCableSource::GetHoverIndex(float x, float y) const
 
 bool PatchCableSource::Enabled() const
 {
+   if (mEnabled && Prefab::ShouldSuppressCableSource(this))
+      return false;
    return mEnabled;
 }
 

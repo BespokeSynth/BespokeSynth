@@ -29,12 +29,21 @@
 
 #include "IDrawableModule.h"
 #include "ClickButton.h"
+#include "Checkbox.h"
+#include "DropdownList.h"
 #include "ModuleContainer.h"
 
 class PatchCableSource;
 class SaveTarget;
+class PrefabModulationPort;
 
-class Prefab : public IDrawableModule, public IButtonListener
+enum class PrefabDisplayMode
+{
+   Edit,
+   Presentation
+};
+
+class Prefab : public IDrawableModule, public IButtonListener, public IDropdownListener
 {
 public:
    Prefab();
@@ -58,6 +67,7 @@ public:
 
    void ButtonClicked(ClickButton* button, double time) override;
    void CheckboxUpdated(Checkbox* checkbox, double time) override;
+   void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -66,9 +76,6 @@ public:
    void LoadState(FileStreamIn& in, int rev) override;
    int GetModuleSaveStateRev() const override { return 0; }
 
-   //IPatchable
-   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-
    void LoadPrefab(std::string loadPath);
 
    static bool sLoadingPrefab;
@@ -76,6 +83,19 @@ public:
    static IDrawableModule* sJustReleasedModule;
 
    bool IsEnabled() const override { return mEnabled; }
+
+   PrefabDisplayMode GetDisplayMode() const { return mDisplayMode; }
+   bool IsInterfaceModule(const IDrawableModule* module) const;
+   void SetInterfaceModule(IDrawableModule* module, bool isInterface);
+   //moves a module out of this prefab into the prefab's parent container. ports can't be removed, only deleted.
+   bool CanRemoveModule(const IDrawableModule* module) const;
+   void RemoveModule(IDrawableModule* module);
+   //the prefab whose container directly holds this module, if any
+   static Prefab* GetOwningPrefab(const IDrawableModule* module);
+   //true if this module is inside a prefab that's currently hiding it for presentation mode
+   static bool IsHiddenByPresentation(const IDrawableModule* module);
+   static bool ShouldSuppressCableSource(const PatchCableSource* source);
+   void OpenSaveDialog();
 
 private:
    //IDrawableModule
@@ -91,10 +111,39 @@ private:
 
    void UpdatePrefabName(std::string path);
 
-   PatchCableSource* mRemoveModuleCable{ nullptr };
+   std::vector<IDrawableModule*> GetInterfaceModules() const;
+   void SetPresentationApplied(bool apply);
+   void UpdateHeaderControls();
+   void LayOutPresentation(float topMargin);
+   float GetWidestPortWidth(bool inlets) const;
+   float GetPresentationLeftMargin() const;
+   void SpawnPort(int index);
+   void PruneInterfaceModules();
+   void BridgePortConnections();
+   bool BridgeModulationPort(PrefabModulationPort* port, const std::vector<IDrawableModule*>& allModules);
+   ofxJSONElement WriteModulesWithEditPositions();
+   void SavePresentationSettings(ofxJSONElement& info);
+   void LoadPresentationSettings(const ofxJSONElement& info);
+   void AddInterfaceModulesByName(const ofxJSONElement& names);
+
    ClickButton* mSaveButton{ nullptr };
    ClickButton* mLoadButton{ nullptr };
    ClickButton* mDisbandButton{ nullptr };
    ModuleContainer mModuleContainer;
    std::string mPrefabName{ "" };
+
+   std::vector<IDrawableModule*> mInterfaceModules; //modules shown in presentation mode
+   DropdownList* mDisplayModeDropdown{ nullptr };
+   PrefabDisplayMode mDisplayMode{ PrefabDisplayMode::Edit };
+   DropdownList* mAddPortDropdown{ nullptr };
+   int mAddPortIndex{ -1 };
+
+   bool mPresentationApplied{ false };
+   //keyed by module rather than name, so renaming a module doesn't lose its positions. names are only used when saving.
+   std::map<IDrawableModule*, ofVec2f> mEditPositions; //positions to restore when leaving presentation mode
+   std::map<IDrawableModule*, ofVec2f> mPresentationPositions; //remembered interface module positions in presentation mode
+   float mPresentationWidth{ 120 };
+   float mPresentationHeight{ 40 };
+
+   bool mLocked{ false };
 };

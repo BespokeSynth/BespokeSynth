@@ -33,6 +33,9 @@
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 #include "UserPrefs.h"
+#include "Prefab.h"
+#include "PrefabPort.h"
+#include "TrackOrganizer.h"
 
 #include <cstring>
 
@@ -76,6 +79,11 @@ void ModuleSaveDataPanel::ReloadSaveData()
    mSaveDataControls.clear();
    mLabels.clear();
    mStringDropdowns.clear();
+   mSavePrefabButton = nullptr;
+   mPrefabPresentationButton = nullptr;
+   mRemoveFromPrefabButton = nullptr;
+   mRemoveFromTrackOrganizerButton = nullptr;
+   mAddToTrackOrganizerButton = nullptr;
 
    if (mSaveModule == nullptr || mSaveModule->IsSaveable() == false)
       return;
@@ -86,7 +94,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
    std::list<ModuleSaveData::SaveVal*> values = mSaveModule->GetSaveData().GetSavedValues();
    for (auto iter = values.begin(); iter != values.end(); ++iter)
       mLabels.push_back((*iter)->mProperty);
-   for (int i = 0; i < mSaveModule->GetChildren().size(); ++i)
+   /*for (int i = 0; i < mSaveModule->GetChildren().size(); ++i)
    {
       IDrawableModule* child = mSaveModule->GetChildren()[i];
       std::list<ModuleSaveData::SaveVal*>& childValues = child->GetSaveData().GetSavedValues();
@@ -95,7 +103,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
          values.push_back(*iter);
          mLabels.push_back(std::string(child->Name()) + "." + (*iter)->mProperty);
       }
-   }
+   }*/
    for (auto iter = mLabels.begin(); iter != mLabels.end(); ++iter)
       maxWidth = MAX(maxWidth, GetStringWidth(*iter));
 
@@ -211,6 +219,45 @@ void ModuleSaveDataPanel::ReloadSaveData()
       y += kItemSpacing;
    }
 
+   Prefab* prefab = dynamic_cast<Prefab*>(mSaveModule);
+   if (prefab)
+   {
+      mSavePrefabButton = new ClickButton(this, "save prefab", x, y);
+      mSavePrefabButton->SetNoHover(true);
+      mSaveDataControls.push_back(mSavePrefabButton);
+      y += kItemSpacing;
+   }
+
+   Prefab* owningPrefab = Prefab::GetOwningPrefab(mSaveModule);
+   if (owningPrefab != nullptr && owningPrefab->CanRemoveModule(mSaveModule))
+   {
+      bool inPresentation = owningPrefab->IsInterfaceModule(mSaveModule);
+      mPrefabPresentationButton = new ClickButton(this, inPresentation ? "remove from presentation" : "add to presentation", x, y);
+      mPrefabPresentationButton->SetNoHover(true);
+      mSaveDataControls.push_back(mPrefabPresentationButton);
+      y += kItemSpacing;
+
+      mRemoveFromPrefabButton = new ClickButton(this, "remove from prefab", x, y);
+      mRemoveFromPrefabButton->SetNoHover(true);
+      mSaveDataControls.push_back(mRemoveFromPrefabButton);
+      y += kItemSpacing;
+   }
+
+   if (!GetTrackOrganizersOwning(mSaveModule).empty())
+   {
+      mRemoveFromTrackOrganizerButton = new ClickButton(this, "remove from trackorganizer", x, y);
+      mRemoveFromTrackOrganizerButton->SetNoHover(true);
+      mSaveDataControls.push_back(mRemoveFromTrackOrganizerButton);
+      y += kItemSpacing;
+   }
+   else if (GetTrackOrganizerSurrounding(mSaveModule) != nullptr)
+   {
+      mAddToTrackOrganizerButton = new ClickButton(this, "add to trackorganizer", x, y);
+      mAddToTrackOrganizerButton->SetNoHover(true);
+      mSaveDataControls.push_back(mAddToTrackOrganizerButton);
+      y += kItemSpacing;
+   }
+
    mHeight = y + 5;
 }
 
@@ -313,9 +360,94 @@ void ModuleSaveDataPanel::FillDropdownList(DropdownList* list, ModuleSaveData::S
       list->SetUnknownItemString(save->mString);
 }
 
+std::vector<TrackOrganizer*> ModuleSaveDataPanel::GetTrackOrganizersOwning(IDrawableModule* module)
+{
+   std::vector<TrackOrganizer*> ret;
+   if (module == nullptr)
+      return ret;
+   std::vector<IDrawableModule*> allModules;
+   TheSynth->GetAllModules(allModules);
+   for (auto* candidate : allModules)
+   {
+      TrackOrganizer* trackOrganizer = dynamic_cast<TrackOrganizer*>(candidate);
+      if (trackOrganizer != nullptr && !trackOrganizer->IsDeleted() && trackOrganizer->HasTrackModule(module))
+         ret.push_back(trackOrganizer);
+   }
+   return ret;
+}
+
+//returns the first trackorganizer whose drawn bounds contain the center of this module
+TrackOrganizer* ModuleSaveDataPanel::GetTrackOrganizerSurrounding(IDrawableModule* module)
+{
+   if (module == nullptr || dynamic_cast<TrackOrganizer*>(module) != nullptr)
+      return nullptr;
+
+   ofRectangle moduleRect = module->GetRect();
+   if (module->HasTitleBar())
+   {
+      moduleRect.y -= IDrawableModule::TitleBarHeight();
+      moduleRect.height += IDrawableModule::TitleBarHeight();
+   }
+   ofVec2f center = moduleRect.getCenter();
+
+   std::vector<IDrawableModule*> allModules;
+   TheSynth->GetAllModules(allModules);
+   for (auto* candidate : allModules)
+   {
+      TrackOrganizer* trackOrganizer = dynamic_cast<TrackOrganizer*>(candidate);
+      if (trackOrganizer != nullptr && !trackOrganizer->IsDeleted() && trackOrganizer->IsShowing() &&
+          trackOrganizer->GetBoundingRect().contains(center.x, center.y))
+         return trackOrganizer;
+   }
+   return nullptr;
+}
+
 void ModuleSaveDataPanel::ButtonClicked(ClickButton* button, double time)
 {
    using namespace juce;
+
+   if (mSaveModule != nullptr && button != nullptr)
+   {
+      if (button == mSavePrefabButton)
+      {
+         Prefab* prefab = dynamic_cast<Prefab*>(mSaveModule);
+         if (prefab != nullptr)
+            prefab->OpenSaveDialog();
+         ReloadSaveData();
+         return;
+      }
+      if (button == mPrefabPresentationButton)
+      {
+         Prefab* owningPrefab = Prefab::GetOwningPrefab(mSaveModule);
+         if (owningPrefab != nullptr)
+            owningPrefab->SetInterfaceModule(mSaveModule, !owningPrefab->IsInterfaceModule(mSaveModule));
+         ReloadSaveData();
+         return;
+      }
+      if (button == mRemoveFromPrefabButton)
+      {
+         Prefab* owningPrefab = Prefab::GetOwningPrefab(mSaveModule);
+         if (owningPrefab != nullptr)
+            owningPrefab->RemoveModule(mSaveModule);
+         ReloadSaveData();
+         return;
+      }
+      if (button == mRemoveFromTrackOrganizerButton)
+      {
+         for (auto* trackOrganizer : GetTrackOrganizersOwning(mSaveModule))
+            trackOrganizer->RemoveTrackModule(mSaveModule);
+         ReloadSaveData();
+         return;
+      }
+      if (button == mAddToTrackOrganizerButton)
+      {
+         TrackOrganizer* trackOrganizer = GetTrackOrganizerSurrounding(mSaveModule);
+         if (trackOrganizer != nullptr)
+            trackOrganizer->GatherModules({ mSaveModule });
+         ReloadSaveData();
+         return;
+      }
+   }
 
    if (button == mApplyButton)
       ApplyChanges();
