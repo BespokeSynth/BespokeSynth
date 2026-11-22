@@ -291,6 +291,11 @@ public:
    float LastTargetFramerate;
    ofxJSONElement mUserPrefsFile;
    std::vector<UserPref*> mUserPrefs;
+
+   ///////////////
+   /// GENERAL ///
+   ///////////////
+
    UserPrefDropdownString devicetype{ "devicetype", "auto", 200, UserPrefCategory::General };
    UserPrefDropdownString audio_output_device{ "audio_output_device", "auto", 350, UserPrefCategory::General };
    UserPrefDropdownString audio_input_device{ "audio_input_device", "none", 350, UserPrefCategory::General };
@@ -315,6 +320,7 @@ public:
    UserPrefBool autosave{ "autosave", false, UserPrefCategory::General };
    UserPrefBool show_tooltips_on_load{ "show_tooltips_on_load", true, UserPrefCategory::General };
    UserPrefBool show_welcome_screen{ "show_welcome_screen", true, UserPrefCategory::General };
+   UserPrefBool unsafe_cable_connections{ "unsafe_cable_connections", false, UserPrefCategory::General };
    UserPrefBool show_minimap{ "show_minimap", false, UserPrefCategory::General };
 #if BESPOKE_MOBILE
    //the buffer takes about 11MB per minute, which is a lot of a phone or tablet's memory
@@ -322,6 +328,10 @@ public:
 #else
    UserPrefTextEntryFloat record_buffer_length_minutes{ "record_buffer_length_minutes", 30, 1, 120, 5, UserPrefCategory::General };
 #endif
+
+   ////////////////
+   /// GRAPHICS ///
+   ////////////////
 
    UserPrefBool draw_background_lissajous{ "draw_background_lissajous", true, UserPrefCategory::Graphics };
    UserPrefBool background_lissajous_autocorrelate{ "background_lissajous_autocorrelate", true, UserPrefCategory::Graphics };
@@ -348,6 +358,10 @@ public:
 #endif
       -100, 100, 5, UserPrefCategory::Graphics
    };
+
+   /////////////
+   /// PATHS ///
+   /////////////
 
    UserPrefString recordings_path{ "recordings_path", "recordings/", 70, UserPrefCategory::Paths };
    UserPrefString samples_path{ "samples_path", "samples/", 70, UserPrefCategory::Paths };
