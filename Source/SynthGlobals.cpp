@@ -624,6 +624,16 @@ int GetScrollSteps(float scroll, bool isSmoothScroll, float& accumulator, float 
    return steps;
 }
 
+namespace
+{
+   bool sIgnoreCharacterModifiers = false;
+}
+
+void SetIgnoreCharacterModifiers(bool ignore)
+{
+   sIgnoreCharacterModifiers = ignore;
+}
+
 int GetKeyModifiers()
 {
    int ret = 0;
@@ -637,6 +647,14 @@ int GetKeyModifiers()
 #endif
    if (ModifierKeys::currentModifiers.isCommandDown())
       ret |= kModifier_Command;
+   if (sIgnoreCharacterModifiers)
+   {
+      //the alt (or altgr, which windows reports as ctrl+alt) held to type the current character isn't a shortcut chord
+      ret &= ~kModifier_Alt;
+#if BESPOKE_WINDOWS
+      ret &= ~kModifier_Command;
+#endif
+   }
    return ret;
 }
 
@@ -646,6 +664,14 @@ bool IsKeyHeld(int key, int modifiers)
           KeyPress::isKeyCurrentlyDown(key) &&
           GetKeyModifiers() == modifiers &&
           TheSynth->GetMainComponent()->hasKeyboardFocus(true);
+}
+
+int KeyToUpper(int key)
+{
+   //toupper() is only defined for values that fit in an unsigned char, and typed characters can be wider
+   if (key >= 0 && key < CHAR_MAX)
+      return toupper(key);
+   return key;
 }
 
 int KeyToLower(int key)

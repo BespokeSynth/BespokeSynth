@@ -407,7 +407,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
          }
       }
    }
-   else if (toupper(key) == 'V' && GetKeyModifiers() == kModifier_Command)
+   else if (KeyToUpper(key) == 'V' && GetKeyModifiers() == kModifier_Command)
    {
       if (mCaretPosition != mCaretPosition2)
          RemoveSelectedText();
@@ -420,7 +420,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       else
          MoveCaret(mCaretPosition + clipboard.length());
    }
-   else if ((toupper(key) == 'C' || toupper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
+   else if ((KeyToUpper(key) == 'C' || KeyToUpper(key) == 'X') && GetKeyModifiers() == kModifier_Command)
    {
       if (mCaretPosition != mCaretPosition2)
       {
@@ -429,11 +429,11 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
          std::string tmpString(mString);
          TheSynth->CopyTextToClipboard(tmpString.substr(caretStart, caretEnd - caretStart));
 
-         if (toupper(key) == 'X')
+         if (KeyToUpper(key) == 'X')
             RemoveSelectedText();
       }
    }
-   else if (toupper(key) == 'A' && GetKeyModifiers() == kModifier_Command)
+   else if (KeyToUpper(key) == 'A' && GetKeyModifiers() == kModifier_Command)
    {
       SelectAll();
    }
