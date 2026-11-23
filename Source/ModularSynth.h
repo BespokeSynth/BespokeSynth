@@ -112,10 +112,12 @@ public:
    void MouseReleased(int x, int y, int button, const juce::MouseInputSource& source);
    void MouseScrolled(float xScroll, float yScroll, bool isSmoothScroll, bool isInvertedScroll, bool canZoomCanvas);
    void MouseMagnify(int x, int y, float scaleFactor, const juce::MouseInputSource& source);
-   bool IsTouchNavigationMode() const { return mTouchNavigationMode; }
+   bool IsTouchNavigationMode() const { return mTouchInteractionMode == TouchInteractionMode::PanZoom; }
+   bool IsRepatchMode() const { return mTouchInteractionMode == TouchInteractionMode::Repatch; }
    void SetResamplingDeviceSampleRate(int rate) { mResamplingDeviceSampleRate = rate; } //0 when not resampling. may be called from the audio thread
    int GetResamplingDeviceSampleRate() const { return mResamplingDeviceSampleRate; }
-   void SetTouchNavigationMode(bool enabled) { mTouchNavigationMode = enabled; }
+   void SetTouchInteractionMode(TouchInteractionMode mode) { mTouchInteractionMode = mode; }
+   TouchInteractionMode GetTouchInteractionMode() const { return mTouchInteractionMode; }
    void SetShowTouchTooltips(bool show) { mShowTouchTooltips = show; }
    bool ShouldTouchAlwaysClick(int x, int y);
    void FilesDropped(std::vector<std::string> files, int x, int y);
@@ -236,6 +238,7 @@ public:
    IDrawableModule* GetLastClickedModule() const;
    EffectFactory* GetEffectFactory() { return &mEffectFactory; }
    const std::vector<IDrawableModule*>& GetGroupSelectedModules() const { return mGroupSelectedModules; }
+   void DeleteGroupSelectedModules();
    void SetGroupSelectedModules(std::list<IDrawableModule*> modules);
    bool ShouldAccentuateActiveModules() const;
    bool ShouldDimModule(IDrawableModule* module);
@@ -377,7 +380,7 @@ private:
    bool mIsMousePanning{ false };
    std::atomic<int> mResamplingDeviceSampleRate{ 0 };
    std::atomic<bool> mShowTouchTooltips{ false }; //there's no hover on a touchscreen, so on iOS tooltips only show while inspecting with a finger
-   bool mTouchNavigationMode{ false }; //when true, touches on the canvas pan and pinch-zoom instead of clicking, for use on touchscreen devices
+   TouchInteractionMode mTouchInteractionMode{ TouchInteractionMode::Click }; //pan/zoom: touches on the canvas pan and pinch-zoom instead of clicking. repatch: cable sources get bigger to be easier to grab
    std::array<bool, 5> mIsMouseButtonHeld{ false };
    struct SpaceMouseInfo
    {

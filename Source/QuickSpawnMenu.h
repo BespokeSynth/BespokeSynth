@@ -66,6 +66,7 @@ public:
 
    void Hide();
    void ShowSpawnCategoriesPopup();
+   void ShowSpawnCategoriesPopupAt(float x, float y);
    void ShowSpawnCategoriesPopupForCable(PatchCable* cable);
    void SetTempConnection(IClickable* target, ConnectionType connectionType);
    QuickSpawnFollower* GetMainContainerFollower() const { return mMainContainerFollower; }
@@ -85,6 +86,12 @@ private:
    void ResetAppearPos();
    void UpdatePosition();
    bool MatchesFilter(const ModuleFactory::Spawnable& spawnable) const;
+   bool IsGridLayout() const;
+   ofRectangle GetGridCellRect(int index) const;
+   std::string GetElementLabel(int index) const;
+   bool IsGridPaged() const { return mGridVisibleRows < mGridRows; }
+   ofRectangle GetGridPageButtonRect(bool up) const;
+   void ChangeGridPage(int direction);
 
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
@@ -111,6 +118,12 @@ private:
    float mScrollOffset{ 0 };
    PatchCable* mFilterForCable{ nullptr };
    QuickSpawnFollower* mMainContainerFollower;
+   int mGridColumns{ 1 };
+   int mGridRows{ 1 };
+   int mGridVisibleRows{ 1 }; //fewer than mGridRows when the grid doesn't fit on screen, and is paged with arrow buttons
+   int mGridFirstRow{ 0 };
+   float mGridScrollAccumulator{ 0 };
+   float mGridCellWidth{ 50 };
 };
 
 extern QuickSpawnMenu* TheQuickSpawnMenu;
