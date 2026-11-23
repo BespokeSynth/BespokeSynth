@@ -19,6 +19,7 @@ using namespace juce;
 #include "IOSAudioSession.h"
 #include "IOSDiagnostics.h"
 #include "IOSPointerInput.h"
+#include "IOSSystemGestures.h"
 #endif
 #if BESPOKE_ANDROID
 #include "AndroidSupport.h"
@@ -152,6 +153,7 @@ public:
                                      if (auto* currentPeer = getPeer())
                                         currentPeer->handleMagnifyGesture(MouseInputSource::InputSourceType::touch, { x, y }, Time::currentTimeMillis(), scaleFactor);
                                   });
+         IOSSystemGestures::Install(peer->getNativeHandle());
       }
 #endif
 
