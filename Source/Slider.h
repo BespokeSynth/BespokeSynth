@@ -168,6 +168,7 @@ private:
    bool mMouseDown{ false };
    float mRefY{ FLT_MAX };
    ofVec2f mClickStartPos{ FLT_MAX, FLT_MAX };
+   double mLastClickTime{ -9999 };
    ofVec2f mLastDragPos{ FLT_MAX, FLT_MAX };
    float mDragOffset{ 0 };
    float mDragPrecision{ 1 };
@@ -304,6 +305,7 @@ private:
    int mDefaultValue;
    IIntSliderListener* mOwner;
    ofVec2f mClickStartPos{ FLT_MAX, FLT_MAX };
+   double mLastClickTime{ -9999 };
    ofVec2f mLastDragPos{ FLT_MAX, FLT_MAX };
    float mDragOffset{ 0 };
    float mDragPrecision{ 1 };

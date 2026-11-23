@@ -353,6 +353,19 @@ void FloatSlider::DisplayLFOControl()
    }
 }
 
+namespace
+{
+   //returns true if this click is the second click of a double-click at roughly the same spot
+   bool CheckDoubleClick(double& lastClickTime, const ofVec2f& lastClickPos, float x, float y)
+   {
+      const double kDoubleClickMs = 300;
+      const float kMaxDistance = 4;
+      bool isDoubleClick = gTime - lastClickTime < kDoubleClickMs && lastClickPos.distanceSquared(ofVec2f(x, y)) < kMaxDistance * kMaxDistance;
+      lastClickTime = isDoubleClick ? -9999 : gTime;
+      return isDoubleClick;
+   }
+}
+
 void FloatSlider::OnClicked(float x, float y, bool right)
 {
    if (right)
@@ -385,6 +398,12 @@ void FloatSlider::OnClicked(float x, float y, bool right)
          mMinEntry->MakeActiveTextEntry(true);
       }
 
+      return;
+   }
+
+   if (CheckDoubleClick(mLastClickTime, mClickStartPos, x, y))
+   {
+      ResetToDefault();
       return;
    }
 
@@ -1180,6 +1199,12 @@ void IntSlider::OnClicked(float x, float y, bool right)
          mMinEntry->MakeActiveTextEntry(true);
       }
 
+      return;
+   }
+
+   if (CheckDoubleClick(mLastClickTime, mClickStartPos, x, y))
+   {
+      ResetToDefault();
       return;
    }
 
