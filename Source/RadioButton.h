@@ -67,6 +67,11 @@ public:
    void Clear();
    EnumMap GetEnumMap();
    void SetForcedWidth(int width) { mForcedWidth = width; }
+   void SetElementHeight(int height)
+   {
+      mElementHeight = height;
+      UpdateDimensions();
+   }
    void CopyContentsTo(DropdownList* list) const;
    RadioButtonElement GetElement(int index) { return mElements[index]; }
 
@@ -125,4 +130,5 @@ private:
    float mSliderVal{ 0 };
    int mLastSetValue{ 0 };
    int mForcedWidth{ -1 };
+   int mElementHeight{ 15 }; //matches GetSpacing() by default
 };

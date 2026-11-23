@@ -1923,6 +1923,9 @@ titlebar~
 ~settings~adjust preferences, saved as userprefs.json
 ~load layout~[none]
 ~play/pause~stop all audio processing (shift-p)
+~spawn~show a grid of module categories to spawn from (touch input mode)
+~touch mode~what touches do: "click" interacts with modules and controls, "pan/zoom" moves and zooms the canvas, and "repatch" makes patch cable sources much larger so they're easier to grab (touch input mode)
+~delete~delete the group-selected modules (touch input mode)
 
 
 
@@ -2051,6 +2054,7 @@ userprefseditor~settings for bespoke. some settings changes require bespoke to b
 ~autosave~should autosave be enabled on startup
 ~show_tooltips_on_load~should tooltips be enabled on startup
 ~show_minimap~should the minimap be displayed (requires restart)
+~touch_input_mode~replace the title bar's spawn menus with a "spawn" button that opens a grid of buttons, and add controls to switch between click, pan/zoom, and repatch touch modes, plus a delete button for selected modules. on by default on iOS and android
 ~show_welcome_screen~should we show the welcome screen when you first open bespoke?
 ~immediate_paste~when enabled, pasting values on UI controls will apply immediately instead of requiring you to press enter
 ~record_buffer_length_minutes~length of always-on recording buffer for "write audio" button in the title bar (requires restart)

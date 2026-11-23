@@ -155,6 +155,13 @@ enum KeyModifiers
    kModifier_Command = 8
 };
 
+enum class TouchInteractionMode
+{
+   Click,
+   PanZoom,
+   Repatch
+};
+
 enum class StepVelocityType
 {
    Off = 0,

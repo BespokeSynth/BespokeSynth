@@ -37,9 +37,11 @@
 
 namespace
 {
-   const int kPatchCableSourceRadius = 5;
-   const int kPatchCableSourceClickRadius = 7;
-   const int kPatchCableSpacing = 8;
+   //in touch input mode's "repatch" mode, cable sources get bigger so they're easier to grab with a finger
+   float RepatchScale() { return TheSynth->IsRepatchMode() ? 3.0f / gDrawScale : 1.0f; }
+   float PatchCableSourceRadius() { return 5 * RepatchScale(); }
+   float PatchCableSourceClickRadius() { return 7 * RepatchScale(); }
+   float PatchCableSpacing() { return 8 * RepatchScale(); }
 }
 
 bool PatchCableSource::sAllowInsert = true;
@@ -319,7 +321,7 @@ void PatchCableSource::Render()
       {
          ofSetLineWidth(0);
          ofColor color = GetColor();
-         float radius = kPatchCableSourceRadius;
+         float radius = PatchCableSourceRadius();
          IDrawableModule* moveModule = TheSynth->GetMoveModule();
          if (GetKeyModifiers() == kModifier_Shift && moveModule != nullptr)
          {
@@ -333,7 +335,7 @@ void PatchCableSource::Render()
                //highlight autopatchable cable sources
                float lerp = ofMap(sin(gTime / 600 * PI * 2), -1, 1, 0, 1);
                color = ofColor::lerp(color, ofColor::white, lerp * .7f);
-               radius = ofLerp(radius, kPatchCableSourceClickRadius, lerp);
+               radius = ofLerp(radius, PatchCableSourceClickRadius(), lerp);
             }
          }
 
@@ -345,13 +347,13 @@ void PatchCableSource::Render()
          {
             ofSetColor(ofColor::white);
             ofFill();
-            ofCircle(cableX, cableY, kPatchCableSourceRadius - 2);
+            ofCircle(cableX, cableY, PatchCableSourceRadius() - 2);
             if (InAddCableMode())
             {
                ofSetColor(0, 0, 0);
                ofSetLineWidth(2);
-               ofLine(cableX, cableY - (kPatchCableSourceRadius - 1), cableX, cableY + (kPatchCableSourceRadius - 1));
-               ofLine(cableX - (kPatchCableSourceRadius - 1), cableY, cableX + (kPatchCableSourceRadius - 1), cableY);
+               ofLine(cableX, cableY - (PatchCableSourceRadius() - 1), cableX, cableY + (PatchCableSourceRadius() - 1));
+               ofLine(cableX - (PatchCableSourceRadius() - 1), cableY, cableX + (PatchCableSourceRadius() - 1), cableY);
             }
          }
 
@@ -368,11 +370,11 @@ void PatchCableSource::Render()
       if (mHoverIndex != -1 && mDefaultPatchBehavior != kDefaultPatchBehavior_Add)
       {
          if (mSide == Side::kBottom)
-            cableY += kPatchCableSpacing;
+            cableY += PatchCableSpacing();
          else if (mSide == Side::kLeft)
-            cableX -= kPatchCableSpacing;
+            cableX -= PatchCableSpacing();
          else if (mSide == Side::kRight || mSide == Side::kNone)
-            cableX += kPatchCableSpacing;
+            cableX += PatchCableSpacing();
       }
    }
 
@@ -397,11 +399,11 @@ ofVec2f PatchCableSource::GetCableStart(int index) const
    if (mHoverIndex != -1 && mDefaultPatchBehavior != kDefaultPatchBehavior_Add)
    {
       if (mSide == Side::kBottom)
-         cableY += kPatchCableSpacing * index;
+         cableY += PatchCableSpacing() * index;
       else if (mSide == Side::kLeft)
-         cableX -= kPatchCableSpacing * index;
+         cableX -= PatchCableSpacing() * index;
       else if (mSide == Side::kRight || mSide == Side::kNone)
-         cableX += kPatchCableSpacing * index;
+         cableX += PatchCableSpacing() * index;
    }
 
    return ofVec2f(cableX, cableY);
@@ -602,18 +604,18 @@ int PatchCableSource::GetHoverIndex(float x, float y) const
    float cableY = mY;
    for (int i = 0; i < mPatchCables.size() || i == 0; ++i)
    {
-      if (ofDistSquared(x, y, cableX, cableY) < kPatchCableSourceClickRadius * kPatchCableSourceClickRadius)
+      if (ofDistSquared(x, y, cableX, cableY) < PatchCableSourceClickRadius() * PatchCableSourceClickRadius())
          return i;
 
       if (mDefaultPatchBehavior == kDefaultPatchBehavior_Add)
          break;
 
       if (mSide == Side::kBottom)
-         cableY += kPatchCableSpacing;
+         cableY += PatchCableSpacing();
       else if (mSide == Side::kLeft)
-         cableX -= kPatchCableSpacing;
+         cableX -= PatchCableSpacing();
       else if (mSide == Side::kRight || mSide == Side::kNone)
-         cableX += kPatchCableSpacing;
+         cableX += PatchCableSpacing();
    }
 
    return -1;

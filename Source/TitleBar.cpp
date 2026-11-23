@@ -37,6 +37,7 @@
 #include "VSTScanner.h"
 #include "MidiController.h"
 #include "WelcomeScreen.h"
+#include "QuickSpawnMenu.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
 
@@ -146,10 +147,15 @@ void TitleBar::CreateUIControls()
    BUTTON_SIZE(mMenuButton, "menu", 50, 32);
    ENDUIBLOCK0();
 
-#if BESPOKE_MOBILE
-   mTouchNavigationButton = new ClickButton(this, "pan/zoom", 195, 1);
-   mTouchNavigationButton->SetDimensions(60, 32);
-#endif
+   mSpawnButton = new ClickButton(this, "spawn", 195, 1);
+   mSpawnButton->SetDimensions(50, 32);
+   mTouchModeSelector = new RadioButton(this, "touch mode", 250, 1, (int*)&mTouchMode, kRadioHorizontal);
+   mTouchModeSelector->AddLabel("click", (int)TouchInteractionMode::Click);
+   mTouchModeSelector->AddLabel("pan/zoom", (int)TouchInteractionMode::PanZoom);
+   mTouchModeSelector->AddLabel("repatch", (int)TouchInteractionMode::Repatch);
+   mTouchModeSelector->SetElementHeight(32);
+   mDeleteButton = new ClickButton(this, "delete", 400, 1);
+   mDeleteButton->SetDimensions(50, 32);
 
    mDisplayHelpButton = new ClickButton(this, " ? ", 380, 1);
    mPlayPauseButton = new ClickButton(this, "play/pause", 300, 1, ButtonDisplayStyle::kPause);
@@ -296,6 +302,11 @@ void TitleBar::ListLayouts()
 void TitleBar::Poll()
 {
    mHelpDisplay->Poll();
+
+   //the touch mode selector only exists in touch input mode, so don't leave a mode on that can't be switched off
+   if (!UserPrefs.touch_input_mode.Get() && TheSynth->GetTouchInteractionMode() != TouchInteractionMode::Click)
+      TheSynth->SetTouchInteractionMode(TouchInteractionMode::Click);
+   mTouchMode = TheSynth->GetTouchInteractionMode();
 }
 
 void TitleBar::OnClicked(float x, float y, bool right)
@@ -315,6 +326,8 @@ void TitleBar::OnClicked(float x, float y, bool right)
       mIsDraggingSize = true;
       mDragEdgeYOffset = h - y;
    }
+
+   sShowInitialHelpOverlay = false;
 }
 
 void TitleBar::MouseReleased()
@@ -398,38 +411,33 @@ void TitleBar::DrawModule()
 
    DrawTextRightJustify(info, pixelWidth - 140, 32);
 
+   const bool touchInputMode = UserPrefs.touch_input_mode.Get();
+
    mMenuButton->SetShowing(!hideElements);
-   if (mTouchNavigationButton != nullptr)
-      mTouchNavigationButton->SetShowing(!hideElements);
+   mSpawnButton->SetShowing(!hideElements && touchInputMode);
+   mTouchModeSelector->SetShowing(!hideElements && touchInputMode);
    mPlayPauseButton->SetShowing(!hideElements);
    mDisplayHelpButton->SetShowing(!hideElements);
    for (auto* spawnList : mSpawnLists.GetDropdowns())
-      spawnList->GetList()->SetShowing(!hideElements);
+      spawnList->GetList()->SetShowing(!hideElements && !touchInputMode);
 
    mMenuButton->SetPosition(140 + margin, 1);
    mLoadLayoutDropdown->SetPosition(140 + margin, 20);
    mSaveLayoutButton->SetPosition(280 + margin, 19);
    mMenuButton->Draw();
-   if (mTouchNavigationButton != nullptr)
-   {
-      mTouchNavigationButton->SetPosition(195 + margin, 1);
-      mTouchNavigationButton->Draw();
-   }
-   if (mTouchNavigationButton != nullptr && TheSynth->IsTouchNavigationMode())
-   {
-      //highlight to show the toggle is on
-      ofPushStyle();
-      ofNoFill();
-      ofSetLineWidth(2);
-      ofSetColor(100, 220, 255);
-      ofRect(mTouchNavigationButton->GetRect(K(local)));
-      ofPopStyle();
-   }
+   mSpawnButton->SetPosition(195 + margin, 1);
+   mSpawnButton->Draw();
+   mTouchModeSelector->SetPosition(250 + margin, 1);
+   mTouchModeSelector->Draw();
+   mDeleteButton->SetShowing(!hideElements && touchInputMode && !TheSynth->GetGroupSelectedModules().empty());
+   ofRectangle touchModeRect = mTouchModeSelector->GetRect(true);
+   mDeleteButton->SetPosition(touchModeRect.getMaxX() + 5, 1);
+   mDeleteButton->Draw();
    mSaveLayoutButton->Draw();
    mLoadLayoutDropdown->Draw();
    mPlayPauseButton->Draw();
 
-   float startX = (mTouchNavigationButton != nullptr ? 260 : 200) + margin;
+   float startX = 200 + margin;
    float startY = 2;
 
    bool newline = true;
@@ -438,6 +446,9 @@ void TitleBar::DrawModule()
    float y = startY;
    for (auto* spawnList : mSpawnLists.GetDropdowns())
    {
+      if (touchInputMode)
+         break;
+
       if (newline)
       {
          newline = false;
@@ -622,6 +633,8 @@ void TitleBar::CheckboxUpdated(Checkbox* checkbox, double time)
 
 void TitleBar::DropdownClicked(DropdownList* list)
 {
+   sShowInitialHelpOverlay = false;
+
    if (list == mSpawnLists.mPlugins.GetList())
       mSpawnLists.SetUpPluginsDropdown();
 
@@ -644,6 +657,8 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal, double time)
 
 void TitleBar::ButtonClicked(ClickButton* button, double time)
 {
+   sShowInitialHelpOverlay = false;
+
    if (button == mSaveLayoutButton)
    {
       if (GetKeyModifiers() == kModifier_Shift)
@@ -663,8 +678,29 @@ void TitleBar::ButtonClicked(ClickButton* button, double time)
    }
    if (button == mPlayPauseButton)
       TheSynth->SetAudioPaused(!TheSynth->IsAudioPaused());
-   if (button == mTouchNavigationButton)
-      TheSynth->SetTouchNavigationMode(!TheSynth->IsTouchNavigationMode());
+   if (button == mDeleteButton)
+      TheSynth->DeleteGroupSelectedModules();
+   if (button == mSpawnButton)
+   {
+      if (TheQuickSpawnMenu->IsShowing())
+      {
+         TheQuickSpawnMenu->Hide();
+      }
+      else
+      {
+         float titleBarWidth, titleBarHeight;
+         GetDimensions(titleBarWidth, titleBarHeight);
+         TheQuickSpawnMenu->ShowSpawnCategoriesPopupAt(mSpawnButton->GetRect().x, titleBarHeight + 2);
+      }
+   }
+}
+
+void TitleBar::RadioButtonUpdated(RadioButton* radio, int oldVal, double time)
+{
+   sShowInitialHelpOverlay = false;
+
+   if (radio == mTouchModeSelector)
+      TheSynth->SetTouchInteractionMode(mTouchMode);
 }
 
 void TitleBar::ShowHelp()
@@ -677,7 +713,6 @@ void TitleBar::ShowHelp()
    mHelpDisplay->SetOwningContainer(GetOwningContainer());
    mHelpDisplay->Show();
    TheSynth->PushModalFocusItem(mHelpDisplay);
-   sShowInitialHelpOverlay = false;
 }
 
 void NewPatchConfirmPopup::CreateUIControls()

@@ -1259,11 +1259,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    key = KeyToLower(key); //now convert to lowercase because everything else just cares about keys as buttons (unmodified by shift)
 
    if ((key == juce::KeyPress::backspaceKey || key == juce::KeyPress::deleteKey) && !isRepeat)
-   {
-      for (auto module : mGroupSelectedModules)
-         module->GetOwningContainer()->DeleteModule(module);
-      mGroupSelectedModules.clear();
-   }
+      DeleteGroupSelectedModules();
 
    if (key == KeyPress::F2Key && !isRepeat)
    {
@@ -1948,8 +1944,19 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
    if (gHoveredUIControl != nullptr)
       hoveredUIControlModuleParent = gHoveredUIControl->GetModuleParent();
 
+   //in repatch mode, the enlarged cable sources overlap UI controls, and should take priority over them
+   bool hoveringRepatchCableSource = false;
+   if (IsRepatchMode() && hoveredUIControlModuleParent != nullptr)
+   {
+      for (auto* source : hoveredUIControlModuleParent->GetPatchCableSources())
+      {
+         if (source->IsHovered())
+            hoveringRepatchCableSource = true;
+      }
+   }
+
    if (hoveredUIControlModuleParent != nullptr && !hoveredUIControlModuleParent->IsDeleted() && !hoveredUIControlModuleParent->IsHoveringOverResizeHandle() &&
-       !IUIControl::WasLastHoverSetManually() &&
+       !IUIControl::WasLastHoverSetManually() && !hoveringRepatchCableSource &&
        mGroupSelectedModules.empty() &&
        mQuickSpawn->IsShowing() == false &&
        (GetTopModalFocusItem() == nullptr || hoveredUIControlModuleParent == GetTopModalFocusItem()))
@@ -2059,13 +2066,14 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       }
       mHasDuplicatedDuringDrag = false;
 
-      if (mGroupSelectedModules.empty() == false)
+      if (mGroupSelectedModules.empty() == false && clickedModule != TheTitleBar) //let title bar clicks through, so the touch mode delete button can act on the selection
       {
          if (!VectorContains(clickedModule, mGroupSelectedModules))
             mGroupSelectedModules.clear();
          return;
       }
 
+      bool quickSpawnWasShowing = mQuickSpawn != nullptr && mQuickSpawn->IsShowing(); //so a click that opens it (e.g. the title bar's spawn button) doesn't immediately close it
       if (clickedModule)
       {
          x = GetMouseX(clickedModule->GetModuleParent()->GetOwningContainer());
@@ -2080,9 +2088,16 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       if (clickedModule == nullptr)
          mLastClickWasEmptySpace = true;
 
-      if (mQuickSpawn != nullptr && mQuickSpawn->IsShowing() && clickedModule != mQuickSpawn)
+      if (quickSpawnWasShowing && mQuickSpawn->IsShowing() && clickedModule != mQuickSpawn)
          mQuickSpawn->Hide();
    }
+}
+
+void ModularSynth::DeleteGroupSelectedModules()
+{
+   for (auto module : mGroupSelectedModules)
+      module->GetOwningContainer()->DeleteModule(module);
+   mGroupSelectedModules.clear();
 }
 
 void ModularSynth::ToggleQuickSpawn()
@@ -2225,6 +2240,9 @@ void ModularSynth::MouseMagnify(int intX, int intY, float scaleFactor, const juc
 bool ModularSynth::ShouldTouchAlwaysClick(int x, int y)
 {
    if (!mModalFocusItemStack.empty()) //popup menus (e.g. the title bar's main menu) need to be tappable and dismissable
+      return true;
+
+   if (mMoveModule != nullptr) //a freshly spawned module stuck to the cursor gets placed with a tap
       return true;
 
    //the title bar and other UI-layer elements

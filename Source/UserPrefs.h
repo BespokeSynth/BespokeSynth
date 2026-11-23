@@ -217,6 +217,7 @@ class UserPrefBool : public UserPref
 public:
    UserPrefBool(std::string name, bool defaultValue, UserPrefCategory category)
    : mValue(defaultValue)
+   , mDefault(defaultValue)
    {
       RegisterUserPref(this);
       mName = name;
@@ -316,6 +317,11 @@ public:
    UserPrefBool show_tooltips_on_load{ "show_tooltips_on_load", true, UserPrefCategory::General };
    UserPrefBool show_welcome_screen{ "show_welcome_screen", true, UserPrefCategory::General };
    UserPrefBool show_minimap{ "show_minimap", false, UserPrefCategory::General };
+#if BESPOKE_MOBILE
+   UserPrefBool touch_input_mode{ "touch_input_mode", true, UserPrefCategory::General };
+#else
+   UserPrefBool touch_input_mode{ "touch_input_mode", false, UserPrefCategory::General };
+#endif
 #if BESPOKE_MOBILE
    //the buffer takes about 11MB per minute, which is a lot of a phone or tablet's memory
    UserPrefTextEntryFloat record_buffer_length_minutes{ "record_buffer_length_minutes", 10, 1, 120, 5, UserPrefCategory::General };

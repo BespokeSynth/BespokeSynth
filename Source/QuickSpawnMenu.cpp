@@ -41,6 +41,11 @@ namespace
 {
    const int kItemSpacing = 15;
    const int kRightClickShiftX = 11;
+   //touch input mode lays categories and modules out as a grid of buttons, sized like the title bar's menu button
+   const float kGridCellHeight = 32;
+   const float kGridCellMinWidth = 50;
+   const float kGridSpacing = 3;
+   const float kGridPageButtonWidth = 32;
    ofVec2f kModuleGrabOffset(-40, 10);
 }
 
@@ -85,6 +90,17 @@ void QuickSpawnMenu::ShowSpawnCategoriesPopup()
    UpdateDisplay();
 }
 
+void QuickSpawnMenu::ShowSpawnCategoriesPopupAt(float x, float y)
+{
+   mAppearAtMousePos.set(x, y);
+   mScrollOffset = 0;
+   mGridFirstRow = 0;
+   mMenuMode = MenuMode::ModuleCategories;
+   mSearchString = "";
+   mFilterForCable = nullptr;
+   UpdateDisplay();
+}
+
 void QuickSpawnMenu::ShowSpawnCategoriesPopupForCable(PatchCable* cable)
 {
    ResetAppearPos();
@@ -106,6 +122,7 @@ void QuickSpawnMenu::ResetAppearPos()
 {
    mAppearAtMousePos.set(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
    mScrollOffset = 0;
+   mGridFirstRow = 0;
 }
 
 void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
@@ -285,15 +302,54 @@ void QuickSpawnMenu::UpdateDisplay()
          mScrollOffset = 0;
       }
 
-      float width = 150;
-      for (auto& element : mElements)
+      if (IsGridLayout())
       {
-         float elementWidth = GetStringWidth(element.mLabel + " " + element.mDecorator) + 10 + (mMenuMode == MenuMode::SingleLetter ? 0 : kRightClickShiftX);
-         if (elementWidth > width)
-            width = elementWidth;
-      }
+         mGridCellWidth = kGridCellMinWidth;
+         for (int i = 0; i < (int)mElements.size(); ++i)
+            mGridCellWidth = MAX(mGridCellWidth, GetStringWidth(GetElementLabel(i)) + 10);
 
-      SetDimensions(width, MAX((int)mElements.size(), 1) * kItemSpacing);
+         const int numElements = MAX(1, (int)mElements.size());
+         const float screenWidth = ofGetWidth() / GetOwningContainer()->GetDrawScale() - 10;
+         const float screenHeight = ofGetHeight() / GetOwningContainer()->GetDrawScale() - (TheTitleBar->GetRect().height + 5) - 5;
+         const int maxRows = MAX(1, (int)((screenHeight + kGridSpacing) / (kGridCellHeight + kGridSpacing)));
+         const int maxColumns = MAX(1, (int)((screenWidth + kGridSpacing) / (mGridCellWidth + kGridSpacing)));
+
+         //aim for a square grid, widened as needed to fit the screen's height, and narrowed to fit its width
+         int columns = (int)ceil(sqrt((float)numElements));
+         columns = MAX(columns, (numElements + maxRows - 1) / maxRows);
+         columns = MIN(columns, maxColumns);
+         int rows = (numElements + columns - 1) / columns;
+
+         if (rows > maxRows)
+         {
+            //doesn't fit, so page through it with arrow buttons on the right, using every column that fits next to them
+            int pagedMaxColumns = MAX(1, (int)((screenWidth - kGridPageButtonWidth + kGridSpacing) / (mGridCellWidth + kGridSpacing)));
+            columns = MIN(numElements, pagedMaxColumns);
+            rows = (numElements + columns - 1) / columns;
+         }
+
+         mGridColumns = MAX(1, columns);
+         mGridRows = MAX(1, rows);
+         mGridVisibleRows = MIN(mGridRows, maxRows);
+         mGridFirstRow = ofClamp(mGridFirstRow, 0, mGridRows - mGridVisibleRows);
+
+         float width = mGridColumns * mGridCellWidth + (mGridColumns - 1) * kGridSpacing;
+         if (IsGridPaged())
+            width += kGridSpacing + kGridPageButtonWidth;
+         SetDimensions(width, mGridVisibleRows * kGridCellHeight + (mGridVisibleRows - 1) * kGridSpacing);
+      }
+      else
+      {
+         float width = 150;
+         for (auto& element : mElements)
+         {
+            float elementWidth = GetStringWidth(element.mLabel + " " + element.mDecorator) + 10 + (mMenuMode == MenuMode::SingleLetter ? 0 : kRightClickShiftX);
+            if (elementWidth > width)
+               width = elementWidth;
+         }
+
+         SetDimensions(width, MAX((int)mElements.size(), 1) * kItemSpacing);
+      }
       UpdatePosition();
       SetShowing(true);
    }
@@ -376,6 +432,30 @@ bool QuickSpawnMenu::MatchesFilter(const ModuleFactory::Spawnable& spawnable) co
    return inputMatches && outputMatches;
 }
 
+bool QuickSpawnMenu::IsGridLayout() const
+{
+   return UserPrefs.touch_input_mode.Get() && (mMenuMode == MenuMode::ModuleCategories || mMenuMode == MenuMode::SingleCategory);
+}
+
+ofRectangle QuickSpawnMenu::GetGridCellRect(int index) const
+{
+   int column = index % mGridColumns;
+   int row = index / mGridColumns - mGridFirstRow;
+   return ofRectangle(column * (mGridCellWidth + kGridSpacing), row * (kGridCellHeight + kGridSpacing), mGridCellWidth, kGridCellHeight);
+}
+
+std::string QuickSpawnMenu::GetElementLabel(int index) const
+{
+   bool showDecorator = true;
+   if (mMenuMode == MenuMode::SingleCategory && mSelectedCategoryIndex >= 0 && mSelectedCategoryIndex < (int)TheTitleBar->GetSpawnLists().size())
+      showDecorator = TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->ShouldShowDecorators();
+
+   const auto& element = mElements[index];
+   if (showDecorator && !element.mDecorator.empty())
+      return element.mLabel + " " + element.mDecorator;
+   return element.mLabel;
+}
+
 void QuickSpawnMenu::UpdatePosition()
 {
    float minX = 5;
@@ -383,7 +463,14 @@ void QuickSpawnMenu::UpdatePosition()
    float minY = TheTitleBar->GetRect().height + 5;
    float maxY = ofGetHeight() / GetOwningContainer()->GetDrawScale() - mHeight - 5;
 
-   if (mMenuMode == MenuMode::SingleLetter)
+   if (IsGridLayout())
+   {
+      //keep it on screen if possible. if it's too tall to fit, keep the top visible
+      float x = MAX(minX, MIN(mAppearAtMousePos.x, maxX));
+      float y = MAX(minY, MIN(mAppearAtMousePos.y, maxY));
+      SetPosition(x, y + mScrollOffset);
+   }
+   else if (mMenuMode == MenuMode::SingleLetter)
    {
       SetPosition(ofClamp(mAppearAtMousePos.x - mWidth / 2, minX, maxX),
                   ofClamp(mAppearAtMousePos.y - mHeight / 2, minY, maxY) + mScrollOffset);
@@ -399,12 +486,42 @@ void QuickSpawnMenu::MouseReleased()
 {
 }
 
+ofRectangle QuickSpawnMenu::GetGridPageButtonRect(bool up) const
+{
+   float x = mWidth - kGridPageButtonWidth;
+   if (up)
+      return ofRectangle(x, 0, kGridPageButtonWidth, kGridCellHeight);
+   return ofRectangle(x, mHeight - kGridCellHeight, kGridPageButtonWidth, kGridCellHeight);
+}
+
+void QuickSpawnMenu::ChangeGridPage(int direction)
+{
+   mGridFirstRow = ofClamp(mGridFirstRow + direction * mGridVisibleRows, 0, mGridRows - mGridVisibleRows);
+}
+
 bool QuickSpawnMenu::MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll)
 {
    const float kScrollSpeed = 5;
 
    if (isInvertedScroll)
       scrollY *= -1;
+
+   if (IsGridLayout())
+   {
+      //scroll a row at a time
+      if (!isSmoothScroll)
+         scrollY = scrollY > 0 ? 1 : (scrollY < 0 ? -1 : 0);
+      else
+         scrollY /= 10;
+      mGridScrollAccumulator += scrollY;
+      while (fabsf(mGridScrollAccumulator) >= 1)
+      {
+         int direction = mGridScrollAccumulator > 0 ? -1 : 1;
+         mGridFirstRow = ofClamp(mGridFirstRow + direction, 0, mGridRows - mGridVisibleRows);
+         mGridScrollAccumulator += direction;
+      }
+      return true;
+   }
 
    if (!isSmoothScroll)
    {
@@ -425,6 +542,17 @@ bool QuickSpawnMenu::MouseScrolled(float x, float y, float scrollX, float scroll
 void QuickSpawnMenu::MoveMouseToIndex(int index)
 {
    mHighlightIndex = index;
+   if (IsGridLayout())
+   {
+      int row = index / mGridColumns;
+      if (row < mGridFirstRow)
+         mGridFirstRow = row;
+      if (row >= mGridFirstRow + mGridVisibleRows)
+         mGridFirstRow = row - mGridVisibleRows + 1;
+      ofVec2f center = GetGridCellRect(index).getCenter();
+      TheSynth->SetMousePosition(GetOwningContainer(), mX + center.x, mY + center.y);
+      return;
+   }
    TheSynth->SetMousePosition(GetOwningContainer(), mX + 5, mY + (index + .5f) * kItemSpacing);
 }
 
@@ -439,7 +567,63 @@ void QuickSpawnMenu::DrawModule()
    ofSetColor(50, 50, 50, 100);
    ofFill();
    ofRect(-2, -2, mWidth + 4, mHeight + 4);
-   for (int i = 0; i < mElements.size(); ++i)
+   if (IsGridLayout())
+   {
+      for (int i = mGridFirstRow * mGridColumns; i < MIN((int)mElements.size(), (mGridFirstRow + mGridVisibleRows) * mGridColumns); ++i)
+      {
+         ModuleCategory category;
+         if (mMenuMode == MenuMode::ModuleCategories)
+            category = TheTitleBar->GetSpawnLists()[mCategoryIndices[i]]->GetCategory();
+         else
+            category = TheSynth->GetModuleFactory()->GetModuleCategory(mElements[i]);
+
+         ofRectangle rect = GetGridCellRect(i);
+         ofSetColor(IDrawableModule::GetColor(category) * (i == mHighlightIndex ? .7f : .5f), 255);
+         ofFill();
+         ofRect(rect, 4);
+         ofSetColor(IDrawableModule::GetColor(category), 255);
+
+         if (i == mHighlightIndex)
+            ofSetColor(255, 255, 0);
+         else
+            ofSetColor(255, 255, 255);
+         std::string label = GetElementLabel(i);
+         DrawTextNormal(label, rect.x + (rect.width - GetStringWidth(label)) / 2, rect.y + rect.height / 2 + 4);
+      }
+
+      if (IsGridPaged())
+      {
+         float mouseX = TheSynth->GetMouseX(GetOwningContainer()) - GetPosition().x;
+         float mouseY = TheSynth->GetMouseY(GetOwningContainer()) - GetPosition().y;
+         for (bool up : { true, false })
+         {
+            ofRectangle rect = GetGridPageButtonRect(up);
+            bool canPage = up ? mGridFirstRow > 0 : mGridFirstRow < mGridRows - mGridVisibleRows;
+            bool hovered = canPage && rect.contains(mouseX, mouseY);
+            ofSetColor(hovered ? ofColor(110, 110, 110) : ofColor(80, 80, 80), 255);
+            ofFill();
+            ofRect(rect, 4);
+            ofSetColor(canPage ? ofColor(255, 255, 255) : ofColor(130, 130, 130), 255);
+            ofVec2f c = rect.getCenter();
+            const float kArrowSize = 7;
+            if (up)
+               ofTriangle(c.x - kArrowSize, c.y + kArrowSize / 2, c.x + kArrowSize, c.y + kArrowSize / 2, c.x, c.y - kArrowSize / 2);
+            else
+               ofTriangle(c.x - kArrowSize, c.y - kArrowSize / 2, c.x + kArrowSize, c.y - kArrowSize / 2, c.x, c.y + kArrowSize / 2);
+         }
+
+         //page indicator between the arrows
+         std::string pageText = ofToString(mGridFirstRow / mGridVisibleRows + (mGridFirstRow % mGridVisibleRows != 0 ? 2 : 1)) + "/" + ofToString((mGridRows + mGridVisibleRows - 1) / mGridVisibleRows);
+         ofRectangle upRect = GetGridPageButtonRect(true);
+         ofRectangle downRect = GetGridPageButtonRect(false);
+         if (downRect.y - (upRect.y + upRect.height) > 14)
+         {
+            ofSetColor(200, 200, 200);
+            DrawTextNormal(pageText, upRect.getCenter().x - GetStringWidth(pageText) / 2, (upRect.y + upRect.height + downRect.y) / 2 + 4);
+         }
+      }
+   }
+   for (int i = 0; i < (int)mElements.size() && !IsGridLayout(); ++i)
    {
       if (mMenuMode == MenuMode::ModuleCategories)
          ofSetColor(IDrawableModule::GetColor(TheTitleBar->GetSpawnLists()[mCategoryIndices[i]]->GetCategory()) * (i == mHighlightIndex ? .7f : .5f), 255);
@@ -492,6 +676,22 @@ void QuickSpawnMenu::OnClicked(float x, float y, bool right)
       return;
    }
 
+   if (IsGridLayout() && IsGridPaged())
+   {
+      if (GetGridPageButtonRect(true).contains(x, y))
+      {
+         ChangeGridPage(-1);
+         return;
+      }
+      if (GetGridPageButtonRect(false).contains(x, y))
+      {
+         ChangeGridPage(1);
+         return;
+      }
+      if (x > mWidth - kGridPageButtonWidth - kGridSpacing)
+         return; //the gap around the arrow buttons shouldn't dismiss the menu
+   }
+
    OnSelectItem(GetIndexAt(x, y));
 }
 
@@ -521,7 +721,13 @@ void QuickSpawnMenu::OnSelectItem(int index)
       {
          mSelectedCategoryIndex = mCategoryIndices[index];
          mMenuMode = MenuMode::SingleCategory;
-         ResetAppearPos();
+         if (IsGridLayout())
+         {
+            mScrollOffset = 0; //the module grid replaces the category grid in place
+            mGridFirstRow = 0;
+         }
+         else
+            ResetAppearPos();
          UpdateDisplay();
       }
       else
@@ -542,6 +748,21 @@ std::string QuickSpawnMenu::GetHoveredModuleTypeName()
 
 int QuickSpawnMenu::GetIndexAt(int x, int y) const
 {
+   if (IsGridLayout())
+   {
+      if (x < 0 || y < 0)
+         return -1;
+      int column = (int)(x / (mGridCellWidth + kGridSpacing));
+      int row = (int)(y / (kGridCellHeight + kGridSpacing));
+      if (column >= mGridColumns || row >= mGridVisibleRows)
+         return -1;
+      row += mGridFirstRow;
+      int index = row * mGridColumns + column;
+      if (index >= (int)mElements.size() || !GetGridCellRect(index).contains(x, y))
+         return -1;
+      return index;
+   }
+
    if (x >= 0 && x < mWidth)
       return y / kItemSpacing;
    return -1;

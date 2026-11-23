@@ -30,6 +30,7 @@
 #include "DropdownList.h"
 #include "ClickButton.h"
 #include "Slider.h"
+#include "RadioButton.h"
 #include "VSTPlugin.h"
 #include "WindowCloseListener.h"
 #include "ModuleFactory.h"
@@ -150,7 +151,7 @@ private:
    NewPatchConfirmPopup mNewPatchConfirmPopup;
 };
 
-class TitleBar : public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public WindowCloseListener
+class TitleBar : public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public WindowCloseListener
 {
 public:
    TitleBar();
@@ -180,6 +181,7 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void ButtonClicked(ClickButton* button, double time) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override {}
+   void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
 
    static bool sShowInitialHelpOverlay;
 
@@ -203,7 +205,10 @@ private:
    ClickButton* mSaveLayoutButton{ nullptr };
    DropdownList* mLoadLayoutDropdown{ nullptr };
    ClickButton* mDisplayHelpButton{ nullptr };
-   ClickButton* mTouchNavigationButton{ nullptr };
+   ClickButton* mSpawnButton{ nullptr }; //replaces the spawn dropdowns in touch input mode
+   RadioButton* mTouchModeSelector{ nullptr }; //click, pan/zoom, or repatch, in touch input mode
+   ClickButton* mDeleteButton{ nullptr }; //deletes group-selected modules, in touch input mode
+   TouchInteractionMode mTouchMode{ TouchInteractionMode::Click };
    int mLoadLayoutIndex{ -1 };
 
    HelpDisplay* mHelpDisplay{ nullptr };

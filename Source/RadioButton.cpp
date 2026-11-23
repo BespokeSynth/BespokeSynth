@@ -109,7 +109,7 @@ void RadioButton::UpdateDimensions()
          if (width > mWidth)
             mWidth = width;
       }
-      mHeight = radioSpacing * (int)mElements.size();
+      mHeight = mElementHeight * (int)mElements.size();
       mElementWidth = mWidth;
    }
    else
@@ -121,7 +121,7 @@ void RadioButton::UpdateDimensions()
             mElementWidth = width;
       }
       mWidth = mElementWidth * (int)mElements.size();
-      mHeight = radioSpacing;
+      mHeight = mElementHeight;
    }
 
    if (mForcedWidth != -1)
@@ -190,7 +190,7 @@ void RadioButton::Render()
 
       ofSetColor(textColor);
       //ofRect(mX,mY+i*radioSpacing,w,15);
-      DrawTextNormal(mElements[i].mLabel, rect.x + 2, rect.y + 12);
+      DrawTextNormal(mElements[i].mLabel, rect.x + 2, rect.y + (rect.height - 15) / 2 + 12);
    }
 
    for (int i = 0; i < mElements.size(); ++i)
@@ -224,14 +224,14 @@ ofRectangle RadioButton::GetElementRect(int index) const
    if (mDirection == kRadioVertical)
    {
       float x = mX;
-      float y = mY + index * radioSpacing;
-      return ofRectangle(x, y, mWidth, radioSpacing);
+      float y = mY + index * mElementHeight;
+      return ofRectangle(x, y, mWidth, mElementHeight);
    }
    else
    {
       float x = mX + mElementWidth * index;
       float y = mY;
-      return ofRectangle(x, y, mElementWidth, radioSpacing);
+      return ofRectangle(x, y, mElementWidth, mElementHeight);
    }
 }
 
@@ -247,7 +247,7 @@ void RadioButton::OnClicked(float x, float y, bool right)
       return;
 
    if (mDirection == kRadioVertical)
-      SetIndex(y / radioSpacing, NextBufferTime(false));
+      SetIndex(y / mElementHeight, NextBufferTime(false));
    else //kRadioHorizontal
       SetIndex(int(x / mElementWidth), NextBufferTime(false));
 }
