@@ -33,6 +33,7 @@
 #include "IDrawableModule.h"
 
 class IUIControl;
+class Checkbox;
 
 class TouchInterfacePanel : public IDrawableModule
 {
@@ -62,6 +63,7 @@ private:
    int GetNumColumns() const;
    void ChangePage(int direction);
    void UpdateControlList();
+   Checkbox* GetEnabledCheckbox() const; //null if the module can't be enabled/disabled
    bool IsValidControl(IUIControl* control) const;
 
    ofRectangle GetContentRect() const; //the area of the screen that isn't cut off by notches, rounded corners, etc
@@ -72,6 +74,7 @@ private:
    ofRectangle GetSquareRect(int column) const; //for buttons and checkboxes
    float GetTitleBarHeight() const;
    void DrawButton(ofRectangle rect, std::string label, bool enabled) const;
+   void DrawTitle();
    void DrawControl(IUIControl* control, int column) const;
 
    void BeginDrag(float x, float y);
@@ -85,6 +88,7 @@ private:
    IDrawableModule* mModule{ nullptr };
    std::vector<IUIControl*> mControls;
    int mPage{ 0 };
+   ofRectangle mTitleRect; //where the module's name was last drawn, tappable to enable/disable the module
 
    //touch state
    IUIControl* mTouchedControl{ nullptr };

@@ -52,13 +52,18 @@ namespace
    const float kDoubleTapDistance = 15;
 
    //shrinks text to fit, and then truncates it if it would get too small to read
-   void DrawTextToFit(std::string text, float centerX, float baselineY, float maxWidth, float size)
+   void FitText(std::string& text, float& size, float maxWidth)
    {
       const float kMinSize = 9;
       while (size > kMinSize && GetStringWidth(text, size) > maxWidth)
          size -= .5f;
       while (text.length() > 1 && GetStringWidth(text, size) > maxWidth)
          text.pop_back();
+   }
+
+   void DrawTextToFit(std::string text, float centerX, float baselineY, float maxWidth, float size)
+   {
+      FitText(text, size, maxWidth);
       DrawTextNormal(text, centerX - GetStringWidth(text, size) / 2, baselineY, size);
    }
 
@@ -160,6 +165,11 @@ void TouchInterfacePanel::UpdateControlList()
       if (!IsValidControl(mLastTappedControl))
          mLastTappedControl = nullptr;
    }
+}
+
+Checkbox* TouchInterfacePanel::GetEnabledCheckbox() const
+{
+   return mModule != nullptr ? mModule->GetEnabledCheckbox() : nullptr;
 }
 
 bool TouchInterfacePanel::IsValidControl(IUIControl* control) const
@@ -405,6 +415,15 @@ void TouchInterfacePanel::OnClicked(float x, float y, bool right)
       return;
    }
 
+   if (Checkbox* enabledCheckbox = GetEnabledCheckbox())
+   {
+      if (mTitleRect.contains(x, y))
+      {
+         enabledCheckbox->SetFromMidiCC(enabledCheckbox->GetValue() > 0 ? 0 : 1, NextBufferTime(false), SetValueMethod::Direct);
+         return;
+      }
+   }
+
    if (GetNumPages() > 1)
    {
       for (int direction : { -1, 1 })
@@ -599,6 +618,55 @@ void TouchInterfacePanel::DrawControl(IUIControl* control, int column) const
    ofPopStyle();
 }
 
+void TouchInterfacePanel::DrawTitle()
+{
+   const ofRectangle content = GetContentRect();
+   const float left = GetNumPages() > 1 ? GetPageButtonRect(1).getMaxX() + kMargin : content.x;
+   const float maxWidth = GetExitButtonRect().x - kMargin - left;
+   const float centerX = left + maxWidth / 2;
+   const float centerY = GetExitButtonRect().getCenter().y;
+   float size = 22;
+
+   ofPushStyle();
+
+   Checkbox* enabledCheckbox = GetEnabledCheckbox();
+   const float kCircleRadius = 9;
+   const float kCircleSpace = enabledCheckbox != nullptr ? kCircleRadius * 2 + 8 : 0;
+   const float kPadding = 10;
+
+   std::string title = mModule->GetTitleLabel();
+   FitText(title, size, maxWidth - kCircleSpace - kPadding * 2);
+   const float width = GetStringWidth(title, size) + kCircleSpace;
+   float x = centerX - width / 2;
+   mTitleRect = ofRectangle(x - kPadding, content.y, width + kPadding * 2, kHeaderHeight - 8);
+
+   bool enabled = true;
+   ofColor color = IDrawableModule::GetColor(mModule->GetModuleCategory());
+   if (enabledCheckbox != nullptr)
+   {
+      enabled = enabledCheckbox->GetValue() > 0;
+
+      ofFill();
+      ofSetColor(70, 70, 70, 180);
+      ofRect(mTitleRect, 6);
+
+      //like the enabled indicator in a module's title bar
+      ofSetColor(color * .3f, 255);
+      ofCircle(x + kCircleRadius, centerY, kCircleRadius);
+      if (enabled)
+      {
+         ofSetColor(color, 255);
+         ofCircle(x + kCircleRadius, centerY, kCircleRadius * .6f);
+      }
+      x += kCircleSpace;
+   }
+
+   ofSetColor(255, 255, 255, enabled ? 255 : 110);
+   DrawTextNormal(title, x, centerY + 7, size);
+
+   ofPopStyle();
+}
+
 //skips the usual module frame, since its background would make us too opaque
 void TouchInterfacePanel::Render()
 {
@@ -625,18 +693,10 @@ void TouchInterfacePanel::DrawModule()
    ofRect(0, 0, w, h, 0);
 
    const ofRectangle content = GetContentRect();
-   const ofRectangle exitButton = GetExitButtonRect();
 
-   //show the details of what we're adjusting, since it could be under the finger
-   std::string title = mModule->GetTitleLabel();
-   if (mTouchedControl != nullptr && mIsDragging)
-      title = GetControlLabel(mTouchedControl) + ": " + mTouchedControl->GetDisplayValue(mTouchedControl->GetValue());
-   ofSetColor(255, 255, 255);
-   const float titleLeft = GetNumPages() > 1 ? GetPageButtonRect(1).getMaxX() + kMargin : content.x;
-   const float titleWidth = exitButton.x - kMargin - titleLeft;
-   DrawTextToFit(title, titleLeft + titleWidth / 2, content.y + 27, titleWidth, 22);
+   DrawTitle();
 
-   DrawButton(exitButton, "exit", true);
+   DrawButton(GetExitButtonRect(), "exit", true);
 
    for (int column = 0; column < kMaxColumns; ++column)
    {
