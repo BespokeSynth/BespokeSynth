@@ -30,6 +30,17 @@
 #include "Ramp.h"
 #include "IAudioPoller.h"
 
+//dragging far away from a slider increases its precision
+namespace PrecisionDrag
+{
+   //how much movement along the slider is scaled down at a given distance away from it (1 at the slider, approaching 0 far away)
+   float Damp(float distance);
+
+   //moves a slider for a drag. positions are normalized (0-1 along the slider), distances are away from the slider, perpendicular to it.
+   //returns the new (clamped) slider position, and updates offset
+   float Apply(float& offset, float cursorPos, float lastCursorPos, float distance, float lastDistance, float fineTuneFactor, bool allowReelIn);
+}
+
 class FloatSlider;
 class FloatSliderLFOControl;
 class IModulator;
@@ -106,6 +117,7 @@ public:
    Mode GetMode() const { return mMode; }
    void AddDetent(float value);
    void RemoveDetent(float value);
+   const std::vector<float>& GetDetents() const { return mDetents; }
 
    bool CheckNeedsDraw() override;
 

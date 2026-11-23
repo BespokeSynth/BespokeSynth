@@ -1937,23 +1937,28 @@ bool ControlSurface::IsDisplayableControl(IUIControl* control)
 
 void ControlSurface::UpdateControlList()
 {
-   mControls.clear();
+   mControls = GetDisplayableControls(GetCurrentControlModule());
+}
+
+//static
+std::vector<IUIControl*> ControlSurface::GetDisplayableControls(IDrawableModule* module)
+{
    std::vector<IUIControl*> controls;
-   if (IDrawableModule* currentControlModule = GetCurrentControlModule())
+   if (module != nullptr)
    {
-      if (currentControlModule->HasPush2OverrideControls())
-         currentControlModule->GetPush2OverrideControls(controls);
+      if (module->HasPush2OverrideControls())
+         module->GetPush2OverrideControls(controls);
       else
-         controls = currentControlModule->GetUIControls();
+         controls = module->GetUIControls();
    }
 
-   for (int i = 0; i < controls.size(); ++i)
+   std::vector<IUIControl*> displayableControls;
+   for (auto* control : controls)
    {
-      if (IsDisplayableControl(controls[i]))
-      {
-         mControls.push_back(controls[i]);
-      }
+      if (IsDisplayableControl(control))
+         displayableControls.push_back(control);
    }
+   return displayableControls;
 }
 
 void ControlSurface::DetermineTrackControlLayout()
@@ -1977,21 +1982,7 @@ void ControlSurface::DetermineTrackControlLayout()
    mTrackControlLayout.clear();
    for (int i = 0; i < (int)trackModules.size(); ++i)
    {
-      int numControls = 0;
-      std::vector<IUIControl*> controls;
-      if (trackModules[i] != nullptr)
-      {
-         if (trackModules[i]->HasPush2OverrideControls())
-            trackModules[i]->GetPush2OverrideControls(controls);
-         else
-            controls = trackModules[i]->GetUIControls();
-      }
-
-      for (int j = 0; j < controls.size(); ++j)
-      {
-         if (IsDisplayableControl(controls[j]))
-            ++numControls;
-      }
+      int numControls = (int)GetDisplayableControls(trackModules[i]).size();
 
       IDrawableModule* nameModule = trackModules[i];
       if (nameModule == nullptr && gridInterfaces[i] != nullptr)

@@ -1059,7 +1059,7 @@ void VSTPlugin::UpdateEmbeddedView()
    const bool settled = nowMs - mLastEmbedMoveTimeMs > 150;
 
    //a native view always sits above the canvas, so get out of the way of anything that should draw on top of it
-   const bool visible = settled && IsShowing() && !Minimized() && TheSynth->GetTopModalFocusItem() == nullptr && TheSynth->GetMoveModule() == nullptr;
+   const bool visible = settled && IsShowing() && !Minimized() && TheSynth->GetTopModalFocusItem() == nullptr && TheSynth->GetMoveModule() == nullptr && !TheSynth->IsTouchInterfacePanelShowing();
    const float clipTop = TheTitleBar != nullptr ? TheTitleBar->GetRect().getMaxY() * TheSynth->GetUIScale() : 0;
 
 #if BESPOKE_IOS

@@ -44,6 +44,7 @@ class Sample;
 class PatchCable;
 class MidiController;
 class QuickSpawnMenu;
+class TouchInterfacePanel;
 class ADSRDisplay;
 class UserPrefsEditor;
 class Minimap;
@@ -113,6 +114,9 @@ public:
    void MouseScrolled(float xScroll, float yScroll, bool isSmoothScroll, bool isInvertedScroll, bool canZoomCanvas);
    void MouseMagnify(int x, int y, float scaleFactor, const juce::MouseInputSource& source);
    bool IsTouchNavigationMode() const { return mTouchInteractionMode == TouchInteractionMode::PanZoom; }
+   bool IsInterfaceMode() const { return mTouchInteractionMode == TouchInteractionMode::Interface; }
+   bool IsTouchInterfacePanelShowing() const;
+   void CancelInterfaceTap() { mInterfaceTapModule = nullptr; }
    bool IsRepatchMode() const { return mTouchInteractionMode == TouchInteractionMode::Repatch; }
    void SetResamplingDeviceSampleRate(int rate) { mResamplingDeviceSampleRate = rate; } //0 when not resampling. may be called from the audio thread
    int GetResamplingDeviceSampleRate() const { return mResamplingDeviceSampleRate; }
@@ -380,7 +384,9 @@ private:
    bool mIsMousePanning{ false };
    std::atomic<int> mResamplingDeviceSampleRate{ 0 };
    std::atomic<bool> mShowTouchTooltips{ false }; //there's no hover on a touchscreen, so on iOS tooltips only show while inspecting with a finger
-   TouchInteractionMode mTouchInteractionMode{ TouchInteractionMode::Click }; //pan/zoom: touches on the canvas pan and pinch-zoom instead of clicking. repatch: cable sources get bigger to be easier to grab
+   TouchInteractionMode mTouchInteractionMode{ TouchInteractionMode::Click }; //pan/zoom: touches on the canvas pan and pinch-zoom instead of clicking. repatch: cable sources get bigger to be easier to grab. interface: tapping a module opens a panel of its controls
+   IDrawableModule* mInterfaceTapModule{ nullptr }; //module that was pressed in interface mode, its panel opens if this turns out to be a tap rather than a drag
+   ofVec2f mInterfaceTapPos;
    std::array<bool, 5> mIsMouseButtonHeld{ false };
    struct SpaceMouseInfo
    {
@@ -401,6 +407,7 @@ private:
 
    LocationZoomer mZoomer;
    QuickSpawnMenu* mQuickSpawn{ nullptr };
+   TouchInterfacePanel* mTouchInterfacePanel{ nullptr };
    std::unique_ptr<Minimap> mMinimap{ nullptr };
    UserPrefsEditor* mUserPrefsEditor{ nullptr };
    WelcomeScreen* mWelcomeScreen{ nullptr };

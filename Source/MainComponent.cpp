@@ -841,6 +841,7 @@ private:
       }
 
       //turn it into a two-finger pan/zoom: end the first finger's click, and navigate with both
+      mSynth.CancelInterfaceTap();
       auto* clickSource = Desktop::getInstance().getMouseSource(mClickTouch.mSourceIndex);
       mSynth.MouseReleased(mClickTouch.mPosition.x, mClickTouch.mPosition.y, 1, clickSource != nullptr ? *clickSource : e.source);
       mNavigationTouches.push_back(mClickTouch);

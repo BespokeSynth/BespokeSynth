@@ -917,6 +917,8 @@ target_sources(BespokeSynth PRIVATE
     WaveformViewer.h
     Waveshaper.cpp
     Waveshaper.h
+    TouchInterfacePanel.cpp
+    TouchInterfacePanel.h
     WelcomeScreen.cpp
     WelcomeScreen.h
     WhiteKeys.cpp

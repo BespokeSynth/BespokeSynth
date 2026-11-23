@@ -24,6 +24,7 @@
 #include "PatchCable.h"
 #include "ADSRDisplay.h"
 #include "QuickSpawnMenu.h"
+#include "TouchInterfacePanel.h"
 #include "AudioToCV.h"
 #include "ScriptModule.h"
 #include "DrumPlayer.h"
@@ -1928,6 +1929,21 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       return;
    }
 
+   //in interface mode, tapping a module opens its panel, and dragging pans the canvas
+   mInterfaceTapModule = nullptr;
+   if (IsInterfaceMode() && !rightButton && GetTopModalFocusItem() == nullptr && mGroupSelectedModules.empty() && !mQuickSpawn->IsShowing())
+   {
+      IDrawableModule* module = GetModuleAtCursor();
+      bool isUI = module != nullptr && (module->GetOwningContainer() == &mUILayerModuleContainer || module == TheSaveDataPanel || module == mUserPrefsEditor);
+      if (!isUI)
+      {
+         mInterfaceTapModule = module;
+         mInterfaceTapPos.set(intX, intY);
+         mIsMousePanning = true;
+         return;
+      }
+   }
+
    if (gHoveredUIControl != nullptr && IsKeyModifierComboHeld(KeyModifierCombo::Randomize))
    {
       gHoveredUIControl->Randomize();
@@ -2091,6 +2107,11 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       if (quickSpawnWasShowing && mQuickSpawn->IsShowing() && clickedModule != mQuickSpawn)
          mQuickSpawn->Hide();
    }
+}
+
+bool ModularSynth::IsTouchInterfacePanelShowing() const
+{
+   return mTouchInterfacePanel != nullptr && mTouchInterfacePanel->IsShowing();
 }
 
 void ModularSynth::DeleteGroupSelectedModules()
@@ -2458,6 +2479,18 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
 
    if (!mGroupSelectedModules.empty() && !mMouseMovedSignificantlySincePressed)
       mGroupSelectedModules.clear();
+
+   if (mInterfaceTapModule != nullptr)
+   {
+      const float kMaxTapDistance = 10;
+      IDrawableModule* module = mInterfaceTapModule;
+      mInterfaceTapModule = nullptr;
+      if (!module->IsDeleted() && mInterfaceTapPos.distanceSquared(ofVec2f(intX, intY)) < kMaxTapDistance * kMaxTapDistance)
+      {
+         if (!mTouchInterfacePanel->ShowForModule(module))
+            TheTitleBar->DisplayTemporaryMessage("no controls");
+      }
+   }
 
    if (rightButton && mLastClickWasEmptySpace && !mMouseMovedSignificantlySincePressed && mQuickSpawn != nullptr)
       mQuickSpawn->ShowSpawnCategoriesPopup();
@@ -2844,6 +2877,8 @@ void ModularSynth::ResetLayout()
    delete TheTitleBar;
    delete TheSaveDataPanel;
    delete mQuickSpawn;
+   delete mTouchInterfacePanel;
+   mInterfaceTapModule = nullptr;
    delete mUserPrefsEditor;
    delete mNoteOutputQueue;
 
@@ -2883,6 +2918,13 @@ void ModularSynth::ResetLayout()
    mQuickSpawn->Init();
    mUILayerModuleContainer.AddModule(mQuickSpawn);
    mModuleContainer.AddModule(mQuickSpawn->GetMainContainerFollower());
+
+   mTouchInterfacePanel = new TouchInterfacePanel();
+   mTouchInterfacePanel->SetName("touchinterface");
+   mTouchInterfacePanel->SetTypeName("touchinterface", kModuleCategory_Other);
+   mTouchInterfacePanel->CreateUIControls();
+   mTouchInterfacePanel->Init();
+   mUILayerModuleContainer.AddModule(mTouchInterfacePanel);
 
    mUserPrefsEditor = new UserPrefsEditor();
    mUserPrefsEditor->SetName("userprefseditor");

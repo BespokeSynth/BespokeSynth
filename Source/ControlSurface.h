@@ -99,6 +99,8 @@ public:
 
    static IUIControl* sBindToUIControl;
 
+   static std::vector<IUIControl*> GetDisplayableControls(IDrawableModule* module); //the controls that get mapped to encoders
+
    bool IsEnabled() const override { return true; }
 
 private:

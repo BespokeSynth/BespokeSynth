@@ -153,6 +153,7 @@ void TitleBar::CreateUIControls()
    mTouchModeSelector->AddLabel("click", (int)TouchInteractionMode::Click);
    mTouchModeSelector->AddLabel("pan/zoom", (int)TouchInteractionMode::PanZoom);
    mTouchModeSelector->AddLabel("repatch", (int)TouchInteractionMode::Repatch);
+   mTouchModeSelector->AddLabel("interface", (int)TouchInteractionMode::Interface);
    mTouchModeSelector->SetElementHeight(32);
    mDeleteButton = new ClickButton(this, "delete", 400, 1);
    mDeleteButton->SetDimensions(50, 32);
@@ -477,19 +478,6 @@ void TitleBar::DrawModule()
    }
    mModuleCategory = type;
 
-   if (!hideElements)
-   {
-      float usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
-      std::string stats;
-      stats += "fps:" + ofToString(ofGetFrameRate(), 0);
-      stats += "  audio cpu:" + ofToString(usage * 100, 1);
-      if (usage > 1)
-         ofSetColor(255, 150, 150);
-      else
-         ofSetColor(255, 255, 255);
-      DrawTextRightJustify(stats, pixelWidth - 5, 33);
-   }
-
    mDisplayHelpButton->SetPosition(pixelWidth - 20, 4);
    mDisplayHelpButton->Draw();
    if (TheSynth->IsAudioPaused())
@@ -498,6 +486,16 @@ void TitleBar::DrawModule()
       mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPause);
    mPlayPauseButton->SetPosition(mDisplayHelpButton->GetPosition(true).x - mPlayPauseButton->GetRect().width - 5, 4);
    mPlayPauseButton->Draw();
+
+   if (!hideElements)
+   {
+      float usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
+      ofSetColor(255, 255, 255);;
+      DrawTextRightJustify("fps:" + ofToString(ofGetFrameRate(), 0), mPlayPauseButton->GetRect(true).x - 3, 17);
+      if (usage > 1)
+         ofSetColor(255, 150, 150);
+      DrawTextRightJustify("audio cpu:" + ofToString(usage * 100, 1), pixelWidth - 5, 33);
+   }
 
    if (mSpecifiedHeight != -1 || mNumDropdownRows >= 3)
    {
