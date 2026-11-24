@@ -65,6 +65,26 @@ public:
    void TouchReleased(int touchId) override;
 
 private:
+   //a module that's connected to the one we're showing
+   struct Routing
+   {
+      IDrawableModule* mModule{ nullptr };
+      std::string mLabel;
+      ofColor mConnectionColor;
+      bool operator==(const Routing& other) const
+      {
+         return mModule == other.mModule && mLabel == other.mLabel && mConnectionColor.r == other.mConnectionColor.r &&
+                mConnectionColor.g == other.mConnectionColor.g && mConnectionColor.b == other.mConnectionColor.b;
+      }
+   };
+
+   //the list of modules along one side of the panel
+   struct RoutingList
+   {
+      std::vector<Routing> mModules;
+      int mPage{ 0 };
+   };
+
    struct Touch
    {
       int mTouchId{ kMouseTouchId };
@@ -87,11 +107,19 @@ private:
    int GetNumPages() const;
    int GetNumColumns() const;
    void ChangePage(int direction);
+   void SetModule(IDrawableModule* module);
    void UpdateControlList();
+   void UpdateRoutingModules();
+   int GetNumRoutingButtons() const; //how many fit along each side
+   int GetNumRoutingModulesPerPage(const RoutingList& list) const; //one button is for paging, if they don't all fit
+   ofRectangle GetRoutingButtonRect(bool isInput, int index) const;
+   bool PressRoutingButton(bool isInput, float x, float y);
+   void DrawRoutingButtons(bool isInput) const;
    Checkbox* GetEnabledCheckbox() const; //null if the module can't be enabled/disabled
    bool IsValidControl(IUIControl* control) const;
 
    ofRectangle GetContentRect() const; //the area of the screen that isn't cut off by notches, rounded corners, etc
+   ofRectangle GetControlsRect() const; //what's left of the content area below the header, and between the routing buttons
    ofRectangle GetExitButtonRect() const;
    ofRectangle GetPageButtonRect(int direction) const;
    ofRectangle GetColumnRect(int column) const; //column on the current page
@@ -120,6 +148,9 @@ private:
    IDrawableModule* mModule{ nullptr };
    std::vector<IUIControl*> mControls;
    int mPage{ 0 };
+   RoutingList mRoutingInputs; //previous modules in the signal chain
+   RoutingList mRoutingOutputs; //next modules in the signal chain
+   double mLastRoutingUpdateTime{ 0 };
    ofRectangle mTitleRect; //where the module's name was last drawn, tappable to enable/disable the module
 
    //fixed size, since it's accessed while drawing

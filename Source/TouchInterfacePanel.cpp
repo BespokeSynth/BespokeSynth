@@ -31,6 +31,8 @@
 #include "ControlSurface.h"
 #include "IModulator.h"
 #include "ModularSynth.h"
+#include "PatchCable.h"
+#include "PatchCableSource.h"
 #include "QuickSpawnMenu.h"
 #include "Slider.h"
 #include "SynthGlobals.h"
@@ -41,13 +43,16 @@ namespace
    const int kMaxColumns = 8;
    const float kMargin = 8;
    const float kHeaderHeight = 44;
-   const float kPageButtonWidth = 64;
-   const float kPageLabelWidth = 50;
+   const float kPageLabelHeight = 20;
    const float kLabelHeight = 42;
    const float kMaxColumnWidth = 120;
    const float kColumnSpacing = 6;
    const float kDragDeadZone = 20; //fingers don't move in straight lines, so allow some sideways drift before increasing precision
    const float kDetentCatchDistance = 14; //how far to drag to get out of a detent
+   const float kSideButtonWidth = 72;
+   const float kSideButtonHeight = 44;
+   const float kSideButtonSpacing = 4;
+   const double kRoutingUpdateMs = 250;
    const double kDoubleTapMs = 300;
    const float kDoubleTapDistance = 15;
 
@@ -102,22 +107,29 @@ TouchInterfacePanel::~TouchInterfacePanel()
 
 bool TouchInterfacePanel::ShowForModule(IDrawableModule* module)
 {
-   std::vector<IUIControl*> controls = ControlSurface::GetDisplayableControls(module);
-   if (controls.empty())
+   if (ControlSurface::GetDisplayableControls(module).empty())
       return false;
 
-   std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
-   mModule = module;
-   mControls = controls;
-   mPage = 0;
-   mLastTappedControl = nullptr;
-   EndAllTouches();
+   SetModule(module);
 
    gHoveredUIControl = nullptr; //don't let clicks get directed to a control that we're covering up
    GetOwningContainer()->MoveToFront(this);
    SetPosition(0, GetTitleBarHeight());
    SetShowing(true);
    return true;
+}
+
+void TouchInterfacePanel::SetModule(IDrawableModule* module)
+{
+   std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
+   EndAllTouches(); //while the controls being touched are still in our list
+   mModule = module;
+   mControls = ControlSurface::GetDisplayableControls(module);
+   mPage = 0;
+   mLastTappedControl = nullptr;
+   mRoutingInputs = RoutingList();
+   mRoutingOutputs = RoutingList();
+   UpdateRoutingModules();
 }
 
 void TouchInterfacePanel::Hide()
@@ -127,6 +139,8 @@ void TouchInterfacePanel::Hide()
    SetShowing(false);
    mModule = nullptr;
    mControls.clear();
+   mRoutingInputs = RoutingList();
+   mRoutingOutputs = RoutingList();
    mLastTappedControl = nullptr;
 }
 
@@ -144,6 +158,8 @@ void TouchInterfacePanel::Poll()
 
    SetPosition(0, GetTitleBarHeight());
    UpdateControlList();
+   if (gTime - mLastRoutingUpdateTime > kRoutingUpdateMs)
+      UpdateRoutingModules();
 }
 
 void TouchInterfacePanel::UpdateControlList()
@@ -172,6 +188,108 @@ void TouchInterfacePanel::UpdateControlList()
       if (!IsValidControl(mLastTappedControl))
          mLastTappedControl = nullptr;
    }
+}
+
+void TouchInterfacePanel::UpdateRoutingModules()
+{
+   mLastRoutingUpdateTime = gTime;
+
+   std::vector<Routing> inputs;
+   std::vector<Routing> outputs;
+
+   auto add = [this](std::vector<Routing>& list, IDrawableModule* module, ofColor color)
+   {
+      if (module == nullptr || module == mModule || module->IsDeleted())
+         return;
+      for (const auto& routing : list)
+      {
+         if (routing.mModule == module)
+            return;
+      }
+      list.push_back({ module, module->GetTitleLabel(), color });
+   };
+
+   if (mModule != nullptr)
+   {
+      std::vector<IDrawableModule*> modules;
+      TheSynth->GetAllModules(modules);
+      for (auto* module : modules)
+      {
+         for (auto* source : module->GetPatchCableSources())
+         {
+            for (auto* cable : source->GetPatchCables())
+            {
+               if (cable->GetTarget() == mModule)
+                  add(inputs, module, source->GetColor());
+            }
+         }
+      }
+
+      for (auto* source : mModule->GetPatchCableSources())
+      {
+         for (auto* cable : source->GetPatchCables())
+            add(outputs, dynamic_cast<IDrawableModule*>(cable->GetTarget()), source->GetColor());
+      }
+   }
+
+   auto update = [this](RoutingList& list, std::vector<Routing>& modules)
+   {
+      if (list.mModules == modules)
+         return;
+      std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
+      list.mModules = modules;
+      if (list.mPage * GetNumRoutingModulesPerPage(list) >= (int)modules.size())
+         list.mPage = 0;
+   };
+   update(mRoutingInputs, inputs);
+   update(mRoutingOutputs, outputs);
+}
+
+int TouchInterfacePanel::GetNumRoutingButtons() const
+{
+   float height = GetContentRect().height - kHeaderHeight;
+   if (GetNumPages() > 1)
+      height -= kSideButtonHeight + kSideButtonSpacing; //leave room for the page buttons
+   return MAX(2, (int)((height + kSideButtonSpacing) / (kSideButtonHeight + kSideButtonSpacing)));
+}
+
+int TouchInterfacePanel::GetNumRoutingModulesPerPage(const RoutingList& list) const
+{
+   const int numButtons = GetNumRoutingButtons();
+   return (int)list.mModules.size() <= numButtons ? numButtons : numButtons - 1;
+}
+
+ofRectangle TouchInterfacePanel::GetRoutingButtonRect(bool isInput, int index) const
+{
+   ofRectangle content = GetContentRect();
+   return ofRectangle(isInput ? content.x : content.getMaxX() - kSideButtonWidth, content.y + kHeaderHeight + (kSideButtonHeight + kSideButtonSpacing) * index, kSideButtonWidth, kSideButtonHeight);
+}
+
+bool TouchInterfacePanel::PressRoutingButton(bool isInput, float x, float y)
+{
+   RoutingList& list = isInput ? mRoutingInputs : mRoutingOutputs;
+   const int perPage = GetNumRoutingModulesPerPage(list);
+   const int numModules = (int)list.mModules.size();
+
+   for (int i = 0; i < perPage; ++i)
+   {
+      int index = list.mPage * perPage + i;
+      if (index < numModules && GetRoutingButtonRect(isInput, i).contains(x, y))
+      {
+         SetModule(list.mModules[index].mModule);
+         return true;
+      }
+   }
+
+   if (numModules > perPage && GetRoutingButtonRect(isInput, perPage).contains(x, y))
+   {
+      ++list.mPage;
+      if (list.mPage * perPage >= numModules)
+         list.mPage = 0;
+      return true;
+   }
+
+   return false;
 }
 
 Checkbox* TouchInterfacePanel::GetEnabledCheckbox() const
@@ -231,6 +349,24 @@ ofRectangle TouchInterfacePanel::GetContentRect() const
    return ofRectangle(left + kMargin, top + kMargin, ofGetWidth() / scale - left - right - kMargin * 2, height - top - bottom - kMargin * 2);
 }
 
+ofRectangle TouchInterfacePanel::GetControlsRect() const
+{
+   ofRectangle rect = GetContentRect();
+   rect.y += kHeaderHeight;
+   rect.height -= kHeaderHeight;
+   const bool hasPages = GetNumPages() > 1;
+   if (hasPages)
+      rect.height -= kPageLabelHeight;
+   if (hasPages || !mRoutingInputs.mModules.empty())
+   {
+      rect.x += kSideButtonWidth + kMargin;
+      rect.width -= kSideButtonWidth + kMargin;
+   }
+   if (hasPages || !mRoutingOutputs.mModules.empty())
+      rect.width -= kSideButtonWidth + kMargin;
+   return rect;
+}
+
 ofRectangle TouchInterfacePanel::GetExitButtonRect() const
 {
    ofRectangle content = GetContentRect();
@@ -241,17 +377,16 @@ ofRectangle TouchInterfacePanel::GetExitButtonRect() const
 ofRectangle TouchInterfacePanel::GetPageButtonRect(int direction) const
 {
    ofRectangle content = GetContentRect();
-   return ofRectangle(direction < 0 ? content.x : content.x + kPageButtonWidth + kPageLabelWidth, content.y, kPageButtonWidth, kHeaderHeight - 8);
+   return ofRectangle(direction < 0 ? content.x : content.getMaxX() - kSideButtonWidth, content.getMaxY() - kSideButtonHeight, kSideButtonWidth, kSideButtonHeight);
 }
 
 ofRectangle TouchInterfacePanel::GetColumnRect(int column) const
 {
-   ofRectangle content = GetContentRect();
+   ofRectangle area = GetControlsRect();
    int numColumns = GetNumColumns();
-   float columnWidth = MIN(content.width / numColumns, kMaxColumnWidth);
-   float startX = content.x + (content.width - columnWidth * numColumns) / 2;
-   float top = content.y + kHeaderHeight;
-   return ofRectangle(startX + columnWidth * column, top, columnWidth, content.getMaxY() - top);
+   float columnWidth = MIN(area.width / numColumns, kMaxColumnWidth);
+   float startX = area.x + (area.width - columnWidth * numColumns) / 2;
+   return ofRectangle(startX + columnWidth * column, area.y, columnWidth, area.height);
 }
 
 ofRectangle TouchInterfacePanel::GetTrackRect(int column) const
@@ -511,6 +646,10 @@ void TouchInterfacePanel::Press(int touchId, float x, float y)
       }
    }
 
+   UpdateRoutingModules(); //make sure that they all still exist
+   if (PressRoutingButton(true, x, y) || PressRoutingButton(false, x, y))
+      return;
+
    UpdateControlList();
 
    for (int column = 0; column < kMaxColumns; ++column)
@@ -598,7 +737,7 @@ void TouchInterfacePanel::DrawButton(ofRectangle rect, std::string label, bool e
    ofSetColor(70, 70, 70, enabled ? 255 : 90);
    ofRect(rect, 6);
    ofSetColor(255, 255, 255, enabled ? 255 : 90);
-   DrawTextToFit(label, rect.getCenter().x, rect.getCenter().y + 6, rect.width - 8, 18);
+   DrawTextToFit(label, rect.getCenter().x, rect.getCenter().y + 6, rect.width - 14, 18);
    ofPopStyle();
 }
 
@@ -724,7 +863,7 @@ void TouchInterfacePanel::DrawControl(IUIControl* control, int column) const
 void TouchInterfacePanel::DrawTitle()
 {
    const ofRectangle content = GetContentRect();
-   const float left = GetNumPages() > 1 ? GetPageButtonRect(1).getMaxX() + kMargin : content.x;
+   const float left = content.x;
    const float maxWidth = GetExitButtonRect().x - kMargin - left;
    const float centerX = left + maxWidth / 2;
    const float centerY = GetExitButtonRect().getCenter().y;
@@ -770,6 +909,38 @@ void TouchInterfacePanel::DrawTitle()
    ofPopStyle();
 }
 
+void TouchInterfacePanel::DrawRoutingButtons(bool isInput) const
+{
+   const RoutingList& list = isInput ? mRoutingInputs : mRoutingOutputs;
+   const int perPage = GetNumRoutingModulesPerPage(list);
+   const int numModules = (int)list.mModules.size();
+
+   ofPushStyle();
+   ofFill();
+   for (int i = 0; i < perPage; ++i)
+   {
+      const int index = list.mPage * perPage + i;
+      if (index >= numModules)
+         break;
+
+      const Routing& routing = list.mModules[index];
+      const ofRectangle rect = GetRoutingButtonRect(isInput, i);
+      DrawButton(rect, routing.mLabel, true);
+
+      //strip along the outside edge, in the color of the cable
+      const float kStripWidth = 5;
+      ofSetColor(routing.mConnectionColor);
+      ofRect(isInput ? rect.x : rect.getMaxX() - kStripWidth, rect.y, kStripWidth, rect.height, 2);
+   }
+
+   if (numModules > perPage)
+   {
+      const int numPages = (numModules + perPage - 1) / perPage;
+      DrawButton(GetRoutingButtonRect(isInput, perPage), ofToString(list.mPage + 1) + "/" + ofToString(numPages) + " >", true);
+   }
+   ofPopStyle();
+}
+
 //skips the usual module frame, since its background would make us too opaque
 void TouchInterfacePanel::Render()
 {
@@ -801,6 +972,16 @@ void TouchInterfacePanel::DrawModule()
 
    DrawButton(GetExitButtonRect(), "exit", true);
 
+   DrawRoutingButtons(true);
+   DrawRoutingButtons(false);
+
+   if (mControls.empty()) //we can get here through the signal chain
+   {
+      ofRectangle area = GetControlsRect();
+      ofSetColor(255, 255, 255, 130);
+      DrawTextToFit("no controls", area.getCenter().x, area.getCenter().y + 6, area.width, 18);
+   }
+
    for (int column = 0; column < kMaxColumns; ++column)
    {
       int index = mPage * kMaxColumns + column;
@@ -814,7 +995,7 @@ void TouchInterfacePanel::DrawModule()
       DrawButton(GetPageButtonRect(-1), "<", mPage > 0);
       DrawButton(GetPageButtonRect(1), ">", mPage < numPages - 1);
       ofSetColor(255, 255, 255);
-      DrawTextToFit(ofToString(mPage + 1) + "/" + ofToString(numPages), content.x + kPageButtonWidth + kPageLabelWidth / 2, GetPageButtonRect(1).getCenter().y + 6, kPageLabelWidth - 8, 18);
+      DrawTextToFit(ofToString(mPage + 1) + "/" + ofToString(numPages), w / 2, content.getMaxY() - 2, 80, 18);
    }
 
    ofPopStyle();
