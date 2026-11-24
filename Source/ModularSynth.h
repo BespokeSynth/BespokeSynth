@@ -45,6 +45,7 @@ class PatchCable;
 class MidiController;
 class QuickSpawnMenu;
 class TouchInterfacePanel;
+class ITouchListener;
 class ADSRDisplay;
 class UserPrefsEditor;
 class Minimap;
@@ -162,6 +163,14 @@ public:
    void PushModalFocusItem(IDrawableModule* item);
    void PopModalFocusItem();
    IDrawableModule* GetTopModalFocusItem() const;
+
+   void AddTouchListener(ITouchListener* listener); //the most recently added listener gets the first chance to claim a touch
+   void RemoveTouchListener(ITouchListener* listener);
+   //these return true if the touch belongs to a listener, and shouldn't be handled any other way
+   bool TouchPressed(int touchId, float screenX, float screenY);
+   bool TouchMoved(int touchId, float screenX, float screenY);
+   bool TouchReleased(int touchId);
+
    std::vector<IDrawableModule*> GetModalFocusItemStack() const { return mModalFocusItemStack; }
    bool IsModalFocusItem(IDrawableModule* item) const;
 
@@ -408,6 +417,8 @@ private:
    LocationZoomer mZoomer;
    QuickSpawnMenu* mQuickSpawn{ nullptr };
    TouchInterfacePanel* mTouchInterfacePanel{ nullptr };
+   std::vector<ITouchListener*> mTouchListeners;
+   std::map<int, ITouchListener*> mClaimedTouches; //touch id -> the listener it belongs to, null if that listener is gone
    std::unique_ptr<Minimap> mMinimap{ nullptr };
    UserPrefsEditor* mUserPrefsEditor{ nullptr };
    WelcomeScreen* mWelcomeScreen{ nullptr };

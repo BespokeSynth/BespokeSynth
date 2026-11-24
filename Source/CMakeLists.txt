@@ -393,6 +393,7 @@ target_sources(BespokeSynth PRIVATE
     IPulseReceiver.cpp
     IPulseReceiver.h
     IUIControl.cpp
+    ITouchListener.h
     IUIControl.h
     IVoiceParams.h
     InputChannel.cpp

@@ -91,6 +91,13 @@ TouchInterfacePanel::TouchInterfacePanel()
 {
    SetShouldDrawOutline(false);
    SetShowing(false);
+   TheSynth->AddTouchListener(this);
+}
+
+TouchInterfacePanel::~TouchInterfacePanel()
+{
+   if (TheSynth != nullptr)
+      TheSynth->RemoveTouchListener(this);
 }
 
 bool TouchInterfacePanel::ShowForModule(IDrawableModule* module)
@@ -104,7 +111,7 @@ bool TouchInterfacePanel::ShowForModule(IDrawableModule* module)
    mControls = controls;
    mPage = 0;
    mLastTappedControl = nullptr;
-   EndTouch();
+   EndAllTouches();
 
    gHoveredUIControl = nullptr; //don't let clicks get directed to a control that we're covering up
    GetOwningContainer()->MoveToFront(this);
@@ -116,7 +123,7 @@ bool TouchInterfacePanel::ShowForModule(IDrawableModule* module)
 void TouchInterfacePanel::Hide()
 {
    std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
-   EndTouch();
+   EndAllTouches();
    SetShowing(false);
    mModule = nullptr;
    mControls.clear();
@@ -146,7 +153,7 @@ void TouchInterfacePanel::UpdateControlList()
 
    if (mModule->IsDeleted())
    {
-      mTouchedControl = nullptr; //it might not exist anymore
+      mControls.clear(); //they might not exist anymore
       Hide();
       return;
    }
@@ -157,10 +164,10 @@ void TouchInterfacePanel::UpdateControlList()
       std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
       mControls = controls;
       mPage = ofClamp(mPage, 0, GetNumPages() - 1);
-      if (!IsValidControl(mTouchedControl))
+      for (auto& touch : mTouches)
       {
-         mTouchedControl = nullptr;
-         mIsDragging = false;
+         if (!IsValidControl(touch.mControl))
+            touch = Touch();
       }
       if (!IsValidControl(mLastTappedControl))
          mLastTappedControl = nullptr;
@@ -276,9 +283,9 @@ void TouchInterfacePanel::SetControlPos(IUIControl* control, float pos)
 }
 
 //finds the detent closest to rangeStart that's between rangeStart (exclusive) and rangeEnd (inclusive)
-bool TouchInterfacePanel::FindDetent(float rangeStart, float rangeEnd, float& detentPos, float& detentValue) const
+bool TouchInterfacePanel::FindDetent(IUIControl* control, float rangeStart, float rangeEnd, float& detentPos, float& detentValue) const
 {
-   FloatSlider* slider = dynamic_cast<FloatSlider*>(mTouchedControl);
+   FloatSlider* slider = dynamic_cast<FloatSlider*>(control);
    if (slider == nullptr)
       return false;
 
@@ -299,115 +306,183 @@ bool TouchInterfacePanel::FindDetent(float rangeStart, float rangeEnd, float& de
    return found;
 }
 
-void TouchInterfacePanel::SetCaughtDetent(float detentPos, float detentValue)
+void TouchInterfacePanel::SetCaughtDetent(Touch& touch, float detentPos, float detentValue)
 {
-   mIsCaughtOnDetent = true;
-   mDragPos = detentPos;
+   touch.mIsCaughtOnDetent = true;
+   touch.mDragPos = detentPos;
 
    //set the detent's value directly, so that it's exact
-   if (IModulator* modulator = GetAdjustableModulator(mTouchedControl))
+   if (IModulator* modulator = GetAdjustableModulator(touch.mControl))
       modulator->GetMax() = detentValue;
    else
-      mTouchedControl->SetValue(detentValue, NextBufferTime(false));
+      touch.mControl->SetValue(detentValue, NextBufferTime(false));
 }
 
-void TouchInterfacePanel::BeginDrag(float x, float y)
+void TouchInterfacePanel::BeginDrag(Touch& touch, float x, float y)
 {
-   if (FloatSlider* slider = dynamic_cast<FloatSlider*>(mTouchedControl))
+   if (FloatSlider* slider = dynamic_cast<FloatSlider*>(touch.mControl))
    {
       slider->mTouching = true;
       slider->UpdateTouching();
    }
 
-   mIsDragging = true;
-   mDragStart.set(x, y);
-   mLastDrag.set(x, y);
-   mDragOffset = 0;
-   mDragPrecision = 1;
-   mIsCaughtOnDetent = false;
-   mDragPos = ofClamp((mDragTrack.getMaxY() - y) / mDragTrack.height, 0, 1);
+   touch.mIsDragging = true;
+   touch.mDragStart.set(x, y);
+   touch.mLastDrag.set(x, y);
+   touch.mDragOffset = 0;
+   touch.mDragPrecision = 1;
+   touch.mIsCaughtOnDetent = false;
+   touch.mDragPos = ofClamp((touch.mDragTrack.getMaxY() - y) / touch.mDragTrack.height, 0, 1);
 
    //catch on a detent if we touched down right next to one
-   float catchDistance = kDetentCatchDistance / 2 / mDragTrack.height;
+   float catchDistance = kDetentCatchDistance / 2 / touch.mDragTrack.height;
    float detentPos, detentValue;
-   if (FindDetent(mDragPos - catchDistance, mDragPos + catchDistance, detentPos, detentValue))
-      SetCaughtDetent(detentPos, detentValue);
+   if (FindDetent(touch.mControl, touch.mDragPos - catchDistance, touch.mDragPos + catchDistance, detentPos, detentValue))
+      SetCaughtDetent(touch, detentPos, detentValue);
    else
-      SetControlPos(mTouchedControl, mDragPos);
+      SetControlPos(touch.mControl, touch.mDragPos);
 }
 
-void TouchInterfacePanel::UpdateDrag(float x, float y)
+void TouchInterfacePanel::UpdateDrag(Touch& touch, float x, float y)
 {
-   if (x == mLastDrag.x && y == mLastDrag.y)
+   if (x == touch.mLastDrag.x && y == touch.mLastDrag.y)
       return;
 
-   auto getSidewaysDistance = [this](float dragX)
+   auto getSidewaysDistance = [&touch](float dragX)
    {
-      return MAX(0, fabsf(dragX - mDragStart.x) - kDragDeadZone);
+      return MAX(0, fabsf(dragX - touch.mDragStart.x) - kDragDeadZone);
    };
 
    float distance = getSidewaysDistance(x);
-   float cursorPos = (mDragTrack.getMaxY() - y) / mDragTrack.height;
-   float lastCursorPos = (mDragTrack.getMaxY() - mLastDrag.y) / mDragTrack.height;
-   float pos = PrecisionDrag::Apply(mDragOffset, cursorPos, lastCursorPos, distance, getSidewaysDistance(mLastDrag.x), 1, true);
-   mDragPrecision = PrecisionDrag::Damp(distance);
-   mLastDrag.set(x, y);
+   float cursorPos = (touch.mDragTrack.getMaxY() - y) / touch.mDragTrack.height;
+   float lastCursorPos = (touch.mDragTrack.getMaxY() - touch.mLastDrag.y) / touch.mDragTrack.height;
+   float pos = PrecisionDrag::Apply(touch.mDragOffset, cursorPos, lastCursorPos, distance, getSidewaysDistance(touch.mLastDrag.x), 1, true);
+   touch.mDragPrecision = PrecisionDrag::Damp(distance);
+   touch.mLastDrag.set(x, y);
 
-   const float catchDistance = kDetentCatchDistance / mDragTrack.height * mDragPrecision;
+   const float catchDistance = kDetentCatchDistance / touch.mDragTrack.height * touch.mDragPrecision;
 
-   if (mIsCaughtOnDetent)
+   if (touch.mIsCaughtOnDetent)
    {
-      float move = pos - mDragPos;
+      float move = pos - touch.mDragPos;
       if (fabsf(move) <= catchDistance)
          return;
 
       //pull free of the detent, and absorb the distance that took, so that the value doesn't jump
-      mIsCaughtOnDetent = false;
+      touch.mIsCaughtOnDetent = false;
       float absorb = move > 0 ? catchDistance : -catchDistance;
-      mDragOffset -= absorb;
+      touch.mDragOffset -= absorb;
       pos -= absorb;
    }
 
    float detentPos, detentValue;
-   if (FindDetent(mDragPos, pos, detentPos, detentValue) &&
+   if (FindDetent(touch.mControl, touch.mDragPos, pos, detentPos, detentValue) &&
        fabsf(pos - detentPos) <= catchDistance) //let fast movements blow right past it
    {
-      SetCaughtDetent(detentPos, detentValue);
+      SetCaughtDetent(touch, detentPos, detentValue);
       return;
    }
 
-   mDragPos = pos;
-   SetControlPos(mTouchedControl, mDragPos);
+   touch.mDragPos = pos;
+   SetControlPos(touch.mControl, touch.mDragPos);
 }
 
-void TouchInterfacePanel::EndTouch()
+TouchInterfacePanel::Touch* TouchInterfacePanel::FindTouch(int touchId)
 {
-   if (IsValidControl(mTouchedControl))
+   for (auto& touch : mTouches)
    {
-      if (mIsDragging)
+      if (touch.mControl != nullptr && touch.mTouchId == touchId)
+         return &touch;
+   }
+   return nullptr;
+}
+
+TouchInterfacePanel::Touch* TouchInterfacePanel::FindFreeTouch()
+{
+   for (auto& touch : mTouches)
+   {
+      if (touch.mControl == nullptr)
+         return &touch;
+   }
+   return nullptr;
+}
+
+const TouchInterfacePanel::Touch* TouchInterfacePanel::FindTouch(const IUIControl* control) const
+{
+   for (const auto& touch : mTouches)
+   {
+      if (touch.mControl != nullptr && touch.mControl == control)
+         return &touch;
+   }
+   return nullptr;
+}
+
+void TouchInterfacePanel::EndAllTouches()
+{
+   for (auto& touch : mTouches)
+      EndTouch(touch);
+}
+
+void TouchInterfacePanel::EndTouch(Touch& touch)
+{
+   if (IsValidControl(touch.mControl))
+   {
+      if (touch.mIsDragging)
       {
-         FloatSlider* slider = dynamic_cast<FloatSlider*>(mTouchedControl);
+         FloatSlider* slider = dynamic_cast<FloatSlider*>(touch.mControl);
          if (slider != nullptr)
          {
             slider->mTouching = false;
             slider->UpdateTouching(); //"relative" sliders spring back when released
          }
       }
-      else if (dynamic_cast<ClickButton*>(mTouchedControl) != nullptr)
+      else if (dynamic_cast<ClickButton*>(touch.mControl) != nullptr)
       {
-         mTouchedControl->MouseReleased();
+         touch.mControl->MouseReleased();
       }
    }
-   mTouchedControl = nullptr;
-   mIsDragging = false;
+   touch = Touch();
 }
 
 void TouchInterfacePanel::OnClicked(float x, float y, bool right)
 {
-   if (right)
+   if (!right)
+      Press(kMouseTouchId, x, y);
+}
+
+bool TouchInterfacePanel::WantsTouch(float screenX, float screenY)
+{
+   if (!IsShowing() || TheQuickSpawnMenu->IsShowing())
+      return false;
+
+   ModuleContainer* container = GetOwningContainer();
+   return container->GetModuleAt(TheSynth->GetMouseX(container, screenX), TheSynth->GetMouseY(container, screenY)) == this; //could be covered, e.g. by the title bar
+}
+
+ofVec2f TouchInterfacePanel::ScreenToLocal(float screenX, float screenY) const
+{
+   ModuleContainer* container = GetOwningContainer();
+   return ofVec2f(TheSynth->GetMouseX(container, screenX), TheSynth->GetMouseY(container, screenY)) - GetPosition();
+}
+
+void TouchInterfacePanel::TouchPressed(int touchId, float screenX, float screenY)
+{
+   ofVec2f pos = ScreenToLocal(screenX, screenY);
+   Press(touchId, pos.x, pos.y);
+}
+
+void TouchInterfacePanel::TouchMoved(int touchId, float screenX, float screenY)
+{
+   ofVec2f pos = ScreenToLocal(screenX, screenY);
+   Move(touchId, pos.x, pos.y);
+}
+
+void TouchInterfacePanel::Press(int touchId, float x, float y)
+{
+   if (!IsShowing())
       return;
 
-   EndTouch();
+   TouchReleased(touchId); //in case we missed the release
 
    if (GetExitButtonRect().contains(x, y))
    {
@@ -448,10 +523,14 @@ void TouchInterfacePanel::OnClicked(float x, float y, bool right)
       if (control->IsButtonControl() && !GetSquareRect(column).contains(x, y))
          return;
 
-      mTouchedControl = control;
+      Touch* touch = FindFreeTouch();
+      if (touch == nullptr || FindTouch(control) != nullptr) //another touch already has this control
+         return;
 
       if (control->IsButtonControl())
       {
+         touch->mTouchId = touchId;
+         touch->mControl = control;
          if (dynamic_cast<Checkbox*>(control) != nullptr)
             control->SetFromMidiCC(control->GetValue() > 0 ? 0 : 1, NextBufferTime(false), SetValueMethod::Direct);
          else
@@ -467,26 +546,49 @@ void TouchInterfacePanel::OnClicked(float x, float y, bool right)
       if (isDoubleTap)
       {
          control->ResetToDefault();
-         mTouchedControl = nullptr;
          return;
       }
 
-      mDragTrack = GetTrackRect(column);
-      BeginDrag(x, y);
+      touch->mTouchId = touchId;
+      touch->mControl = control;
+      touch->mDragTrack = GetTrackRect(column);
+      BeginDrag(*touch, x, y);
       return;
    }
 }
 
+void TouchInterfacePanel::Move(int touchId, float x, float y)
+{
+   if (FindTouch(touchId) == nullptr)
+      return;
+
+   UpdateControlList(); //another touch might have changed which controls exist
+
+   Touch* touch = FindTouch(touchId);
+   if (touch != nullptr && touch->mIsDragging)
+      UpdateDrag(*touch, x, y);
+}
+
+void TouchInterfacePanel::TouchReleased(int touchId)
+{
+   if (FindTouch(touchId) == nullptr)
+      return;
+
+   UpdateControlList();
+
+   if (Touch* touch = FindTouch(touchId))
+      EndTouch(*touch);
+}
+
 bool TouchInterfacePanel::MouseMoved(float x, float y)
 {
-   if (mIsDragging && IsValidControl(mTouchedControl))
-      UpdateDrag(x, y);
+   Move(kMouseTouchId, x, y);
    return false;
 }
 
 void TouchInterfacePanel::MouseReleased()
 {
-   EndTouch();
+   TouchReleased(kMouseTouchId);
 }
 
 void TouchInterfacePanel::DrawButton(ofRectangle rect, std::string label, bool enabled) const
@@ -503,7 +605,8 @@ void TouchInterfacePanel::DrawButton(ofRectangle rect, std::string label, bool e
 void TouchInterfacePanel::DrawControl(IUIControl* control, int column) const
 {
    const ofRectangle track = GetTrackRect(column);
-   const bool isTouched = control == mTouchedControl;
+   const Touch* touch = FindTouch(control);
+   const bool isTouched = touch != nullptr;
    ofColor color = IDrawableModule::GetColor(mModule->GetModuleCategory());
 
    ofPushStyle();
@@ -534,8 +637,8 @@ void TouchInterfacePanel::DrawControl(IUIControl* control, int column) const
    }
    else
    {
-      const bool isDragging = isTouched && mIsDragging;
-      const float rawPos = isDragging ? mDragPos : GetControlPos(control);
+      const bool isDragging = isTouched && touch->mIsDragging;
+      const float rawPos = isDragging ? touch->mDragPos : GetControlPos(control);
       const int numValues = control->GetNumValues(); //0 for continuous controls
       const float pos = numValues > 1 ? roundf(rawPos * (numValues - 1)) / (numValues - 1) : rawPos;
       auto posToY = [&track](float p)
@@ -591,8 +694,8 @@ void TouchInterfacePanel::DrawControl(IUIControl* control, int column) const
       else
       {
          //thinner line when dragging with more precision
-         ofSetLineWidth(isDragging ? MAX(4 * sqrtf(mDragPrecision), .5f) : 4);
-         if (isDragging && mIsCaughtOnDetent)
+         ofSetLineWidth(isDragging ? MAX(4 * sqrtf(touch->mDragPrecision), .5f) : 4);
+         if (isDragging && touch->mIsCaughtOnDetent)
             ofSetColor(255, 255, 0);
          else
             ofSetColor(255, 0, 0);

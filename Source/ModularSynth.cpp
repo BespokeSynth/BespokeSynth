@@ -25,6 +25,7 @@
 #include "ADSRDisplay.h"
 #include "QuickSpawnMenu.h"
 #include "TouchInterfacePanel.h"
+#include "ITouchListener.h"
 #include "AudioToCV.h"
 #include "ScriptModule.h"
 #include "DrumPlayer.h"
@@ -2112,6 +2113,68 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
 bool ModularSynth::IsTouchInterfacePanelShowing() const
 {
    return mTouchInterfacePanel != nullptr && mTouchInterfacePanel->IsShowing();
+}
+
+void ModularSynth::AddTouchListener(ITouchListener* listener)
+{
+   if (!VectorContains(listener, mTouchListeners))
+      mTouchListeners.push_back(listener);
+}
+
+void ModularSynth::RemoveTouchListener(ITouchListener* listener)
+{
+   RemoveFromVector(listener, mTouchListeners);
+   for (auto& touch : mClaimedTouches)
+   {
+      if (touch.second == listener)
+         touch.second = nullptr; //keep it claimed until it lifts, so that it doesn't start doing something else
+   }
+}
+
+bool ModularSynth::TouchPressed(int touchId, float screenX, float screenY)
+{
+   TouchReleased(touchId); //in case we missed the release
+
+   if (GetTopModalFocusItem() != nullptr || mMoveModule != nullptr) //leave these to the usual mouse handling
+      return false;
+
+   for (auto it = mTouchListeners.rbegin(); it != mTouchListeners.rend(); ++it)
+   {
+      ITouchListener* listener = *it;
+      if (listener->WantsTouch(screenX, screenY))
+      {
+         mClaimedTouches[touchId] = listener;
+         IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
+         listener->TouchPressed(touchId, screenX, screenY);
+         return true;
+      }
+   }
+
+   return false;
+}
+
+bool ModularSynth::TouchMoved(int touchId, float screenX, float screenY)
+{
+   auto it = mClaimedTouches.find(touchId);
+   if (it == mClaimedTouches.end())
+      return false;
+
+   if (it->second != nullptr)
+      it->second->TouchMoved(touchId, screenX, screenY);
+   return true;
+}
+
+bool ModularSynth::TouchReleased(int touchId)
+{
+   auto it = mClaimedTouches.find(touchId);
+   if (it == mClaimedTouches.end())
+      return false;
+
+   ITouchListener* listener = it->second;
+   mClaimedTouches.erase(it);
+   if (listener != nullptr)
+      listener->TouchReleased(touchId);
+   return true;
 }
 
 void ModularSynth::DeleteGroupSelectedModules()

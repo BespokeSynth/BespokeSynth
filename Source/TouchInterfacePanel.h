@@ -31,14 +31,17 @@
 #pragma once
 
 #include "IDrawableModule.h"
+#include "ITouchListener.h"
+#include <array>
 
 class IUIControl;
 class Checkbox;
 
-class TouchInterfacePanel : public IDrawableModule
+class TouchInterfacePanel : public IDrawableModule, public ITouchListener
 {
 public:
    TouchInterfacePanel();
+   ~TouchInterfacePanel();
 
    void Render() override;
    void DrawModule() override;
@@ -55,7 +58,29 @@ public:
    bool ShowForModule(IDrawableModule* module); //returns false if the module doesn't have any controls to show
    void Hide();
 
+   //ITouchListener
+   bool WantsTouch(float screenX, float screenY) override;
+   void TouchPressed(int touchId, float screenX, float screenY) override;
+   void TouchMoved(int touchId, float screenX, float screenY) override;
+   void TouchReleased(int touchId) override;
+
 private:
+   struct Touch
+   {
+      int mTouchId{ kMouseTouchId };
+      IUIControl* mControl{ nullptr }; //null if this touch isn't in use
+      bool mIsDragging{ false };
+      ofRectangle mDragTrack;
+      ofVec2f mDragStart;
+      ofVec2f mLastDrag;
+      float mDragOffset{ 0 };
+      float mDragPrecision{ 1 };
+      float mDragPos{ 0 }; //0-1 position of the dragged slider
+      bool mIsCaughtOnDetent{ false };
+   };
+   static constexpr int kMouseTouchId = -1; //for input from the usual mouse handling
+   static constexpr int kMaxTouches = 11; //ten fingers, and the mouse
+
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
@@ -77,29 +102,28 @@ private:
    void DrawTitle();
    void DrawControl(IUIControl* control, int column) const;
 
-   void BeginDrag(float x, float y);
-   void UpdateDrag(float x, float y);
-   void EndTouch();
+   ofVec2f ScreenToLocal(float screenX, float screenY) const;
+   void Press(int touchId, float x, float y);
+   void Move(int touchId, float x, float y);
+   Touch* FindTouch(int touchId);
+   Touch* FindFreeTouch();
+   const Touch* FindTouch(const IUIControl* control) const;
+   void BeginDrag(Touch& touch, float x, float y);
+   void UpdateDrag(Touch& touch, float x, float y);
+   void EndTouch(Touch& touch);
+   void EndAllTouches();
    float GetControlPos(IUIControl* control) const;
    void SetControlPos(IUIControl* control, float pos);
-   void SetCaughtDetent(float detentPos, float detentValue);
-   bool FindDetent(float rangeStart, float rangeEnd, float& detentPos, float& detentValue) const;
+   void SetCaughtDetent(Touch& touch, float detentPos, float detentValue);
+   bool FindDetent(IUIControl* control, float rangeStart, float rangeEnd, float& detentPos, float& detentValue) const;
 
    IDrawableModule* mModule{ nullptr };
    std::vector<IUIControl*> mControls;
    int mPage{ 0 };
    ofRectangle mTitleRect; //where the module's name was last drawn, tappable to enable/disable the module
 
-   //touch state
-   IUIControl* mTouchedControl{ nullptr };
-   bool mIsDragging{ false };
-   ofRectangle mDragTrack;
-   ofVec2f mDragStart;
-   ofVec2f mLastDrag;
-   float mDragOffset{ 0 };
-   float mDragPrecision{ 1 };
-   float mDragPos{ 0 }; //0-1 position of the dragged slider
-   bool mIsCaughtOnDetent{ false };
+   //fixed size, since it's accessed while drawing
+   std::array<Touch, kMaxTouches> mTouches;
    IUIControl* mLastTappedControl{ nullptr };
    double mLastTapTime{ -9999 };
    ofVec2f mLastTapPos;
