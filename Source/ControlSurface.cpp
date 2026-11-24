@@ -1917,11 +1917,17 @@ void ControlSurface::UpdateHoldHints()
 }
 
 //static
-bool ControlSurface::IsDisplayableControl(IUIControl* control)
+bool ControlSurface::IsDisplayableControl(IUIControl* control, ControlSurfaceDeviceType surfaceType)
 {
    const IDrawableModule* owningModule = control->GetModuleParent();
 
-   if (owningModule == TheTransport && control->Name() == std::string("tempo"))
+   if (!control->IsShowing())
+      return false;
+
+   // hide tempo on move and push, since the clicky encoder to assigned to tempo
+   if (owningModule == TheTransport &&
+       (surfaceType == ControlSurfaceDeviceType::AbletonMove || surfaceType == ControlSurfaceDeviceType::AbletonPush2) &&
+       control->Name() == std::string("tempo"))
       return false;
 
    if (dynamic_cast<const FloatSliderLFOControl*>(owningModule) != nullptr && control->Name() == std::string("pin"))
@@ -1937,25 +1943,32 @@ bool ControlSurface::IsDisplayableControl(IUIControl* control)
 
 void ControlSurface::UpdateControlList()
 {
-   mControls = GetDisplayableControls(GetCurrentControlModule());
+   mControls = GetDisplayableControls(GetCurrentControlModule(), mDeviceType);
 }
 
 //static
-std::vector<IUIControl*> ControlSurface::GetDisplayableControls(IDrawableModule* module)
+std::vector<IUIControl*> ControlSurface::GetDisplayableControls(IDrawableModule* module, ControlSurfaceDeviceType surfaceType)
 {
+   bool hasOverrideControls = false;
+
    std::vector<IUIControl*> controls;
    if (module != nullptr)
    {
       if (module->HasPush2OverrideControls())
+      {
          module->GetPush2OverrideControls(controls);
+         hasOverrideControls = true;
+      }
       else
+      {
          controls = module->GetUIControls();
+      }
    }
 
    std::vector<IUIControl*> displayableControls;
    for (auto* control : controls)
    {
-      if (IsDisplayableControl(control))
+      if (IsDisplayableControl(control, surfaceType) || hasOverrideControls)
          displayableControls.push_back(control);
    }
    return displayableControls;
@@ -1982,7 +1995,7 @@ void ControlSurface::DetermineTrackControlLayout()
    mTrackControlLayout.clear();
    for (int i = 0; i < (int)trackModules.size(); ++i)
    {
-      int numControls = (int)GetDisplayableControls(trackModules[i]).size();
+      int numControls = (int)GetDisplayableControls(trackModules[i], mDeviceType).size();
 
       IDrawableModule* nameModule = trackModules[i];
       if (nameModule == nullptr && gridInterfaces[i] != nullptr)

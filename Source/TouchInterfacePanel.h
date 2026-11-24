@@ -30,12 +30,15 @@
 
 #pragma once
 
+#include "AbletonMoveLCD.h"
 #include "IDrawableModule.h"
 #include "ITouchListener.h"
 #include <array>
 
 class IUIControl;
 class Checkbox;
+class FloatSlider;
+class FloatSliderLFOControl;
 
 class TouchInterfacePanel : public IDrawableModule, public ITouchListener
 {
@@ -57,6 +60,7 @@ public:
 
    bool ShowForModule(IDrawableModule* module); //returns false if the module doesn't have any controls to show
    void Hide();
+   void DrawModuleHighlight() const; //draws on the canvas, rather than in the panel
 
    //ITouchListener
    bool WantsTouch(float screenX, float screenY) override;
@@ -89,7 +93,9 @@ private:
    {
       int mTouchId{ kMouseTouchId };
       IUIControl* mControl{ nullptr }; //null if this touch isn't in use
+      int mOrder{ 0 }; //higher for more recent touches
       bool mIsDragging{ false };
+      bool mIsModulatorTap{ false }; //might turn out to be a tap on a modulated control, if it doesn't move before it's released
       ofRectangle mDragTrack;
       ofVec2f mDragStart;
       ofVec2f mLastDrag;
@@ -100,15 +106,22 @@ private:
    };
    static constexpr int kMouseTouchId = -1; //for input from the usual mouse handling
    static constexpr int kMaxTouches = 11; //ten fingers, and the mouse
+   static constexpr int kMaxColumns = 8;
 
    void OnClicked(float x, float y, bool right) override;
    bool MouseMoved(float x, float y) override;
 
    int GetNumPages() const;
+   int GetNumRows() const;
    int GetNumColumns() const;
+   int GetNumControlsPerPage() const { return GetNumRows() * kMaxColumns; }
    void ChangePage(int direction);
    void SetModule(IDrawableModule* module);
    void UpdateControlList();
+   IDrawableModule* GetModulatorModule(IUIControl* control) const; //the module that's modulating this control, if any
+   FloatSliderLFOControl* GetUnpinnedLFO() const; //null if the module isn't an LFO that only exists as a popup
+   bool IsUnpinnedLFOValid() const;
+   std::string GetModuleLabel(IDrawableModule* module) const;
    void UpdateRoutingModules();
    int GetNumRoutingButtons() const; //how many fit along each side
    int GetNumRoutingModulesPerPage(const RoutingList& list) const; //one button is for paging, if they don't all fit
@@ -122,13 +135,14 @@ private:
    ofRectangle GetControlsRect() const; //what's left of the content area below the header, and between the routing buttons
    ofRectangle GetExitButtonRect() const;
    ofRectangle GetPageButtonRect(int direction) const;
-   ofRectangle GetColumnRect(int column) const; //column on the current page
-   ofRectangle GetTrackRect(int column) const;
-   ofRectangle GetSquareRect(int column) const; //for buttons and checkboxes
+   ofRectangle GetSlotRect(int slot) const; //where the control at this index on the current page goes
+   ofRectangle GetTrackRect(int slot) const;
+   ofRectangle GetSquareRect(int slot) const; //for buttons and checkboxes
    float GetTitleBarHeight() const;
    void DrawButton(ofRectangle rect, std::string label, bool enabled) const;
    void DrawTitle();
-   void DrawControl(IUIControl* control, int column) const;
+   void DrawControl(IUIControl* control, int slot) const;
+   void DrawControlVisualization();
 
    ofVec2f ScreenToLocal(float screenX, float screenY) const;
    void Press(int touchId, float x, float y);
@@ -136,6 +150,7 @@ private:
    Touch* FindTouch(int touchId);
    Touch* FindFreeTouch();
    const Touch* FindTouch(const IUIControl* control) const;
+   void AssignTouch(Touch& touch, int touchId, IUIControl* control);
    void BeginDrag(Touch& touch, float x, float y);
    void UpdateDrag(Touch& touch, float x, float y);
    void EndTouch(Touch& touch);
@@ -146,6 +161,9 @@ private:
    bool FindDetent(IUIControl* control, float rangeStart, float rangeEnd, float& detentPos, float& detentValue) const;
 
    IDrawableModule* mModule{ nullptr };
+   FloatSlider* mLFOTarget{ nullptr }; //if the module is an unpinned LFO, the slider that it's modulating
+   IDrawableModule* mLFOTargetParent{ nullptr };
+   IDrawableModule* mLFOTargetModule{ nullptr };
    std::vector<IUIControl*> mControls;
    int mPage{ 0 };
    RoutingList mRoutingInputs; //previous modules in the signal chain
@@ -155,6 +173,8 @@ private:
 
    //fixed size, since it's accessed while drawing
    std::array<Touch, kMaxTouches> mTouches;
+   int mTouchCounter{ 0 };
+   AbletonMoveLCD mVisualizationLCD; //control visualizers draw to this
    IUIControl* mLastTappedControl{ nullptr };
    double mLastTapTime{ -9999 };
    ofVec2f mLastTapPos;

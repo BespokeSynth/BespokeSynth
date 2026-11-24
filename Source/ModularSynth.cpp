@@ -666,6 +666,9 @@ void ModularSynth::Draw()
 
    mModuleContainer.DrawContents();
 
+   if (mTouchInterfacePanel != nullptr)
+      mTouchInterfacePanel->DrawModuleHighlight();
+
    IClickable* dropTarget = nullptr;
    if (PatchCable::sActivePatchCable != nullptr)
       dropTarget = PatchCable::sActivePatchCable->GetDropTarget();

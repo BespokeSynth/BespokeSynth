@@ -99,7 +99,7 @@ public:
 
    static IUIControl* sBindToUIControl;
 
-   static std::vector<IUIControl*> GetDisplayableControls(IDrawableModule* module); //the controls that get mapped to encoders
+   static std::vector<IUIControl*> GetDisplayableControls(IDrawableModule* module, ControlSurfaceDeviceType surfaceType); //the controls that get mapped to encoders
 
    bool IsEnabled() const override { return true; }
 
@@ -139,7 +139,7 @@ private:
    void SendLeds(bool force);
 
    void UpdateControlList();
-   static bool IsDisplayableControl(IUIControl* control);
+   static bool IsDisplayableControl(IUIControl* control, ControlSurfaceDeviceType surfaceType);
    int GetControlOffset() const;
    int GetNumControlPages() const;
    void StepControlPage(int direction);

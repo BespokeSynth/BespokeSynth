@@ -29,6 +29,8 @@
 #include "Checkbox.h"
 #include "ClickButton.h"
 #include "ControlSurface.h"
+#include "FloatSliderLFOControl.h"
+#include "IControlVisualizer.h"
 #include "IModulator.h"
 #include "ModularSynth.h"
 #include "PatchCable.h"
@@ -37,10 +39,10 @@
 #include "Slider.h"
 #include "SynthGlobals.h"
 #include "TitleBar.h"
+#include "nanovg/nanovg.h"
 
 namespace
 {
-   const int kMaxColumns = 8;
    const float kMargin = 8;
    const float kHeaderHeight = 44;
    const float kPageLabelHeight = 20;
@@ -48,13 +50,32 @@ namespace
    const float kMaxColumnWidth = 120;
    const float kColumnSpacing = 6;
    const float kDragDeadZone = 20; //fingers don't move in straight lines, so allow some sideways drift before increasing precision
+   const float kTapDistance = 10; //touches on modulated controls that move less than this are taps
    const float kDetentCatchDistance = 14; //how far to drag to get out of a detent
    const float kSideButtonWidth = 72;
    const float kSideButtonHeight = 44;
    const float kSideButtonSpacing = 4;
+   const float kRowSpacing = 8;
+   const float kTargetTrackInches = 2; //on displays with room for multiple rows of sliders, how tall the sliders should be, at minimum
    const double kRoutingUpdateMs = 250;
    const double kDoubleTapMs = 300;
    const float kDoubleTapDistance = 15;
+
+   //JUCE's display DPI is nominal on most platforms, so just use what's typical for the type of display.
+   //these are in the same units as ofGetWidth()/ofGetHeight(), i.e., before applying the display's pixel ratio
+   float GetPointsPerInch()
+   {
+#if JUCE_IOS
+      static const bool sIsTablet = juce::SystemStats::getDeviceDescription().containsIgnoreCase("iPad");
+      return sIsTablet ? 132 : 153;
+#elif JUCE_ANDROID
+      return 160;
+#elif JUCE_MAC
+      return 110;
+#else
+      return 96;
+#endif
+   }
 
    //shrinks text to fit, and then truncates it if it would get too small to read
    void FitText(std::string& text, float& size, float maxWidth)
@@ -96,6 +117,7 @@ TouchInterfacePanel::TouchInterfacePanel()
 {
    SetShouldDrawOutline(false);
    SetShowing(false);
+   mVisualizationLCD.Init();
    TheSynth->AddTouchListener(this);
 }
 
@@ -107,7 +129,7 @@ TouchInterfacePanel::~TouchInterfacePanel()
 
 bool TouchInterfacePanel::ShowForModule(IDrawableModule* module)
 {
-   if (ControlSurface::GetDisplayableControls(module).empty())
+   if (ControlSurface::GetDisplayableControls(module, ControlSurfaceDeviceType::None).empty())
       return false;
 
    SetModule(module);
@@ -124,7 +146,19 @@ void TouchInterfacePanel::SetModule(IDrawableModule* module)
    std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
    EndAllTouches(); //while the controls being touched are still in our list
    mModule = module;
-   mControls = ControlSurface::GetDisplayableControls(module);
+   mLFOTarget = nullptr;
+   mLFOTargetParent = nullptr;
+   mLFOTargetModule = nullptr;
+   if (FloatSliderLFOControl* lfo = GetUnpinnedLFO())
+   {
+      mLFOTarget = lfo->GetOwner();
+      if (mLFOTarget != nullptr)
+      {
+         mLFOTargetParent = dynamic_cast<IDrawableModule*>(mLFOTarget->GetParent());
+         mLFOTargetModule = mLFOTarget->GetModuleParent();
+      }
+   }
+   mControls = ControlSurface::GetDisplayableControls(module, ControlSurfaceDeviceType::None);
    mPage = 0;
    mLastTappedControl = nullptr;
    mRoutingInputs = RoutingList();
@@ -158,7 +192,8 @@ void TouchInterfacePanel::Poll()
 
    SetPosition(0, GetTitleBarHeight());
    UpdateControlList();
-   if (gTime - mLastRoutingUpdateTime > kRoutingUpdateMs)
+   mPage = ofClamp(mPage, 0, GetNumPages() - 1); //resizing can change how many rows fit
+   if (IsShowing() && gTime - mLastRoutingUpdateTime > kRoutingUpdateMs)
       UpdateRoutingModules();
 }
 
@@ -167,14 +202,14 @@ void TouchInterfacePanel::UpdateControlList()
    if (mModule == nullptr)
       return;
 
-   if (mModule->IsDeleted())
+   if (mModule->IsDeleted() || !IsUnpinnedLFOValid())
    {
       mControls.clear(); //they might not exist anymore
       Hide();
       return;
    }
 
-   std::vector<IUIControl*> controls = ControlSurface::GetDisplayableControls(mModule);
+   std::vector<IUIControl*> controls = ControlSurface::GetDisplayableControls(mModule, ControlSurfaceDeviceType::None);
    if (controls != mControls)
    {
       std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
@@ -188,6 +223,67 @@ void TouchInterfacePanel::UpdateControlList()
       if (!IsValidControl(mLastTappedControl))
          mLastTappedControl = nullptr;
    }
+}
+
+IDrawableModule* TouchInterfacePanel::GetModulatorModule(IUIControl* control) const
+{
+   if (dynamic_cast<FloatSlider*>(control) != nullptr)
+   {
+      IModulator* modulator = control->GetModulator();
+      if (modulator == nullptr || !modulator->Active())
+         return nullptr;
+      if (IDrawableModule* module = dynamic_cast<IDrawableModule*>(modulator))
+         return module;
+   }
+
+   //only float sliders know about their modulators, and some modulators are just a part of a module, so look for the cable
+   std::vector<IDrawableModule*> modules;
+   TheSynth->GetAllModules(modules);
+   for (auto* module : modules)
+   {
+      if (!module->IsEnabled())
+         continue;
+      for (auto* source : module->GetPatchCableSources())
+      {
+         if (source->GetConnectionType() != kConnectionType_Modulator)
+            continue;
+         for (auto* cable : source->GetPatchCables())
+         {
+            if (cable->GetTarget() == control)
+               return module;
+         }
+      }
+   }
+   return nullptr;
+}
+
+FloatSliderLFOControl* TouchInterfacePanel::GetUnpinnedLFO() const
+{
+   FloatSliderLFOControl* lfo = dynamic_cast<FloatSliderLFOControl*>(mModule);
+   return lfo != nullptr && !lfo->IsPinned() ? lfo : nullptr;
+}
+
+//unpinned LFOs are pooled, so they outlive the slider that they're modulating, and can get reassigned to a different one
+bool TouchInterfacePanel::IsUnpinnedLFOValid() const
+{
+   FloatSliderLFOControl* lfo = GetUnpinnedLFO();
+   if (lfo == nullptr)
+      return true;
+
+   if (mLFOTarget == nullptr || lfo->GetOwner() != mLFOTarget || mLFOTargetModule == nullptr || mLFOTargetModule->IsDeleted())
+      return false;
+
+   //the slider might not exist anymore, so make sure that we can find it before touching it
+   if (mLFOTargetParent != mLFOTargetModule && !VectorContains(mLFOTargetParent, mLFOTargetModule->GetChildren())) //e.g., effects in an effectchain
+      return false;
+   return VectorContains(static_cast<IUIControl*>(mLFOTarget), mLFOTargetParent->GetUIControls());
+}
+
+std::string TouchInterfacePanel::GetModuleLabel(IDrawableModule* module) const
+{
+   if (module == mModule && mLFOTarget != nullptr && GetUnpinnedLFO() != nullptr)
+      return "lfo: " + GetControlLabel(mLFOTarget);
+   return module->GetTitleLabel();
 }
 
 void TouchInterfacePanel::UpdateRoutingModules()
@@ -228,8 +324,16 @@ void TouchInterfacePanel::UpdateRoutingModules()
       for (auto* source : mModule->GetPatchCableSources())
       {
          for (auto* cable : source->GetPatchCables())
-            add(outputs, dynamic_cast<IDrawableModule*>(cable->GetTarget()), source->GetColor());
+         {
+            IDrawableModule* target = dynamic_cast<IDrawableModule*>(cable->GetTarget());
+            if (IUIControl* control = dynamic_cast<IUIControl*>(cable->GetTarget())) //e.g., something that we're modulating
+               target = control->GetModuleParent();
+            add(outputs, target, source->GetColor());
+         }
       }
+
+      if (mLFOTarget != nullptr && GetUnpinnedLFO() != nullptr) //these don't have cables
+         add(outputs, mLFOTargetModule, IDrawableModule::GetColor(kModuleCategory_Modulator));
    }
 
    auto update = [this](RoutingList& list, std::vector<Routing>& modules)
@@ -304,7 +408,17 @@ bool TouchInterfacePanel::IsValidControl(IUIControl* control) const
 
 int TouchInterfacePanel::GetNumPages() const
 {
-   return MAX(1, ((int)mControls.size() + kMaxColumns - 1) / kMaxColumns);
+   return MAX(1, ((int)mControls.size() + GetNumControlsPerPage() - 1) / GetNumControlsPerPage());
+}
+
+int TouchInterfacePanel::GetNumRows() const
+{
+   //doesn't use GetControlsRect(), because that depends on whether there are multiple pages, which depends on this
+   const float height = GetContentRect().height - kHeaderHeight - kPageLabelHeight;
+   const float targetRowHeight = kTargetTrackInches * GetPointsPerInch() / GetOwningContainer()->GetDrawScale() + kLabelHeight;
+   const int numRowsThatFit = MAX(1, (int)((height + kRowSpacing) / (targetRowHeight + kRowSpacing)));
+   const int numRowsNeeded = MAX(1, ((int)mControls.size() + kMaxColumns - 1) / kMaxColumns);
+   return MIN(numRowsThatFit, numRowsNeeded);
 }
 
 int TouchInterfacePanel::GetNumColumns() const
@@ -380,24 +494,26 @@ ofRectangle TouchInterfacePanel::GetPageButtonRect(int direction) const
    return ofRectangle(direction < 0 ? content.x : content.getMaxX() - kSideButtonWidth, content.getMaxY() - kSideButtonHeight, kSideButtonWidth, kSideButtonHeight);
 }
 
-ofRectangle TouchInterfacePanel::GetColumnRect(int column) const
+ofRectangle TouchInterfacePanel::GetSlotRect(int slot) const
 {
    ofRectangle area = GetControlsRect();
    int numColumns = GetNumColumns();
    float columnWidth = MIN(area.width / numColumns, kMaxColumnWidth);
    float startX = area.x + (area.width - columnWidth * numColumns) / 2;
-   return ofRectangle(startX + columnWidth * column, area.y, columnWidth, area.height);
+   const int numRows = GetNumRows();
+   const float rowHeight = (area.height - kRowSpacing * (numRows - 1)) / numRows;
+   return ofRectangle(startX + columnWidth * (slot % kMaxColumns), area.y + (rowHeight + kRowSpacing) * (slot / kMaxColumns), columnWidth, rowHeight);
 }
 
-ofRectangle TouchInterfacePanel::GetTrackRect(int column) const
+ofRectangle TouchInterfacePanel::GetTrackRect(int slot) const
 {
-   ofRectangle rect = GetColumnRect(column);
+   ofRectangle rect = GetSlotRect(slot);
    return ofRectangle(rect.x + kColumnSpacing / 2, rect.y, rect.width - kColumnSpacing, MAX(1, rect.height - kLabelHeight));
 }
 
-ofRectangle TouchInterfacePanel::GetSquareRect(int column) const
+ofRectangle TouchInterfacePanel::GetSquareRect(int slot) const
 {
-   ofRectangle track = GetTrackRect(column);
+   ofRectangle track = GetTrackRect(slot);
    float size = MIN(track.width, track.height);
    return ofRectangle(track.getCenter().x - size / 2, track.getCenter().y - size / 2, size, size);
 }
@@ -411,6 +527,7 @@ float TouchInterfacePanel::GetControlPos(IUIControl* control) const
 
 void TouchInterfacePanel::SetControlPos(IUIControl* control, float pos)
 {
+   control->StartBeacon();
    if (IModulator* modulator = GetAdjustableModulator(control))
       modulator->GetMax() = static_cast<FloatSlider*>(control)->PosToVal(pos, K(ignoreSmooth));
    else
@@ -445,6 +562,7 @@ void TouchInterfacePanel::SetCaughtDetent(Touch& touch, float detentPos, float d
 {
    touch.mIsCaughtOnDetent = true;
    touch.mDragPos = detentPos;
+   touch.mControl->StartBeacon();
 
    //set the detent's value directly, so that it's exact
    if (IModulator* modulator = GetAdjustableModulator(touch.mControl))
@@ -552,6 +670,13 @@ const TouchInterfacePanel::Touch* TouchInterfacePanel::FindTouch(const IUIContro
    return nullptr;
 }
 
+void TouchInterfacePanel::AssignTouch(Touch& touch, int touchId, IUIControl* control)
+{
+   touch.mTouchId = touchId;
+   touch.mControl = control;
+   touch.mOrder = ++mTouchCounter;
+}
+
 void TouchInterfacePanel::EndAllTouches()
 {
    for (auto& touch : mTouches)
@@ -562,7 +687,11 @@ void TouchInterfacePanel::EndTouch(Touch& touch)
 {
    if (IsValidControl(touch.mControl))
    {
-      if (touch.mIsDragging)
+      if (touch.mIsModulatorTap)
+      {
+         //didn't do anything to the control
+      }
+      else if (touch.mIsDragging)
       {
          FloatSlider* slider = dynamic_cast<FloatSlider*>(touch.mControl);
          if (slider != nullptr)
@@ -617,7 +746,12 @@ void TouchInterfacePanel::Press(int touchId, float x, float y)
    if (!IsShowing())
       return;
 
-   TouchReleased(touchId); //in case we missed the release
+   UpdateControlList(); //make sure that everything still exists
+   if (!IsShowing())
+      return;
+
+   if (Touch* touch = FindTouch(touchId)) //in case we missed the release
+      EndTouch(*touch);
 
    if (GetExitButtonRect().contains(x, y))
    {
@@ -629,6 +763,7 @@ void TouchInterfacePanel::Press(int touchId, float x, float y)
    {
       if (mTitleRect.contains(x, y))
       {
+         enabledCheckbox->StartBeacon();
          enabledCheckbox->SetFromMidiCC(enabledCheckbox->GetValue() > 0 ? 0 : 1, NextBufferTime(false), SetValueMethod::Direct);
          return;
       }
@@ -650,26 +785,33 @@ void TouchInterfacePanel::Press(int touchId, float x, float y)
    if (PressRoutingButton(true, x, y) || PressRoutingButton(false, x, y))
       return;
 
-   UpdateControlList();
-
-   for (int column = 0; column < kMaxColumns; ++column)
+   for (int slot = 0; slot < GetNumControlsPerPage(); ++slot)
    {
-      int index = mPage * kMaxColumns + column;
-      if (index >= (int)mControls.size() || !GetColumnRect(column).contains(x, y))
+      int index = mPage * GetNumControlsPerPage() + slot;
+      if (index >= (int)mControls.size() || !GetSlotRect(slot).contains(x, y))
          continue;
 
       IUIControl* control = mControls[index];
-      if (control->IsButtonControl() && !GetSquareRect(column).contains(x, y))
+      if (control->IsButtonControl() && !GetSquareRect(slot).contains(x, y))
          return;
 
       Touch* touch = FindFreeTouch();
       if (touch == nullptr || FindTouch(control) != nullptr) //another touch already has this control
          return;
 
+      if (GetModulatorModule(control) != nullptr)
+      {
+         AssignTouch(*touch, touchId, control);
+         touch->mIsModulatorTap = true;
+         touch->mDragTrack = GetTrackRect(slot);
+         touch->mDragStart.set(x, y);
+         return;
+      }
+
       if (control->IsButtonControl())
       {
-         touch->mTouchId = touchId;
-         touch->mControl = control;
+         AssignTouch(*touch, touchId, control);
+         control->StartBeacon();
          if (dynamic_cast<Checkbox*>(control) != nullptr)
             control->SetFromMidiCC(control->GetValue() > 0 ? 0 : 1, NextBufferTime(false), SetValueMethod::Direct);
          else
@@ -684,13 +826,13 @@ void TouchInterfacePanel::Press(int touchId, float x, float y)
       mLastTapPos.set(x, y);
       if (isDoubleTap)
       {
+         control->StartBeacon();
          control->ResetToDefault();
          return;
       }
 
-      touch->mTouchId = touchId;
-      touch->mControl = control;
-      touch->mDragTrack = GetTrackRect(column);
+      AssignTouch(*touch, touchId, control);
+      touch->mDragTrack = GetTrackRect(slot);
       BeginDrag(*touch, x, y);
       return;
    }
@@ -704,7 +846,21 @@ void TouchInterfacePanel::Move(int touchId, float x, float y)
    UpdateControlList(); //another touch might have changed which controls exist
 
    Touch* touch = FindTouch(touchId);
-   if (touch != nullptr && touch->mIsDragging)
+   if (touch == nullptr)
+      return;
+
+   if (touch->mIsModulatorTap && touch->mDragStart.distanceSquared(ofVec2f(x, y)) > kTapDistance * kTapDistance)
+   {
+      if (touch->mControl->IsButtonControl())
+      {
+         EndTouch(*touch);
+         return;
+      }
+      touch->mIsModulatorTap = false;
+      BeginDrag(*touch, x, y);
+   }
+
+   if (touch->mIsDragging)
       UpdateDrag(*touch, x, y);
 }
 
@@ -716,7 +872,12 @@ void TouchInterfacePanel::TouchReleased(int touchId)
    UpdateControlList();
 
    if (Touch* touch = FindTouch(touchId))
+   {
+      IDrawableModule* modulatorModule = touch->mIsModulatorTap ? GetModulatorModule(touch->mControl) : nullptr;
       EndTouch(*touch);
+      if (modulatorModule != nullptr)
+         SetModule(modulatorModule);
+   }
 }
 
 bool TouchInterfacePanel::MouseMoved(float x, float y)
@@ -741,9 +902,9 @@ void TouchInterfacePanel::DrawButton(ofRectangle rect, std::string label, bool e
    ofPopStyle();
 }
 
-void TouchInterfacePanel::DrawControl(IUIControl* control, int column) const
+void TouchInterfacePanel::DrawControl(IUIControl* control, int slot) const
 {
-   const ofRectangle track = GetTrackRect(column);
+   const ofRectangle track = GetTrackRect(slot);
    const Touch* touch = FindTouch(control);
    const bool isTouched = touch != nullptr;
    ofColor color = IDrawableModule::GetColor(mModule->GetModuleCategory());
@@ -753,7 +914,7 @@ void TouchInterfacePanel::DrawControl(IUIControl* control, int column) const
 
    if (control->IsButtonControl())
    {
-      const ofRectangle square = GetSquareRect(column);
+      const ofRectangle square = GetSquareRect(slot);
       if (dynamic_cast<Checkbox*>(control) != nullptr)
       {
          ofSetColor(110, 110, 110, 150);
@@ -876,7 +1037,7 @@ void TouchInterfacePanel::DrawTitle()
    const float kCircleSpace = enabledCheckbox != nullptr ? kCircleRadius * 2 + 8 : 0;
    const float kPadding = 10;
 
-   std::string title = mModule->GetTitleLabel();
+   std::string title = GetModuleLabel(mModule);
    FitText(title, size, maxWidth - kCircleSpace - kPadding * 2);
    const float width = GetStringWidth(title, size) + kCircleSpace;
    float x = centerX - width / 2;
@@ -941,6 +1102,110 @@ void TouchInterfacePanel::DrawRoutingButtons(bool isInput) const
    ofPopStyle();
 }
 
+//highlights the module out on the canvas
+void TouchInterfacePanel::DrawModuleHighlight() const
+{
+   if (!IsShowing() || mModule == nullptr)
+      return;
+
+   IDrawableModule* module = GetUnpinnedLFO() != nullptr ? mLFOTargetModule : mModule; //unpinned LFOs aren't on the canvas
+   if (module == nullptr || module->IsDeleted() || module->GetOwningContainer() == nullptr || !module->IsShowing())
+      return;
+
+   ofRectangle rect = module->GetRect();
+   if (module->HasTitleBar())
+   {
+      rect.y -= IDrawableModule::TitleBarHeight();
+      rect.height += IDrawableModule::TitleBarHeight();
+   }
+
+   ofPushStyle();
+   ofNoFill();
+   ofSetColor(255, 255, 255, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, 100, 180));
+   ofSetLineWidth(3);
+   ofRect(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6, 6);
+   ofPopStyle();
+}
+
+//shows the visualization for the most recently touched control that has one, or the module's LFO, next to the module's name
+void TouchInterfacePanel::DrawControlVisualization()
+{
+   const Touch* newest = nullptr;
+   for (const auto& touch : mTouches)
+   {
+      if (touch.mControl != nullptr && touch.mControl->GetControlVisualizer() != nullptr && (newest == nullptr || touch.mOrder > newest->mOrder))
+         newest = &touch;
+   }
+   FloatSliderLFOControl* lfo = dynamic_cast<FloatSliderLFOControl*>(mModule);
+   if ((newest == nullptr && lfo == nullptr) || mVisualizationLCD.GetPixels() == nullptr)
+      return;
+
+   const int lcdWidth = mVisualizationLCD.GetWidth();
+   const int lcdHeight = mVisualizationLCD.GetHeight();
+
+   const ofRectangle content = GetContentRect();
+   ofRectangle rect(mTitleRect.getMaxX() + kMargin, content.y, 0, kHeaderHeight - 8);
+   rect.width = rect.height * lcdWidth / lcdHeight;
+   if (rect.getMaxX() > GetExitButtonRect().x - kMargin)
+   {
+      rect.x = mTitleRect.x - kMargin - rect.width; //try the other side
+      if (rect.x < content.x)
+         return;
+   }
+
+   mVisualizationLCD.Clear();
+   if (newest == nullptr)
+      lfo->DrawToAbletonMoveScreen(&mVisualizationLCD);
+   else
+      newest->mControl->GetControlVisualizer()->DrawVisualizationToScreen(&mVisualizationLCD, newest->mControl);
+
+   static std::vector<unsigned char> sPixels;
+   static int sImage = -1;
+   static int sImageContextGeneration = -1;
+
+   sPixels.resize(lcdWidth * lcdHeight * 4);
+   for (int y = 0; y < lcdHeight; ++y)
+   {
+      for (int x = 0; x < lcdWidth; ++x)
+      {
+         //white, with the lcd's value as the opacity
+         unsigned char* pixel = &sPixels[(x + y * lcdWidth) * 4];
+         pixel[0] = pixel[1] = pixel[2] = 255;
+         pixel[3] = mVisualizationLCD.GetPixel(x, y) > 0 ? 255 : 0;
+      }
+   }
+
+   //images don't survive the GL context being recreated
+   if (sImageContextGeneration != gNanoVGContextGeneration)
+   {
+      sImage = -1;
+      sImageContextGeneration = gNanoVGContextGeneration;
+   }
+
+   if (sImage == -1)
+      sImage = nvgCreateImageRGBA(gNanoVG, lcdWidth, lcdHeight, 0, sPixels.data());
+   else
+      nvgUpdateImage(gNanoVG, sImage, sPixels.data());
+
+   ofPushStyle();
+   ofFill();
+   ofSetColor(0, 0, 0, 180);
+   ofRect(rect, 4);
+   ofPopStyle();
+
+   if (sImage <= 0)
+   {
+      sImage = -1;
+      return;
+   }
+
+   NVGpaint paint = nvgImagePattern(gNanoVG, rect.x, rect.y, rect.width, rect.height, 0, sImage, 1);
+   nvgBeginPath(gNanoVG);
+   nvgRect(gNanoVG, rect.x, rect.y, rect.width, rect.height);
+   nvgFillPaint(gNanoVG, paint);
+   nvgFill(gNanoVG);
+}
+
 //skips the usual module frame, since its background would make us too opaque
 void TouchInterfacePanel::Render()
 {
@@ -969,6 +1234,7 @@ void TouchInterfacePanel::DrawModule()
    const ofRectangle content = GetContentRect();
 
    DrawTitle();
+   DrawControlVisualization();
 
    DrawButton(GetExitButtonRect(), "exit", true);
 
@@ -982,11 +1248,11 @@ void TouchInterfacePanel::DrawModule()
       DrawTextToFit("no controls", area.getCenter().x, area.getCenter().y + 6, area.width, 18);
    }
 
-   for (int column = 0; column < kMaxColumns; ++column)
+   for (int slot = 0; slot < GetNumControlsPerPage(); ++slot)
    {
-      int index = mPage * kMaxColumns + column;
+      int index = mPage * GetNumControlsPerPage() + slot;
       if (index < (int)mControls.size())
-         DrawControl(mControls[index], column);
+         DrawControl(mControls[index], slot);
    }
 
    const int numPages = GetNumPages();
