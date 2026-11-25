@@ -39,6 +39,7 @@
 #if BESPOKE_IOS
 #include "IOSPluginViewHost.h"
 #include "IOSAUParameterEvents.h"
+#include "IOSAUMidiOutput.h"
 #endif
 
 #include <atomic>
@@ -184,6 +185,9 @@ private:
    std::atomic<int> mWantRemoveSliderIndex{ -1 };
 
    std::atomic<bool> mPluginReady{ false };
+#if BESPOKE_IOS
+   std::unique_ptr<IOSAUMidiOutput::Receiver, IOSAUMidiOutput::Deleter> mPluginMidiOutput; //declared before mPlugin, because it has to outlive it
+#endif
    std::unique_ptr<juce::AudioProcessor> mPlugin;
 
    //plugins are created asynchronously (AUv3 requires it). until the instance arrives, state loaded from a save file waits here

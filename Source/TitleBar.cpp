@@ -186,6 +186,11 @@ void TitleBar::ManagePlugins()
    mPluginListWindow->toFront(true);
 }
 
+bool TitleBar::IsManagePluginsItem(const ModuleFactory::Spawnable& spawnable) const
+{
+   return spawnable.mSpawnMethod == ModuleFactory::SpawnMethod::Module && spawnable.mLabel == kManagePluginsLabel;
+}
+
 void TitleBar::OnWindowClosed()
 {
    mPluginListWindow.reset(nullptr);
@@ -635,6 +640,11 @@ void TitleBar::DropdownClicked(DropdownList* list)
 {
    sShowInitialHelpOverlay = false;
 
+   RefreshSpawnList(list);
+}
+
+void TitleBar::RefreshSpawnList(DropdownList* list)
+{
    if (list == mSpawnLists.mPlugins.GetList())
       mSpawnLists.SetUpPluginsDropdown();
 

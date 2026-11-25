@@ -699,6 +699,13 @@ void QuickSpawnMenu::OnSelectItem(int index)
 {
    if (mMenuMode == MenuMode::SingleLetter || mMenuMode == MenuMode::Search || mMenuMode == MenuMode::SingleCategory)
    {
+      if (index >= 0 && index < mElements.size() && TheTitleBar->IsManagePluginsItem(mElements[index]))
+      {
+         Hide();
+         TheTitleBar->ManagePlugins();
+         return;
+      }
+
       if (index >= 0 && index < mElements.size())
       {
          IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(mElements[index], TheSynth->GetMouseX(TheSynth->GetRootContainer()) + kModuleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + kModuleGrabOffset.y);
@@ -720,6 +727,7 @@ void QuickSpawnMenu::OnSelectItem(int index)
       if (index >= 0 && index < mElements.size())
       {
          mSelectedCategoryIndex = mCategoryIndices[index];
+         TheTitleBar->RefreshSpawnList(TheTitleBar->GetSpawnLists()[mSelectedCategoryIndex]->GetList());
          mMenuMode = MenuMode::SingleCategory;
          if (IsGridLayout())
          {
