@@ -606,11 +606,17 @@ void VSTPlugin::UnloadPlugin()
    mParameterEvents = nullptr;
 #endif
 
+#if BESPOKE_IOS
+   std::unique_ptr<IOSAUMidiOutput::Receiver, IOSAUMidiOutput::Deleter> oldPluginMidiOutput; //freed after oldPlugin, which can still call into it
+#endif
    std::unique_ptr<juce::AudioProcessor> oldPlugin;
    {
       std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
       std::lock_guard<ofMutex> lock(mVSTMutex);
       oldPlugin = std::move(mPlugin);
+#if BESPOKE_IOS
+      oldPluginMidiOutput = std::move(mPluginMidiOutput);
+#endif
       //the sliders stay until the next plugin's CreateParameterSliders replaces them, but their parameters go with
       //this plugin. a new plugin arrives asynchronously, and Poll() or a slider change in between would use them
       for (auto& parameter : mParameterSliders)
@@ -658,6 +664,17 @@ void VSTPlugin::OnPluginCreated(std::unique_ptr<juce::AudioPluginInstance> insta
    instance->enableAllBuses();
    ofLog() << "vst layout  - inputs: " << layouts.inputBuses.size() << " x outputs: " << layouts.outputBuses.size();
 
+#if BESPOKE_IOS
+   //juce 7 only receives MIDI from an AU on macOS. once juce does it on iOS too, we can delete IOSAUMidiOutput.mm
+   static_assert(JUCE_MAJOR_VERSION == 7, "check whether this juce receives AU MIDI output on iOS. if it does, delete IOSAUMidiOutput.mm");
+   std::unique_ptr<IOSAUMidiOutput::Receiver, IOSAUMidiOutput::Deleter> midiOutput;
+   if (desc.pluginFormatName.equalsIgnoreCase("audiounit"))
+   {
+      midiOutput.reset(IOSAUMidiOutput::Create(instance->getPlatformSpecificData(), gBufferSize));
+      ofLog() << "vst midi output: " << (midiOutput != nullptr ? "yes" : "no");
+   }
+#endif
+
    instance->prepareToPlay(gSampleRate, gBufferSize);
    instance->setPlayHead(&mPlayhead);
 
@@ -665,6 +682,9 @@ void VSTPlugin::OnPluginCreated(std::unique_ptr<juce::AudioPluginInstance> insta
    std::lock_guard<ofMutex> lock(mVSTMutex);
 
    mPlugin = std::move(instance);
+#if BESPOKE_IOS
+   mPluginMidiOutput = std::move(midiOutput);
+#endif
    mPluginName = mPlugin->getName().toStdString();
    mPluginFormatName = ofToString(desc.pluginFormatName.toLowerCase());
    mPluginId = GetPluginName() + "_" + ofToString(desc.uniqueId);
@@ -1453,6 +1473,17 @@ void VSTPlugin::Process(double time)
          }
 
          mPlugin->processBlock(buffer, mMidiBuffer);
+
+#if BESPOKE_IOS
+         if (mPluginMidiOutput != nullptr)
+         {
+            mMidiBuffer.clear(); //as juce does for a plugin that produces MIDI, so its input isn't echoed
+            IOSAUMidiOutput::Collect(mPluginMidiOutput.get(), [this](const unsigned char* data, int length, int sampleOffset)
+                                     {
+                                        mMidiBuffer.addEvent(data, length, sampleOffset);
+                                     });
+         }
+#endif
 
          if (!mMidiBuffer.isEmpty())
          {

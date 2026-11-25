@@ -169,6 +169,8 @@ public:
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
    void ManagePlugins();
+   bool IsManagePluginsItem(const ModuleFactory::Spawnable& spawnable) const; //the plugins list's "manage plugins..." entry, which isn't a module
+   void RefreshSpawnList(DropdownList* list); //for lists whose contents can change while running
    const std::vector<SpawnList*>& GetSpawnLists() const { return mSpawnLists.GetDropdowns(); }
    void DisplayTemporaryMessage(std::string message);
 
