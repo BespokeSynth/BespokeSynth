@@ -66,7 +66,7 @@ void Checkbox::SetDisplayText(bool display)
 void Checkbox::UpdateWidth()
 {
    if (mDisplayText)
-      mWidth = 15 + GetStringWidth(GetDisplayName());
+      mWidth = mHeight + GetStringWidth(GetDisplayName());
    else
       mWidth = mHeight - 3;
 }
@@ -118,7 +118,7 @@ void Checkbox::Render()
    ofSetColor(color);
 
    if (mDisplayText)
-      DrawTextNormal(GetDisplayName(), mX + 13, mY + 12);
+      DrawTextNormal(GetDisplayName(), mX + mHeight - 2, mY + 12 + (mHeight - 15) / 2);
    if (*mVar)
    {
       if (mUseCircleLook)

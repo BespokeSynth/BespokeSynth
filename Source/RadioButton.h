@@ -72,6 +72,7 @@ public:
       mElementHeight = height;
       UpdateDimensions();
    }
+   void SetDimensions(int width, int height); //height is split evenly between the elements
    void CopyContentsTo(DropdownList* list) const;
    RadioButtonElement GetElement(int index) { return mElements[index]; }
 

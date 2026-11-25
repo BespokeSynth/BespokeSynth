@@ -128,6 +128,22 @@ void RadioButton::UpdateDimensions()
       mWidth = mForcedWidth;
 }
 
+void RadioButton::SetDimensions(int width, int height)
+{
+   int numElements = MAX(1, (int)mElements.size());
+   if (mDirection == kRadioVertical)
+   {
+      mElementHeight = MAX(1, height / numElements);
+   }
+   else
+   {
+      mElementHeight = MAX(1, height);
+      mElementWidth = (float)width / numElements;
+   }
+   mForcedWidth = width;
+   UpdateDimensions();
+}
+
 void RadioButton::Clear()
 {
    mElements.clear();

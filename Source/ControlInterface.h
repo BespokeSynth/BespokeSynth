@@ -37,10 +37,11 @@
 #include "ClickButton.h"
 #include "DropdownList.h"
 #include "RadioButton.h"
+#include "TextEntry.h"
 
 class PatchCableSource;
 
-class ControlInterface : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ICodeEntryListener, public IButtonListener, public IDropdownListener, public IRadioButtonListener
+class ControlInterface : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ICodeEntryListener, public IButtonListener, public IDropdownListener, public IRadioButtonListener, public ITextEntryListener
 {
 public:
    ControlInterface();
@@ -53,6 +54,7 @@ public:
    void CreateUIControls() override;
    void Init() override;
    void KeyPressed(int key, bool isRepeat) override;
+   void MouseReleased() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
@@ -68,6 +70,11 @@ public:
    void ButtonClicked(ClickButton* button, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal, double time) override;
+   void TextEntryComplete(TextEntry* entry) override;
+
+   //present our controls to control surfaces in our own specified order
+   bool HasPush2OverrideControls() const override { return true; }
+   void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const override;
 
    //ICodeEntryListener
    void ExecuteCode() override;
@@ -86,6 +93,9 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
+   void Poll() override;
+   void OnClicked(float x, float y, bool right) override;
+   bool MouseMoved(float x, float y) override;
 
    static const int kDefaultSliderWidth{ 120 };
 
@@ -100,6 +110,9 @@ private:
       void UpdateInfoFromControl();
       void ApplyInfoToControl();
       float GetInfo(std::string name, float defaultVal) const;
+      bool HasInfo(std::string name) const;
+      bool IsSlider() const { return mFloatSlider != nullptr || mIntSlider != nullptr; }
+      void SetPosition(float x, float y);
 
       void SaveState(FileStreamOut& out);
       void LoadState(FileStreamIn& in, int rev);
@@ -126,11 +139,47 @@ private:
    };
 
    ofVec2f FindNewUIControlPos();
+   ControlElement* CreateControl(std::list<ControlElement*>::iterator insertPos);
    ControlElement* FindOrCreateNewControl(std::string identifier, std::string type, bool& isNewControl);
+
+   //edit mode
+   void SetEditMode(bool editMode);
+   void SetSelectedControl(ControlElement* control);
+   void MoveSelectedControl(int direction);
+   void AutoPositionControls();
+   void UpdateEditorFields();
+   void DrawEditor();
+   void OnControlRemoved(ControlElement* control);
+   ControlElement* GetControlAt(float x, float y) const;
+   template <class T>
+   T* CreateEditorControl(T* control);
 
    PatchCableSource* mAddControlCable{ nullptr };
    std::list<ControlElement*> mControls;
    ControlElement* mCurrentEditControl{ nullptr };
    CodeEntry* mControlEditorBox{ nullptr };
    bool mShowCables{ true };
+
+   bool mEditMode{ false };
+   bool mAutoPosition{ true };
+   ControlElement* mSelectedControl{ nullptr };
+   ControlElement* mDragControl{ nullptr };
+   ofVec2f mDragStartMousePos;
+   ofVec2f mDragStartControlPos;
+   bool mHasDragged{ false };
+   float mEditorY{ 0 };
+   std::vector<IUIControl*> mEditorControls; //controls used in edit mode. these aren't in the module's list of controls.
+   Checkbox* mAutoPositionCheckbox{ nullptr };
+   TextEntry* mEditNameEntry{ nullptr };
+   TextEntry* mEditMinEntry{ nullptr };
+   TextEntry* mEditMaxEntry{ nullptr };
+   TextEntry* mEditWidthEntry{ nullptr };
+   TextEntry* mEditHeightEntry{ nullptr };
+   ClickButton* mMoveUpButton{ nullptr };
+   ClickButton* mMoveDownButton{ nullptr };
+   std::string mEditName;
+   float mEditMin{ 0 };
+   float mEditMax{ 1 };
+   int mEditWidth{ 0 };
+   int mEditHeight{ 0 };
 };

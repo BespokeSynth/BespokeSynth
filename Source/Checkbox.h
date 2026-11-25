@@ -62,6 +62,11 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return true; }
    void SetBoxSize(float size) { mHeight = size; }
+   void SetDimensions(float width, float height)
+   {
+      mWidth = width;
+      mHeight = height;
+   }
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    bool ShouldDisplayAsInactive() const override { return GetValue() == 0; }
 
