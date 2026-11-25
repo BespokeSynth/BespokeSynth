@@ -33,7 +33,10 @@
 #include "ClickButton.h"
 #include "RadioButton.h"
 #include "UserPrefs.h"
+#include "SaveTarget.h"
 #include "juce_core/juce_core.h"
+
+#include <array>
 
 class WelcomeScreen : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IDropdownListener, public IButtonListener, public IRadioButtonListener
 {
@@ -76,18 +79,23 @@ private:
    void DrawModule() override;
    bool MouseScrolled(float x, float y, float scrollX, float scrollY, bool isSmoothScroll, bool isInvertedScroll) override;
 
-   bool AlreadyHasFile(const juce::File& file);
+   void UpdateRecentFiles();
+   void UpdateLayout();
 
    struct RecentFile
    {
+      SaveTarget mTarget;
       juce::File mFile;
       juce::Time mTime;
       bool mRecentlyOpened{ false };
-      ClickButton* mButton{ nullptr };
       int mScreenshotImageHandle{ -1 };
    };
 
+   static constexpr int kMaxRecentFiles = 12;
+
    std::vector<RecentFile> mRecentFiles;
+   std::array<ClickButton*, kMaxRecentFiles> mRecentFileButtons{};
+   std::vector<int> mImagesToDelete; //images can only be deleted on the render thread
    int mScreenshotContextGeneration{ -1 }; //see gNanoVGContextGeneration
    float mRecentFilesScrollOffset{ 0.0f };
    ClickButton* mTutorialVideoLinkButton{ nullptr };
