@@ -159,7 +159,8 @@ enum class TouchInteractionMode
 {
    Click,
    PanZoom,
-   Repatch
+   Repatch,
+   Interface
 };
 
 enum class StepVelocityType

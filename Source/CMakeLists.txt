@@ -393,6 +393,7 @@ target_sources(BespokeSynth PRIVATE
     IPulseReceiver.cpp
     IPulseReceiver.h
     IUIControl.cpp
+    ITouchListener.h
     IUIControl.h
     IVoiceParams.h
     InputChannel.cpp
@@ -917,6 +918,8 @@ target_sources(BespokeSynth PRIVATE
     WaveformViewer.h
     Waveshaper.cpp
     Waveshaper.h
+    TouchInterfacePanel.cpp
+    TouchInterfacePanel.h
     WelcomeScreen.cpp
     WelcomeScreen.h
     WhiteKeys.cpp

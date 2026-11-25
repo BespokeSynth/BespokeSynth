@@ -841,6 +841,7 @@ private:
       }
 
       //turn it into a two-finger pan/zoom: end the first finger's click, and navigate with both
+      mSynth.CancelInterfaceTap();
       auto* clickSource = Desktop::getInstance().getMouseSource(mClickTouch.mSourceIndex);
       mSynth.MouseReleased(mClickTouch.mPosition.x, mClickTouch.mPosition.y, 1, clickSource != nullptr ? *clickSource : e.source);
       mNavigationTouches.push_back(mClickTouch);
@@ -897,8 +898,35 @@ private:
       return true;
    }
 
+   //touch listeners get first pick of touches, see ITouchListener
+   bool StartListenerTouch(const MouseEvent& e)
+   {
+      if (!e.source.isTouch())
+         return false;
+#if BESPOKE_IOS
+      if (IOSPointerInput::WasLastPressFromPointer()) //mice and trackpads use the usual mouse handling
+      {
+         mSynth.TouchReleased(e.source.getIndex()); //in case we missed the release of an earlier touch with this index
+         return false;
+      }
+#endif
+      return mSynth.TouchPressed(e.source.getIndex(), e.position.x, e.position.y);
+   }
+
+   bool UpdateListenerTouch(const MouseEvent& e)
+   {
+      return e.source.isTouch() && mSynth.TouchMoved(e.source.getIndex(), e.position.x, e.position.y);
+   }
+
+   bool EndListenerTouch(const MouseEvent& e)
+   {
+      return e.source.isTouch() && mSynth.TouchReleased(e.source.getIndex());
+   }
+
    void mouseDown(const MouseEvent& e) override
    {
+      if (StartListenerTouch(e))
+         return;
       if (StartNavigationTouch(e))
          return;
       if (e.source.isTouch())
@@ -914,6 +942,8 @@ private:
 
    void mouseUp(const MouseEvent& e) override
    {
+      if (EndListenerTouch(e))
+         return;
       if (EndNavigationTouch(e))
          return;
       if (IsIgnoredTouch(e))
@@ -935,7 +965,7 @@ private:
 
    void mouseDrag(const MouseEvent& e) override
    {
-      if (UpdateNavigationTouch(e) || IsIgnoredTouch(e))
+      if (UpdateListenerTouch(e) || UpdateNavigationTouch(e) || IsIgnoredTouch(e))
          return;
       if (e.source.isTouch())
       {

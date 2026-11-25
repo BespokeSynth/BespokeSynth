@@ -208,7 +208,7 @@ private:
    DropdownList* mLoadLayoutDropdown{ nullptr };
    ClickButton* mDisplayHelpButton{ nullptr };
    ClickButton* mSpawnButton{ nullptr }; //replaces the spawn dropdowns in touch input mode
-   RadioButton* mTouchModeSelector{ nullptr }; //click, pan/zoom, or repatch, in touch input mode
+   RadioButton* mTouchModeSelector{ nullptr }; //click, pan/zoom, repatch, or interface, in touch input mode
    ClickButton* mDeleteButton{ nullptr }; //deletes group-selected modules, in touch input mode
    TouchInteractionMode mTouchMode{ TouchInteractionMode::Click };
    int mLoadLayoutIndex{ -1 };

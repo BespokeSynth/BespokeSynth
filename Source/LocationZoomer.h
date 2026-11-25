@@ -36,6 +36,8 @@ public:
    void Update();
    void OnKeyPressed(char key);
    void CancelMovement() { mCurrentProgress = 1; }
+   void SetTemporaryView(float zoomLevel, ofVec2f offset, float blendMs); //can be called again to change the view
+   void EndTemporaryView(float blendMs); //returns to wherever we were before the temporary view
    void GoHome();
    ofxJSONElement GetSaveData();
    void LoadFromSaveData(const ofxJSONElement& saveData);
@@ -64,4 +66,11 @@ private:
    Location mHome{};
 
    bool mInVanityPanningMode{ false };
+
+   void StartBlend(const Location& destination, float blendMs);
+   bool IsBlending() const { return mBlendMs > 0 && mCurrentProgress < 1; }
+   float mBlendMs{ 0 }; //0 if the current movement uses mSpeed
+   double mBlendStartMs{ 0 };
+   bool mHasTemporaryView{ false };
+   Location mTemporaryViewReturn{}; //where we were before the temporary view
 };

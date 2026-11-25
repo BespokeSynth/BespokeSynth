@@ -1917,11 +1917,17 @@ void ControlSurface::UpdateHoldHints()
 }
 
 //static
-bool ControlSurface::IsDisplayableControl(IUIControl* control)
+bool ControlSurface::IsDisplayableControl(IUIControl* control, ControlSurfaceDeviceType surfaceType)
 {
    const IDrawableModule* owningModule = control->GetModuleParent();
 
-   if (owningModule == TheTransport && control->Name() == std::string("tempo"))
+   if (!control->IsShowing())
+      return false;
+
+   // hide tempo on move and push, since the clicky encoder to assigned to tempo
+   if (owningModule == TheTransport &&
+       (surfaceType == ControlSurfaceDeviceType::AbletonMove || surfaceType == ControlSurfaceDeviceType::AbletonPush2) &&
+       control->Name() == std::string("tempo"))
       return false;
 
    if (dynamic_cast<const FloatSliderLFOControl*>(owningModule) != nullptr && control->Name() == std::string("pin"))
@@ -1937,23 +1943,35 @@ bool ControlSurface::IsDisplayableControl(IUIControl* control)
 
 void ControlSurface::UpdateControlList()
 {
-   mControls.clear();
-   std::vector<IUIControl*> controls;
-   if (IDrawableModule* currentControlModule = GetCurrentControlModule())
-   {
-      if (currentControlModule->HasPush2OverrideControls())
-         currentControlModule->GetPush2OverrideControls(controls);
-      else
-         controls = currentControlModule->GetUIControls();
-   }
+   mControls = GetDisplayableControls(GetCurrentControlModule(), mDeviceType);
+}
 
-   for (int i = 0; i < controls.size(); ++i)
+//static
+std::vector<IUIControl*> ControlSurface::GetDisplayableControls(IDrawableModule* module, ControlSurfaceDeviceType surfaceType)
+{
+   bool hasOverrideControls = false;
+
+   std::vector<IUIControl*> controls;
+   if (module != nullptr)
    {
-      if (IsDisplayableControl(controls[i]))
+      if (module->HasPush2OverrideControls())
       {
-         mControls.push_back(controls[i]);
+         module->GetPush2OverrideControls(controls);
+         hasOverrideControls = true;
+      }
+      else
+      {
+         controls = module->GetUIControls();
       }
    }
+
+   std::vector<IUIControl*> displayableControls;
+   for (auto* control : controls)
+   {
+      if (IsDisplayableControl(control, surfaceType) || hasOverrideControls)
+         displayableControls.push_back(control);
+   }
+   return displayableControls;
 }
 
 void ControlSurface::DetermineTrackControlLayout()
@@ -1977,21 +1995,7 @@ void ControlSurface::DetermineTrackControlLayout()
    mTrackControlLayout.clear();
    for (int i = 0; i < (int)trackModules.size(); ++i)
    {
-      int numControls = 0;
-      std::vector<IUIControl*> controls;
-      if (trackModules[i] != nullptr)
-      {
-         if (trackModules[i]->HasPush2OverrideControls())
-            trackModules[i]->GetPush2OverrideControls(controls);
-         else
-            controls = trackModules[i]->GetUIControls();
-      }
-
-      for (int j = 0; j < controls.size(); ++j)
-      {
-         if (IsDisplayableControl(controls[j]))
-            ++numControls;
-      }
+      int numControls = (int)GetDisplayableControls(trackModules[i], mDeviceType).size();
 
       IDrawableModule* nameModule = trackModules[i];
       if (nameModule == nullptr && gridInterfaces[i] != nullptr)

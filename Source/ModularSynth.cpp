@@ -24,6 +24,8 @@
 #include "PatchCable.h"
 #include "ADSRDisplay.h"
 #include "QuickSpawnMenu.h"
+#include "TouchInterfacePanel.h"
+#include "ITouchListener.h"
 #include "AudioToCV.h"
 #include "ScriptModule.h"
 #include "DrumPlayer.h"
@@ -510,6 +512,9 @@ bool SortPointsByY(ofVec2f a, ofVec2f b)
 // how this function's math works: https://www.desmos.com/calculator/nnoypjy1wk
 void ModularSynth::ZoomView(float zoomAmount, bool fromMouse)
 {
+   if (IsTouchInterfacePanelZoomed()) //stay focused on the module
+      return;
+
    // pick a point and scale the four corners of the screen relative to it by moving DrawOffset and scaling
    float oldDrawScale = gDrawScale;
 
@@ -559,6 +564,9 @@ void ModularSynth::ZoomView(float zoomAmount, bool fromMouse)
 
 void ModularSynth::SetZoomLevel(float zoomLevel)
 {
+   if (IsTouchInterfacePanelZoomed()) //stay focused on the module
+      return;
+
    float oldDrawScale = gDrawScale;
    gDrawScale = zoomLevel;
    float zoomAmount = (gDrawScale - oldDrawScale) / oldDrawScale;
@@ -570,12 +578,18 @@ void ModularSynth::SetZoomLevel(float zoomLevel)
 
 void ModularSynth::PanView(float x, float y)
 {
+   if (IsTouchInterfacePanelZoomed()) //stay focused on the module
+      return;
+
    GetDrawOffset() += ofVec2f(x, y) / gDrawScale;
    mHideTooltipsUntilMouseMove = true;
 }
 
 void ModularSynth::PanTo(float x, float y)
 {
+   if (IsTouchInterfacePanelZoomed()) //stay focused on the module
+      return;
+
    SetDrawOffset(ofVec2f(ofGetWidth() / gDrawScale / 2 - x, ofGetHeight() / gDrawScale / 2 - y));
    mHideTooltipsUntilMouseMove = true;
 }
@@ -663,6 +677,9 @@ void ModularSynth::Draw()
    TheSaveDataPanel->UpdatePosition();
 
    mModuleContainer.DrawContents();
+
+   if (mTouchInterfacePanel != nullptr)
+      mTouchInterfacePanel->DrawModuleHighlight();
 
    IClickable* dropTarget = nullptr;
    if (PatchCable::sActivePatchCable != nullptr)
@@ -1458,7 +1475,7 @@ void ModularSynth::MouseMoved(int intX, int intY)
    mMousePos.x = intX;
    mMousePos.y = intY;
 
-   if (IsKeyHeld(' ') || mIsMousePanning)
+   if ((IsKeyHeld(' ') || mIsMousePanning) && !IsTouchInterfacePanelZoomed())
    {
       GetDrawOffset() += (ofVec2f(intX, intY) - mLastMoveMouseScreenPos) / gDrawScale;
       mZoomer.CancelMovement();
@@ -1928,6 +1945,21 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       return;
    }
 
+   //in interface mode, tapping a module opens its panel, and dragging pans the canvas
+   mInterfaceTapModule = nullptr;
+   if (IsInterfaceMode() && !rightButton && GetTopModalFocusItem() == nullptr && mGroupSelectedModules.empty() && !mQuickSpawn->IsShowing())
+   {
+      IDrawableModule* module = GetModuleAtCursor();
+      bool isUI = module != nullptr && (module->GetOwningContainer() == &mUILayerModuleContainer || module == TheSaveDataPanel || module == mUserPrefsEditor);
+      if (!isUI)
+      {
+         mInterfaceTapModule = module;
+         mInterfaceTapPos.set(intX, intY);
+         mIsMousePanning = true;
+         return;
+      }
+   }
+
    if (gHoveredUIControl != nullptr && IsKeyModifierComboHeld(KeyModifierCombo::Randomize))
    {
       gHoveredUIControl->Randomize();
@@ -2093,6 +2125,78 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
    }
 }
 
+bool ModularSynth::IsTouchInterfacePanelShowing() const
+{
+   return mTouchInterfacePanel != nullptr && mTouchInterfacePanel->IsShowing() && !mTouchInterfacePanel->IsZoomed();
+}
+
+bool ModularSynth::IsTouchInterfacePanelZoomed() const
+{
+   return mTouchInterfacePanel != nullptr && mTouchInterfacePanel->IsShowing() && mTouchInterfacePanel->IsZoomed();
+}
+
+void ModularSynth::AddTouchListener(ITouchListener* listener)
+{
+   if (!VectorContains(listener, mTouchListeners))
+      mTouchListeners.push_back(listener);
+}
+
+void ModularSynth::RemoveTouchListener(ITouchListener* listener)
+{
+   RemoveFromVector(listener, mTouchListeners);
+   for (auto& touch : mClaimedTouches)
+   {
+      if (touch.second == listener)
+         touch.second = nullptr; //keep it claimed until it lifts, so that it doesn't start doing something else
+   }
+}
+
+bool ModularSynth::TouchPressed(int touchId, float screenX, float screenY)
+{
+   TouchReleased(touchId); //in case we missed the release
+
+   if (GetTopModalFocusItem() != nullptr || mMoveModule != nullptr) //leave these to the usual mouse handling
+      return false;
+
+   for (auto it = mTouchListeners.rbegin(); it != mTouchListeners.rend(); ++it)
+   {
+      ITouchListener* listener = *it;
+      if (listener->WantsTouch(screenX, screenY))
+      {
+         mClaimedTouches[touchId] = listener;
+         IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
+         listener->TouchPressed(touchId, screenX, screenY);
+         return true;
+      }
+   }
+
+   return false;
+}
+
+bool ModularSynth::TouchMoved(int touchId, float screenX, float screenY)
+{
+   auto it = mClaimedTouches.find(touchId);
+   if (it == mClaimedTouches.end())
+      return false;
+
+   if (it->second != nullptr)
+      it->second->TouchMoved(touchId, screenX, screenY);
+   return true;
+}
+
+bool ModularSynth::TouchReleased(int touchId)
+{
+   auto it = mClaimedTouches.find(touchId);
+   if (it == mClaimedTouches.end())
+      return false;
+
+   ITouchListener* listener = it->second;
+   mClaimedTouches.erase(it);
+   if (listener != nullptr)
+      listener->TouchReleased(touchId);
+   return true;
+}
+
 void ModularSynth::DeleteGroupSelectedModules()
 {
    for (auto module : mGroupSelectedModules)
@@ -2239,6 +2343,9 @@ void ModularSynth::MouseMagnify(int intX, int intY, float scaleFactor, const juc
 //in touch navigation mode, touches on the canvas pan/zoom, but some places still need regular clicks
 bool ModularSynth::ShouldTouchAlwaysClick(int x, int y)
 {
+   if (IsTouchInterfacePanelZoomed()) //don't let a second finger interrupt the click to start a pan/zoom that isn't allowed
+      return true;
+
    if (!mModalFocusItemStack.empty()) //popup menus (e.g. the title bar's main menu) need to be tappable and dismissable
       return true;
 
@@ -2458,6 +2565,18 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
 
    if (!mGroupSelectedModules.empty() && !mMouseMovedSignificantlySincePressed)
       mGroupSelectedModules.clear();
+
+   if (mInterfaceTapModule != nullptr)
+   {
+      const float kMaxTapDistance = 10;
+      IDrawableModule* module = mInterfaceTapModule;
+      mInterfaceTapModule = nullptr;
+      if (!module->IsDeleted() && mInterfaceTapPos.distanceSquared(ofVec2f(intX, intY)) < kMaxTapDistance * kMaxTapDistance)
+      {
+         if (!mTouchInterfacePanel->ShowForModule(module))
+            TheTitleBar->DisplayTemporaryMessage("no controls");
+      }
+   }
 
    if (rightButton && mLastClickWasEmptySpace && !mMouseMovedSignificantlySincePressed && mQuickSpawn != nullptr)
       mQuickSpawn->ShowSpawnCategoriesPopup();
@@ -2844,6 +2963,9 @@ void ModularSynth::ResetLayout()
    delete TheTitleBar;
    delete TheSaveDataPanel;
    delete mQuickSpawn;
+   delete mTouchInterfacePanel;
+   mTouchInterfacePanel = nullptr;
+   mInterfaceTapModule = nullptr;
    delete mUserPrefsEditor;
    delete mNoteOutputQueue;
 
@@ -2883,6 +3005,13 @@ void ModularSynth::ResetLayout()
    mQuickSpawn->Init();
    mUILayerModuleContainer.AddModule(mQuickSpawn);
    mModuleContainer.AddModule(mQuickSpawn->GetMainContainerFollower());
+
+   mTouchInterfacePanel = new TouchInterfacePanel();
+   mTouchInterfacePanel->SetName("touchinterface");
+   mTouchInterfacePanel->SetTypeName("touchinterface", kModuleCategory_Other);
+   mTouchInterfacePanel->CreateUIControls();
+   mTouchInterfacePanel->Init();
+   mUILayerModuleContainer.AddModule(mTouchInterfacePanel);
 
    mUserPrefsEditor = new UserPrefsEditor();
    mUserPrefsEditor->SetName("userprefseditor");

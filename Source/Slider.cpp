@@ -35,37 +35,38 @@
 
 namespace
 {
-   constexpr float kDragVerticalDampBase = 1.015f;
-
-   //how much horizontal movement is scaled down at a given vertical distance from the click (1 at the slider, approaching 0 far away)
-   float VerticalDamp(float dy)
-   {
-      return 1.0f / powf(kDragVerticalDampBase, fabsf(dy));
-   }
+   constexpr float kDragDampBase = 1.015f;
 
    float IndicatorLineWidth(bool dragging, float precision)
    {
       //thinner indicator line while dragging with higher precision
       return dragging ? std::max(2.0f * powf(precision, .5f), .3f) : 2.0f;
    }
+}
 
-   //precision drag: the slider position is the cursor position plus an offset.
-   //horizontal movement while away from the slider grows the offset (so the slider moves slower than the cursor),
+namespace PrecisionDrag
+{
+   float Damp(float distance)
+   {
+      return 1.0f / powf(kDragDampBase, fabsf(distance));
+   }
+
+   //the slider position is the cursor position plus an offset.
+   //movement along the slider while away from it grows the offset (so the slider moves slower than the cursor),
    //and moving back toward the slider shrinks the offset proportionally, so that returning to the
    //slider's row puts the slider back under the cursor.
-   //positions are normalized (0-1 across the slider). the virtual position (cursor + offset) can go past the ends of
-   //the slider, and the returned position is clamped, so after overshooting min/max the value doesn't change until you
-   //drag back to where it hit the end. returns the new (clamped) slider position, and updates offset.
-   float ApplyPrecisionDrag(float& offset, float cursorPos, float lastCursorPos, float dy, float lastDy, float fineTuneFactor, bool allowReelIn)
+   //the virtual position (cursor + offset) can go past the ends of the slider, and the returned position is clamped,
+   //so after overshooting min/max the value doesn't change until you drag back to where it hit the end.
+   float Apply(float& offset, float cursorPos, float lastCursorPos, float distance, float lastDistance, float fineTuneFactor, bool allowReelIn)
    {
-      float damp = VerticalDamp(dy);
+      float damp = Damp(distance);
 
       //slider should move by the damped cursor movement, but the cursor's own movement is already accounted for
       offset += (cursorPos - lastCursorPos) * (damp * fineTuneFactor - 1.0f);
 
-      if (allowReelIn && fabsf(dy) < fabsf(lastDy))
+      if (allowReelIn && fabsf(distance) < fabsf(lastDistance))
       {
-         float lastWeight = 1.0f - VerticalDamp(lastDy);
+         float lastWeight = 1.0f - Damp(lastDistance);
          if (lastWeight > 0)
             offset *= (1.0f - damp) / lastWeight;
       }
@@ -459,8 +460,8 @@ void FloatSlider::SetValueForMouse(float x, float y, bool drag)
    float lastDy = isAdjustingModulator ? 0 : mLastDragPos.y - mClickStartPos.y;
 
    float lastCursorPos = (mLastDragPos.x - 1) / (mWidth - 2);
-   float pos = ApplyPrecisionDrag(mDragOffset, cursorPos, lastCursorPos, dy, lastDy, fineTuneFactor, !fineTune);
-   mDragPrecision = VerticalDamp(dy) * fineTuneFactor;
+   float pos = PrecisionDrag::Apply(mDragOffset, cursorPos, lastCursorPos, dy, lastDy, fineTuneFactor, !fineTune);
+   mDragPrecision = PrecisionDrag::Damp(dy) * fineTuneFactor;
 
    float oldVal = *var;
    mLastDragPos.set(x, y);
@@ -1246,8 +1247,8 @@ void IntSlider::SetValueForMouse(float x, float y, bool drag)
 
    float fineTuneFactor = fineTune ? .1f : 1.0f;
    float lastCursorPos = (mLastDragPos.x - 1) / (mWidth - 2);
-   mSliderVal = ApplyPrecisionDrag(mDragOffset, cursorPos, lastCursorPos, y - mClickStartPos.y, mLastDragPos.y - mClickStartPos.y, fineTuneFactor, !fineTune);
-   mDragPrecision = VerticalDamp(y - mClickStartPos.y) * fineTuneFactor;
+   mSliderVal = PrecisionDrag::Apply(mDragOffset, cursorPos, lastCursorPos, y - mClickStartPos.y, mLastDragPos.y - mClickStartPos.y, fineTuneFactor, !fineTune);
+   mDragPrecision = PrecisionDrag::Damp(y - mClickStartPos.y) * fineTuneFactor;
    mLastDragPos.set(x, y);
 
    *mVar = ofClamp((int)round(ofLerp(mMin, mMax, mSliderVal)), mMin, mMax);

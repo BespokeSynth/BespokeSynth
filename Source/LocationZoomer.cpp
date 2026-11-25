@@ -41,11 +41,29 @@ void LocationZoomer::Init()
    mStart = mHome;
    mDestination = mHome;
    mCurrentProgress = 1;
+   mBlendMs = 0;
+   mHasTemporaryView = false;
    gDrawScale = mHome.mZoomLevel;
 }
 
 void LocationZoomer::Update()
 {
+   if (IsBlending())
+   {
+      mCurrentProgress = ofClamp((juce::Time::getMillisecondCounterHiRes() - mBlendStartMs) / mBlendMs, 0, 1);
+      if (mCurrentProgress >= 1) //land on it exactly
+      {
+         gDrawScale = mDestination.mZoomLevel;
+         TheSynth->SetDrawOffset(mDestination.mOffset);
+         return;
+      }
+      //blend the visible area of the canvas, rather than the scale, so that everything moves in a straight line
+      const float ease = mCurrentProgress * mCurrentProgress * (3 - 2 * mCurrentProgress);
+      gDrawScale = 1 / ofLerp(1 / mStart.mZoomLevel, 1 / mDestination.mZoomLevel, ease);
+      TheSynth->SetDrawOffset(ofVec2f(ofLerp(mStart.mOffset.x, mDestination.mOffset.x, ease), ofLerp(mStart.mOffset.y, mDestination.mOffset.y, ease)));
+      return;
+   }
+
    if (mCurrentProgress < 1)
    {
       mCurrentProgress = ofClamp(mCurrentProgress + ofGetLastFrameTime() * mSpeed, 0, 1);
@@ -78,6 +96,16 @@ void LocationZoomer::OnKeyPressed(char key)
 
 void LocationZoomer::WriteCurrentLocation(char key)
 {
+   if (key == -1 && mHasTemporaryView) //don't save the temporary view as the patch's location
+   {
+      mLocations[key] = mTemporaryViewReturn;
+      return;
+   }
+   if (key == -1 && IsBlending())
+   {
+      mLocations[key] = mDestination;
+      return;
+   }
    mLocations[key].mZoomLevel = gDrawScale;
    mLocations[key].mOffset = TheSynth->GetDrawOffset();
 }
@@ -101,6 +129,39 @@ void LocationZoomer::MoveToLocation(float zoomLevel, ofVec2f offset)
    mDestination.mOffset = offset;
    mCurrentProgress = 0;
    mSpeed = 2;
+   mBlendMs = 0;
+}
+
+void LocationZoomer::StartBlend(const Location& destination, float blendMs)
+{
+   mInVanityPanningMode = false;
+   mStart.mZoomLevel = gDrawScale;
+   mStart.mOffset = TheSynth->GetDrawOffset();
+   mDestination = destination;
+   mCurrentProgress = 0;
+   mBlendMs = blendMs;
+   mBlendStartMs = juce::Time::getMillisecondCounterHiRes();
+}
+
+void LocationZoomer::SetTemporaryView(float zoomLevel, ofVec2f offset, float blendMs)
+{
+   if (!mHasTemporaryView)
+   {
+      if (IsBlending()) //still on the way back from the last one
+         mTemporaryViewReturn = mDestination;
+      else
+         mTemporaryViewReturn = { gDrawScale, TheSynth->GetDrawOffset() };
+      mHasTemporaryView = true;
+   }
+   StartBlend({ zoomLevel, offset }, blendMs);
+}
+
+void LocationZoomer::EndTemporaryView(float blendMs)
+{
+   if (!mHasTemporaryView)
+      return;
+   mHasTemporaryView = false;
+   StartBlend(mTemporaryViewReturn, blendMs);
 }
 
 void LocationZoomer::GoHome()
@@ -116,6 +177,8 @@ void LocationZoomer::EnterVanityPanningMode()
 
 void LocationZoomer::ExitVanityPanningMode()
 {
+   if (IsBlending()) //let these finish, so that clicking doesn't strand us partway back from a temporary view
+      return;
    mInVanityPanningMode = false;
    mCurrentProgress = 1;
 }
@@ -168,6 +231,7 @@ void LocationZoomer::PickNewVanityPanningDestination()
 
    mCurrentProgress = 0;
    mSpeed = ofRandom(.03f, .1f);
+   mBlendMs = 0;
 }
 
 ofxJSONElement LocationZoomer::GetSaveData()
