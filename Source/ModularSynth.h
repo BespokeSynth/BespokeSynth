@@ -115,8 +115,9 @@ public:
    void MouseScrolled(float xScroll, float yScroll, bool isSmoothScroll, bool isInvertedScroll, bool canZoomCanvas);
    void MouseMagnify(int x, int y, float scaleFactor, const juce::MouseInputSource& source);
    bool IsTouchNavigationMode() const { return mTouchInteractionMode == TouchInteractionMode::PanZoom; }
-   bool IsInterfaceMode() const { return mTouchInteractionMode == TouchInteractionMode::Interface; }
-   bool IsTouchInterfacePanelShowing() const;
+   bool IsInterfaceMode() const { return mTouchInteractionMode == TouchInteractionMode::Interface && !IsTouchInterfacePanelZoomed(); } //acts like click mode while zoomed
+   bool IsTouchInterfacePanelShowing() const; //false while it's zoomed, since it isn't covering the canvas
+   bool IsTouchInterfacePanelZoomed() const;
    void CancelInterfaceTap() { mInterfaceTapModule = nullptr; }
    bool IsRepatchMode() const { return mTouchInteractionMode == TouchInteractionMode::Repatch; }
    void SetResamplingDeviceSampleRate(int rate) { mResamplingDeviceSampleRate = rate; } //0 when not resampling. may be called from the audio thread

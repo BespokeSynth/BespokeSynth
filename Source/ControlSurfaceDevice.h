@@ -61,7 +61,7 @@ enum class ControlSurfaceDeviceType
    AbletonPush2,
    NovationLaunchControl3,
    Count,
-   None=Count
+   None = Count
 };
 
 struct ControlSurfaceLedState

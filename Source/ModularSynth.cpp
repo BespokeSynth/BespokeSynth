@@ -512,6 +512,9 @@ bool SortPointsByY(ofVec2f a, ofVec2f b)
 // how this function's math works: https://www.desmos.com/calculator/nnoypjy1wk
 void ModularSynth::ZoomView(float zoomAmount, bool fromMouse)
 {
+   if (IsTouchInterfacePanelZoomed()) //stay focused on the module
+      return;
+
    // pick a point and scale the four corners of the screen relative to it by moving DrawOffset and scaling
    float oldDrawScale = gDrawScale;
 
@@ -561,6 +564,9 @@ void ModularSynth::ZoomView(float zoomAmount, bool fromMouse)
 
 void ModularSynth::SetZoomLevel(float zoomLevel)
 {
+   if (IsTouchInterfacePanelZoomed()) //stay focused on the module
+      return;
+
    float oldDrawScale = gDrawScale;
    gDrawScale = zoomLevel;
    float zoomAmount = (gDrawScale - oldDrawScale) / oldDrawScale;
@@ -572,12 +578,18 @@ void ModularSynth::SetZoomLevel(float zoomLevel)
 
 void ModularSynth::PanView(float x, float y)
 {
+   if (IsTouchInterfacePanelZoomed()) //stay focused on the module
+      return;
+
    GetDrawOffset() += ofVec2f(x, y) / gDrawScale;
    mHideTooltipsUntilMouseMove = true;
 }
 
 void ModularSynth::PanTo(float x, float y)
 {
+   if (IsTouchInterfacePanelZoomed()) //stay focused on the module
+      return;
+
    SetDrawOffset(ofVec2f(ofGetWidth() / gDrawScale / 2 - x, ofGetHeight() / gDrawScale / 2 - y));
    mHideTooltipsUntilMouseMove = true;
 }
@@ -1463,7 +1475,7 @@ void ModularSynth::MouseMoved(int intX, int intY)
    mMousePos.x = intX;
    mMousePos.y = intY;
 
-   if (IsKeyHeld(' ') || mIsMousePanning)
+   if ((IsKeyHeld(' ') || mIsMousePanning) && !IsTouchInterfacePanelZoomed())
    {
       GetDrawOffset() += (ofVec2f(intX, intY) - mLastMoveMouseScreenPos) / gDrawScale;
       mZoomer.CancelMovement();
@@ -2115,7 +2127,12 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
 
 bool ModularSynth::IsTouchInterfacePanelShowing() const
 {
-   return mTouchInterfacePanel != nullptr && mTouchInterfacePanel->IsShowing();
+   return mTouchInterfacePanel != nullptr && mTouchInterfacePanel->IsShowing() && !mTouchInterfacePanel->IsZoomed();
+}
+
+bool ModularSynth::IsTouchInterfacePanelZoomed() const
+{
+   return mTouchInterfacePanel != nullptr && mTouchInterfacePanel->IsShowing() && mTouchInterfacePanel->IsZoomed();
 }
 
 void ModularSynth::AddTouchListener(ITouchListener* listener)
@@ -2326,6 +2343,9 @@ void ModularSynth::MouseMagnify(int intX, int intY, float scaleFactor, const juc
 //in touch navigation mode, touches on the canvas pan/zoom, but some places still need regular clicks
 bool ModularSynth::ShouldTouchAlwaysClick(int x, int y)
 {
+   if (IsTouchInterfacePanelZoomed()) //don't let a second finger interrupt the click to start a pan/zoom that isn't allowed
+      return true;
+
    if (!mModalFocusItemStack.empty()) //popup menus (e.g. the title bar's main menu) need to be tappable and dismissable
       return true;
 
@@ -2944,6 +2964,7 @@ void ModularSynth::ResetLayout()
    delete TheSaveDataPanel;
    delete mQuickSpawn;
    delete mTouchInterfacePanel;
+   mTouchInterfacePanel = nullptr;
    mInterfaceTapModule = nullptr;
    delete mUserPrefsEditor;
    delete mNoteOutputQueue;

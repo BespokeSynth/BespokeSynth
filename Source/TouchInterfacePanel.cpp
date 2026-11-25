@@ -30,8 +30,10 @@
 #include "ClickButton.h"
 #include "ControlSurface.h"
 #include "FloatSliderLFOControl.h"
+#include "HelpDisplay.h"
 #include "IControlVisualizer.h"
 #include "IModulator.h"
+#include "LocationZoomer.h"
 #include "ModularSynth.h"
 #include "PatchCable.h"
 #include "PatchCableSource.h"
@@ -45,6 +47,7 @@ namespace
 {
    const float kMargin = 8;
    const float kHeaderHeight = 44;
+   const float kHeaderButtonWidth = 64;
    const float kPageLabelHeight = 20;
    const float kLabelHeight = 42;
    const float kMaxColumnWidth = 120;
@@ -58,6 +61,8 @@ namespace
    const float kRowSpacing = 8;
    const float kTargetTrackInches = 2; //on displays with room for multiple rows of sliders, how tall the sliders should be, at minimum
    const double kRoutingUpdateMs = 250;
+   const float kZoomBlendMs = 500;
+   const ofColor kBackgroundColor(20, 20, 20, 153);
    const double kDoubleTapMs = 300;
    const float kDoubleTapDistance = 15;
 
@@ -170,6 +175,7 @@ void TouchInterfacePanel::Hide()
 {
    std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
    EndAllTouches();
+   EndZoom();
    SetShowing(false);
    mModule = nullptr;
    mControls.clear();
@@ -184,7 +190,7 @@ void TouchInterfacePanel::Poll()
       return;
 
    //the title bar is still usable while we're showing, so get out of the way if it was used to do something else
-   if (!TheSynth->IsInterfaceMode() || TheQuickSpawnMenu->IsShowing())
+   if (TheSynth->GetTouchInteractionMode() != TouchInteractionMode::Interface || (TheQuickSpawnMenu->IsShowing() && !mIsZoomed))
    {
       Hide();
       return;
@@ -195,6 +201,76 @@ void TouchInterfacePanel::Poll()
    mPage = ofClamp(mPage, 0, GetNumPages() - 1); //resizing can change how many rows fit
    if (IsShowing() && gTime - mLastRoutingUpdateTime > kRoutingUpdateMs)
       UpdateRoutingModules();
+
+   if (mIsZoomed)
+   {
+      if (GetCanvasModule() == nullptr)
+         EndZoom();
+      else if (mZoomScreenSize.x != ofGetWidth() || mZoomScreenSize.y != ofGetHeight()) //e.g. the device was rotated
+         ZoomToModule();
+   }
+}
+
+IDrawableModule* TouchInterfacePanel::GetCanvasModule() const
+{
+   IDrawableModule* module = GetUnpinnedLFO() != nullptr ? mLFOTargetModule : mModule; //unpinned LFOs aren't on the canvas
+   if (module == nullptr || module->IsDeleted() || module->GetOwningContainer() == nullptr || !module->IsShowing())
+      return nullptr;
+   return module;
+}
+
+ofRectangle TouchInterfacePanel::GetCanvasModuleRect(IDrawableModule* module) const
+{
+   ofRectangle rect = module->GetRect();
+   if (module->HasTitleBar())
+   {
+      rect.y -= IDrawableModule::TitleBarHeight();
+      rect.height += IDrawableModule::TitleBarHeight();
+   }
+   return rect;
+}
+
+bool TouchInterfacePanel::ZoomToModule()
+{
+   IDrawableModule* module = GetCanvasModule();
+   if (module == nullptr)
+      return false;
+
+   const ofRectangle moduleRect = GetCanvasModuleRect(module);
+   if (moduleRect.width <= 0 || moduleRect.height <= 0)
+      return false;
+
+   EndAllTouches();
+
+   //fit below our buttons, or between them if the module is narrow enough to get bigger that way, so that they don't cover it
+   const float uiScale = GetOwningContainer()->GetDrawScale();
+   const ofRectangle content = GetContentRect();
+   const ofRectangle zoomButton = GetZoomButtonRect();
+   const ofRectangle exitButton = GetExitButtonRect();
+   const ofRectangle below(content.x, content.y + kHeaderHeight, content.width, content.height - kHeaderHeight);
+   const ofRectangle between(exitButton.getMaxX() + kMargin, content.y, zoomButton.x - exitButton.getMaxX() - kMargin * 2, content.height);
+   auto getFit = [&moduleRect, uiScale](const ofRectangle& rect)
+   {
+      return ofClamp(MIN(rect.width / moduleRect.width, rect.height / moduleRect.height) * uiScale, .1f, 8);
+   };
+   const ofRectangle area = getFit(between) > getFit(below) ? between : below;
+   const float scale = getFit(area);
+   ofVec2f screenCenter(area.getCenter().x * uiScale, (area.getCenter().y + GetTitleBarHeight()) * uiScale);
+
+   mIsZoomed = true;
+   mZoomScreenSize.set(ofGetWidth(), ofGetHeight());
+   gHoveredUIControl = nullptr;
+   TheSynth->GetLocationZoomer()->SetTemporaryView(scale, screenCenter / scale - moduleRect.getCenter(), kZoomBlendMs);
+   return true;
+}
+
+void TouchInterfacePanel::EndZoom()
+{
+   if (!mIsZoomed)
+      return;
+   mIsZoomed = false;
+   gHoveredUIControl = nullptr; //don't let clicks get directed to a control that we're covering up
+   TheSynth->GetLocationZoomer()->EndTemporaryView(kZoomBlendMs);
 }
 
 void TouchInterfacePanel::UpdateControlList()
@@ -484,8 +560,13 @@ ofRectangle TouchInterfacePanel::GetControlsRect() const
 ofRectangle TouchInterfacePanel::GetExitButtonRect() const
 {
    ofRectangle content = GetContentRect();
-   const float kWidth = 64;
-   return ofRectangle(content.getMaxX() - kWidth, content.y, kWidth, kHeaderHeight - 8);
+   return ofRectangle(content.x, content.y, kHeaderButtonWidth, kHeaderHeight - 8);
+}
+
+ofRectangle TouchInterfacePanel::GetZoomButtonRect() const
+{
+   ofRectangle content = GetContentRect();
+   return ofRectangle(content.getMaxX() - kHeaderButtonWidth, content.y, kHeaderButtonWidth, kHeaderHeight - 8);
 }
 
 ofRectangle TouchInterfacePanel::GetPageButtonRect(int direction) const
@@ -509,6 +590,12 @@ ofRectangle TouchInterfacePanel::GetTrackRect(int slot) const
 {
    ofRectangle rect = GetSlotRect(slot);
    return ofRectangle(rect.x + kColumnSpacing / 2, rect.y, rect.width - kColumnSpacing, MAX(1, rect.height - kLabelHeight));
+}
+
+ofRectangle TouchInterfacePanel::GetLabelRect(int slot) const
+{
+   const ofRectangle track = GetTrackRect(slot);
+   return ofRectangle(track.x, track.getMaxY() + 3, track.width, kLabelHeight - 3);
 }
 
 ofRectangle TouchInterfacePanel::GetSquareRect(int slot) const
@@ -664,7 +751,7 @@ const TouchInterfacePanel::Touch* TouchInterfacePanel::FindTouch(const IUIContro
 {
    for (const auto& touch : mTouches)
    {
-      if (touch.mControl != nullptr && touch.mControl == control)
+      if (touch.mControl != nullptr && touch.mControl == control && !touch.mIsTooltip)
          return &touch;
    }
    return nullptr;
@@ -687,7 +774,7 @@ void TouchInterfacePanel::EndTouch(Touch& touch)
 {
    if (IsValidControl(touch.mControl))
    {
-      if (touch.mIsModulatorTap)
+      if (touch.mIsModulatorTap || touch.mIsTooltip)
       {
          //didn't do anything to the control
       }
@@ -706,6 +793,13 @@ void TouchInterfacePanel::EndTouch(Touch& touch)
       }
    }
    touch = Touch();
+}
+
+bool TouchInterfacePanel::TestClick(float x, float y, bool right, bool testOnly /*=false*/)
+{
+   if (mIsZoomed && !GetZoomButtonRect().contains(x - mX, y - mY) && !GetExitButtonRect().contains(x - mX, y - mY))
+      return false; //let it through to the canvas
+   return IDrawableModule::TestClick(x, y, right, testOnly);
 }
 
 void TouchInterfacePanel::OnClicked(float x, float y, bool right)
@@ -759,6 +853,18 @@ void TouchInterfacePanel::Press(int touchId, float x, float y)
       return;
    }
 
+   if (GetZoomButtonRect().contains(x, y))
+   {
+      if (mIsZoomed)
+         EndZoom();
+      else
+         ZoomToModule();
+      return;
+   }
+
+   if (mIsZoomed)
+      return;
+
    if (Checkbox* enabledCheckbox = GetEnabledCheckbox())
    {
       if (mTitleRect.contains(x, y))
@@ -792,10 +898,21 @@ void TouchInterfacePanel::Press(int touchId, float x, float y)
          continue;
 
       IUIControl* control = mControls[index];
+      Touch* touch = FindFreeTouch();
+
+      if (y >= GetLabelRect(slot).y)
+      {
+         if (touch != nullptr)
+         {
+            AssignTouch(*touch, touchId, control);
+            touch->mIsTooltip = true;
+         }
+         return;
+      }
+
       if (control->IsButtonControl() && !GetSquareRect(slot).contains(x, y))
          return;
 
-      Touch* touch = FindFreeTouch();
       if (touch == nullptr || FindTouch(control) != nullptr) //another touch already has this control
          return;
 
@@ -1011,7 +1128,7 @@ void TouchInterfacePanel::DrawControl(IUIControl* control, int slot) const
 
    //backing, to keep the labels readable over the canvas
    ofSetColor(0, 0, 0, 150);
-   ofRect(track.x, track.getMaxY() + 3, track.width, kLabelHeight - 3, 4);
+   ofRect(GetLabelRect(slot), 4);
 
    ofSetColor(255, 255, 255);
    DrawTextToFit(GetControlLabel(control), track.getCenter().x, track.getMaxY() + 18, track.width, 16);
@@ -1024,8 +1141,8 @@ void TouchInterfacePanel::DrawControl(IUIControl* control, int slot) const
 void TouchInterfacePanel::DrawTitle()
 {
    const ofRectangle content = GetContentRect();
-   const float left = content.x;
-   const float maxWidth = GetExitButtonRect().x - kMargin - left;
+   const float left = GetExitButtonRect().getMaxX() + kMargin;
+   const float maxWidth = GetZoomButtonRect().x - kMargin - left;
    const float centerX = left + maxWidth / 2;
    const float centerY = GetExitButtonRect().getCenter().y;
    float size = 22;
@@ -1105,19 +1222,14 @@ void TouchInterfacePanel::DrawRoutingButtons(bool isInput) const
 //highlights the module out on the canvas
 void TouchInterfacePanel::DrawModuleHighlight() const
 {
-   if (!IsShowing() || mModule == nullptr)
+   if (!IsShowing() || mIsZoomed)
       return;
 
-   IDrawableModule* module = GetUnpinnedLFO() != nullptr ? mLFOTargetModule : mModule; //unpinned LFOs aren't on the canvas
-   if (module == nullptr || module->IsDeleted() || module->GetOwningContainer() == nullptr || !module->IsShowing())
+   IDrawableModule* module = GetCanvasModule();
+   if (module == nullptr)
       return;
 
-   ofRectangle rect = module->GetRect();
-   if (module->HasTitleBar())
-   {
-      rect.y -= IDrawableModule::TitleBarHeight();
-      rect.height += IDrawableModule::TitleBarHeight();
-   }
+   const ofRectangle rect = GetCanvasModuleRect(module);
 
    ofPushStyle();
    ofNoFill();
@@ -1127,13 +1239,52 @@ void TouchInterfacePanel::DrawModuleHighlight() const
    ofPopStyle();
 }
 
+//darkens everything around the module that we're zoomed in on
+void TouchInterfacePanel::DrawZoomFrame()
+{
+   float w, h;
+   GetModuleDimensions(w, h);
+
+   ofPushStyle();
+   ofFill();
+   ofSetColor(kBackgroundColor);
+   IDrawableModule* module = GetCanvasModule();
+   if (module == nullptr)
+   {
+      ofRect(0, 0, w, h, 0);
+      ofPopStyle();
+      return;
+   }
+
+   const float kPadding = 3;
+   const float scale = gDrawScale / GetOwningContainer()->GetDrawScale();
+   const ofRectangle rect = GetCanvasModuleRect(module);
+   const ofVec2f offset = TheSynth->GetDrawOffset();
+   const float left = ofClamp((rect.x - kPadding + offset.x) * scale - mX, 0, w);
+   const float right = ofClamp((rect.getMaxX() + kPadding + offset.x) * scale - mX, 0, w);
+   const float top = ofClamp((rect.y - kPadding + offset.y) * scale - mY, 0, h);
+   const float bottom = ofClamp((rect.getMaxY() + kPadding + offset.y) * scale - mY, 0, h);
+
+   //four rectangles, since paths with holes don't draw correctly on iOS
+   auto drawRect = [](float x, float y, float width, float height)
+   {
+      if (width > 0 && height > 0)
+         ofRect(x, y, width, height, 0);
+   };
+   drawRect(0, 0, w, top);
+   drawRect(0, bottom, w, h - bottom);
+   drawRect(0, top, left, bottom - top);
+   drawRect(right, top, w - right, bottom - top);
+   ofPopStyle();
+}
+
 //shows the visualization for the most recently touched control that has one, or the module's LFO, next to the module's name
 void TouchInterfacePanel::DrawControlVisualization()
 {
    const Touch* newest = nullptr;
    for (const auto& touch : mTouches)
    {
-      if (touch.mControl != nullptr && touch.mControl->GetControlVisualizer() != nullptr && (newest == nullptr || touch.mOrder > newest->mOrder))
+      if (touch.mControl != nullptr && !touch.mIsTooltip && touch.mControl->GetControlVisualizer() != nullptr && (newest == nullptr || touch.mOrder > newest->mOrder))
          newest = &touch;
    }
    FloatSliderLFOControl* lfo = dynamic_cast<FloatSliderLFOControl*>(mModule);
@@ -1146,10 +1297,10 @@ void TouchInterfacePanel::DrawControlVisualization()
    const ofRectangle content = GetContentRect();
    ofRectangle rect(mTitleRect.getMaxX() + kMargin, content.y, 0, kHeaderHeight - 8);
    rect.width = rect.height * lcdWidth / lcdHeight;
-   if (rect.getMaxX() > GetExitButtonRect().x - kMargin)
+   if (rect.getMaxX() > GetZoomButtonRect().x - kMargin)
    {
       rect.x = mTitleRect.x - kMargin - rect.width; //try the other side
-      if (rect.x < content.x)
+      if (rect.x < GetExitButtonRect().getMaxX() + kMargin)
          return;
    }
 
@@ -1206,6 +1357,58 @@ void TouchInterfacePanel::DrawControlVisualization()
    nvgFill(gNanoVG);
 }
 
+//for the control whose name is being pressed
+void TouchInterfacePanel::DrawTooltip() const
+{
+   const Touch* newest = nullptr;
+   for (const auto& touch : mTouches)
+   {
+      if (touch.mControl != nullptr && touch.mIsTooltip && (newest == nullptr || touch.mOrder > newest->mOrder))
+         newest = &touch;
+   }
+   if (newest == nullptr)
+      return;
+
+   int slot = -1;
+   for (int i = 0; i < GetNumControlsPerPage(); ++i)
+   {
+      const int index = mPage * GetNumControlsPerPage() + i;
+      if (index < (int)mControls.size() && mControls[index] == newest->mControl)
+         slot = i;
+   }
+   if (slot == -1)
+      return;
+
+   const std::string tooltip = TheTitleBar->GetHelpDisplay()->GetUIControlTooltip(newest->mControl);
+   const ofRectangle label = GetLabelRect(slot);
+   const ofRectangle content = GetContentRect();
+   const float kFontSize = 18;
+   const float kPadding = 8;
+   const float maxWidth = MIN(360, content.width - kPadding * 2);
+
+   nvgFontFaceId(gNanoVG, gFont.GetFontHandle());
+   nvgFontSize(gNanoVG, kFontSize);
+   float bounds[4];
+   nvgTextBoxBounds(gNanoVG, 0, 0, maxWidth, tooltip.c_str(), nullptr, bounds);
+
+   //above the name, so that it isn't under the finger
+   ofRectangle rect(0, 0, bounds[2] - bounds[0] + kPadding * 2, bounds[3] - bounds[1] + kPadding * 2);
+   rect.x = ofClamp(label.getCenter().x - rect.width / 2, content.x, content.getMaxX() - rect.width);
+   rect.y = MAX(label.y - 24 - rect.height, content.y);
+
+   ofPushStyle();
+   ofFill();
+   ofSetColor(50, 50, 50, 240);
+   ofRect(rect, 4);
+   ofNoFill();
+   ofSetColor(255, 255, 255, 180);
+   ofSetLineWidth(1);
+   ofRect(rect, 4);
+   ofSetColor(255, 255, 255);
+   gFont.DrawStringWrap(tooltip, kFontSize, rect.x + kPadding - bounds[0], rect.y + kPadding - bounds[1], maxWidth);
+   ofPopStyle();
+}
+
 //skips the usual module frame, since its background would make us too opaque
 void TouchInterfacePanel::Render()
 {
@@ -1223,12 +1426,20 @@ void TouchInterfacePanel::DrawModule()
    if (mModule == nullptr)
       return;
 
+   if (mIsZoomed)
+   {
+      DrawZoomFrame();
+      DrawButton(GetZoomButtonRect(), "return", true);
+      DrawButton(GetExitButtonRect(), "exit", true);
+      return;
+   }
+
    float w, h;
    GetModuleDimensions(w, h);
 
    ofPushStyle();
    ofFill();
-   ofSetColor(20, 20, 20, 153);
+   ofSetColor(kBackgroundColor);
    ofRect(0, 0, w, h, 0);
 
    const ofRectangle content = GetContentRect();
@@ -1236,6 +1447,7 @@ void TouchInterfacePanel::DrawModule()
    DrawTitle();
    DrawControlVisualization();
 
+   DrawButton(GetZoomButtonRect(), "zoom", GetCanvasModule() != nullptr);
    DrawButton(GetExitButtonRect(), "exit", true);
 
    DrawRoutingButtons(true);
@@ -1263,6 +1475,8 @@ void TouchInterfacePanel::DrawModule()
       ofSetColor(255, 255, 255);
       DrawTextToFit(ofToString(mPage + 1) + "/" + ofToString(numPages), w / 2, content.getMaxY() - 2, 80, 18);
    }
+
+   DrawTooltip();
 
    ofPopStyle();
 }

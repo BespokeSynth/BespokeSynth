@@ -490,7 +490,7 @@ void TitleBar::DrawModule()
    if (!hideElements)
    {
       float usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
-      ofSetColor(255, 255, 255);;
+      ofSetColor(255, 255, 255);
       DrawTextRightJustify("fps:" + ofToString(ofGetFrameRate(), 0), mPlayPauseButton->GetRect(true).x - 3, 17);
       if (usage > 1)
          ofSetColor(255, 150, 150);

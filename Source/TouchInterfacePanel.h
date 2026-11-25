@@ -60,6 +60,8 @@ public:
 
    bool ShowForModule(IDrawableModule* module); //returns false if the module doesn't have any controls to show
    void Hide();
+   bool IsZoomed() const { return mIsZoomed; } //temporarily zoomed in on the module, to interact with it directly
+   bool TestClick(float x, float y, bool right, bool testOnly = false) override;
    void DrawModuleHighlight() const; //draws on the canvas, rather than in the panel
 
    //ITouchListener
@@ -95,6 +97,7 @@ private:
       IUIControl* mControl{ nullptr }; //null if this touch isn't in use
       int mOrder{ 0 }; //higher for more recent touches
       bool mIsDragging{ false };
+      bool mIsTooltip{ false }; //pressing on the control's name, rather than adjusting it
       bool mIsModulatorTap{ false }; //might turn out to be a tap on a modulated control, if it doesn't move before it's released
       ofRectangle mDragTrack;
       ofVec2f mDragStart;
@@ -134,15 +137,23 @@ private:
    ofRectangle GetContentRect() const; //the area of the screen that isn't cut off by notches, rounded corners, etc
    ofRectangle GetControlsRect() const; //what's left of the content area below the header, and between the routing buttons
    ofRectangle GetExitButtonRect() const;
+   ofRectangle GetZoomButtonRect() const;
+   IDrawableModule* GetCanvasModule() const; //the module to look at on the canvas, null if there isn't one
+   ofRectangle GetCanvasModuleRect(IDrawableModule* module) const; //including its title bar
+   bool ZoomToModule();
+   void DrawZoomFrame();
+   void EndZoom();
    ofRectangle GetPageButtonRect(int direction) const;
    ofRectangle GetSlotRect(int slot) const; //where the control at this index on the current page goes
    ofRectangle GetTrackRect(int slot) const;
+   ofRectangle GetLabelRect(int slot) const;
    ofRectangle GetSquareRect(int slot) const; //for buttons and checkboxes
    float GetTitleBarHeight() const;
    void DrawButton(ofRectangle rect, std::string label, bool enabled) const;
    void DrawTitle();
    void DrawControl(IUIControl* control, int slot) const;
    void DrawControlVisualization();
+   void DrawTooltip() const;
 
    ofVec2f ScreenToLocal(float screenX, float screenY) const;
    void Press(int touchId, float x, float y);
@@ -174,6 +185,8 @@ private:
    //fixed size, since it's accessed while drawing
    std::array<Touch, kMaxTouches> mTouches;
    int mTouchCounter{ 0 };
+   bool mIsZoomed{ false };
+   ofVec2f mZoomScreenSize; //the screen size that we zoomed to fit
    AbletonMoveLCD mVisualizationLCD; //control visualizers draw to this
    IUIControl* mLastTappedControl{ nullptr };
    double mLastTapTime{ -9999 };
