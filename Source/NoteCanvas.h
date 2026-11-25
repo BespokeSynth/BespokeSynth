@@ -153,6 +153,7 @@ private:
    ClickButton* mQuantizeButton{ nullptr };
    ClickButton* mSaveMidiButton{ nullptr };
    ClickButton* mLoadMidiButton{ nullptr };
+   ClickButton* mClearButton{ nullptr };
    TextEntry* mLoadMidiTrackEntry{ nullptr };
    int mLoadMidiTrack{ 1 };
    ClickButton* mClipButton{ nullptr };

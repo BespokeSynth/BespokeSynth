@@ -47,6 +47,7 @@ void SampleCanvas::CreateUIControls()
 
    mNumMeasuresSlider = new IntSlider(this, "measures", 5, 5, 100, 15, &mNumMeasures, 1, 16);
    mIntervalSelector = new DropdownList(this, "interval", 110, 5, (int*)(&mInterval));
+   mClearButton = new ClickButton(this, "clear", 160, 5);
 
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
@@ -222,6 +223,7 @@ void SampleCanvas::DrawModule()
 
    mNumMeasuresSlider->Draw();
    mIntervalSelector->Draw();
+   mClearButton->Draw();
 
    mCanvas->Draw();
    mCanvasTimeline->Draw();
@@ -276,6 +278,12 @@ void SampleCanvas::DropdownUpdated(DropdownList* list, int oldVal, double time)
    {
       UpdateNumColumns();
    }
+}
+
+void SampleCanvas::ButtonClicked(ClickButton* button, double time)
+{
+   if (button == mClearButton)
+      mCanvas->Clear();
 }
 
 void SampleCanvas::LoadLayout(const ofxJSONElement& moduleInfo)
