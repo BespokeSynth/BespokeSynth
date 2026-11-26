@@ -33,6 +33,17 @@
 #include "MathUtils.h"
 #include "UIControlMacros.h"
 
+namespace
+{
+   const float kEditorWidth = 215;
+   const float kEditorRowHeight = 18;
+   const float kEditorColumn1 = 45;
+   const float kEditorColumn2 = 147;
+   const float kDragThreshold = 5;
+   const int kMinControlSize = 5;
+   const int kMaxControlSize = 2000;
+}
+
 ControlInterface::ControlInterface()
 : IDrawableModule(130, 20)
 {
@@ -51,10 +62,355 @@ void ControlInterface::CreateUIControls()
 
    mAddControlCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mAddControlCable);
+
+   mAutoPositionCheckbox = CreateEditorControl(new Checkbox(this, "auto-position", 5, 0, &mAutoPosition));
+   mEditNameEntry = CreateEditorControl(new TextEntry(this, "edit name", kEditorColumn1, 0, 18, &mEditName));
+   mEditMinEntry = CreateEditorControl(new TextEntry(this, "edit min", kEditorColumn1, 0, 7, &mEditMin, -FLT_MAX, FLT_MAX));
+   mEditMaxEntry = CreateEditorControl(new TextEntry(this, "edit max", kEditorColumn2, 0, 7, &mEditMax, -FLT_MAX, FLT_MAX));
+   mEditWidthEntry = CreateEditorControl(new TextEntry(this, "edit width", kEditorColumn1, 0, 7, &mEditWidth, kMinControlSize, kMaxControlSize));
+   mEditHeightEntry = CreateEditorControl(new TextEntry(this, "edit height", kEditorColumn2, 0, 7, &mEditHeight, kMinControlSize, kMaxControlSize));
+   mMoveUpButton = CreateEditorControl(new ClickButton(this, "move up", kEditorColumn1, 0));
+   mMoveDownButton = CreateEditorControl(new ClickButton(this, "move down", kEditorColumn1 + 55, 0));
+}
+
+template <class T>
+T* ControlInterface::CreateEditorControl(T* control)
+{
+   //take this out of the module's list of controls, so that it doesn't get treated as a part of the interface (control surfaces, snapshots, randomization, patching, name lookups...)
+   RemoveUIControl(control, false);
+   control->SetCableTargetable(false);
+   control->SetShouldSaveState(false);
+   control->SetIsRandomizable(false);
+   control->SetShowing(false);
+   mEditorControls.push_back(control);
+   return control;
 }
 
 ControlInterface::~ControlInterface()
 {
+   for (auto* control : mEditorControls)
+      control->Delete();
+}
+
+void ControlInterface::Poll()
+{
+   IDrawableModule::Poll();
+
+   for (auto* control : mControls)
+   {
+      if (control->mUIControl != nullptr)
+         control->mUIControl->SetNoHover(mEditMode); //so that clicks go to the module rather than directly to the control
+   }
+
+   if (mAutoPosition)
+      AutoPositionControls();
+
+   for (auto* control : mEditorControls)
+      control->Poll();
+
+   UpdateEditorFields();
+}
+
+void ControlInterface::SetEditMode(bool editMode)
+{
+   mEditMode = editMode;
+   mDragControl = nullptr;
+   SetSelectedControl(nullptr);
+
+   for (auto* control : mControls)
+   {
+      if (control->mUIControl != nullptr)
+      {
+         control->mUIControl->SetNoHover(mEditMode);
+         if (mEditMode && gHoveredUIControl == control->mUIControl)
+            gHoveredUIControl = nullptr;
+      }
+   }
+}
+
+void ControlInterface::SetSelectedControl(ControlElement* control)
+{
+   if (control != mSelectedControl)
+   {
+      //don't let an in-progress text edit get applied to a different control
+      for (auto* editorControl : mEditorControls)
+      {
+         TextEntry* entry = dynamic_cast<TextEntry*>(editorControl);
+         if (entry != nullptr && IKeyboardFocusListener::GetActiveKeyboardFocus() == entry)
+            IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
+      }
+   }
+
+   mSelectedControl = control;
+   UpdateEditorFields();
+}
+
+void ControlInterface::OnControlRemoved(ControlElement* control)
+{
+   if (mSelectedControl == control)
+      SetSelectedControl(nullptr);
+   if (mDragControl == control)
+      mDragControl = nullptr;
+   if (mCurrentEditControl == control)
+      mCurrentEditControl = nullptr;
+}
+
+void ControlInterface::MoveSelectedControl(int direction)
+{
+   auto iter = std::find(mControls.begin(), mControls.end(), mSelectedControl);
+   if (iter == mControls.end())
+      return;
+   if (direction < 0 && iter == mControls.begin())
+      return;
+   if (direction > 0 && std::next(iter) == mControls.end())
+      return;
+
+   auto other = direction < 0 ? std::prev(iter) : std::next(iter);
+   SwapPatchCableSources((*iter)->mTargetCable, (*other)->mTargetCable); //cables are saved by index, and get recreated in the order of our controls when loading
+   std::iter_swap(iter, other);
+}
+
+void ControlInterface::AutoPositionControls()
+{
+   float y = 3;
+   for (auto* control : mControls)
+   {
+      if (control->mUIControl != nullptr)
+      {
+         control->SetPosition(5, y);
+         y += control->mUIControl->GetRect(K(local)).height + 3;
+      }
+   }
+}
+
+void ControlInterface::UpdateEditorFields()
+{
+   if (mSelectedControl == nullptr || mSelectedControl->mUIControl == nullptr)
+      return;
+
+   mEditName = mSelectedControl->mUIControl->GetDisplayName();
+   if (mSelectedControl->mFloatSlider != nullptr)
+   {
+      mEditMin = mSelectedControl->mFloatSlider->GetMin();
+      mEditMax = mSelectedControl->mFloatSlider->GetMax();
+   }
+   if (mSelectedControl->mIntSlider != nullptr)
+   {
+      mEditMin = mSelectedControl->mIntSlider->GetMin();
+      mEditMax = mSelectedControl->mIntSlider->GetMax();
+   }
+   ofRectangle rect = mSelectedControl->mUIControl->GetRect(K(local));
+   mEditWidth = (int)rect.width;
+   mEditHeight = (int)rect.height;
+}
+
+void ControlInterface::TextEntryComplete(TextEntry* entry)
+{
+   if (mSelectedControl == nullptr || mSelectedControl->mUIControl == nullptr)
+      return;
+
+   mSelectedControl->UpdateInfoFromControl(); //pick up any changes that were made directly to the control
+
+   if (entry == mEditNameEntry)
+      mSelectedControl->mInfo["display_name"] = mEditName;
+
+   if ((entry == mEditMinEntry || entry == mEditMaxEntry) && mSelectedControl->IsSlider())
+   {
+      bool isInt = mSelectedControl->mIntSlider != nullptr;
+      bool isValid = isInt ? ((int)mEditMin < (int)mEditMax) : (mEditMin < mEditMax);
+      if (isValid)
+      {
+         const char* field = (entry == mEditMinEntry) ? "min" : "max";
+         float value = (entry == mEditMinEntry) ? mEditMin : mEditMax;
+         if (isInt)
+            mSelectedControl->mInfo[field] = (int)value;
+         else
+            mSelectedControl->mInfo[field] = value;
+      }
+   }
+
+   //only store a size if it was changed, so that controls that size themselves automatically continue to do so
+   ofRectangle rect = mSelectedControl->mUIControl->GetRect(K(local));
+   if (entry == mEditWidthEntry && mEditWidth != (int)rect.width)
+      mSelectedControl->mInfo["width"] = mEditWidth;
+   if (entry == mEditHeightEntry && mEditHeight != (int)rect.height)
+      mSelectedControl->mInfo["height"] = mEditHeight;
+
+   mSelectedControl->ApplyInfoToControl();
+   UpdateEditorFields();
+}
+
+void ControlInterface::GetPush2OverrideControls(std::vector<IUIControl*>& controls) const
+{
+   for (auto* control : mControls)
+   {
+      if (control->mUIControl != nullptr && control->mUIControl->IsShowing())
+         controls.push_back(control->mUIControl);
+   }
+}
+
+ControlInterface::ControlElement* ControlInterface::GetControlAt(float x, float y) const
+{
+   for (auto iter = mControls.rbegin(); iter != mControls.rend(); ++iter) //backwards, to prefer what was drawn on top
+   {
+      if ((*iter)->mUIControl != nullptr && (*iter)->mUIControl->GetRect(K(local)).contains(x, y))
+         return *iter;
+   }
+   return nullptr;
+}
+
+void ControlInterface::OnClicked(float x, float y, bool right)
+{
+   if (mEditMode && !Minimized() && y >= 0)
+   {
+      for (auto* control : mEditorControls)
+      {
+         if (control->TestClick(x, y, right))
+            return;
+      }
+
+      if (y < mEditorY)
+      {
+         if (right)
+            return;
+
+         mDragControl = GetControlAt(x, y);
+         mHasDragged = false;
+         if (mDragControl != nullptr)
+         {
+            mDragStartMousePos.set(x, y);
+            mDragStartControlPos = mDragControl->mUIControl->GetPosition(K(local));
+         }
+         else
+         {
+            SetSelectedControl(nullptr);
+         }
+         return;
+      }
+   }
+
+   IDrawableModule::OnClicked(x, y, right);
+}
+
+bool ControlInterface::MouseMoved(float x, float y)
+{
+   IDrawableModule::MouseMoved(x, y);
+
+   if (Minimized() || !mEditMode)
+      return false;
+
+   if (mDragControl != nullptr)
+   {
+      ofVec2f delta = ofVec2f(x, y) - mDragStartMousePos;
+      if (delta.lengthSquared() > kDragThreshold * kDragThreshold)
+         mHasDragged = true;
+      if (mHasDragged && !mAutoPosition)
+         mDragControl->SetPosition(MAX(0.0f, mDragStartControlPos.x + delta.x), MAX(0.0f, mDragStartControlPos.y + delta.y));
+   }
+   else
+   {
+      for (auto* control : mEditorControls)
+         control->NotifyMouseMoved(x, y);
+   }
+
+   return false;
+}
+
+void ControlInterface::MouseReleased()
+{
+   IDrawableModule::MouseReleased();
+
+   for (auto* control : mEditorControls)
+      control->MouseReleased();
+
+   if (mDragControl != nullptr)
+   {
+      if (!mHasDragged) //it was a tap
+         SetSelectedControl(mDragControl);
+      mDragControl = nullptr;
+   }
+}
+
+void ControlInterface::DrawEditor()
+{
+   bool hasSelection = mEditMode && mSelectedControl != nullptr && mSelectedControl->mUIControl != nullptr;
+   bool hasSlider = hasSelection && mSelectedControl->IsSlider();
+
+   mAutoPositionCheckbox->SetShowing(mEditMode);
+   mEditNameEntry->SetShowing(hasSelection);
+   mEditMinEntry->SetShowing(hasSlider);
+   mEditMaxEntry->SetShowing(hasSlider);
+   mEditWidthEntry->SetShowing(hasSelection);
+   mEditHeightEntry->SetShowing(hasSelection);
+   mMoveUpButton->SetShowing(hasSelection);
+   mMoveDownButton->SetShowing(hasSelection);
+
+   //only link entries that are visible, for tabbing between them
+   mEditNameEntry->SetNextTextEntry(hasSlider ? mEditMinEntry : mEditWidthEntry);
+   mEditMinEntry->SetNextTextEntry(mEditMaxEntry);
+   mEditMaxEntry->SetNextTextEntry(hasSlider ? mEditWidthEntry : nullptr);
+   mEditWidthEntry->SetNextTextEntry(mEditHeightEntry);
+
+   if (!mEditMode)
+      return;
+
+   ofPushStyle();
+   ofNoFill();
+   for (auto* control : mControls)
+   {
+      if (control->mUIControl != nullptr)
+      {
+         bool highlighted = control == mSelectedControl || control == mDragControl;
+         ofSetColor(255, 255, 0, highlighted ? 255 : 80);
+         ofSetLineWidth(highlighted ? 1.5f : .5f);
+         ofRect(control->mUIControl->GetRect(K(local)));
+      }
+   }
+
+   mEditorY = mHeight;
+   ofSetColor(255, 255, 255, gModuleDrawAlpha * .3f);
+   ofSetLineWidth(.5f);
+   mWidth = MAX(mWidth, kEditorWidth);
+   ofLine(3, mEditorY, mWidth - 3, mEditorY);
+
+   float y = mEditorY + 3;
+   ofSetColor(255, 255, 255, gModuleDrawAlpha);
+   mAutoPositionCheckbox->SetPosition(5, y);
+   y += kEditorRowHeight;
+
+   if (hasSelection)
+   {
+      DrawTextRightJustify("name", kEditorColumn1 - 3, y + 12);
+      mEditNameEntry->SetPosition(kEditorColumn1, y);
+      y += kEditorRowHeight;
+
+      if (hasSlider)
+      {
+         DrawTextRightJustify("min", kEditorColumn1 - 3, y + 12);
+         mEditMinEntry->SetPosition(kEditorColumn1, y);
+         DrawTextRightJustify("max", kEditorColumn2 - 3, y + 12);
+         mEditMaxEntry->SetPosition(kEditorColumn2, y);
+         y += kEditorRowHeight;
+      }
+
+      DrawTextRightJustify("width", kEditorColumn1 - 3, y + 12);
+      mEditWidthEntry->SetPosition(kEditorColumn1, y);
+      DrawTextRightJustify("height", kEditorColumn2 - 3, y + 12);
+      mEditHeightEntry->SetPosition(kEditorColumn2, y);
+      y += kEditorRowHeight;
+
+      int index = (int)std::distance(mControls.begin(), std::find(mControls.begin(), mControls.end(), mSelectedControl));
+      DrawTextRightJustify(ofToString(index + 1) + "/" + ofToString((int)mControls.size()), kEditorColumn1 - 3, y + 12);
+      mMoveUpButton->SetPosition(kEditorColumn1, y);
+      mMoveDownButton->PositionTo(mMoveUpButton, kAnchor_Right_Padded);
+      y += kEditorRowHeight;
+   }
+
+   mHeight = y + 2;
+   ofPopStyle();
+
+   for (auto* control : mEditorControls)
+      control->Draw();
 }
 
 void ControlInterface::DrawModule()
@@ -84,6 +440,8 @@ void ControlInterface::DrawModule()
          control->mTargetCable->SetManualPosition(rect.getMaxX() + 5, rect.getCenter().y);
       }
    }
+
+   DrawEditor();
 
    mControlEditorBox->SetShowing(mCurrentEditControl != nullptr);
    if (mCurrentEditControl != nullptr)
@@ -159,19 +517,26 @@ void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserC
    if (fromUserClick)
    {
       bool repatched = false;
+      auto insertPos = mControls.end();
+      ofVec2f controlPos = FindNewUIControlPos();
       IUIControl* targetUIControl = dynamic_cast<IUIControl*>(cableSource->GetTarget());
 
-      for (auto* control : mControls)
+      for (auto iter = mControls.begin(); iter != mControls.end(); ++iter)
       {
+         ControlElement* control = *iter;
          if (control->GetCableSource() == cableSource)
          {
             if (targetUIControl != nullptr)
                repatched = true;
 
+            //if we're repatching, the new control takes the old one's position and place in the order
+            if (control->mUIControl != nullptr)
+               controlPos = control->mUIControl->GetPosition(K(local));
+            OnControlRemoved(control);
             RemovePatchCableSource(cableSource);
             if (control->mUIControl != nullptr)
                RemoveUIControl(control->mUIControl);
-            mControls.remove(control);
+            insertPos = mControls.erase(iter);
             break;
          }
       }
@@ -182,11 +547,7 @@ void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserC
          {
             mAddControlCable->Clear();
 
-            ofVec2f controlPos = FindNewUIControlPos();
-
-            ControlElement* control = new ControlElement();
-            mControls.push_back(control);
-            control->Init(this);
+            ControlElement* control = CreateControl(insertPos);
 
             control->mInfo["path"] = targetUIControl->Path(false, false, GetParent());
             control->mInfo["display_name"] = targetUIControl->GetDisplayName();
@@ -264,11 +625,26 @@ void ControlInterface::PostRepatch(PatchCableSource* cableSource, bool fromUserC
    }
 }
 
+ControlInterface::ControlElement* ControlInterface::CreateControl(std::list<ControlElement*>::iterator insertPos)
+{
+   ControlElement* control = new ControlElement();
+   auto newIter = mControls.insert(insertPos, control);
+   control->Init(this);
+   //the new cable source was added at the end, move it back so that cable order matches control order
+   for (auto iter = std::prev(mControls.end()); iter != newIter; --iter)
+      SwapPatchCableSources(control->mTargetCable, (*iter)->mTargetCable);
+   return control;
+}
+
 ControlInterface::ControlElement* ControlInterface::FindOrCreateNewControl(std::string identifier, std::string type, bool& isNewControl)
 {
    ControlElement* control = nullptr;
-   for (auto* existingControl : mControls)
+   auto insertPos = mControls.end();
+   bool isReplacement = false;
+   ofVec2f replacedPos;
+   for (auto iter = mControls.begin(); iter != mControls.end(); ++iter)
    {
+      ControlElement* existingControl = *iter;
       if (existingControl->mInfo["identifier"] == identifier)
       {
          if (existingControl->mInfo["type"] == type)
@@ -279,11 +655,17 @@ ControlInterface::ControlElement* ControlInterface::FindOrCreateNewControl(std::
          }
          else
          {
-            //we already have a control with this name but it's a different type, delete it and make a new one
-            RemovePatchCableSource(control->mTargetCable);
-            if (control->mUIControl != nullptr)
-               RemoveUIControl(control->mUIControl);
-            mControls.remove(control);
+            //we already have a control with this name but it's a different type, delete it and make a new one in its place
+            isReplacement = true;
+            if (existingControl->mUIControl != nullptr)
+               replacedPos = existingControl->mUIControl->GetPosition(K(local));
+            else
+               replacedPos.set(existingControl->GetInfo("x", 0), existingControl->GetInfo("y", 0));
+            OnControlRemoved(existingControl);
+            RemovePatchCableSource(existingControl->mTargetCable);
+            if (existingControl->mUIControl != nullptr)
+               RemoveUIControl(existingControl->mUIControl);
+            insertPos = mControls.erase(iter);
          }
          break;
       }
@@ -291,10 +673,13 @@ ControlInterface::ControlElement* ControlInterface::FindOrCreateNewControl(std::
 
    if (control == nullptr)
    {
-      control = new ControlElement();
-      mControls.push_back(control);
-      control->Init(this);
+      control = CreateControl(insertPos);
       control->mInfo["type"] = type;
+      if (isReplacement)
+      {
+         control->mInfo["x"] = replacedPos.x;
+         control->mInfo["y"] = replacedPos.y;
+      }
       isNewControl = true;
    }
 
@@ -310,6 +695,8 @@ FloatSlider* ControlInterface::AddFloatSlider(std::string name, float defaultVal
       control->mDummyFloat = defaultVal;
    else
       controlPos = control->mUIControl->GetPosition(K(local));
+   if (isNewControl && control->HasInfo("x")) //we replaced an existing control, take its position
+      controlPos.set(control->GetInfo("x", 0), control->GetInfo("y", 0));
 
    control->mInfo["path"] = "";
    control->mInfo["display_name"] = name;
@@ -318,7 +705,8 @@ FloatSlider* ControlInterface::AddFloatSlider(std::string name, float defaultVal
    control->mInfo["y"] = controlPos.y;
    control->mInfo["min"] = min;
    control->mInfo["max"] = max;
-   control->mInfo["width"] = kDefaultSliderWidth;
+   if (!control->HasInfo("width")) //don't stomp a width that was set in edit mode
+      control->mInfo["width"] = kDefaultSliderWidth;
    control->mInfo["default_value"] = defaultVal;
 
    control->SetUpControl();
@@ -335,6 +723,8 @@ IntSlider* ControlInterface::AddIntSlider(std::string name, int defaultVal, int 
       control->mDummyInt = defaultVal;
    else
       controlPos = control->mUIControl->GetPosition(K(local));
+   if (isNewControl && control->HasInfo("x")) //we replaced an existing control, take its position
+      controlPos.set(control->GetInfo("x", 0), control->GetInfo("y", 0));
 
    control->mInfo["path"] = "";
    control->mInfo["display_name"] = name;
@@ -343,7 +733,8 @@ IntSlider* ControlInterface::AddIntSlider(std::string name, int defaultVal, int 
    control->mInfo["y"] = controlPos.y;
    control->mInfo["min"] = min;
    control->mInfo["max"] = max;
-   control->mInfo["width"] = kDefaultSliderWidth;
+   if (!control->HasInfo("width")) //don't stomp a width that was set in edit mode
+      control->mInfo["width"] = kDefaultSliderWidth;
    control->mInfo["default_value"] = defaultVal;
 
    control->SetUpControl();
@@ -355,6 +746,7 @@ void ControlInterface::ClearAllControls()
 {
    for (auto* control : mControls)
    {
+      OnControlRemoved(control);
       RemovePatchCableSource(control->mTargetCable);
       if (control->mUIControl != nullptr)
          RemoveUIControl(control->mUIControl);
@@ -403,6 +795,11 @@ void ControlInterface::CheckboxUpdated(Checkbox* checkbox, double time)
 
 void ControlInterface::ButtonClicked(ClickButton* button, double time)
 {
+   if (button == mMoveUpButton)
+      MoveSelectedControl(-1);
+   if (button == mMoveDownButton)
+      MoveSelectedControl(1);
+
    for (auto* control : mControls)
    {
       if (button == control->mButton)
@@ -442,6 +839,8 @@ void ControlInterface::RadioButtonUpdated(RadioButton* radio, int oldVal, double
 
 void ControlInterface::SaveLayout(ofxJSONElement& moduleInfo)
 {
+   moduleInfo["auto_position"] = mAutoPosition;
+
    for (auto* control : mControls)
    {
       ofxJSONElement controlInfo;
@@ -468,6 +867,11 @@ void ControlInterface::SaveLayout(ofxJSONElement& moduleInfo)
 void ControlInterface::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadBool("show_cables", moduleInfo, true);
+   mModuleSaveData.SetBool("edit_mode", false); //always start out of edit mode
+   if (!moduleInfo["auto_position"].isNull())
+      mAutoPosition = moduleInfo["auto_position"].asBool();
+   else
+      mAutoPosition = moduleInfo["controls"].size() == 0; //on by default, but don't rearrange layouts that were saved before this option existed
 
    int numControls = moduleInfo["controls"].size();
    for (int i = 0; i < numControls; ++i)
@@ -498,6 +902,8 @@ void ControlInterface::LoadLayout(const ofxJSONElement& moduleInfo)
 void ControlInterface::SetUpFromSaveData()
 {
    mShowCables = mModuleSaveData.GetBool("show_cables");
+   if (mModuleSaveData.GetBool("edit_mode") != mEditMode)
+      SetEditMode(!mEditMode);
 }
 
 void ControlInterface::SaveState(FileStreamOut& out)
@@ -667,6 +1073,22 @@ float ControlInterface::ControlElement::GetInfo(std::string name, float defaultV
    return defaultVal;
 }
 
+bool ControlInterface::ControlElement::HasInfo(std::string name) const
+{
+   return !mInfo[name].isNull();
+}
+
+void ControlInterface::ControlElement::SetPosition(float x, float y)
+{
+   ofVec2f current = mUIControl->GetPosition(K(local));
+   if (x != current.x || y != current.y || GetInfo("x", -1) != x || GetInfo("y", -1) != y)
+   {
+      mUIControl->SetPosition(x, y);
+      mInfo["x"] = x;
+      mInfo["y"] = y;
+   }
+}
+
 void ControlInterface::ControlElement::ApplyInfoToControl()
 {
    if (mUIControl)
@@ -678,14 +1100,14 @@ void ControlInterface::ControlElement::ApplyInfoToControl()
    if (mFloatSlider)
    {
       mFloatSlider->SetExtents(GetInfo("min", 0), GetInfo("max", 1));
-      mFloatSlider->SetDimensions(GetInfo("width", 80), 15);
+      mFloatSlider->SetDimensions(GetInfo("width", 80), GetInfo("height", 15));
       mFloatSlider->SetDefaultValue(GetInfo("default_value", mFloatSlider->GetDefaultValue()));
    }
 
    if (mIntSlider)
    {
       mIntSlider->SetExtents((int)GetInfo("min", 0), (int)GetInfo("max", 1));
-      mIntSlider->SetDimensions(GetInfo("width", 80), 15);
+      mIntSlider->SetDimensions(GetInfo("width", 80), GetInfo("height", 15));
       mIntSlider->SetDefaultValue(GetInfo("default_value", mIntSlider->GetDefaultValue()));
    }
 
@@ -703,6 +1125,25 @@ void ControlInterface::ControlElement::ApplyInfoToControl()
       int numElements = mInfo["values"].size();
       for (int i = 0; i < numElements; ++i)
          mRadioButton->AddLabel(mInfo["values"][i]["label"].asCString(), mInfo["values"][i]["value"].asInt());
+   }
+
+   if (mUIControl != nullptr && !IsSlider() && (HasInfo("width") || HasInfo("height")))
+   {
+      ofRectangle rect = mUIControl->GetRect(K(local));
+      float width = GetInfo("width", rect.width);
+      float height = GetInfo("height", rect.height);
+      if (mCheckbox)
+      {
+         mCheckbox->SetDimensions(width, height);
+         if (!HasInfo("width"))
+            mCheckbox->SetOverrideDisplayName(mInfo["display_name"].asString()); //recalculate width to fit the new box size
+      }
+      if (mButton)
+         mButton->SetDimensions(width, height);
+      if (mDropdown)
+         mDropdown->SetDimensions(width, height);
+      if (mRadioButton)
+         mRadioButton->SetDimensions(width, height);
    }
 }
 

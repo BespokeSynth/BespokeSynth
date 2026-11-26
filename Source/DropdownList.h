@@ -129,6 +129,7 @@ public:
    }
    void DrawLabel(bool draw) { mDrawLabel = draw; }
    void SetWidth(int width);
+   void SetDimensions(int width, int height); //overrides the automatically calculated width
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
    void GetPopupDimensions(float& width, float& height) { mModalList.GetDimensions(width, height); }
    void SetMaxPerColumn(int max)

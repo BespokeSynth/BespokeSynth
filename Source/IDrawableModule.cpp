@@ -675,6 +675,14 @@ void IDrawableModule::RemovePatchCableSource(PatchCableSource* source)
    delete source;
 }
 
+void IDrawableModule::SwapPatchCableSources(PatchCableSource* a, PatchCableSource* b)
+{
+   auto iterA = std::find(mPatchCableSources.begin(), mPatchCableSources.end(), a);
+   auto iterB = std::find(mPatchCableSources.begin(), mPatchCableSources.end(), b);
+   if (iterA != mPatchCableSources.end() && iterB != mPatchCableSources.end())
+      std::iter_swap(iterA, iterB);
+}
+
 void IDrawableModule::Exit()
 {
    for (auto source : mPatchCableSources)

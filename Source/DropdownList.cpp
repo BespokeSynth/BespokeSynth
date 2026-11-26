@@ -135,6 +135,14 @@ void DropdownList::SetWidth(int width)
    }
 }
 
+void DropdownList::SetDimensions(int width, int height)
+{
+   mAutoCalculateWidth = false;
+   mWidth = width;
+   CalculateWidth();
+   mHeight = height;
+}
+
 std::string DropdownList::GetLabel(int val) const
 {
    for (int i = 0; i < mElements.size(); ++i)
@@ -182,6 +190,8 @@ void DropdownList::Render()
          xOffset = mLabelSize;
       }
 
+      float centeringOffset = (mHeight - kItemSpacing) / 2.0f;
+
       DrawBeacon(mX + mWidth / 2 + xOffset, mY + mHeight / 2);
 
       ofFill();
@@ -195,12 +205,12 @@ void DropdownList::Render()
 
       ofPushMatrix();
       ofClipWindow(mX, mY, w - (mDrawTriangle ? 12 : 0), h, true);
-      DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12);
+      DrawTextNormal(GetDisplayValue(*mVar), mX + 2 + xOffset, mY + 12 + centeringOffset);
       ofPopMatrix();
       if (mDrawTriangle)
       {
          ofSetLineWidth(.5f);
-         ofTriangle(mX + w - 11, mY + 4, mX + w - 3, mY + 4, mX + w - 7, mY + 11);
+         ofTriangle(mX + w - 11, mY + 4 + centeringOffset, mX + w - 3, mY + 4 + centeringOffset, mX + w - 7, mY + 11 + centeringOffset);
       }
    }
    else if (mDisplayStyle == DropdownDisplayStyle::kHamburger)
@@ -235,7 +245,7 @@ void DropdownList::Render()
       ofColor categoryColor = IDrawableModule::GetColor(GetModuleParent()->GetModuleCategory());
       categoryColor.a = 80;
       ofSetColor(categoryColor);
-      ofRect(mX, mY, pw, mHeight);
+      ofRect(mX, mY, pw, kItemSpacing);
       ofPopStyle();
    }
 }
@@ -455,7 +465,7 @@ ofVec2f DropdownList::GetModalListPosition() const
    GetPosition(thisx, thisy);
    if (mDrawLabel)
       thisx += mLabelSize;
-   return ofVec2f(thisx, thisy + kItemSpacing);
+   return ofVec2f(thisx, thisy + mHeight);
 }
 
 bool DropdownList::MouseMoved(float x, float y)
