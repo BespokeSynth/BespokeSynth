@@ -546,8 +546,17 @@ void SampleCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    ofTranslate(rect.x, rect.y);
    if (mSample)
    {
-      float width = rect.width;
-      DrawAudioBuffer(width, rect.height, mSample->Data(), 0, mSample->LengthInSamples(), -1);
+      //only draw the part of the waveform that's actually visible on the canvas
+      float visibleStartX = std::max(0.0f, rect.x);
+      float visibleEndX = std::min(mCanvas->GetWidth(), rect.x + rect.width);
+      if (rect.width > 0 && visibleEndX > visibleStartX)
+      {
+         float lengthInSamples = mSample->LengthInSamples();
+         float startSample = (visibleStartX - rect.x) / rect.width * lengthInSamples;
+         float endSample = (visibleEndX - rect.x) / rect.width * lengthInSamples;
+         ofTranslate(visibleStartX - rect.x, 0);
+         DrawAudioBuffer(visibleEndX - visibleStartX, rect.height, mSample->Data(), startSample, endSample, -1);
+      }
    }
    else
    {
