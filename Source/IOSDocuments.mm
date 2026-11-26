@@ -25,6 +25,13 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
+namespace juce
+{
+   //defined in juce_URL.cpp, and not declared in any header. the URL takes ownership of the bookmark (an NSData*)
+   void setURLBookmark(URL& url, void* bookmark);
+   void* getURLBookmark(URL& url);
+}
+
 namespace
 {
    std::function<void(const juce::File&)> sOpenFileHandler;
@@ -74,6 +81,21 @@ namespace
       return YES;
    }
 
+   NSURL* ResolveBookmarkData(NSData* data, BOOL* isStale)
+   {
+      return [NSURL URLByResolvingBookmarkData:data
+                                       options:NSURLBookmarkResolutionWithoutUI
+                                 relativeToURL:nil
+                           bookmarkDataIsStale:isStale
+                                         error:nil];
+   }
+
+   NSData* GetBookmarkData(const juce::URL& url)
+   {
+      juce::URL copy(url);
+      return (__bridge NSData*)juce::getURLBookmark(copy);
+   }
+
    //UIKit checks which methods the app delegate implements when UIApplicationMain installs it, so the method has to be
    //added before then, rather than when the app initialises. JUCE's delegate doesn't implement it, so add it at load time
    __attribute__((constructor)) void AddOpenURLToAppDelegate()
@@ -95,4 +117,88 @@ void IOSDocuments::SetOpenFileHandler(std::function<void(const juce::File& file)
 #endif
       sPendingURL = nil;
    }
+}
+
+std::string IOSDocuments::GetBookmark(const juce::URL& url)
+{
+   NSData* data = GetBookmarkData(url);
+   if (data == nil)
+      return "";
+   return [data base64EncodedStringWithOptions:0].UTF8String;
+}
+
+IOSDocuments::ResolvedBookmark IOSDocuments::ResolveBookmark(const std::string& bookmark)
+{
+   ResolvedBookmark ret;
+
+   @autoreleasepool
+   {
+      NSData* data = [[NSData alloc] initWithBase64EncodedString:@(bookmark.c_str()) options:0];
+#if !__has_feature(objc_arc)
+      [data autorelease];
+#endif
+      if (data == nil)
+         return ret;
+
+      BOOL isStale = NO;
+      NSURL* url = ResolveBookmarkData(data, &isStale);
+      if (url == nil)
+         return ret;
+
+      bool accessing = [url startAccessingSecurityScopedResource];
+
+      //deleted files can still resolve, to their place in the trash
+      bool isReachable = [url checkResourceIsReachableAndReturnError:nil] && ![url.pathComponents containsObject:@".Trash"];
+      if (isReachable)
+      {
+         if (isStale)
+         {
+            NSData* refreshed = [url bookmarkDataWithOptions:0 includingResourceValuesForKeys:nil relativeToURL:nil error:nil];
+            if (refreshed != nil)
+               data = refreshed;
+         }
+
+         NSString* status = nil;
+         [url getResourceValue:&status forKey:NSURLUbiquitousItemDownloadingStatusKey error:nil]; //nil if it isn't a cloud file
+         ret.mIsDownloaded = (status == nil || ![status isEqualToString:NSURLUbiquitousItemDownloadingStatusNotDownloaded]);
+
+         ret.mURL = juce::URL(juce::String::fromUTF8(url.absoluteString.UTF8String));
+         juce::setURLBookmark(ret.mURL, (void*)CFBridgingRetain(data));
+      }
+
+      if (accessing)
+         [url stopAccessingSecurityScopedResource];
+   }
+
+   return ret;
+}
+
+void IOSDocuments::CoordinateRead(const juce::URL& url, std::function<void(const juce::String& error)> onDone)
+{
+   NSURL* nsURL = nil;
+   if (NSData* data = GetBookmarkData(url))
+   {
+      BOOL isStale = NO;
+      nsURL = ResolveBookmarkData(data, &isStale);
+   }
+   if (nsURL == nil)
+   {
+      onDone("couldn't get access to the file");
+      return;
+   }
+
+   bool accessing = [nsURL startAccessingSecurityScopedResource];
+   NSFileAccessIntent* intent = [NSFileAccessIntent readingIntentWithURL:nsURL options:NSFileCoordinatorReadingWithoutChanges];
+   NSFileCoordinator* coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+   [coordinator coordinateAccessWithIntents:@[ intent ]
+                                      queue:[NSOperationQueue mainQueue]
+                                 byAccessor:^(NSError* error)
+                                 {
+                                    onDone(error != nil ? juce::String::fromUTF8(error.localizedDescription.UTF8String) : juce::String());
+                                    if (accessing)
+                                       [nsURL stopAccessingSecurityScopedResource];
+                                 }];
+#if !__has_feature(objc_arc)
+   [coordinator release];
+#endif
 }

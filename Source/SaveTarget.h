@@ -47,11 +47,26 @@ public:
    explicit SaveTarget(const std::string& path);
    explicit SaveTarget(const juce::FileChooser& chooser); //chooser must have a result
 
+   SaveTarget(const std::string& path, const std::string& bookmark); //bookmark is from GetBookmark(), and can be empty
+
    const std::string& GetPath() const { return mPath; } //where the file ends up
    const std::string& GetWritePath() const { return mWritePath; } //where to write it
 
    bool Commit() const; //call after writing to GetWritePath()
    bool CommitFrom(const juce::File& source) const; //use source instead of GetWritePath(). leaves source in place
+
+   //a way to get access to this file again after a restart, for platforms where the path isn't enough. empty if not needed
+   std::string GetBookmark() const;
+
+   //false if we know that the file is gone, or that we don't have access to it
+   bool IsAccessible() const { return mIsAccessible; }
+
+   //false if the contents would have to be downloaded first (e.g. from iCloud)
+   bool IsAvailableLocally() const { return mIsAvailableLocally; }
+
+   //call onReady once the file's contents are available, downloading them if necessary. onReady is called on the message
+   //thread, and might be called before this returns. if the download fails, the failure is reported to the user instead
+   void EnsureAvailable(std::function<void(const SaveTarget& target)> onReady) const;
 
    //returns nullptr if the file can't be opened. permission to read lasts for as long as the stream does
    std::unique_ptr<juce::InputStream> CreateInputStream() const;
@@ -59,6 +74,8 @@ public:
 private:
    std::string mPath;
    std::string mWritePath;
+   bool mIsAccessible{ true };
+   bool mIsAvailableLocally{ true };
 #if BESPOKE_MOBILE
    juce::URL mChosenURL; //must stay this object or a copy of it, since it carries the permission to write
 #endif

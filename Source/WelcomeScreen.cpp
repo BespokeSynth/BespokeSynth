@@ -35,6 +35,8 @@
 #include "UIControlMacros.h"
 #include "UserPrefsEditor.h"
 
+#include <tuple>
+
 #include "juce_opengl/juce_opengl.h"
 using namespace juce::gl;
 
@@ -57,16 +59,22 @@ namespace
    const float kSaveStateButtonStartY = 110;
    const float kSaveStateButtonPadX = 10;
    const float kSaveStateButtonPadY = 10;
-}
+   const float kSaveStateButtonLabelHeight = 32;
+   const float kSaveStateButtonImagePad = 2;
+   const float kSaveStateGridTop = kSaveStateButtonStartY + kSaveStateButtonPadY;
+   const float kMinSaveStateGridHeight = 110; //keep enough space for at least one usable row
+   const float kMinButtonWidth = 100; //keep labels readable
+   const float kPreferredImageWidth = 200; //beyond this, showing more files is better than showing bigger files
+   const float kMaxImageWidth = WelcomeScreen::kScreenshotWidth * 2; //don't blow screenshots up too much if there are only a few files
+   const float kImageAspect = float(WelcomeScreen::kScreenshotWidth) / WelcomeScreen::kScreenshotHeight;
 
-bool WelcomeScreen::AlreadyHasFile(const juce::File& file)
-{
-   for (const auto& recentFile : mRecentFiles)
+   //width of the largest screenshot that can fit in a button, alongside the label
+   float GetFitImageWidth(float buttonWidth, float buttonHeight)
    {
-      if (recentFile.mFile == file)
-         return true;
+      float availableWidth = buttonWidth - kSaveStateButtonImagePad * 2;
+      float availableHeight = buttonHeight - kSaveStateButtonLabelHeight - kSaveStateButtonImagePad * 2;
+      return MAX(0, MIN(availableWidth, availableHeight * kImageAspect));
    }
-   return false;
 }
 
 void WelcomeScreen::CreateUIControls()
@@ -84,32 +92,63 @@ void WelcomeScreen::CreateUIControls()
    mDiscordLinkButton = new ClickButton(this, "bespoke discord", 324, 53);
    mTutorialVideoLinkButton = new ClickButton(this, "youtu.be/SYBc8X2IxqM", 176, 72);
 
-   float uiScreenWidth = ofGetWidth() / TheSynth->GetUIScale();
-   float uiScreenHeight = ofGetHeight() / TheSynth->GetUIScale();
-   mWidth = uiScreenWidth - 100;
-   mHeight = uiScreenHeight - 150;
-   SetPosition(uiScreenWidth / 2 - mWidth / 2, uiScreenHeight / 2 - mHeight / 2);
+   for (int i = 0; i < kMaxRecentFiles; ++i)
+   {
+      mRecentFileButtons[i] = new ClickButton(this, ("recentfile" + ofToString(i + 1)).c_str(), kSaveStateButtonStartX, kSaveStateGridTop);
+      mRecentFileButtons[i]->SetOverrideDisplayName("");
+   }
 
-   float saveStateButtonWidth = (mWidth - (kSaveStateButtonStartX * 2)) / 5 - kSaveStateButtonPadX;
-   float saveStateButtonHeight = saveStateButtonWidth * .9f;
+   mCloseButton = new ClickButton(this, "close", mWidth - 40, 10);
 
+   UpdateRecentFiles();
+   UpdateLayout();
+}
+
+void WelcomeScreen::UpdateRecentFiles()
+{
    const int kMaxDesiredFiles = 10;
 
-   int x = kSaveStateButtonStartX;
-   int y = kSaveStateButtonStartY + kSaveStateButtonPadY;
-
    using namespace juce;
+
+   std::vector<RecentFile> recentFiles;
+   auto alreadyHasFile = [&recentFiles](const File& file)
+   {
+      return std::any_of(recentFiles.begin(), recentFiles.end(), [&file](const RecentFile& recentFile)
+                         {
+                            return recentFile.mFile == file;
+                         });
+   };
 
    ofxJSONElement workspaceData;
    workspaceData.open(TheSynth->GetWorkspaceDataPath());
    for (int i = 0; i < workspaceData["recent_files"].size(); ++i)
    {
+      std::string path = workspaceData["recent_files"][i]["file"].asString();
+#if BESPOKE_IOS
+      //our data folder can move when the app gets updated
+      const std::string kDataFolder = "/Documents/BespokeSynth/";
+      size_t dataFolderPos = path.find(kDataFolder);
+      if (dataFolderPos != std::string::npos && path.find("/Containers/Data/Application/") != std::string::npos)
+         path = ofToDataPath(path.substr(dataFolderPos + kDataFolder.length()));
+#endif
+
       RecentFile recentFile;
-      recentFile.mFile = File(workspaceData["recent_files"][i]["file"].asString());
+      recentFile.mTarget = SaveTarget(path, workspaceData["recent_files"][i]["bookmark"].asString());
+      recentFile.mFile = File(recentFile.mTarget.GetPath());
       recentFile.mTime = Time::fromISO8601(workspaceData["recent_files"][i]["time"].asString());
       recentFile.mRecentlyOpened = !workspaceData["recent_files"][i]["saved"].asBool();
-      if (recentFile.mFile.existsAsFile())
-         mRecentFiles.insert(mRecentFiles.begin(), recentFile);
+      if (!recentFile.mTarget.IsAccessible())
+         continue;
+      if (recentFile.mTarget.GetBookmark().empty() && !recentFile.mFile.existsAsFile())
+         continue;
+
+      //this one is more recent than everything that we've gathered so far
+      recentFiles.erase(std::remove_if(recentFiles.begin(), recentFiles.end(), [&recentFile](const RecentFile& other)
+                                       {
+                                          return other.mFile == recentFile.mFile;
+                                       }),
+                        recentFiles.end());
+      recentFiles.insert(recentFiles.begin(), recentFile);
    }
 
    //include the most recent autosave as the first entry
@@ -125,20 +164,21 @@ void WelcomeScreen::CreateUIControls()
                 });
       RecentFile autosaveFile;
       autosaveFile.mFile = autosaveFiles[0];
+      autosaveFile.mTarget = SaveTarget(autosaveFile.mFile.getFullPathName().toStdString());
       autosaveFile.mTime = autosaveFiles[0].getLastModificationTime();
       autosaveFile.mRecentlyOpened = false;
-      for (auto iter = mRecentFiles.begin(); iter != mRecentFiles.end(); ++iter)
+      for (auto iter = recentFiles.begin(); iter != recentFiles.end(); ++iter)
       {
          if (autosaveFile.mTime > iter->mTime)
          {
-            if (!AlreadyHasFile(autosaveFile.mFile))
-               mRecentFiles.insert(iter, autosaveFile);
+            if (!alreadyHasFile(autosaveFile.mFile))
+               recentFiles.insert(iter, autosaveFile);
             break;
          }
       }
    }
 
-   if (mRecentFiles.size() < kMaxDesiredFiles)
+   if (recentFiles.size() < kMaxDesiredFiles)
    {
       File dir(ofToDataPath("savestate"));
       Array<File> files;
@@ -149,47 +189,124 @@ void WelcomeScreen::CreateUIControls()
                    return lhs.getLastModificationTime().toMilliseconds() > rhs.getLastModificationTime().toMilliseconds();
                 });
 
-      for (int i = 0; i < files.size() && mRecentFiles.size() < kMaxDesiredFiles; ++i)
+      for (int i = 0; i < files.size() && recentFiles.size() < kMaxDesiredFiles; ++i)
       {
          if (files[i].getFileExtension() != ".bsk")
             continue;
 
-         if (AlreadyHasFile(files[i]))
+         if (alreadyHasFile(files[i]))
             continue;
 
          RecentFile recentFile;
          recentFile.mFile = files[i];
+         recentFile.mTarget = SaveTarget(recentFile.mFile.getFullPathName().toStdString());
          recentFile.mTime = files[i].getLastModificationTime();
          recentFile.mRecentlyOpened = false;
-         mRecentFiles.push_back(recentFile);
+         recentFiles.push_back(recentFile);
       }
    }
 
-   int i = 1;
-   for (auto& recentFile : mRecentFiles)
+   if (recentFiles.size() > kMaxRecentFiles)
+      recentFiles.resize(kMaxRecentFiles);
+
+   std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
+
+   //hold on to the screenshots of files that haven't changed
+   for (const auto& previousFile : mRecentFiles)
    {
-      if (y + saveStateButtonHeight + kSaveStateButtonPadY > mHeight)
-         break;
+      if (previousFile.mScreenshotImageHandle == -1)
+         continue;
 
-      recentFile.mButton = new ClickButton(this, ("recentfile" + ofToString(i)).c_str(), x, y);
-      recentFile.mButton->SetOverrideDisplayName("");
-      recentFile.mButton->SetDimensions(saveStateButtonWidth, saveStateButtonHeight);
-
-      x += saveStateButtonWidth + kSaveStateButtonPadX;
-      if (x + saveStateButtonWidth + kSaveStateButtonPadX > mWidth)
-      {
-         x = kSaveStateButtonStartX;
-         y += saveStateButtonHeight + kSaveStateButtonPadY;
-      }
-
-      ++i;
+      auto match = std::find_if(recentFiles.begin(), recentFiles.end(), [&previousFile](const RecentFile& recentFile)
+                                {
+                                   return recentFile.mFile == previousFile.mFile && recentFile.mTime == previousFile.mTime && recentFile.mTarget.IsAvailableLocally() == previousFile.mTarget.IsAvailableLocally();
+                                });
+      if (match != recentFiles.end())
+         match->mScreenshotImageHandle = previousFile.mScreenshotImageHandle;
+      else
+         mImagesToDelete.push_back(previousFile.mScreenshotImageHandle);
    }
 
-   mCloseButton = new ClickButton(this, "close", mWidth - 40, 10);
+   mRecentFiles = std::move(recentFiles);
+}
+
+void WelcomeScreen::UpdateLayout()
+{
+   float uiScreenWidth = ofGetWidth() / TheSynth->GetUIScale();
+   float uiScreenHeight = ofGetHeight() / TheSynth->GetUIScale();
+   mWidth = uiScreenWidth - 100;
+   mHeight = uiScreenHeight - 150;
+
+   //on small screens, use up more of the vertical margin to make room for a row of recent files
+   const float kMinHeight = kSaveStateGridTop + kMinSaveStateGridHeight + kSaveStateButtonPadY;
+   if (mHeight < kMinHeight)
+      mHeight = MAX(mHeight, MIN(kMinHeight, uiScreenHeight - 20));
+
+   SetPosition(uiScreenWidth / 2 - mWidth / 2, uiScreenHeight / 2 - mHeight / 2);
+   mCloseButton->SetPosition(mWidth - 40, 10);
+
+   const int numFiles = (int)mRecentFiles.size();
+   for (int i = numFiles; i < kMaxRecentFiles; ++i)
+      mRecentFileButtons[i]->SetShowing(false);
+   if (numFiles == 0)
+      return;
+
+   const float gridWidth = mWidth - kSaveStateButtonStartX * 2;
+   const float gridHeight = mHeight - kSaveStateGridTop - kSaveStateButtonPadY;
+
+   //find the grid that covers the most space with screenshots, without letting oversized screenshots crowd out other files
+   int numCols = 1;
+   int numRows = 1;
+   float bestScore = -1;
+   float bestArea = -1;
+   int bestNumShown = 0;
+   for (int cols = 1; cols <= numFiles; ++cols)
+   {
+      const int maxRows = (numFiles + cols - 1) / cols;
+      for (int rows = 1; rows <= maxRows; ++rows)
+      {
+         float buttonWidth = (gridWidth - kSaveStateButtonPadX * (cols - 1)) / cols;
+         float buttonHeight = (gridHeight - kSaveStateButtonPadY * (rows - 1)) / rows;
+         if ((cols > 1 && buttonWidth < kMinButtonWidth) || (rows > 1 && buttonHeight < kSaveStateButtonLabelHeight))
+            continue;
+
+         float imageWidth = GetFitImageWidth(buttonWidth, buttonHeight);
+         float cappedWidth = MIN(imageWidth, kPreferredImageWidth);
+         int numShown = MIN(numFiles, cols * rows);
+         float score = numShown * cappedWidth * cappedWidth;
+         float area = numShown * imageWidth * imageWidth;
+         //if there's no space for screenshots at all, every score is zero, so this comes down to showing the most files
+         if (std::tie(score, area, numShown) > std::tie(bestScore, bestArea, bestNumShown))
+         {
+            bestScore = score;
+            bestArea = area;
+            bestNumShown = numShown;
+            numCols = cols;
+            numRows = rows;
+         }
+      }
+   }
+
+   float buttonWidth = (gridWidth - kSaveStateButtonPadX * (numCols - 1)) / numCols;
+   float buttonHeight = (gridHeight - kSaveStateButtonPadY * (numRows - 1)) / numRows;
+   buttonWidth = ofClamp(buttonWidth, 1, kMaxImageWidth + kSaveStateButtonImagePad * 2);
+   buttonHeight = ofClamp(buttonHeight, kSaveStateButtonLabelHeight, kMaxImageWidth / kImageAspect + kSaveStateButtonLabelHeight + kSaveStateButtonImagePad * 2);
+
+   for (int i = 0; i < numFiles; ++i)
+   {
+      int col = i % numCols;
+      int row = i / numCols;
+      ClickButton* button = mRecentFileButtons[i];
+      button->SetShowing(row < numRows);
+      button->SetPosition(kSaveStateButtonStartX + col * (buttonWidth + kSaveStateButtonPadX), kSaveStateGridTop + row * (buttonHeight + kSaveStateButtonPadY));
+      button->SetDimensions(buttonWidth, buttonHeight);
+   }
 }
 
 void WelcomeScreen::Show()
 {
+   UpdateRecentFiles();
+   UpdateLayout();
    TheSynth->PushModalFocusItem(this);
 }
 
@@ -225,39 +342,50 @@ void WelcomeScreen::DrawModule()
       mScreenshotContextGeneration = gNanoVGContextGeneration;
       for (auto& recentFile : mRecentFiles)
          recentFile.mScreenshotImageHandle = -1;
+      mImagesToDelete.clear();
    }
+
+   for (int image : mImagesToDelete)
+      nvgDeleteImage(gNanoVG, image);
+   mImagesToDelete.clear();
 
    for (int i = 0; i < (int)mRecentFiles.size(); ++i)
    {
-      if (mRecentFiles[i].mButton == nullptr)
+      if (!mRecentFileButtons[i]->IsShowing())
          continue;
 
-      mRecentFiles[i].mButton->Draw();
-      ofRectangle rect = mRecentFiles[i].mButton->GetRect(K(local));
+      mRecentFileButtons[i]->Draw();
+      ofRectangle rect = mRecentFileButtons[i]->GetRect(K(local));
       ofPushMatrix();
 
-      ofRectangle imageRect = rect;
-      imageRect.height *= float(kScreenshotHeight) / kScreenshotWidth;
-      constexpr float padding = 2;
-      imageRect.x += padding;
-      imageRect.y += padding;
-      imageRect.width -= padding * 2;
-      imageRect.height -= padding * 2;
+      ofRectangle imageRect;
+      imageRect.width = GetFitImageWidth(rect.width, rect.height);
+      imageRect.height = imageRect.width / kImageAspect;
+      imageRect.x = rect.x + (rect.width - imageRect.width) / 2;
+      imageRect.y = rect.y + (rect.height - kSaveStateButtonLabelHeight - imageRect.height) / 2;
       if (mRecentFiles[i].mScreenshotImageHandle == -1)
       {
-         FileStreamIn in(ofToDataPath(mRecentFiles[i].mFile.getFullPathName().toStdString()));
          unsigned char* screenshotData = nullptr;
          int screenshotSize = 0;
-         std::string jsonLayoutString;
-         ModularSynth::LoadStateHeader(in, screenshotData, screenshotSize, jsonLayoutString);
-         FileStreamIn::s32BitMode = false;
+         //reading a file that isn't downloaded would block until it is
+         std::unique_ptr<juce::InputStream> stream;
+         if (mRecentFiles[i].mTarget.IsAvailableLocally())
+            stream = mRecentFiles[i].mTarget.CreateInputStream();
+         if (stream != nullptr)
+         {
+            FileStreamIn in(std::move(stream));
+            std::string jsonLayoutString;
+            ModularSynth::LoadStateHeader(in, screenshotData, screenshotSize, jsonLayoutString);
+            FileStreamIn::s32BitMode = false;
+         }
          if (screenshotData != nullptr)
             mRecentFiles[i].mScreenshotImageHandle = nvgCreateImageMem(gNanoVG, 0, screenshotData, screenshotSize);
          else
             mRecentFiles[i].mScreenshotImageHandle = nvgCreateImage(gNanoVG, ofToResourcePath("bespoke_default.png").c_str(), 0);
+         delete[] screenshotData;
       }
 
-      if (mRecentFiles[i].mScreenshotImageHandle != -1)
+      if (mRecentFiles[i].mScreenshotImageHandle != -1 && imageRect.width > 0)
       {
          NVGpaint pattern = nvgImagePattern(gNanoVG, imageRect.x, imageRect.y, imageRect.width, imageRect.height, 0, mRecentFiles[i].mScreenshotImageHandle, 1.0f);
          nvgBeginPath(gNanoVG);
@@ -291,8 +419,14 @@ void WelcomeScreen::ButtonClicked(ClickButton* button, double time)
 {
    for (int i = 0; i < (int)mRecentFiles.size(); ++i)
    {
-      if (button == mRecentFiles[i].mButton)
-         TheSynth->LoadState(mRecentFiles[i].mFile.getFullPathName().toStdString());
+      if (button == mRecentFileButtons[i])
+      {
+         mRecentFiles[i].mTarget.EnsureAvailable([](const SaveTarget& target)
+                                                 {
+                                                    TheSynth->LoadState(target);
+                                                 });
+         return; //loading can replace this screen
+      }
    }
 
    if (button == mTutorialVideoLinkButton)

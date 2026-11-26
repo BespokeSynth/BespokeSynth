@@ -1075,7 +1075,14 @@ void ModularSynth::PostRender()
 
          glFinish();
          glReadBuffer(GL_COLOR_ATTACHMENT0);
-         glReadPixels(0, 0, winWidth, winHeight, GL_RGB, GL_UNSIGNED_BYTE, mScreenshotPixels);
+         //GLES only guarantees that reading RGBA works, so read that and drop the alpha
+         std::vector<unsigned char> rgbaPixels(winWidth * winHeight * 4);
+         glReadPixels(0, 0, winWidth, winHeight, GL_RGBA, GL_UNSIGNED_BYTE, rgbaPixels.data());
+         for (int i = 0; i < winWidth * winHeight; ++i)
+         {
+            for (int channel = 0; channel < 3; ++channel)
+               mScreenshotPixels[i * 3 + channel] = rgbaPixels[i * 4 + channel];
+         }
 
          nvgluBindFramebuffer(nullptr);
 
@@ -3565,7 +3572,7 @@ void ModularSynth::CompleteQueuedSaveState()
       std::string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
       mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
       TheTitleBar->DisplayTemporaryMessage("saved " + filename);
-      AddRecentFile(mCurrentSaveStatePath, true);
+      AddRecentFile(target, true);
    }
 }
 
@@ -3582,14 +3589,18 @@ void ModularSynth::OpenSaveStateFile(std::string bskPath)
       mStartupSaveStateFile = std::move(bskPath);
 }
 
-void ModularSynth::AddRecentFile(std::string file, bool saved)
+void ModularSynth::AddRecentFile(const SaveTarget& target, bool saved)
 {
+   std::string file = target.GetPath();
+   std::string bookmark = target.GetBookmark();
    if (mWorkspaceData["recent_files"].isArray())
    {
       for (int i = 0; i < mWorkspaceData["recent_files"].size(); ++i)
       {
          if (mWorkspaceData["recent_files"][i]["file"] == file)
          {
+            if (bookmark.empty())
+               bookmark = mWorkspaceData["recent_files"][i]["bookmark"].asString();
             mWorkspaceData["recent_files"].removeIndex(i, nullptr);
             break;
          }
@@ -3602,6 +3613,8 @@ void ModularSynth::AddRecentFile(std::string file, bool saved)
    fileInfo["file"] = file;
    fileInfo["time"] = juce::Time::getCurrentTime().toISO8601(true).toStdString();
    fileInfo["saved"] = saved;
+   if (!bookmark.empty())
+      fileInfo["bookmark"] = bookmark;
    mWorkspaceData["recent_files"].append(fileInfo);
    mWorkspaceData.save(GetWorkspaceDataPath());
 }
@@ -3623,7 +3636,7 @@ void ModularSynth::LoadState(const SaveTarget& target)
       return;
    }
 
-   AddRecentFile(file, false);
+   AddRecentFile(target, false);
 
    if (mInitialized)
       TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup
@@ -3913,7 +3926,7 @@ void ModularSynth::OnConsoleInput(std::string command /* = "" */)
       }
       else if (tokens[0] == "welcomescreen")
       {
-         PushModalFocusItem(mWelcomeScreen);
+         mWelcomeScreen->Show();
       }
       else if (tokens[0] == "dump" && tokens.size() >= 2)
       {

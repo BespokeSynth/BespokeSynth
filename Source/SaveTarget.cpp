@@ -30,6 +30,9 @@
 #if BESPOKE_ANDROID
 #include "AndroidSupport.h"
 #endif
+#if BESPOKE_IOS
+#include "IOSDocuments.h"
+#endif
 
 namespace
 {
@@ -95,6 +98,61 @@ SaveTarget::SaveTarget(const juce::FileChooser& chooser)
    auto tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory);
    mWritePath = tempDir.getNonexistentChildFile("bespoke_save", ".tmp", false).getFullPathName().toStdString();
 #endif
+}
+
+SaveTarget::SaveTarget(const std::string& path, const std::string& bookmark)
+: SaveTarget(path)
+{
+#if BESPOKE_IOS
+   if (bookmark.empty())
+      return;
+
+   auto resolved = IOSDocuments::ResolveBookmark(bookmark);
+   if (resolved.mURL.isEmpty())
+   {
+      mIsAccessible = false;
+      return;
+   }
+
+   mChosenURL = resolved.mURL;
+   mPath = resolved.mURL.getLocalFile().getFullPathName().toStdString(); //might have been moved or renamed
+   mIsAvailableLocally = resolved.mIsDownloaded;
+   auto tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory);
+   mWritePath = tempDir.getNonexistentChildFile("bespoke_save", ".tmp", false).getFullPathName().toStdString();
+#endif
+}
+
+std::string SaveTarget::GetBookmark() const
+{
+#if BESPOKE_IOS
+   return IOSDocuments::GetBookmark(mChosenURL);
+#else
+   return "";
+#endif
+}
+
+void SaveTarget::EnsureAvailable(std::function<void(const SaveTarget& target)> onReady) const
+{
+#if BESPOKE_IOS
+   if (!mChosenURL.isEmpty())
+   {
+      IOSDocuments::CoordinateRead(mChosenURL,
+                                   [target = *this, onReady = std::move(onReady)](const juce::String& error)
+                                   {
+                                      if (error.isEmpty())
+                                      {
+                                         onReady(target);
+                                      }
+                                      else
+                                      {
+                                         ofLog() << "failed to open " << target.mPath << ": " << error.toStdString();
+                                         TheSynth->LogEvent("couldn't open " + target.mPath + ": " + error.toStdString(), kLogEventType_Error);
+                                      }
+                                   });
+      return;
+   }
+#endif
+   onReady(*this);
 }
 
 std::unique_ptr<juce::InputStream> SaveTarget::CreateInputStream() const
