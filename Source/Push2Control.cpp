@@ -66,6 +66,7 @@ Push2Control::Push2Control()
 : mSpawnLists(this)
 , mDevice(this)
 {
+   mDevice.SetInputHiddenFromAllInputs(true);
    Initialize();
    for (int i = 0; i < 128 * 2; ++i)
       mLedState[i] = -1;

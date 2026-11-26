@@ -89,6 +89,7 @@ public:
 
    bool ConnectInput(const char* name);
    void ConnectInput(int index);
+   void SetInputHiddenFromAllInputs(bool hidden); //for devices that a module handles itself (like a push 2), so "all input" doesn't double up on them
    bool ConnectOutput(const char* name, int channel = 1);
    bool ConnectOutput(int index, int channel = 1);
    void DisconnectInput();
@@ -111,11 +112,19 @@ public:
 
    static void SendMidiMessage(MidiDeviceListener* listener, const char* deviceName, const juce::MidiMessage& message);
 
+   static constexpr const char* kAllInputsName{ "all input" }; //pass to ConnectInput() to receive from every midi input, including ones plugged in later. echoes of messages we send to loopback ports are dropped
    static constexpr float kPitchBendCenter{ 8192.0f };
    static constexpr float kPitchBendMax{ 16320.0f };
 
 private:
    void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
+   void ConnectAllInputs();
+   void DisableInputIfUnused(const juce::String& identifier);
+   bool IsHiddenFromAllInputs(const juce::String& identifier, const juce::String& name, const juce::MidiMessage& message) const;
+   void SendMessageNow(const juce::MidiMessage& message);
+   void SendBlock(const juce::MidiMessage& message, int sampleNumber);
+   void RememberSentMessage(const juce::MidiMessage& message);
+   static void UpdateHiddenFromAllInputs();
 
    juce::MidiDeviceInfo mDeviceInInfo;
    juce::MidiDeviceInfo mDeviceOutInfo;
@@ -124,4 +133,8 @@ private:
    MidiDeviceListener* mListener{ nullptr };
    int mOutputChannel{ 1 };
    bool mIsInputEnabled{ false };
+   bool mHasInputConnected{ false };
+   bool mIsConnectedToAllInputs{ false };
+   bool mInputHiddenFromAllInputs{ false };
+   std::atomic<juce::uint32> mOutputNameHash{ 0 }; //read on the audio thread, to recognize echoes from loopback ports
 };

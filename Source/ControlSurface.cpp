@@ -72,6 +72,7 @@ ControlSurface::ControlSurface()
 : IDrawableModule(166, 82)
 , mDevice(this)
 {
+   mDevice.SetInputHiddenFromAllInputs(true);
    for (int i = 0; i < (int)ControlSurfaceDeviceType::Count; ++i)
       mSurfaces[i] = CreateControlSurfaceDevice((ControlSurfaceDeviceType)i);
 

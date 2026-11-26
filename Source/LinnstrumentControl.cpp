@@ -39,6 +39,7 @@ using namespace std::chrono_literals;
 LinnstrumentControl::LinnstrumentControl()
 : mDevice(this)
 {
+   mDevice.SetInputHiddenFromAllInputs(true);
    TheScale->AddListener(this);
 
    for (size_t i = 0; i < mGridColorState.size(); ++i)
