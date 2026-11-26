@@ -193,10 +193,16 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
       const float halfH = height * 0.5f;
       const int pixelWidth = (int)width;
       const float samplesPerPixel = length / pixelWidth;
-      const int innerStride = 1; //MAX(1, (int)(samplesPerPixel / 100));
+      // read at most ~100 samples per column. stride is a power of two, and the sampled indices are aligned to
+      // absolute multiples of it (below), so the picked samples don't shift around ("crawl") as the view scrolls
+      const int kMaxSamplesPerColumn = 100;
+      int innerStride = 1;
+      while (innerStride * 2 * kMaxSamplesPerColumn <= samplesPerPixel)
+         innerStride *= 2;
 
       // fix "crawling" effect by quantizing displayed start sample
-      start -= int(start) % int(samplesPerPixel);
+      if (samplesPerPixel >= 1)
+         start -= int(start) % int(samplesPerPixel);
 
       // pass 1: gather per-column min/max
       float highestMagnitude = 0;
@@ -208,7 +214,8 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
          int sampleStart = (int)(x * samplesPerPixel + start);
          int sampleCount = MAX(1, (int)samplesPerPixel);
 
-         for (int j = 0; j < sampleCount; j += innerStride)
+         int firstOffset = (innerStride - ((sampleStart % innerStride) + innerStride) % innerStride) % innerStride;
+         for (int j = firstOffset; j < sampleCount; j += innerStride)
          {
             int sampleIdx = sampleStart + j;
             if (wraparoundFrom != -1 && sampleIdx > wraparoundFrom)
