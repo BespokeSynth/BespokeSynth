@@ -29,21 +29,140 @@
 
 using namespace juce;
 
+namespace
+{
+   std::vector<MidiDevice*> sAllDevices;
+   std::atomic<int> sNumAllInputDevices{ 0 };
+
+   //inputs that "all input" should ignore because a module handles them itself, read from the midi thread
+   juce::SpinLock sHiddenInputsLock;
+   juce::StringArray sHiddenInputIdentifiers;
+
+   //recently sent messages, so that "all input" can recognize them if a loopback port (IAC bus, loopMIDI, etc) echoes them back.
+   //matching actual messages (rather than hiding every input that shares a name with an output) keeps hardware like a keystep working,
+   //since many devices use the same name for their input and output ports.
+   struct SentMessage
+   {
+      juce::uint32 mOutputNameHash{ 0 };
+      juce::uint32 mHash{ 0 };
+      int mSize{ 0 };
+      double mTimeMs{ -99999 };
+   };
+   juce::SpinLock sSentMessagesLock;
+   std::array<SentMessage, 256> sSentMessages;
+   int sSentMessagesIndex{ 0 };
+   std::atomic<double> sLastSentMessageTimeMs{ -99999 };
+   constexpr double kEchoWindowMs = 1000;
+
+   juce::uint32 HashBytes(const juce::uint8* data, size_t size)
+   {
+      juce::uint32 hash = 2166136261u; //fnv-1a (JenkinsHash stops at zero bytes, which midi is full of)
+      for (size_t i = 0; i < size; ++i)
+         hash = (hash ^ data[i]) * 16777619u;
+      return hash;
+   }
+
+   juce::uint32 HashMidiBytes(const juce::MidiMessage& message)
+   {
+      return HashBytes(message.getRawData(), (size_t)message.getRawDataSize());
+   }
+
+   juce::uint32 HashName(const juce::String& name)
+   {
+      return HashBytes(reinterpret_cast<const juce::uint8*>(name.toRawUTF8()), name.getNumBytesAsUTF8());
+   }
+
+   bool IsEchoOfSentMessage(const juce::String& inputName, const juce::MidiMessage& message)
+   {
+      const double now = juce::Time::getMillisecondCounterHiRes();
+      if (now - sLastSentMessageTimeMs.load() >= kEchoWindowMs)
+         return false;
+
+      const juce::uint32 nameHash = HashName(inputName); //a loopback port's input has the same name as its output
+      const juce::uint32 hash = HashMidiBytes(message);
+      const juce::SpinLock::ScopedLockType lock(sSentMessagesLock);
+      for (auto& sent : sSentMessages)
+      {
+         if (sent.mHash == hash && sent.mOutputNameHash == nameHash && sent.mSize == message.getRawDataSize() && now - sent.mTimeMs < kEchoWindowMs)
+         {
+            sent.mTimeMs = -99999; //each sent message accounts for one echo
+            return true;
+         }
+      }
+      return false;
+   }
+
+   juce::Array<juce::MidiDeviceInfo> sConnectedInputDevices;
+
+   //tells us right away when devices are plugged/unplugged, so a quick unplug and replug isn't missed between the periodic refreshes
+   std::unique_ptr<juce::MidiDeviceListConnection> sDeviceListConnection;
+   std::atomic<bool> sDeviceListChanged{ false };
+
+   bool IsInputPresent(const juce::String& identifier)
+   {
+      for (auto& device : sConnectedInputDevices)
+      {
+         if (device.identifier == identifier)
+            return true;
+      }
+      return false;
+   }
+
+   void RefreshConnectedInputDevices(bool immediate)
+   {
+      static double sLastUpdatedListTime = -9999;
+      if (sLastUpdatedListTime + 5000 < gTime || immediate || sDeviceListChanged.exchange(false)) //refresh every 5 seconds as a fallback (getAvailableDevices() is slow on windows)
+      {
+         const auto previousDevices = sConnectedInputDevices;
+         sConnectedInputDevices = MidiInput::getAvailableDevices();
+         sLastUpdatedListTime = gTime;
+
+         if (sNumAllInputDevices > 0)
+         {
+            //open everything for "all input", and close inputs that have been unplugged so they get reopened if they're plugged back in
+            auto& deviceManager = TheSynth->GetAudioDeviceManager();
+            for (auto& device : sConnectedInputDevices)
+               deviceManager.setMidiInputDeviceEnabled(device.identifier, true);
+            for (auto& device : previousDevices)
+            {
+               if (!IsInputPresent(device.identifier))
+                  deviceManager.setMidiInputDeviceEnabled(device.identifier, false);
+            }
+         }
+      }
+   }
+}
+
 MidiDevice::MidiDevice(MidiDeviceListener* listener)
 : mListener(listener)
 {
+   sAllDevices.push_back(this);
+
+   if (sDeviceListConnection == nullptr)
+      sDeviceListConnection = std::make_unique<juce::MidiDeviceListConnection>(juce::MidiDeviceListConnection::make([]
+                                                                                                                    {
+                                                                                                                       sDeviceListChanged = true;
+                                                                                                                    }));
 }
 
 MidiDevice::~MidiDevice()
 {
-   auto& deviceManager = TheSynth->GetAudioDeviceManager();
-   deviceManager.removeMidiInputDeviceCallback(mDeviceInInfo.identifier, this);
+   DisconnectInput();
+   RemoveFromVector(this, sAllDevices);
+   if (sAllDevices.empty())
+      sDeviceListConnection.reset(); //don't leave this for static destruction, after juce has shut down
    if (mMidiOut.get())
       mMidiOut->stopBackgroundThread();
 }
 
 bool MidiDevice::ConnectInput(const char* name)
 {
+   if (juce::String(name) == kAllInputsName)
+   {
+      ConnectAllInputs();
+      return true;
+   }
+
    DisconnectInput();
 
    bool found = false;
@@ -69,6 +188,10 @@ bool MidiDevice::ConnectInput(const char* name)
    deviceManager.addMidiInputDeviceCallback(mDeviceInInfo.identifier, this);
 
    mIsInputEnabled = deviceManager.isMidiInputDeviceEnabled(mDeviceInInfo.identifier);
+   mHasInputConnected = true;
+
+   if (mInputHiddenFromAllInputs)
+      UpdateHiddenFromAllInputs();
 
    TheSynth->AddMidiDevice(this); //TODO(Ryan) need better place for this, but constructor is too early
 
@@ -78,6 +201,97 @@ bool MidiDevice::ConnectInput(const char* name)
 void MidiDevice::ConnectInput(int index)
 {
    ConnectInput(MidiInput::getAvailableDevices()[index].name.toRawUTF8());
+}
+
+void MidiDevice::ConnectAllInputs()
+{
+   DisconnectInput();
+
+   mDeviceInInfo.name = kAllInputsName;
+   mDeviceInInfo.identifier = ""; //an empty identifier registers the callback for all enabled inputs
+   mIsConnectedToAllInputs = true;
+   mIsInputEnabled = true;
+   mHasInputConnected = true;
+   ++sNumAllInputDevices;
+
+   TheSynth->GetAudioDeviceManager().addMidiInputDeviceCallback(mDeviceInInfo.identifier, this);
+
+   RefreshConnectedInputDevices(K(immediate)); //opens all of the inputs
+}
+
+void MidiDevice::SetInputHiddenFromAllInputs(bool hidden)
+{
+   mInputHiddenFromAllInputs = hidden;
+   UpdateHiddenFromAllInputs();
+}
+
+//static
+void MidiDevice::UpdateHiddenFromAllInputs()
+{
+   juce::StringArray identifiers;
+   for (auto* device : sAllDevices)
+   {
+      if (device->mInputHiddenFromAllInputs && device->mHasInputConnected)
+         identifiers.add(device->mDeviceInInfo.identifier);
+   }
+
+   const juce::SpinLock::ScopedLockType lock(sHiddenInputsLock);
+   sHiddenInputIdentifiers.swapWith(identifiers);
+}
+
+bool MidiDevice::IsHiddenFromAllInputs(const juce::String& identifier, const juce::String& name, const juce::MidiMessage& message) const
+{
+   {
+      const juce::SpinLock::ScopedLockType lock(sHiddenInputsLock);
+      if (sHiddenInputIdentifiers.contains(identifier))
+         return true;
+   }
+
+   return IsEchoOfSentMessage(name, message);
+}
+
+void MidiDevice::RememberSentMessage(const juce::MidiMessage& message)
+{
+   if (sNumAllInputDevices == 0)
+      return; //nobody is listening for echoes
+
+   const double now = juce::Time::getMillisecondCounterHiRes();
+   const juce::SpinLock::ScopedLockType lock(sSentMessagesLock);
+   auto& sent = sSentMessages[sSentMessagesIndex];
+   sSentMessagesIndex = (sSentMessagesIndex + 1) % (int)sSentMessages.size();
+   sent.mOutputNameHash = mOutputNameHash;
+   sent.mHash = HashMidiBytes(message);
+   sent.mSize = message.getRawDataSize();
+   sent.mTimeMs = now;
+   sLastSentMessageTimeMs = now;
+}
+
+void MidiDevice::SendMessageNow(const juce::MidiMessage& message)
+{
+   RememberSentMessage(message);
+   mMidiOut->sendMessageNow(message);
+}
+
+void MidiDevice::SendBlock(const juce::MidiMessage& message, int sampleNumber)
+{
+   RememberSentMessage(message);
+   juce::MidiBuffer midiBuffer;
+   midiBuffer.addEvent(message, sampleNumber);
+   mMidiOut->sendBlockOfMessages(midiBuffer, Time::getMillisecondCounter(), gSampleRate);
+}
+
+void MidiDevice::DisableInputIfUnused(const juce::String& identifier)
+{
+   if (IsInputPresent(identifier)) //if it's been unplugged, always close it so that it can be reopened later
+   {
+      for (auto* device : sAllDevices)
+      {
+         if (device != this && device->mHasInputConnected && (device->mIsConnectedToAllInputs || device->mDeviceInInfo.identifier == identifier))
+            return;
+      }
+   }
+
+   TheSynth->GetAudioDeviceManager().setMidiInputDeviceEnabled(identifier, false);
 }
 
 bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
@@ -112,6 +326,7 @@ bool MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
    {
       mMidiOut->startBackgroundThread();
       mDeviceOutInfo = mMidiOut->getDeviceInfo();
+      mOutputNameHash = HashName(mDeviceOutInfo.name);
 
       assert(channel > 0 && channel <= 16);
       mOutputChannel = channel;
@@ -123,12 +338,26 @@ bool MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
 
 void MidiDevice::DisconnectInput()
 {
+   if (!mHasInputConnected)
+      return;
+   mHasInputConnected = false;
+
    auto& deviceManager = TheSynth->GetAudioDeviceManager();
-   if (mDeviceInInfo.identifier.isNotEmpty())
+   deviceManager.removeMidiInputDeviceCallback(mDeviceInInfo.identifier, this);
+   if (mIsConnectedToAllInputs)
    {
-      deviceManager.setMidiInputDeviceEnabled(mDeviceInInfo.identifier, false);
-      deviceManager.removeMidiInputDeviceCallback(mDeviceInInfo.identifier, this);
+      mIsConnectedToAllInputs = false;
+      --sNumAllInputDevices;
+      for (auto& device : sConnectedInputDevices)
+         DisableInputIfUnused(device.identifier);
    }
+   else
+   {
+      DisableInputIfUnused(mDeviceInInfo.identifier);
+   }
+
+   if (mInputHiddenFromAllInputs)
+      UpdateHiddenFromAllInputs();
 }
 
 void MidiDevice::DisconnectOutput()
@@ -139,6 +368,7 @@ void MidiDevice::DisconnectOutput()
    mMidiOut = nullptr;
    mDeviceOutInfo.name = "";
    mDeviceOutInfo.identifier = "";
+   mOutputNameHash = 0;
 }
 
 bool MidiDevice::Reconnect()
@@ -153,20 +383,12 @@ bool MidiDevice::Reconnect()
 
 bool MidiDevice::IsInputConnected(bool immediate)
 {
-   static juce::Array<juce::MidiDeviceInfo> sConnectedInputDevices;
-   static double sLastUpdatedListTime = -9999;
-   if (sLastUpdatedListTime + 5000 < gTime || immediate) //refresh every 5 seconds (getAvailableDevices() is slow on windows)
-   {
-      sConnectedInputDevices = MidiInput::getAvailableDevices();
-      sLastUpdatedListTime = gTime;
-   }
+   RefreshConnectedInputDevices(immediate);
 
-   for (auto& device : sConnectedInputDevices)
-   {
-      if (device.identifier == mDeviceInInfo.identifier)
-         return true;
-   }
-   return false;
+   if (mIsConnectedToAllInputs)
+      return true; //always available, even if nothing is plugged in yet
+
+   return IsInputPresent(mDeviceInInfo.identifier);
 }
 
 std::vector<std::string> MidiDevice::GetPortList(bool forInput)
@@ -196,14 +418,7 @@ void MidiDevice::SendNote(double time, int pitch, int velocity, bool forceNoteOn
 
       int sampleNumber = (time - gTime) * gSampleRateMs;
 
-      juce::MidiBuffer midiBuffer;
-
-      if (velocity > 0 || forceNoteOn)
-         midiBuffer.addEvent(MidiMessage::noteOn(channel, pitch, (uint8)velocity), sampleNumber);
-      else
-         midiBuffer.addEvent(MidiMessage::noteOff(channel, pitch), sampleNumber);
-
-      mMidiOut->sendBlockOfMessages(midiBuffer, Time::getMillisecondCounter(), gSampleRate);
+      SendBlock((velocity > 0 || forceNoteOn) ? MidiMessage::noteOn(channel, pitch, (uint8)velocity) : MidiMessage::noteOff(channel, pitch), sampleNumber);
    }
 }
 
@@ -214,7 +429,7 @@ void MidiDevice::SendCC(int ctl, int value, int channel /* = -1*/)
       if (channel == -1)
          channel = mOutputChannel;
 
-      mMidiOut->sendMessageNow(MidiMessage::controllerEvent(channel, ctl, value));
+      SendMessageNow(MidiMessage::controllerEvent(channel, ctl, value));
    }
 }
 
@@ -226,7 +441,7 @@ void MidiDevice::SendAftertouch(int pressure, int channel /* = -1*/)
          channel = mOutputChannel;
 
       //TODO_PORT(Ryan) pitch number?
-      mMidiOut->sendMessageNow(MidiMessage::aftertouchChange(channel, 0, pressure));
+      SendMessageNow(MidiMessage::aftertouchChange(channel, 0, pressure));
    }
 }
 
@@ -237,7 +452,7 @@ void MidiDevice::SendProgramChange(int program, int channel /* = -1*/)
       if (channel == -1)
          channel = mOutputChannel;
 
-      mMidiOut->sendMessageNow(MidiMessage::programChange(channel, program));
+      SendMessageNow(MidiMessage::programChange(channel, program));
    }
 }
 
@@ -248,7 +463,7 @@ void MidiDevice::SendPitchBend(int bend, int channel /* = -1*/)
       if (channel == -1)
          channel = mOutputChannel;
 
-      mMidiOut->sendMessageNow(MidiMessage::pitchWheel(channel, bend));
+      SendMessageNow(MidiMessage::pitchWheel(channel, bend));
    }
 }
 
@@ -256,7 +471,7 @@ void MidiDevice::SendSysEx(std::string data)
 {
    if (mMidiOut)
    {
-      mMidiOut->sendMessageNow(MidiMessage::createSysExMessage(data.c_str(), (int)data.length()));
+      SendMessageNow(MidiMessage::createSysExMessage(data.c_str(), (int)data.length()));
    }
 }
 
@@ -264,7 +479,7 @@ void MidiDevice::SendData(unsigned char a, unsigned char b, unsigned char c)
 {
    if (mMidiOut)
    {
-      mMidiOut->sendMessageNow(MidiMessage(a, b, c));
+      SendMessageNow(MidiMessage(a, b, c));
    }
 }
 
@@ -273,11 +488,7 @@ void MidiDevice::SendMessage(double time, juce::MidiMessage message)
    if (mMidiOut)
    {
       int sampleNumber = (time - gTime) * gSampleRateMs;
-
-      juce::MidiBuffer midiBuffer;
-      midiBuffer.addEvent(message, sampleNumber);
-
-      mMidiOut->sendBlockOfMessages(midiBuffer, Time::getMillisecondCounter(), gSampleRate);
+      SendBlock(message, sampleNumber);
    }
 }
 
@@ -286,12 +497,20 @@ void MidiDevice::handleIncomingMidiMessage(MidiInput* source, const MidiMessage&
    if (TheSynth->IsReady() == false)
       return;
 
+   juce::String name = mDeviceInInfo.name;
+   if (mIsConnectedToAllInputs && source != nullptr)
+   {
+      name = source->getName();
+      if (IsHiddenFromAllInputs(source->getIdentifier(), name, message))
+         return;
+   }
+
    if (mListener)
    {
-      MidiDevice::SendMidiMessage(mListener, mDeviceInInfo.name.toRawUTF8(), message);
+      MidiDevice::SendMidiMessage(mListener, name.toRawUTF8(), message);
 
       if (gPrintMidiInput)
-         ofLog() << mDeviceInInfo.name << " " << message.getDescription();
+         ofLog() << name << " " << message.getDescription();
    }
 }
 

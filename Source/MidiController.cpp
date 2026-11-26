@@ -1768,7 +1768,7 @@ void MidiController::LoadControllerLayout(std::string filename)
             mOutChannel = mLayoutData["outchannel"].asInt();
             mModuleSaveData.SetInt("outchannel", mOutChannel);
          }
-         if (!mLayoutData["outdevice"].isNull())
+         if (!mLayoutData["outdevice"].isNull() && mDeviceIn != MidiDevice::kAllInputsName) //"all input" never sends output
          {
             mDeviceOut = mLayoutData["outdevice"].asString();
             mModuleSaveData.SetString("deviceout", mDeviceOut);
@@ -1988,7 +1988,7 @@ void MidiController::LoadControllerLayout(std::string filename)
 
 void MidiController::OnDeviceChanged()
 {
-   if (!mDeviceIn.empty())
+   if (!mDeviceIn.empty() && mDeviceIn != MidiDevice::kAllInputsName)
    {
       std::string filename = mDeviceIn + ".json";
       ofStringReplace(filename, "/", "");
@@ -2304,6 +2304,7 @@ std::vector<std::string> MidiController::GetAvailableInputDevices()
          devices.push_back(d.name.toStdString());
    }
 
+   devices.push_back(MidiDevice::kAllInputsName);
    devices.push_back("keyboard");
    devices.push_back("monome");
    devices.push_back("osccontroller");
@@ -2375,6 +2376,8 @@ void MidiController::ConnectDevice()
          break;
       }
    }
+   if (deviceInName == MidiDevice::kAllInputsName)
+      hasOutput = false;
    mDeviceIn = deviceInName;
    mDeviceOut = hasOutput ? deviceOutName : "";
    mModuleSaveData.SetString("devicein", mDeviceIn);
