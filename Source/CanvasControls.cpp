@@ -43,7 +43,6 @@ void CanvasControls::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mRemoveElementButton = new ClickButton(this, "delete", 5, 1);
    mNumVisibleRowsEntry = new TextEntry(this, "view rows", 175, 1, 3, &mCanvas->mNumVisibleRows, 1, 9999);
-   mClearButton = new ClickButton(this, "clear", 270, 1);
    mDragModeSelector = new DropdownList(this, "drag mode", 310, 1, (int*)(&mCanvas->mDragMode));
 
    mDragModeSelector->AddLabel("drag both", Canvas::kDragBoth);
@@ -55,7 +54,6 @@ void CanvasControls::CreateUIControls()
    // Block modulator cables from connecting to these controls.
    mRemoveElementButton->SetCableTargetable(false);
    mNumVisibleRowsEntry->SetCableTargetable(false);
-   mClearButton->SetCableTargetable(false);
    mDragModeSelector->SetCableTargetable(false);
    mNumVisibleRowsEntry->SetCableTargetable(false);
 
@@ -117,7 +115,6 @@ void CanvasControls::DrawModule()
    ofPopStyle();
    mRemoveElementButton->Draw();
    mNumVisibleRowsEntry->Draw();
-   mClearButton->Draw();
    mDragModeSelector->Draw();
    if (mSelectedElement)
    {
@@ -189,10 +186,6 @@ void CanvasControls::ButtonClicked(ClickButton* button, double time)
          }
          mCanvas->RemoveElement(element);
       }
-   }
-   if (button == mClearButton)
-   {
-      mCanvas->Clear();
    }
 
    std::vector<CanvasElement*> elements = mCanvas->GetElements(); //make a copy of the list, since I may modify the list through the actions below

@@ -31,12 +31,13 @@
 #include "Canvas.h"
 #include "Slider.h"
 #include "DropdownList.h"
+#include "ClickButton.h"
 
 class CanvasControls;
 class CanvasTimeline;
 class CanvasScrollbar;
 
-class SampleCanvas : public IDrawableModule, public IAudioSource, public ICanvasListener, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener
+class SampleCanvas : public IDrawableModule, public IAudioSource, public ICanvasListener, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener
 {
 public:
    SampleCanvas();
@@ -67,6 +68,7 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal, double time) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal, double time) override;
    void DropdownUpdated(DropdownList* list, int oldVal, double time) override;
+   void ButtonClicked(ClickButton* button, double time) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -94,4 +96,5 @@ private:
    int mNumMeasures{ 4 };
    NoteInterval mInterval{ NoteInterval::kInterval_1n };
    DropdownList* mIntervalSelector{ nullptr };
+   ClickButton* mClearButton{ nullptr };
 };

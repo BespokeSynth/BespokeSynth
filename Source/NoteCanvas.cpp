@@ -65,6 +65,7 @@ void NoteCanvas::CreateUIControls()
    mFreeRecordCheckbox = new Checkbox(this, "free rec", 90, 5, &mFreeRecord);
    mNumMeasuresSlider = new IntSlider(this, "measures", 5, 25, 100, 15, &mNumMeasures, 1, 16);
    mShowIntervalsCheckbox = new Checkbox(this, "show chord intervals", 160, 25, &mShowIntervals);
+   mClearButton = new ClickButton(this, "clear", 295, 25);
 
    mIntervalSelector = new DropdownList(this, "interval", 110, 25, (int*)(&mInterval));
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -1210,6 +1211,7 @@ void NoteCanvas::DrawModule()
    mQuantizeButton->Draw();
    mSaveMidiButton->Draw();
    mLoadMidiButton->Draw();
+   mClearButton->Draw();
    mLoadMidiTrackEntry->Draw();
    //mClipButton->Draw();
    mPlayCheckbox->Draw();
@@ -1526,6 +1528,9 @@ void NoteCanvas::ButtonClicked(ClickButton* button, double time)
 
    if (button == mSaveMidiButton)
       SaveMidi();
+
+   if (button == mClearButton)
+      mCanvas->Clear();
 }
 
 void NoteCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)

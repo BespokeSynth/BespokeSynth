@@ -68,6 +68,7 @@ void EventCanvas::CreateUIControls()
    mNumMeasuresEntry = new TextEntry(this, "measures", 5, 5, 3, &mNumMeasures, 1, 999);
    mIntervalSelector = new DropdownList(this, "interval", 110, 5, (int*)(&mInterval));
    mRecordCheckbox = new Checkbox(this, "record", 220, 5, &mRecord);
+   mClearButton = new ClickButton(this, "clear", 280, 5);
 
    mNumMeasuresEntry->DrawLabel(true);
 
@@ -270,6 +271,7 @@ void EventCanvas::DrawModule()
    mNumMeasuresEntry->Draw();
    mIntervalSelector->Draw();
    mRecordCheckbox->Draw();
+   mClearButton->Draw();
 
    ofRectangle canvasRect = mCanvas->GetRect(true);
    for (int i = 0; i < mControlCables.size(); ++i)
@@ -356,6 +358,9 @@ void EventCanvas::ButtonClicked(ClickButton* button, double time)
          }
       }
    }
+
+   if (button == mClearButton)
+      mCanvas->Clear();
 }
 
 void EventCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal, double time)

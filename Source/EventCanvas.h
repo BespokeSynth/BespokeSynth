@@ -96,6 +96,7 @@ private:
    TextEntry* mNumMeasuresEntry{ nullptr };
    int mNumMeasures{ 1 };
    ClickButton* mQuantizeButton{ nullptr };
+   ClickButton* mClearButton{ nullptr };
    NoteInterval mInterval{ NoteInterval::kInterval_16n };
    DropdownList* mIntervalSelector{ nullptr };
    float mPosition{ 0 };

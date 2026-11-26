@@ -76,7 +76,6 @@ private:
    CanvasElement* mSelectedElement{ nullptr };
    ClickButton* mRemoveElementButton{ nullptr };
    TextEntry* mNumVisibleRowsEntry{ nullptr };
-   ClickButton* mClearButton{ nullptr };
    float mDummyFloat{ 0 };
    int mDummyInt{ 0 };
    DropdownList* mDragModeSelector{ nullptr };
