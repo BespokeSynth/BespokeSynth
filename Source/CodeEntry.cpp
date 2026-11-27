@@ -1331,7 +1331,7 @@ ofVec2f CodeEntry::GetLinePos(int lineNum, bool end, bool published /*= true*/)
    {
       std::string str = published ? mPublishedString : mString;
       auto lines = ofSplitString(str, "\n");
-      if (lineNum < (int)lines.size())
+      if (lineNum >= 0 && lineNum < (int)lines.size())
          x += lines[lineNum].length() * mCharWidth;
    }
 

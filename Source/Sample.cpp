@@ -164,10 +164,14 @@ bool Sample::Write(const char* path /*=nullptr*/)
 bool Sample::WriteDataToFile(const std::string& path, float** data, int numSamples, int channels)
 {
    auto wavFormat = std::make_unique<juce::WavAudioFormat>();
-   juce::File outputFile(ofToSamplePath(path));
+   //relative paths here are things like "recordings/..." and "loops/...", which live in the data folder rather than the samples folder
+   juce::File outputFile(ofToDataPath(path));
    outputFile.create();
    auto outputTo = outputFile.createOutputStream();
    assert(outputTo != nullptr);
+   //createOutputStream() appends to an existing file, so clear it out to overwrite instead
+   outputTo->setPosition(0);
+   outputTo->truncate();
    bool b1{ false };
    auto writer = std::unique_ptr<juce::AudioFormatWriter>(
    wavFormat->createWriterFor(outputTo.release(), gSampleRate, channels, UserPrefs.output_wav_bit_depth.Get(), b1, 0));

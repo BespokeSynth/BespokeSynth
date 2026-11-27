@@ -52,6 +52,14 @@ void PulseDelayer::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    mDelaySlider = new FloatSlider(this, "delay", 4, 4, 100, 15, &mDelay, 0, 1, 4);
+   mDelayMsSlider = new FloatSlider(this, "delay ms", 4, 4, 100, 15, &mDelayMs, 0, 500);
+}
+
+float PulseDelayer::GetDelayMs() const
+{
+   if (mDelayInMs)
+      return mDelayMs;
+   return mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
 }
 
 void PulseDelayer::DrawModule()
@@ -59,9 +67,12 @@ void PulseDelayer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   mDelaySlider->SetShowing(!mDelayInMs);
+   mDelayMsSlider->SetShowing(mDelayInMs);
    mDelaySlider->Draw();
+   mDelayMsSlider->Draw();
 
-   float t = (gTime - mLastPulseTime) / (mDelay * TheTransport->GetDuration(kInterval_1n));
+   float t = (gTime - mLastPulseTime) / GetDelayMs();
    if (t > 0 && t < 1)
    {
       ofPushStyle();
@@ -115,7 +126,7 @@ void PulseDelayer::OnPulse(double time, float velocity, int flags)
    {
       PulseInfo info;
       info.mVelocity = velocity;
-      info.mTriggerTime = time + mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
+      info.mTriggerTime = time + GetDelayMs();
       info.mFlags = flags;
       mInputPulses[mAppendIndex] = info;
       mAppendIndex = (mAppendIndex + 1) % kQueueSize;
@@ -129,6 +140,7 @@ void PulseDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal, double 
 void PulseDelayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("delay_in_milliseconds", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -136,4 +148,5 @@ void PulseDelayer::LoadLayout(const ofxJSONElement& moduleInfo)
 void PulseDelayer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mDelayInMs = mModuleSaveData.GetBool("delay_in_milliseconds");
 }

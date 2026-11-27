@@ -4174,6 +4174,9 @@ void ModularSynth::SaveOutput()
    outputFile.create();
    auto outputTo = outputFile.createOutputStream();
    assert(outputTo != nullptr);
+   //createOutputStream() appends to an existing file, so clear it out to overwrite instead
+   outputTo->setPosition(0);
+   outputTo->truncate();
    bool b1{ false };
    auto writer = std::unique_ptr<juce::AudioFormatWriter>(wavFormat->createWriterFor(outputTo.release(), gSampleRate, channels, UserPrefs.output_wav_bit_depth.Get(), b1, 0));
 

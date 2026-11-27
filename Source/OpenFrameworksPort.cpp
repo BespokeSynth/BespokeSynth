@@ -65,7 +65,7 @@ std::string ofToSamplePath(const std::string& path)
    if (!path.empty() && (path[0] == '.' || juce::File::isAbsolutePath(path)))
       return path;
 
-   auto result = ofToDataPath(path);
+   auto result = ofToDataPath(""); //path gets appended at the end, after the samples folder
 
    auto samplesPath = UserPrefs.samples_path.Get();
    if (samplesPath.empty())
