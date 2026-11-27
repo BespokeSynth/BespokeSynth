@@ -985,11 +985,21 @@ void Snapshots::SetUpFromSaveData()
          DeleteSnapshot(i);
 
       auto* control = mSnapshotControls[0];
-      for (int i = 0; i < control->GetNumValues(); ++i)
+      int numValues = control->GetNumValues();
+      if (numValues > (int)mSnapshotCollection.size())
+         ResizeSnapshotCollection(numValues); //make room for one snapshot per value
+      for (int i = 0; i < numValues; ++i)
       {
+         //use the control's actual i-th value: dropdown values aren't necessarily indices (e.g. an oscillator's "mult" goes -8..8)
+         float value = i;
+         if (auto* dropdown = dynamic_cast<DropdownList*>(control))
+            value = dropdown->GetElement(i).mValue;
+         else if (auto* intSlider = dynamic_cast<IntSlider*>(control))
+            value = intSlider->GetMin() + i;
+
          StoreSnapshot(i, false);
-         mSnapshotCollection[i].mLabel = control->GetDisplayValue(i - 1);
-         mSnapshotCollection[i].mSnapshots.begin()->mValue = i - 1;
+         mSnapshotCollection[i].mLabel = control->GetDisplayValue(value);
+         mSnapshotCollection[i].mSnapshots.begin()->mValue = value;
       }
    }
 

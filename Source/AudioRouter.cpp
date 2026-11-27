@@ -169,9 +169,14 @@ void AudioRouter::SetUpFromSaveData()
    }
    else if (numItems < oldNumItems)
    {
+      //the audio thread walks mDestinationCables, so don't pull them out from under it
+      ScopedMutex mutex(TheSynth->GetAudioMutex(), "AudioRouter::SetUpFromSaveData()");
+
+      mRouteIndex = std::min(mRouteIndex, numItems - 1);
       for (int i = oldNumItems - 1; i >= numItems; --i)
       {
          mRouteSelector->RemoveLabel(i);
+         mDestinationCables[i]->Clear(); //disconnect properly first, so the audio graph forgets the cable before it's deleted
          RemovePatchCableSource(mDestinationCables[i]);
       }
       mDestinationCables.resize(numItems);
