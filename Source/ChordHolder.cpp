@@ -58,6 +58,8 @@ void ChordHolder::Stop(double time)
          PlayNoteOutput(NoteMessage(time, i, 0));
          mNotePlaying[i] = false;
       }
+      if (!mNoteInputHeld[i])
+         mLatchedChord[i] = false;
    }
 }
 
@@ -96,7 +98,14 @@ void ChordHolder::PlayNote(NoteMessage note)
                anyInputNotesHeld = true;
          }
 
-         if (!anyInputNotesHeld) //new input, clear any existing output
+         if (mOnlyPlayWhenPulsed)
+         {
+            //latch the new chord, but keep the current one sounding until the next pulse
+            if (!anyInputNotesHeld)
+               mLatchedChord.fill(false);
+            mLatchedChord[note.pitch] = true;
+         }
+         else if (!anyInputNotesHeld) //new input, clear any existing output
          {
             for (int i = 0; i < 128; ++i)
             {
@@ -144,7 +153,7 @@ void ChordHolder::OnPulse(double time, float velocity, int flags)
          mNotePlaying[i] = false;
       }
 
-      if (mNoteInputHeld[i])
+      if (mNoteInputHeld[i] || (mOnlyPlayWhenPulsed && mLatchedChord[i]))
       {
          PlayNoteOutput(NoteMessage(time, i, velocity * 127));
          mNotePlaying[i] = true;

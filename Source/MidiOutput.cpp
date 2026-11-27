@@ -102,6 +102,9 @@ void MidiOutputModule::PlayNote(NoteMessage note)
 
    mDevice.SendNote(note.time, note.pitch, note.velocity, false, channel);
 
+   if (channel >= 1 && channel <= 16 && note.pitch >= 0 && note.pitch < 128)
+      mHeldNotes[channel - 1][note.pitch] = note.velocity > 0;
+
    int modIdx = channel - 1;
    if (note.voiceIdx == -1)
       modIdx = kGlobalModulationIdx;
@@ -150,7 +153,29 @@ void MidiOutputModule::OnTransportAdvanced(float amount)
 
 void MidiOutputModule::DropdownUpdated(DropdownList* list, int oldVal, double time)
 {
+   FlushHeldNotes(); //release notes on the old device before switching
    mDevice.ConnectOutput(mControllerIndex);
+}
+
+void MidiOutputModule::Exit()
+{
+   IDrawableModule::Exit();
+   FlushHeldNotes();
+}
+
+void MidiOutputModule::FlushHeldNotes()
+{
+   for (int channel = 0; channel < (int)mHeldNotes.size(); ++channel)
+   {
+      for (int pitch = 0; pitch < 128; ++pitch)
+      {
+         if (mHeldNotes[channel][pitch])
+         {
+            mDevice.SendNote(gTime, pitch, 0, false, channel + 1);
+            mHeldNotes[channel][pitch] = false;
+         }
+      }
+   }
 }
 
 void MidiOutputModule::DropdownClicked(DropdownList* list)

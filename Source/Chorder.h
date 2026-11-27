@@ -80,13 +80,26 @@ private:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
 
+   struct ChordOutput
+   {
+      int pitch{ 0 };
+      int voice{ -1 };
+      float velocityScale{ 1 };
+   };
+
    void PlayChorderNote(NoteMessage note);
    void CheckLeftovers();
+   std::vector<ChordOutput> ComputeChord(int inputPitch, int inputVoice) const;
+   void UpdateHeldChords(double time);
+   void ClearHeldNotes();
 
    UIGrid* mChordGrid{ nullptr };
    int mVelocity{ 0 };
    bool mInputNotes[TOTAL_NUM_NOTES]{};
    int mHeldCount[TOTAL_NUM_NOTES]{};
+   //the output notes each held input note produced, so we release exactly those even if the chord shape changes in the meantime
+   std::vector<ChordOutput> mHeldChordOutputs[TOTAL_NUM_NOTES];
+   NoteMessage mHeldInputNotes[TOTAL_NUM_NOTES];
 
    bool mDiatonic{ false };
    int mChordIndex{ 0 };

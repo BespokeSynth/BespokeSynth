@@ -72,6 +72,7 @@ private:
 
    std::array<bool, 128> mNoteInputHeld{ false };
    std::array<bool, 128> mNotePlaying{ false };
+   std::array<bool, 128> mLatchedChord{ false }; //"pulse to play" replays this chord on each pulse until stop is pressed
 
    ClickButton* mStopButton{ nullptr };
    bool mOnlyPlayWhenPulsed{ false };
