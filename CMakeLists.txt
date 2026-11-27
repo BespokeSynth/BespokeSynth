@@ -56,6 +56,21 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif ()
 
+# use ccache for faster rebuilds when it's installed (only affects Makefile/Ninja generators).
+# an explicitly set CMAKE_<LANG>_COMPILER_LAUNCHER takes priority.
+option(BESPOKE_USE_CCACHE "Use ccache to speed up rebuilds, if it is installed" ON)
+if(BESPOKE_USE_CCACHE)
+    find_program(BESPOKE_CCACHE_PROGRAM ccache)
+    if(BESPOKE_CCACHE_PROGRAM)
+        foreach(lang C CXX)
+            if(NOT CMAKE_${lang}_COMPILER_LAUNCHER)
+                set(CMAKE_${lang}_COMPILER_LAUNCHER "${BESPOKE_CCACHE_PROGRAM}")
+            endif()
+        endforeach()
+        message(STATUS "Using ccache: ${BESPOKE_CCACHE_PROGRAM}")
+    endif()
+endif()
+
 project(BespokeSynth VERSION 1.3.0 LANGUAGES C CXX ASM)
 
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
