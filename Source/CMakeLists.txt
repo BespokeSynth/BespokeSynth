@@ -1124,6 +1124,16 @@ if(NOT BESPOKE_ANDROID) # on android, gradle packages resource/ into the apk as 
 endif()
 bespoke_make_portable(BespokeSynth)
 
+# local mac builds are ad-hoc signed, so macOS treats every rebuild as a new app and asks for documents/microphone access again.
+# signing with a stable identity (e.g. -DBESPOKE_DEV_SIGN_AS="Apple Development") lets those permissions stick across rebuilds.
+# this has to come after bespoke_make_portable(), since bundling python rewrites the executable and invalidates its signature.
+set(BESPOKE_DEV_SIGN_AS "" CACHE STRING "Code signing identity for local macOS dev builds, so privacy permissions persist across rebuilds")
+if(APPLE AND BESPOKE_DESKTOP AND BESPOKE_DEV_SIGN_AS AND NOT BESPOKE_SIGN_AS AND NOT CMAKE_GENERATOR STREQUAL "Xcode")
+    add_custom_command(TARGET BespokeSynth POST_BUILD VERBATIM
+        COMMAND codesign --force --sign "${BESPOKE_DEV_SIGN_AS}" "$<TARGET_BUNDLE_DIR:BespokeSynth>"
+        )
+endif()
+
 # Rules to do some installing and packaging which we will have to refactor  but
 # for now gets a nightly going
 set(BESPOKE_NIGHTLY_DIR "${CMAKE_BINARY_DIR}/nightly")
