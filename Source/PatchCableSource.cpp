@@ -357,6 +357,16 @@ void PatchCableSource::Render()
             }
          }
 
+         if (PatchCable::sActivePatchCable != nullptr && VectorContains(PatchCable::sActivePatchCable, mPatchCables))
+         {
+            ofPushStyle();
+            ofSetColor(ofColor::white);
+            ofSetLineWidth(1);
+            ofNoFill();
+            ofCircle(cableX, cableY, PatchCableSourceRadius());
+            ofPopStyle();
+         }
+
          if (mType == kConnectionType_Grid)
          {
             ofPushStyle();
