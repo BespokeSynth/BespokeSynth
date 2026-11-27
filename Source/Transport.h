@@ -236,6 +236,7 @@ private:
    bool mWantSetRandomTempo{ false };
    float mNudgeFactor{ 0 };
    double mSeekMsAfterJump{ 0.0 };
+   bool mSuppressEventsBeforeJump{ false }; //after a reset, don't fire the old measure's remaining events while waiting for the jump to the downbeat
 
    std::list<TransportListenerInfo> mListeners;
    std::list<IAudioPoller*> mAudioPollers;
