@@ -242,6 +242,7 @@ pulsegate~control if pulses are allowed through
 
 pulsedelayer~delay pulses
 ~delay~time to delay, in fractions of a measure
+~delay ms~time to delay, in milliseconds. enable "delay_in_milliseconds" in the module's menu to use this instead of "delay"
 
 
 

@@ -36,11 +36,10 @@ void NoteDisplayer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   bool* notes = mNoteOutput.GetNotes();
    float y = 14;
    for (int i = 0; i < 128; ++i)
    {
-      if (notes[i])
+      if (IsNoteActive(i))
       {
          DrawNoteName(i, y);
          y += 13;
@@ -59,8 +58,26 @@ void NoteDisplayer::DrawNoteName(int pitch, float y) const
 void NoteDisplayer::PlayNote(NoteMessage note)
 {
    PlayNoteOutput(note);
-   mVelocities[note.pitch] = note.velocity;
-   mVoiceIds[note.pitch] = note.voiceIdx;
+
+   if (note.pitch < 0 || note.pitch >= 128)
+      return;
+
+   if (note.velocity > 0)
+   {
+      mVelocities[note.pitch] = note.velocity;
+      mVoiceIds[note.pitch] = note.voiceIdx;
+      mNoteOnTimes[note.pitch] = note.time;
+      mNoteOffTimes[note.pitch] = std::numeric_limits<double>::max();
+   }
+   else
+   {
+      mNoteOffTimes[note.pitch] = note.time;
+   }
+}
+
+bool NoteDisplayer::IsNoteActive(int pitch) const
+{
+   return mNoteOffTimes[pitch] > mNoteOnTimes[pitch] && gTime >= mNoteOnTimes[pitch] && gTime < mNoteOffTimes[pitch];
 }
 
 void NoteDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)

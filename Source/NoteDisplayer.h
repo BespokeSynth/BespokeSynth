@@ -54,6 +54,11 @@ private:
 
    void DrawNoteName(int pitch, float y) const;
 
+   bool IsNoteActive(int pitch) const;
+
    int mVelocities[128]{};
    int mVoiceIds[128]{};
+   //notes can arrive scheduled in the future (e.g. notecreator sends an on and its timed off together), so track when they actually start and stop
+   double mNoteOnTimes[128]{};
+   double mNoteOffTimes[128]{};
 };

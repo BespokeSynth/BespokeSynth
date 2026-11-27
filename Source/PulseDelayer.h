@@ -77,8 +77,13 @@ private:
       height = 22;
    }
 
+   float GetDelayMs() const;
+
+   bool mDelayInMs{ false };
    float mDelay{ .25 };
    FloatSlider* mDelaySlider{ nullptr };
+   float mDelayMs{ 100 };
+   FloatSlider* mDelayMsSlider{ nullptr };
 
    float mLastPulseTime{ 0 };
 

@@ -1391,19 +1391,48 @@ std::string ScriptModule::GetMethodPrefix()
    return prefix;
 }
 
+namespace
+{
+   //replace occurrences of "from" that start a new identifier, so "me." doesn't match inside "time." or "obj.me."
+   void ReplaceIdentifier(std::string& code, const std::string& from, const std::string& to)
+   {
+      size_t pos = 0;
+      while ((pos = code.find(from, pos)) != std::string::npos)
+      {
+         bool startsIdentifier = true;
+         if (pos > 0)
+         {
+            char prev = code[pos - 1];
+            if (std::isalnum(static_cast<unsigned char>(prev)) || prev == '_' || prev == '.')
+               startsIdentifier = false;
+         }
+
+         if (startsIdentifier)
+         {
+            code.replace(pos, from.length(), to);
+            pos += to.length();
+         }
+         else
+         {
+            pos += from.length();
+         }
+      }
+   }
+}
+
 void ScriptModule::FixUpCode(std::string& code)
 {
    std::string prefix = GetMethodPrefix();
-   ofStringReplace(code, "on_pulse(", "on_pulse__" + prefix + "(");
-   ofStringReplace(code, "on_note(", "on_note__" + prefix + "(");
-   ofStringReplace(code, "on_grid_button(", "on_grid_button__" + prefix + "(");
-   ofStringReplace(code, "on_osc(", "on_osc__" + prefix + "(");
-   ofStringReplace(code, "on_midi(", "on_midi__" + prefix + "(");
-   ofStringReplace(code, "on_sysex(", "on_sysex__" + prefix + "(");
-   ofStringReplace(code, "on_ableton_grid_control(", "on_ableton_grid_control__" + prefix + "(");
-   ofStringReplace(code, "update_ableton_grid_leds(", "update_ableton_grid_leds__" + prefix + "(");
-   ofStringReplace(code, "this.", GetThisName() + ".");
-   ofStringReplace(code, "me.", GetThisName() + ".");
+   ReplaceIdentifier(code, "on_pulse(", "on_pulse__" + prefix + "(");
+   ReplaceIdentifier(code, "on_note(", "on_note__" + prefix + "(");
+   ReplaceIdentifier(code, "on_grid_button(", "on_grid_button__" + prefix + "(");
+   ReplaceIdentifier(code, "on_osc(", "on_osc__" + prefix + "(");
+   ReplaceIdentifier(code, "on_midi(", "on_midi__" + prefix + "(");
+   ReplaceIdentifier(code, "on_sysex(", "on_sysex__" + prefix + "(");
+   ReplaceIdentifier(code, "on_ableton_grid_control(", "on_ableton_grid_control__" + prefix + "(");
+   ReplaceIdentifier(code, "update_ableton_grid_leds(", "update_ableton_grid_leds__" + prefix + "(");
+   ReplaceIdentifier(code, "this.", GetThisName() + ".");
+   ReplaceIdentifier(code, "me.", GetThisName() + ".");
 }
 
 void ScriptModule::GetFirstAndLastCharacter(std::string line, char& first, char& last)

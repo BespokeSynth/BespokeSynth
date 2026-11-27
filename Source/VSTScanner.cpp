@@ -197,6 +197,46 @@ void CustomPluginListComponent::OnResize()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace
+{
+   //add folders from the VST_PATH/VST3_PATH environment variables to the plugin scan paths.
+   //this runs every time so the variables apply even after a search path has been saved by a previous scan.
+   void AddSearchPathsFromEnvironment(juce::AudioPluginFormatManager& formatManager, juce::PropertiesFile& properties)
+   {
+#if JUCE_WINDOWS
+      const juce::String separator = ";";
+#else
+      const juce::String separator = ":";
+#endif
+
+      for (auto* format : formatManager.getFormats())
+      {
+         juce::String envVar;
+         if (format->getName() == "VST")
+            envVar = "VST_PATH";
+         else if (format->getName() == "VST3")
+            envVar = "VST3_PATH";
+         else
+            continue;
+
+         juce::String envValue = juce::SystemStats::getEnvironmentVariable(envVar, {});
+         if (envValue.trim().isEmpty())
+            continue;
+
+         juce::FileSearchPath searchPath = juce::PluginListComponent::getLastSearchPath(properties, *format);
+         int numPathsBefore = searchPath.getNumPaths();
+         for (const auto& folder : juce::StringArray::fromTokens(envValue, separator, ""))
+         {
+            if (folder.trim().isNotEmpty())
+               searchPath.addIfNotAlreadyThere(juce::File::getCurrentWorkingDirectory().getChildFile(folder.trim())); //handles ~ and relative paths without asserting
+         }
+
+         if (searchPath.getNumPaths() != numPathsBefore)
+            juce::PluginListComponent::setLastSearchPath(properties, *format, searchPath);
+      }
+   }
+}
+
 PluginListWindow::PluginListWindow(juce::AudioPluginFormatManager& pluginFormatManager, WindowCloseListener* listener)
 : juce::DocumentWindow("Plugin Manager",
                        juce::LookAndFeel::getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
@@ -211,6 +251,10 @@ PluginListWindow::PluginListWindow(juce::AudioPluginFormatManager& pluginFormatM
    TheSynth->GetKnownPluginList().setCustomScanner(nullptr);
 #else
    TheSynth->GetKnownPluginList().setCustomScanner(std::make_unique<CustomPluginScanner>());
+#endif
+
+#if !BESPOKE_IOS
+   AddSearchPathsFromEnvironment(pluginFormatManager, *getAppProperties().getUserSettings());
 #endif
 
    mComponent = new CustomPluginListComponent(pluginFormatManager,
