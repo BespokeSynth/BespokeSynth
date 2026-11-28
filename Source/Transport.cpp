@@ -140,6 +140,7 @@ void Transport::Advance(double ms)
       if (mQueuedMeasure != -1)
       {
          SetMeasure(mQueuedMeasure);
+         mSuppressEventsBeforeJump = false;
 
          if (mSeekMsAfterJump != 0.0)
          {
@@ -303,10 +304,15 @@ void Transport::DrawModule()
 
 void Transport::Reset(bool timeSensitive /*= false*/)
 {
+   //listeners fire events ahead of time (event lookahead, plus up to a buffer), so park far enough before the jump that the downbeat's
+   //events haven't already been passed. parking right at the jump made sequencers skip their first step after a reset
+   double preRollMeasures = (GetEventLookaheadMs() + gBufferSizeMs) / MsPerBar() + .0001;
+   preRollMeasures = std::min(preRollMeasures, .9999);
    if (mLoopEndMeasure != -1)
-      mMeasureTime = mLoopEndMeasure - .0001f;
+      mMeasureTime = mLoopEndMeasure - preRollMeasures;
    else
-      mMeasureTime = .9999f;
+      mMeasureTime = 1 - preRollMeasures;
+   mSuppressEventsBeforeJump = true; //...but don't play the tail of the measure we parked in
 
    if (timeSensitive) //try to line up downbeat with when user actually gave this input
       mSeekMsAfterJump = gBufferSizeMs;
@@ -705,6 +711,8 @@ void Transport::UpdateListeners(double jumpMs)
             int newStep = GetQuantized(checkTime, &info, &remainderMs);
             bool oldJumped = IsPastQueuedMeasureJump(checkTime - jumpMs);
             bool newJumped = IsPastQueuedMeasureJump(checkTime);
+            if (mSuppressEventsBeforeJump && !newJumped)
+               continue;
             if (oldStep != newStep ||
                 oldJumped != newJumped)
             {
