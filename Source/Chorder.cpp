@@ -106,18 +106,7 @@ void Chorder::DrawModule()
 
 void Chorder::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
 {
-   if (!mDiatonic)
-      return; //TODO(Ryan)
-
-   int tone = col + (mChordGrid->GetRows() / 2 - row) * mChordGrid->GetCols();
-   if (value > 0 && oldValue == 0)
-   {
-      AddTone(tone, value * value);
-   }
-   else if (value == 0 && oldValue > 0)
-   {
-      RemoveTone(tone);
-   }
+   UpdateHeldChords(NextBufferTime(false));
 }
 
 void Chorder::AddTone(int tone, float velocity)
@@ -125,15 +114,7 @@ void Chorder::AddTone(int tone, float velocity)
    mChordGrid->SetVal((tone + mChordGrid->GetCols() * 10) % mChordGrid->GetCols(),
                       mChordGrid->GetRows() - 1 - (tone + (mChordGrid->GetRows() / 2 * mChordGrid->GetCols())) / mChordGrid->GetCols(),
                       sqrtf(velocity), !K(notifyListeners));
-   for (int i = 0; i < TOTAL_NUM_NOTES; ++i)
-   {
-      if (mInputNotes[i])
-      {
-         int chordtone = tone + TheScale->GetToneFromPitch(i);
-         int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(NoteMessage(NextBufferTime(false), outPitch, mVelocity * velocity));
-      }
-   }
+   UpdateHeldChords(NextBufferTime(false));
 }
 
 void Chorder::RemoveTone(int tone)
@@ -141,15 +122,106 @@ void Chorder::RemoveTone(int tone)
    mChordGrid->SetVal((tone + mChordGrid->GetCols() * 10) % mChordGrid->GetCols(),
                       mChordGrid->GetRows() - 1 - (tone + (mChordGrid->GetRows() / 2 * mChordGrid->GetCols())) / mChordGrid->GetCols(),
                       0, !K(notifyListeners));
-   for (int i = 0; i < TOTAL_NUM_NOTES; ++i)
+   UpdateHeldChords(NextBufferTime(false));
+}
+
+std::vector<Chorder::ChordOutput> Chorder::ComputeChord(int inputPitch, int inputVoice) const
+{
+   std::vector<ChordOutput> outputs;
+   int idx = 0;
+   // iterate rows from bottom to top to go from lowest to highest note
+   // for compatibility with arpeggiator and strummer
+   for (int row = mChordGrid->GetRows() - 1; row >= 0; --row)
    {
-      if (mInputNotes[i])
+      for (int col = 0; col < mChordGrid->GetCols(); ++col)
       {
-         int chordtone = tone + TheScale->GetToneFromPitch(i);
-         int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(NoteMessage(NextBufferTime(false), outPitch, 0));
+         float val = mChordGrid->GetVal(col, row);
+         if (val > 0)
+         {
+            int gridPosition = col + (mChordGrid->GetRows() / 2 - row) * mChordGrid->GetCols();
+            ChordOutput output;
+            output.voice = (inputVoice == -1) ? -1 : (inputVoice + idx) % 16;
+            output.velocityScale = val * val;
+
+            if (!mDiatonic)
+            {
+               output.pitch = inputPitch + gridPosition;
+            }
+            else if (gridPosition % TheScale->NumTonesInScale() == 0) //if this is the pressed note or an octave of it
+            {
+               //play the pressed note (might not be in scale, so play it directly)
+               int octave = gridPosition / TheScale->NumTonesInScale();
+               output.pitch = inputPitch + TheScale->GetPitchesPerOctave() * octave;
+            }
+            else
+            {
+               int tone = gridPosition + TheScale->GetToneFromPitch(inputPitch);
+               output.pitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(tone));
+            }
+
+            outputs.push_back(output);
+            ++idx;
+         }
       }
    }
+   return outputs;
+}
+
+//the chord shape changed, so release tones that are no longer in the chord and play new ones, for every held input note
+void Chorder::UpdateHeldChords(double time)
+{
+   if (!mEnabled)
+      return;
+
+   for (int i = 0; i < TOTAL_NUM_NOTES; ++i)
+   {
+      if (!mInputNotes[i])
+         continue;
+
+      const NoteMessage& input = mHeldInputNotes[i];
+      std::vector<ChordOutput> newOutputs = ComputeChord(i, input.voiceIdx);
+      std::vector<ChordOutput>& oldOutputs = mHeldChordOutputs[i];
+
+      std::vector<bool> newMatched(newOutputs.size(), false);
+      std::vector<ChordOutput> kept;
+      for (const auto& oldOutput : oldOutputs)
+      {
+         bool found = false;
+         for (size_t j = 0; j < newOutputs.size(); ++j)
+         {
+            if (!newMatched[j] && newOutputs[j].pitch == oldOutput.pitch)
+            {
+               newMatched[j] = true;
+               found = true;
+               break;
+            }
+         }
+         if (found)
+            kept.push_back(oldOutput);
+         else
+            PlayChorderNote(NoteMessage(time, oldOutput.pitch, 0, oldOutput.voice, input.modulation));
+      }
+
+      for (size_t j = 0; j < newOutputs.size(); ++j)
+      {
+         if (!newMatched[j])
+         {
+            int velocity = std::max(1, (int)(input.velocity * newOutputs[j].velocityScale));
+            PlayChorderNote(NoteMessage(time, newOutputs[j].pitch, velocity, newOutputs[j].voice, input.modulation));
+            kept.push_back(newOutputs[j]);
+         }
+      }
+
+      oldOutputs = kept;
+   }
+}
+
+void Chorder::ClearHeldNotes()
+{
+   std::memset(mHeldCount, 0, TOTAL_NUM_NOTES * sizeof(int));
+   std::memset(mInputNotes, 0, TOTAL_NUM_NOTES * sizeof(bool));
+   for (auto& outputs : mHeldChordOutputs)
+      outputs.clear();
 }
 
 void Chorder::OnClicked(float x, float y, bool right)
@@ -178,6 +250,7 @@ bool Chorder::MouseMoved(float x, float y)
 void Chorder::OnScaleChanged()
 {
    mChordGrid->SetGrid(mDiatonic ? TheScale->NumTonesInScale() : TheScale->GetPitchesPerOctave(), 3);
+   UpdateHeldChords(NextBufferTime(false));
 }
 
 void Chorder::CheckboxUpdated(Checkbox* checkbox, double time)
@@ -185,8 +258,7 @@ void Chorder::CheckboxUpdated(Checkbox* checkbox, double time)
    if (checkbox == mEnabledCheckbox)
    {
       mNoteOutput.Flush(time);
-      std::memset(mHeldCount, 0, TOTAL_NUM_NOTES * sizeof(int));
-      std::memset(mInputNotes, 0, TOTAL_NUM_NOTES * sizeof(bool));
+      ClearHeldNotes();
    }
 
    if (checkbox == mDiatonicCheckbox)
@@ -194,6 +266,7 @@ void Chorder::CheckboxUpdated(Checkbox* checkbox, double time)
       mChordDropdown->SetShowing(!mDiatonic);
       mInversionDropdown->SetShowing(!mDiatonic);
       mChordGrid->SetGrid(mDiatonic ? TheScale->NumTonesInScale() : TheScale->GetPitchesPerOctave(), 3);
+      UpdateHeldChords(time);
    }
 }
 
@@ -207,8 +280,9 @@ void Chorder::DropdownUpdated(DropdownList* dropdown, int oldVal, double time)
       {
          int row = 2 - ((val + TheScale->GetPitchesPerOctave()) / TheScale->GetPitchesPerOctave());
          int col = (val + TheScale->GetPitchesPerOctave()) % TheScale->GetPitchesPerOctave();
-         mChordGrid->SetVal(col, row, 1);
+         mChordGrid->SetVal(col, row, 1, !K(notifyListeners));
       }
+      UpdateHeldChords(time);
    }
 }
 
@@ -220,49 +294,31 @@ void Chorder::PlayNote(NoteMessage note)
       return;
    }
 
+   if (note.pitch < 0 || note.pitch >= TOTAL_NUM_NOTES)
+      return;
+
    bool noteOn = note.velocity > 0;
    if (mInputNotes[note.pitch] == noteOn)
       return;
    mInputNotes[note.pitch] = noteOn;
 
-   if (note.velocity > 0)
-      mVelocity = note.velocity;
-
-   int idx = 0;
-   // iterate rows from bottom to top to go from lowest to highest note
-   // for compatibility with arpeggiator and strummer
-   for (int row = mChordGrid->GetRows() - 1; row >= 0; --row)
+   if (noteOn)
    {
-      for (int col = 0; col < mChordGrid->GetCols(); ++col)
+      mVelocity = note.velocity;
+      mHeldInputNotes[note.pitch] = note;
+      mHeldChordOutputs[note.pitch] = ComputeChord(note.pitch, note.voiceIdx);
+      for (const auto& output : mHeldChordOutputs[note.pitch])
       {
-         float val = mChordGrid->GetVal(col, row);
-         if (val > 0)
-         {
-            int gridPosition = col + (mChordGrid->GetRows() / 2 - row) * mChordGrid->GetCols();
-            int voice = (note.voiceIdx == -1) ? -1 : (note.voiceIdx + idx) % 16;
-            int outPitch;
-
-            if (!mDiatonic)
-            {
-               outPitch = note.pitch + gridPosition;
-            }
-            else if (gridPosition % TheScale->NumTonesInScale() == 0) //if this is the pressed note or an octave of it
-            {
-               //play the pressed note (might not be in scale, so play it directly)
-               int octave = gridPosition / TheScale->NumTonesInScale();
-               outPitch = note.pitch + TheScale->GetPitchesPerOctave() * octave;
-            }
-            else
-            {
-               int tone = gridPosition + TheScale->GetToneFromPitch(note.pitch);
-               outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(tone));
-            }
-
-            PlayChorderNote(NoteMessage(note.time, outPitch, note.velocity * val * val, voice, note.modulation));
-
-            ++idx;
-         }
+         int velocity = std::max(1, (int)(note.velocity * output.velocityScale));
+         PlayChorderNote(NoteMessage(note.time, output.pitch, velocity, output.voice, note.modulation));
       }
+   }
+   else
+   {
+      //release exactly the notes this input started, even if the chord shape has changed since
+      for (const auto& output : mHeldChordOutputs[note.pitch])
+         PlayChorderNote(NoteMessage(note.time, output.pitch, 0, output.voice, note.modulation));
+      mHeldChordOutputs[note.pitch].clear();
    }
    CheckLeftovers();
 }

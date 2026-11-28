@@ -344,7 +344,8 @@ void MidiController::OnTransportAdvanced(float amount)
       }
       else
       {
-         playTime = gTime + (note->mTimestampMs - firstNoteTimestampMs);
+         //clamp to one buffer, so a backlog (e.g. from while audio was paused) doesn't get replayed spread out over time
+         playTime = gTime + std::min(note->mTimestampMs - firstNoteTimestampMs, gBufferSizeMs);
          if (playTime <= lastPlayTime)
             playTime += .01; //hack to handle note on/off in the same frame
       }
@@ -402,6 +403,11 @@ void MidiController::OnMidiNote(MidiNote& note)
    }
 
    MidiReceived(kMidiMessage_Note, note.mPitch, note.mVelocity / 127.0f, note.mVelocity, note.mChannel);
+
+   //the queue only drains while audio is running, so don't let note-ons pile up while paused and then all play at once on resume.
+   //note-offs still get queued, so notes held when pausing don't get stuck.
+   if (TheSynth->IsAudioPaused() && note.mVelocity > 0)
+      return;
 
    mQueuedMessageMutex.lock();
    mQueuedNotes.push_back(note);

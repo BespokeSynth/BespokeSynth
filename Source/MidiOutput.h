@@ -26,6 +26,7 @@
 #pragma once
 
 #include "MidiDevice.h"
+#include <array>
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
 #include "DropdownList.h"
@@ -46,6 +47,7 @@ public:
    void CreateUIControls() override;
 
    void Init() override;
+   void Exit() override;
 
    void PlayNote(NoteMessage note) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
@@ -64,6 +66,7 @@ public:
 private:
    void InitController();
    void BuildControllerList();
+   void FlushHeldNotes();
 
    //IDrawableModule
    void DrawModule() override;
@@ -92,4 +95,7 @@ private:
    };
 
    std::vector<ChannelModulations> mChannelModulations;
+
+   //notes currently on at the device, per midi channel, so they can be released if this module goes away
+   std::array<std::array<bool, 128>, 16> mHeldNotes{};
 };
