@@ -54,7 +54,7 @@ public:
    void SetMode(LFOMode mode) { mMode = mode; }
    float CalculatePhase(int samplesIn = 0, bool doTransform = true) const;
    Oscillator* GetOsc() { return &mOsc; }
-   void SetFreeRate(float rate) { mFreeRate = rate; }
+   void SetFreeRate(float rate, double time = -1);
    void SetLength(float length) { mLength = length; }
    float TransformPhase(float phase) const;
    void ResetPhase(double time);
@@ -74,6 +74,8 @@ private:
    Ramp mRandom;
    float mDrunk{ 0 };
    double mFreePhase{ 0 };
+   int mFreePhaseSample{ 0 }; //sample within the current buffer that mFreePhase is measured at, moved when the free rate changes mid-buffer
+   float mPendingFreeRate{ 1 }; //rate to switch to at the start of the next buffer
    double mPhaseResetTime{ 0.0 };
    float mFreeRate{ 1 };
    float mLength{ 1 };

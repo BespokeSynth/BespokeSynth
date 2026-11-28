@@ -145,5 +145,5 @@ void TremoloEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal, double
    if (slider == mDutySlider)
       mLFO.SetPulseWidth(mDuty);
    if (slider == mFreeRateSlider)
-      mLFO.SetFreeRate(mFreeRate);
+      mLFO.SetFreeRate(mFreeRate, time);
 }

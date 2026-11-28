@@ -512,7 +512,7 @@ void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal
    if (slider == mShuffleSlider)
       mLFO.GetOsc()->SetShuffle(mLFOSettings.mShuffle);
    if (slider == mFreeRateSlider)
-      mLFO.SetFreeRate(mLFOSettings.mFreeRate);
+      mLFO.SetFreeRate(mLFOSettings.mFreeRate, time);
    if (slider == mLengthSlider)
       mLFO.SetLength(mLFOSettings.mLength);
    if (slider == mMinSlider)
