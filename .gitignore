@@ -409,3 +409,6 @@ run_cmake*.bat
 run_cmake*.sh
 
 scripts/installer_macOS/Bespoke-Mac.dmg
+
+# Korean patch package output (korean_patch/make_package.sh)
+BespokeSynth-Korean-Patch.zip

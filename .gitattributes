@@ -1,2 +1,7 @@
 # Convert line endings to match the system style
 * text=auto
+
+# Korean patch scripts: keep Windows scripts CRLF and shell scripts LF in every checkout
+korean_patch/*.bat text eol=crlf
+korean_patch/*.ps1 text eol=crlf
+korean_patch/*.sh text eol=lf
