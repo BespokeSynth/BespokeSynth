@@ -27,6 +27,8 @@
 #include "SynthGlobals.h"
 #include "UserPrefs.h"
 
+#include <algorithm>
+
 RollingBuffer::RollingBuffer(int sizeInSamples)
 : mBuffer(sizeInSamples)
 {
@@ -45,7 +47,14 @@ float RollingBuffer::GetSample(int samplesAgo, int channel)
 
 void RollingBuffer::ReadChunk(float* dst, int size, int samplesAgo, int channel)
 {
-   assert(size <= Size());
+   if (size > Size())
+   {
+      //asking for more than we hold (e.g. an audio buffer size bigger than this buffer): the oldest part isn't available, so it's silence
+      int extra = size - Size();
+      std::fill(dst, dst + extra, 0.0f);
+      dst += extra;
+      size = Size();
+   }
 
    int offset = mOffsetToNow[channel] - samplesAgo;
    if (offset < 0)
@@ -71,7 +80,12 @@ void RollingBuffer::Accum(int samplesAgo, float sample, int channel)
 
 void RollingBuffer::WriteChunk(float* samples, int size, int channel)
 {
-   assert(size < Size());
+   if (size > Size())
+   {
+      //more samples than we can hold (e.g. an audio buffer size bigger than this buffer), so only keep the newest ones
+      samples += size - Size();
+      size = Size();
+   }
 
    int wrapSamples = (mOffsetToNow[channel] + size) - Size();
    if (wrapSamples <= 0) //no wraparound
