@@ -75,6 +75,9 @@ private:
    Ramp mPanRamp;
    FloatSlider* mPanSlider{ nullptr };
    float mWiden{ 0 };
+   float mLastWiden{ 0 };
    FloatSlider* mWidenSlider{ nullptr };
    RollingBuffer mWidenerBuffer{ 2048 };
+   std::vector<float> mWidenOld;
+   std::vector<float> mWidenNew;
 };

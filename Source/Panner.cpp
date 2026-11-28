@@ -85,15 +85,54 @@ void Panner::Process(double time)
 
    ChannelBuffer* out = target->GetBuffer();
 
-   if (abs(mWiden) > 0)
+   //always keep the history up to date, so turning widen on doesn't read stale audio
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      mWidenerBuffer.WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+
+   if (mWiden != 0 || mLastWiden != 0)
    {
-      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
-         mWidenerBuffer.WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
-      if (mWiden < 0)
-         mWidenerBuffer.ReadChunk(secondChannel, GetBuffer()->BufferSize(), abs(mWiden), (GetBuffer()->NumActiveChannels() == 1) ? 0 : 1);
-      else
-         mWidenerBuffer.ReadChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), abs(mWiden), 0);
+      //widen delays one side. when the amount changes, crossfade from the old delay to the new one across this buffer, instead of jumping (which clicks)
+      int bufferSize = GetBuffer()->BufferSize();
+      if ((int)mWidenOld.size() < bufferSize)
+      {
+         mWidenOld.resize(bufferSize);
+         mWidenNew.resize(bufferSize);
+      }
+
+      for (int side = 0; side < 2; ++side)
+      {
+         float* dest = (side == 0) ? GetBuffer()->GetChannel(0) : secondChannel;
+         int sourceChannel = (side == 0 || GetBuffer()->NumActiveChannels() == 1) ? 0 : 1;
+         bool oldDelaysThisSide = (side == 0) ? mLastWiden > 0 : mLastWiden < 0;
+         bool newDelaysThisSide = (side == 0) ? mWiden > 0 : mWiden < 0;
+         if (!oldDelaysThisSide && !newDelaysThisSide)
+            continue;
+
+         if (oldDelaysThisSide)
+            mWidenerBuffer.ReadChunk(mWidenOld.data(), bufferSize, (int)abs(mLastWiden), sourceChannel);
+         else
+            BufferCopy(mWidenOld.data(), dest, bufferSize);
+
+         if (newDelaysThisSide)
+            mWidenerBuffer.ReadChunk(mWidenNew.data(), bufferSize, (int)abs(mWiden), sourceChannel);
+         else
+            BufferCopy(mWidenNew.data(), dest, bufferSize);
+
+         if (mLastWiden == mWiden)
+         {
+            BufferCopy(dest, mWidenNew.data(), bufferSize);
+         }
+         else
+         {
+            for (int i = 0; i < bufferSize; ++i)
+            {
+               float blend = .5f - .5f * cosf(FPI * float(i + 1) / bufferSize); //raised cosine, so the fade itself has no corners
+               dest[i] = mWidenOld[i] * (1 - blend) + mWidenNew[i] * blend;
+            }
+         }
+      }
    }
+   mLastWiden = mWiden;
 
    mPanRamp.Start(time, mPan, time + gBufferSizeMs);
    for (int i = 0; i < GetBuffer()->BufferSize(); ++i)
