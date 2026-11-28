@@ -47,7 +47,7 @@ float LFO::CalculatePhase(int samplesIn /*= 0*/, bool doTransform /* = true*/) c
    float ret;
    if (mPeriod == kInterval_Free)
    {
-      ret = mFreePhase + float(samplesIn) / gSampleRate * mFreeRate;
+      ret = mFreePhase + float(samplesIn - mFreePhaseSample) / gSampleRate * mFreeRate;
    }
    else
    {
@@ -197,7 +197,8 @@ void LFO::OnTransportAdvanced(float amount)
    }
    if (mPeriod == kInterval_Free || mOsc.GetType() == kOsc_Perlin)
    {
-      mFreePhase += mFreeRate * amount * TheTransport->MsPerBar() / 1000;
+      double elapsedSamples = amount * TheTransport->MsPerBar() / 1000 * gSampleRate;
+      mFreePhase += mFreeRate * (elapsedSamples - mFreePhaseSample) / gSampleRate;
       double wrap = mOsc.GetShuffle() > 0 ? 2 : 1;
       if (mFreePhase > wrap || mFreePhase < 0)
       {
@@ -206,10 +207,31 @@ void LFO::OnTransportAdvanced(float amount)
             OnTimeEvent(gTime);
       }
    }
+   mFreePhaseSample = 0;
+   mFreeRate = mPendingFreeRate;
+}
+
+//when the free rate changes partway through a buffer, keep the phase continuous by measuring it from the sample where the change happened.
+//otherwise the whole elapsed part of the buffer gets re-scaled by the new rate, which makes the lfo jump (and click)
+void LFO::SetFreeRate(float rate, double time /*= -1*/)
+{
+   mPendingFreeRate = rate;
+
+   //changes from other threads (UI, slider polling) wait until the next buffer starts, since their sample position doesn't line up with the audio thread's
+   if (!IsAudioThread() || rate == mFreeRate)
+      return;
+
+   int sample = 0;
+   if (time >= 0)
+      sample = ofClamp((int)round((time - gTime) / gInvSampleRateMs), 0, gBufferSize);
+   mFreePhase += float(sample - mFreePhaseSample) / gSampleRate * mFreeRate;
+   mFreePhaseSample = sample;
+   mFreeRate = rate;
 }
 
 void LFO::ResetPhase(double time)
 {
+   mFreePhaseSample = 0;
    mFreePhase = 1 - mPhaseOffset;
    mAdjustOffset = 0;
    mAdjustOffset = CalculatePhase() + mPhaseOffset;
