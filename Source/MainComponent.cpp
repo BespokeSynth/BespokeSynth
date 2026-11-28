@@ -719,8 +719,7 @@ public:
          startTimerHz(UserPrefs.target_framerate.Get());
       }
 
-      juce::Point<int> mouse = Desktop::getMousePosition();
-      mouse -= mScreenPosition;
+      juce::Point<int> mouse = GetPointerPosition();
       mSynth.MouseMoved(mouse.x, mouse.y);
 
       float width = getWidth();
@@ -850,6 +849,29 @@ private:
       return true;
    }
 
+   void SetTouchPointer(juce::Point<float> position)
+   {
+      auto mouseScreenPos = Desktop::getInstance().getMainMouseSource().getScreenPosition();
+      mMouseScreenXAtTouch = mouseScreenPos.x;
+      mMouseScreenYAtTouch = mouseScreenPos.y;
+      mTouchPointerX = position.x;
+      mTouchPointerY = position.y;
+      mUseTouchPointer = true;
+   }
+
+   //the pointer position in component space: the clicking touch if there is one, otherwise the mouse
+   juce::Point<int> GetPointerPosition()
+   {
+      auto mouseScreenPos = Desktop::getInstance().getMainMouseSource().getScreenPosition();
+      if (mUseTouchPointer)
+      {
+         if (mouseScreenPos.x == mMouseScreenXAtTouch && mouseScreenPos.y == mMouseScreenYAtTouch)
+            return juce::Point<float>(mTouchPointerX, mTouchPointerY).roundToInt();
+         mUseTouchPointer = false; //the mouse moved, so it's the pointer again
+      }
+      return mouseScreenPos.roundToInt() - mScreenPosition;
+   }
+
    bool IsIgnoredTouch(const MouseEvent& e) const
    {
       return std::find(mIgnoredTouches.begin(), mIgnoredTouches.end(), e.source.getIndex()) != mIgnoredTouches.end();
@@ -936,6 +958,7 @@ private:
 #if BESPOKE_IOS
          mClickTouchIsPointer = IOSPointerInput::WasLastPressFromPointer();
 #endif
+         SetTouchPointer(e.position);
       }
       mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), GetMouseButton(e), e.source);
    }
@@ -959,6 +982,8 @@ private:
 #if BESPOKE_IOS
          mClickTouchIsPointer = false;
 #endif
+         SetTouchPointer(e.position);
+         mSynth.MouseMoved(e.getPosition().x, e.getPosition().y);
       }
       mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, GetMouseButton(e), e.source);
    }
@@ -972,6 +997,9 @@ private:
          if (e.source.getIndex() != mClickTouch.mSourceIndex)
             return;
          mClickTouch.mPosition = e.position;
+         //MouseDragged reads the synth's pointer position, so update it from the touch first
+         SetTouchPointer(e.position);
+         mSynth.MouseMoved(e.getPosition().x, e.getPosition().y);
       }
       mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, GetMouseButton(e), e.source);
    }
@@ -1222,6 +1250,13 @@ private:
    NavigationTouch mClickTouch{ -1, {} }; //the touch currently acting as the mouse, if any (bespoke only handles one pointer)
    bool mClickTouchAlwaysClicks{ false };
    std::vector<int> mIgnoredTouches; //extra touches that bespoke can't handle while a click is underway
+   //where the last clicking touch was, used as the pointer position instead of the main mouse source until the real mouse moves.
+   //on windows the main mouse source is the actual mouse, which doesn't follow touches. written on the message thread, read on the render thread
+   std::atomic<bool> mUseTouchPointer{ false };
+   std::atomic<float> mTouchPointerX{ 0 };
+   std::atomic<float> mTouchPointerY{ 0 };
+   std::atomic<float> mMouseScreenXAtTouch{ 0 };
+   std::atomic<float> mMouseScreenYAtTouch{ 0 };
    bool mHasInitialized{ false }; //initialise() has run once, see there
 #if BESPOKE_ANDROID
    int mAndroidDeviceBufferSize{ 0 }; //see ChooseAndroidDeviceBufferSize()
